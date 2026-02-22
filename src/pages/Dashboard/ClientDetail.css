@@ -1,0 +1,171 @@
+.su-client-detail-dashboard {
+    display: flex;
+    flex-direction: column;
+}
+
+.su-header-with-back {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.su-back-btn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-main);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.su-back-btn:hover {
+    background-color: var(--bg-main);
+}
+
+.su-ml-2 {
+    margin-left: 0.5rem;
+}
+
+.su-header-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.su-client-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.su-metric-card-large {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 380px;
+}
+
+.su-card-header-icon {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.su-card-header-icon .su-section-title {
+    margin-bottom: 0;
+}
+
+.su-chart-wrapper-med {
+    flex: 1;
+    width: 100%;
+}
+
+/* Adherence Custom Visuals */
+.su-adherence-stats {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.su-adherence-circle-wrap {
+    width: 200px;
+    height: 200px;
+}
+
+.su-circular-chart {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 250px;
+}
+
+.su-circle-bg {
+    fill: none;
+    stroke: var(--bg-main);
+    stroke-width: 2.5;
+}
+
+.su-circle-main {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    animation: progress 1s ease-out forwards;
+}
+
+@keyframes progress {
+    0% {
+        stroke-dasharray: 0 100;
+    }
+}
+
+.su-percentage {
+    fill: var(--text-main);
+    font-family: inherit;
+    font-size: 0.6em;
+    font-weight: 700;
+    text-anchor: middle;
+}
+
+.su-adherence-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.su-legend-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.su-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.su-legend-dot.primary {
+    background-color: var(--primary);
+}
+
+.su-legend-dot.error {
+    background-color: var(--error);
+}
+
+.su-legend-dot.warning {
+    background-color: var(--warning);
+}
+
+.su-legend-label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.su-legend-val {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+@media (max-width: 1024px) {
+    .su-client-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .su-metric-card-large {
+        min-height: 320px;
+    }
+
+    .su-adherence-stats {
+        flex-direction: column;
+        gap: 2rem;
+    }
+}

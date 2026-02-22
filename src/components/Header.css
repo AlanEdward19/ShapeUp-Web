@@ -1,0 +1,184 @@
+.su-header {
+    height: 72px;
+    background-color: var(--bg-main);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* Session Title (shown in header during active workout) */
+.su-header-session {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.875rem;
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    border-radius: var(--radius-md);
+}
+
+.su-header-session-icon {
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.su-header-session-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--primary);
+    white-space: nowrap;
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.su-header-search {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 1rem;
+    width: 320px;
+    transition: all var(--transition-fast);
+}
+
+.su-header-search:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.su-header-icon {
+    color: var(--text-muted);
+    margin-right: 0.5rem;
+}
+
+.su-search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    color: var(--text-main);
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.875rem;
+}
+
+/* Header Actions */
+.su-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.su-view-toggle {
+    display: flex;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.25rem;
+}
+
+.su-toggle-btn {
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.su-toggle-btn.active {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: var(--shadow-soft);
+}
+
+.su-icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.su-icon-btn:hover,
+.su-icon-btn.active {
+    color: var(--text-main);
+}
+
+/* Wrapper for positioning the dropdown relative to the bell */
+.su-notif-wrapper {
+    position: relative;
+}
+
+.su-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background-color: var(--error);
+    color: white;
+    font-size: 0.625rem;
+    font-weight: 700;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid var(--bg-main);
+}
+
+/* Profile Menu */
+.su-profile-menu {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.su-avatar {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    overflow: hidden;
+}
+
+.su-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.su-profile-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.su-profile-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.su-profile-role {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}

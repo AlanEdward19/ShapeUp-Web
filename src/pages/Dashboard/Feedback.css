@@ -1,0 +1,304 @@
+.su-feedback-dashboard {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 80px);
+    /* Fill remaining height excluding header */
+}
+
+.su-inbox-layout {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex: 1;
+    min-height: 0;
+    /* Important for scrollable children */
+}
+
+/* Sidebar Inbox List */
+.su-inbox-sidebar {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.su-inbox-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.su-inbox-search {
+    flex: 1;
+    padding: 0.5rem;
+    width: 100%;
+}
+
+.su-inbox-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.su-inbox-item {
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    border-left: 3px solid transparent;
+}
+
+.su-inbox-item:hover {
+    background-color: var(--bg-main);
+}
+
+.su-inbox-item.active {
+    background-color: var(--bg-main);
+    border-left-color: var(--primary);
+}
+
+.su-inbox-item.unread .su-inbox-name {
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.su-inbox-item.unread .su-inbox-subject {
+    font-weight: 600;
+}
+
+.su-inbox-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.su-inbox-client {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.su-inbox-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+
+.su-inbox-avatar.large {
+    width: 44px;
+    height: 44px;
+    font-size: 1.125rem;
+}
+
+.su-inbox-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.su-inbox-time {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+}
+
+.su-inbox-item-subject {
+    font-size: 0.875rem;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.su-inbox-type-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.su-inbox-preview {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.su-inbox-attachment-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background-color: var(--border-color);
+    color: var(--text-muted);
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: var(--radius-sm);
+    margin-top: 0.5rem;
+}
+
+/* Thread Detailed View */
+.su-inbox-thread {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.su-thread-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.su-thread-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.su-thread-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.su-thread-subject {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+}
+
+.su-thread-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.su-dot-separator {
+    color: var(--border-color);
+}
+
+.su-thread-body {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    background-color: var(--bg-main);
+}
+
+.su-message-bubble {
+    max-width: 80%;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    box-shadow: var(--shadow-sm);
+}
+
+.su-message-bubble.client {
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    align-self: flex-start;
+    border-bottom-left-radius: 2px;
+}
+
+.su-message-bubble.coach {
+    background-color: var(--primary);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 2px;
+}
+
+.su-thread-media-attachment {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.su-fake-video-player {
+    background-color: var(--bg-main);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.su-fake-video-player:hover {
+    background-color: var(--border-color);
+}
+
+.su-thread-reply-box {
+    padding: 1.5rem;
+    background-color: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+}
+
+.su-reply-textarea {
+    width: 100%;
+    min-height: 100px;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: var(--text-main);
+    resize: vertical;
+    outline: none;
+    margin-bottom: 1rem;
+}
+
+.su-reply-textarea:focus {
+    border-color: var(--primary);
+}
+
+.su-reply-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.su-thread-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 2rem;
+}
+
+.su-empty-icon {
+    color: var(--border-color);
+    margin-bottom: 1rem;
+}

@@ -1,0 +1,12 @@
+@import './styles/design-system.css';
+
+/* Minimal utility classes can go here, though most styles should be tied to components */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.w-full {
+  width: 100%;
+}

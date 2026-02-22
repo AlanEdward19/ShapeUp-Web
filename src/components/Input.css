@@ -1,0 +1,50 @@
+.su-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    margin-bottom: 1rem;
+}
+
+.su-input-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+    text-align: left;
+}
+
+.su-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--text-main);
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    outline: none;
+}
+
+.su-input::placeholder {
+    color: var(--text-muted);
+}
+
+.su-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.su-input-error {
+    border-color: var(--error);
+}
+
+.su-input-error:focus {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.su-input-error-text {
+    font-size: 0.75rem;
+    color: var(--error);
+    text-align: left;
+}

@@ -1,0 +1,244 @@
+.su-reports-dashboard {
+    display: flex;
+    flex-direction: column;
+}
+
+.su-reports-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Generator Card */
+.su-reports-generator {
+    padding: 1.5rem;
+}
+
+.su-generator-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.su-generator-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.su-generator-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 800px;
+}
+
+.su-form-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.su-flex-1 {
+    flex: 1;
+}
+
+.su-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.su-form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.su-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.su-select {
+    appearance: none;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+}
+
+.su-select:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.su-select.su-full-width {
+    width: 100%;
+}
+
+.su-select-icon {
+    position: absolute;
+    right: 1rem;
+    pointer-events: none;
+    color: var(--text-muted);
+}
+
+/* Format Toggles — custom buttons, no native radio quirks */
+.su-format-toggles {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.su-format-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    line-height: 1;
+}
+
+.su-format-btn .su-format-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+}
+
+.su-format-btn.active {
+    border-color: var(--primary);
+    color: var(--primary);
+    background-color: rgba(37, 99, 235, 0.06);
+}
+
+.su-format-btn.active .su-format-dot {
+    border-color: var(--primary);
+    background-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.su-format-btn:hover:not(.active) {
+    border-color: var(--text-muted);
+    color: var(--text-main);
+}
+
+/* Footer CTA */
+.su-generator-footer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.su-generate-btn {
+    min-width: 200px;
+    justify-content: center;
+}
+
+.su-form-help {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* History Card */
+.su-reports-history {
+    padding: 0;
+    overflow: hidden;
+}
+
+.su-history-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.su-history-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.su-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.su-history-table th {
+    padding: 1rem 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    background-color: var(--bg-main);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.su-history-table td {
+    padding: 1.25rem 1.5rem;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.su-history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.su-history-table tbody tr:hover {
+    background-color: var(--bg-main);
+}
+
+.su-report-type-badge {
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.su-text-right {
+    text-align: right;
+}
+
+.su-font-medium {
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .su-form-row {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}

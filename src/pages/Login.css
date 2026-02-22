@@ -1,0 +1,137 @@
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+/* Subtle background abstract shapes */
+.login-bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: 0;
+    opacity: 0.4;
+}
+
+[data-theme='dark'] .login-bg-shape {
+    opacity: 0.15;
+}
+
+.login-bg-shape-1 {
+    width: 400px;
+    height: 400px;
+    background-color: var(--primary);
+    top: -100px;
+    left: -100px;
+}
+
+.login-bg-shape-2 {
+    width: 300px;
+    height: 300px;
+    background-color: var(--accent);
+    bottom: -50px;
+    right: -50px;
+}
+
+.login-content {
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.login-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.login-logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: -0.025em;
+}
+
+.login-tagline {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+}
+
+.login-card {
+    padding: 2.5rem 2rem;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.password-group {
+    position: relative;
+}
+
+.forgot-password-link {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 0.75rem;
+}
+
+.btn-sign-in {
+    margin-top: 0.5rem;
+    padding: 0.875rem;
+    font-size: 1rem;
+}
+
+.login-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin: 0.5rem 0;
+}
+
+.login-divider::before,
+.login-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.login-divider span {
+    padding: 0 0.75rem;
+}
+
+.btn-google {
+    padding: 0.875rem;
+}
+
+.login-footer-text {
+    margin-top: 2rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.login-footer-text a {
+    font-weight: 500;
+}

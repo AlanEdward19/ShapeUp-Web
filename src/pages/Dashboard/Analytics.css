@@ -1,0 +1,36 @@
+.su-analytics-dashboard {
+    display: flex;
+    flex-direction: column;
+}
+
+.su-analytics-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.su-analytics-charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+}
+
+.su-chart-card {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.su-chart-container-large {
+    flex: 1;
+    min-height: 320px;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .su-analytics-charts-grid {
+        grid-template-columns: 1fr;
+    }
+}

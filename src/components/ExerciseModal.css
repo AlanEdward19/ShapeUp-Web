@@ -1,0 +1,191 @@
+.su-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.su-modal-content {
+    background-color: var(--bg-card);
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-strong);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalScaleIn 0.2s ease-out forwards;
+}
+
+@keyframes modalScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.su-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.su-modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.5rem;
+}
+
+.su-modal-tags {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.su-ex-tag-equipment {
+    font-size: 0.65rem;
+    font-weight: 600;
+    background-color: var(--bg-main);
+    color: var(--text-muted);
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--radius-sm);
+    border: 1px dashed var(--border-color);
+}
+
+.su-modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.su-modal-close:hover {
+    background-color: var(--bg-main);
+    color: var(--error);
+}
+
+.su-modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.su-modal-video-section {
+    padding: 1.5rem;
+    border-right: 1px solid var(--border-color);
+}
+
+.su-video-placeholder {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background-color: #000;
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    cursor: pointer;
+}
+
+.su-video-play-btn {
+    color: var(--primary);
+    opacity: 0.8;
+    transition: all var(--transition-fast);
+}
+
+.su-video-placeholder:hover .su-video-play-btn {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.su-video-hint {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.su-modal-info-section {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.su-info-block h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.su-anatomy-heatmap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.su-anatomy-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.su-anatomy-badge.primary {
+    background-color: rgba(6, 182, 212, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.su-anatomy-badge.secondary {
+    background-color: var(--bg-main);
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+
+.su-execution-list {
+    margin-top: 1rem;
+    padding-left: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+
+.su-execution-list li {
+    margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .su-modal-body {
+        grid-template-columns: 1fr;
+    }
+
+    .su-modal-video-section {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+}
