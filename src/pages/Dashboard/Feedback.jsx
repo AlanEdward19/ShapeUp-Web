@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Search, Filter, MessageSquare, Video, Reply, CheckCircle, Clock } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -53,7 +54,30 @@ const inboxItems = [
 ];
 
 const Feedback = () => {
+    const location = useLocation();
     const [selectedMessage, setSelectedMessage] = useState(inboxItems[0]);
+
+    useEffect(() => {
+        if (location.state && location.state.clientName) {
+            const found = inboxItems.find(item => item.clientName === location.state.clientName);
+            if (found) {
+                setSelectedMessage(found);
+            } else {
+                // If not found in mock list, show a fresh thread state for this client
+                setSelectedMessage({
+                    id: Date.now(),
+                    clientName: location.state.clientName,
+                    clientInitials: location.state.clientName.split(' ').map(n => n[0]).join(''),
+                    type: 'General',
+                    subject: 'New Conversation',
+                    time: 'Just now',
+                    status: 'Read',
+                    preview: 'Start a new conversation...',
+                    videoAttached: false
+                });
+            }
+        }
+    }, [location.state]);
 
     const getTypeColor = (type) => {
         switch (type) {
