@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, MoreVertical, MessageSquare, ExternalLink } from 'lucide-react';
 import Card from '../../components/Card';
@@ -7,8 +7,8 @@ import Input from '../../components/Input';
 import InviteClientModal from '../../components/InviteClientModal';
 import './Clients.css';
 
-// Mock Client Data
-const clientsList = [
+// Mock Client Data - Used as initial state if localStorage is empty
+const initialClientsList = [
     { id: 1, name: 'Mike K.', activePlan: 'Upper Power Phase 1', compliance: 92, lastCheckin: '2 hours ago', status: 'Active' },
     { id: 2, name: 'Sarah J.', activePlan: 'Lower Hypertrophy', compliance: 65, lastCheckin: '4 days ago', status: 'Needs Attention' },
     { id: 3, name: 'David R.', activePlan: 'Full Body Metabolic', compliance: 100, lastCheckin: '1 day ago', status: 'Active' },
@@ -19,6 +19,32 @@ const clientsList = [
 const Clients = () => {
     const navigate = useNavigate();
     const [showInvite, setShowInvite] = useState(false);
+    const [clients, setClients] = useState([]);
+
+    useEffect(() => {
+        const stored = localStorage.getItem('shapeup_clients');
+        if (stored) {
+            setClients(JSON.parse(stored));
+        } else {
+            setClients(initialClientsList);
+            localStorage.setItem('shapeup_clients', JSON.stringify(initialClientsList));
+        }
+    }, []);
+
+    const handleInvite = (email) => {
+        const newClient = {
+            id: Date.now(),
+            name: email, // Will be updated on registration
+            email: email, // Used to match during registration
+            activePlan: '-',
+            compliance: 0,
+            lastCheckin: '-',
+            status: 'Invited'
+        };
+        const updated = [...clients, newClient];
+        setClients(updated);
+        localStorage.setItem('shapeup_clients', JSON.stringify(updated));
+    };
 
     const handleRowClick = (id) => {
         navigate(`/dashboard/clients/${id}`);
@@ -26,11 +52,11 @@ const Clients = () => {
 
     return (
         <div className="su-clients-dashboard">
-            {showInvite && <InviteClientModal onClose={() => setShowInvite(false)} />}
+            {showInvite && <InviteClientModal onClose={() => setShowInvite(false)} onInvite={handleInvite} />}
             <div className="su-dashboard-header-flex">
                 <div>
                     <h1 className="su-page-title">Client Management</h1>
-                    <p className="su-page-subtitle">Directory of your {clientsList.length} active and inactive trainees.</p>
+                    <p className="su-page-subtitle">Directory of your {clients.length} active and inactive trainees.</p>
                 </div>
                 <Button onClick={() => setShowInvite(true)}>Invite New Client</Button>
             </div>
@@ -61,7 +87,7 @@ const Clients = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {clientsList.map(client => (
+                            {clients.map(client => (
                                 <tr
                                     key={client.id}
                                     className="su-clickable-row"
@@ -70,7 +96,11 @@ const Clients = () => {
                                     {/* Client Name/Avatar */}
                                     <td>
                                         <div className="su-client-cell-user">
-                                            <div className="su-client-avatar">{client.name.split(' ').map(n => n[0]).join('')}</div>
+                                            <div className="su-client-avatar">
+                                                {client.name.includes('@')
+                                                    ? client.name.substring(0, 2).toUpperCase()
+                                                    : client.name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()}
+                                            </div>
                                             <span className="su-client-name">{client.name}</span>
                                         </div>
                                     </td>

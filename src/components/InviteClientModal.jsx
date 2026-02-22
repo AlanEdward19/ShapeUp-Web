@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Mail, CheckCircle, Send } from 'lucide-react';
 import './InviteClientModal.css';
 
-const InviteClientModal = ({ onClose }) => {
+const InviteClientModal = ({ onClose, onInvite }) => {
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
     const [error, setError] = useState('');
@@ -20,6 +20,9 @@ const InviteClientModal = ({ onClose }) => {
         }
         setError('');
         setSent(true);
+        if (onInvite) {
+            onInvite(email);
+        }
     };
 
     return (

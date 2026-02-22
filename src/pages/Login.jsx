@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
@@ -80,7 +81,7 @@ const Login = ({ onLogin }) => {
                 </Card>
 
                 <p className="login-footer-text">
-                    Don't have an account? <a href="#">Create account</a>
+                    Don't have an account? <Link to="/register">Create account</Link>
                 </p>
             </div>
         </div>

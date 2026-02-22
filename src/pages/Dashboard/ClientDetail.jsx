@@ -29,23 +29,45 @@ const clientsDB = {
     5: { name: 'Mark T.', goal: 'General Fitness', status: 'Inactive' },
 };
 
-const getClientData = (id) => ({
-    ...clientsDB[id] || { name: `Client #${id}`, goal: 'General Fitness', status: 'Active' },
-    weightProgress: [
-        { week: 'W1', weight: 82.5 }, { week: 'W2', weight: 82.8 },
-        { week: 'W3', weight: 83.1 }, { week: 'W4', weight: 83.5 }, { week: 'W5', weight: 84.0 },
-    ],
-    strengthProgress: [
-        { week: 'W1', load: 110 }, { week: 'W2', load: 112.5 },
-        { week: 'W3', load: 115 }, { week: 'W4', load: 120 }, { week: 'W5', load: 122.5 },
-    ],
-    readinessRadar: [
-        { subject: 'Sleep', A: 80, fullMark: 100 }, { subject: 'Energy', A: 85, fullMark: 100 },
-        { subject: 'Soreness', A: 60, fullMark: 100 }, { subject: 'Stress', A: 40, fullMark: 100 },
-        { subject: 'Nutrition', A: 90, fullMark: 100 },
-    ],
-    adherence: { completed: 18, skipped: 2, partial: 1 },
-});
+const getClientData = (id) => {
+    let baseClient = clientsDB[id];
+
+    // Attempt to override/find from localStorage
+    const stored = localStorage.getItem('shapeup_clients');
+    if (stored) {
+        const clients = JSON.parse(stored);
+        const local = clients.find(c => c.id === id);
+        if (local) {
+            baseClient = { ...baseClient, ...local, goal: local.goal || 'General Fitness' };
+        }
+    }
+
+    if (!baseClient) {
+        baseClient = { name: `Client #${id}`, goal: 'General Fitness', status: 'Active' };
+    }
+
+    // Only apply mock charts if it's one of the original 5 hardcoded ones
+    const hasData = id <= 5;
+
+    return {
+        ...baseClient,
+        weightProgress: hasData ? [
+            { week: 'W1', weight: 82.5 }, { week: 'W2', weight: 82.8 },
+            { week: 'W3', weight: 83.1 }, { week: 'W4', weight: 83.5 }, { week: 'W5', weight: 84.0 },
+        ] : [],
+        strengthProgress: hasData ? [
+            { week: 'W1', load: 110 }, { week: 'W2', load: 112.5 },
+            { week: 'W3', load: 115 }, { week: 'W4', load: 120 }, { week: 'W5', load: 122.5 },
+        ] : [],
+        readinessRadar: hasData ? [
+            { subject: 'Sleep', A: 80, fullMark: 100 }, { subject: 'Energy', A: 85, fullMark: 100 },
+            { subject: 'Soreness', A: 60, fullMark: 100 }, { subject: 'Stress', A: 40, fullMark: 100 },
+            { subject: 'Nutrition', A: 90, fullMark: 100 },
+        ] : [],
+        adherence: hasData ? { completed: 18, skipped: 2, partial: 1 } : { completed: 0, skipped: 0, partial: 0 },
+        hasData
+    };
+};
 
 // Plans + per-plan session history
 const initPlans = [
@@ -588,8 +610,7 @@ const ClientDetail = () => {
     const navigate = useNavigate();
     const client = getClientData(parseInt(id));
 
-    const [activeTab, setActiveTab] = useState('analytics');
-    const [plans, setPlans] = useState(initPlans);
+    const [plans, setPlans] = useState(() => client.hasData ? initPlans : []);
     const [editingPlan, setEditingPlan] = useState(null);
 
     const handleSavePlan = (updated) => {
@@ -669,7 +690,15 @@ const ClientDetail = () => {
             </div>
 
             {/* ── Tab: Analytics ──────────────────────────────────── */}
-            {activeTab === 'analytics' && (
+            {activeTab === 'analytics' && !client.hasData && (
+                <div className="su-client-empty-state su-mt-4" style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-muted)' }}>
+                    <BarChart2 size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
+                    <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>No Data Available</h3>
+                    <p>This client hasn't recorded enough workout sessions yet to generate analytics. Check back later once they start training.</p>
+                </div>
+            )}
+
+            {activeTab === 'analytics' && client.hasData && (
                 <div className="su-client-metrics-grid su-mt-4">
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
