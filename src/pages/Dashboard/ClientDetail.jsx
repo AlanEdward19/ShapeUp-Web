@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, TrendingUp, Activity, Scale, CheckCircle2,
     Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp,
-    GripVertical, X, Save, Settings2, BarChart2, Dumbbell, ClipboardList, History,
-    MessageSquare
+    GripVertical, X, Save, Settings2, BarChart2, Dumbbell, ClipboardList, History
 } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -649,8 +648,10 @@ const ClientDetail = () => {
                         <p className="su-page-subtitle">Goal: <strong>{client.goal}</strong></p>
                     </div>
                 </div>
-                <Button variant="outline" icon={<MessageSquare size={16} />}
-                    onClick={() => navigate('/dashboard/reports', { state: { openChat: { id: parseInt(id), name: client.name } } })}>
+                <Button
+                    variant="outline"
+                    onClick={() => navigate('/dashboard/feedback', { state: { clientName: client.name } })}
+                >
                     Message Client
                 </Button>
             </div>
