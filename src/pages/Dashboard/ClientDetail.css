@@ -169,3 +169,661 @@
         gap: 2rem;
     }
 }
+
+/* ── Tabs ─────────────────────────────────────────────── */
+.su-cp-tabs {
+    display: flex;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0;
+}
+
+.su-cp-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    margin-bottom: -1px;
+}
+
+.su-cp-tab:hover {
+    color: var(--text-main);
+}
+
+.su-cp-tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    font-weight: 600;
+}
+
+.su-cp-section-title {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+/* ── Plans View ───────────────────────────────────────── */
+.su-cp-plans-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.su-cp-plans-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.su-cp-plan-card {
+    padding: 1.25rem 1.5rem;
+}
+
+.su-cp-plan-card.active-plan {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary), var(--shadow-sm);
+}
+
+.su-cp-plan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.875rem;
+}
+
+.su-cp-plan-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.su-active-plan-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    width: fit-content;
+    margin-bottom: 0.1rem;
+}
+
+.su-cp-plan-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.su-cp-plan-meta {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.su-cp-plan-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.su-cp-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.8rem;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    transition: all var(--transition-fast);
+    color: var(--text-muted);
+}
+
+.su-cp-action-btn.edit:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: rgba(37, 99, 235, 0.06);
+}
+
+.su-cp-action-btn.copy:hover {
+    color: #7c3aed;
+    border-color: #7c3aed;
+    background: rgba(124, 58, 237, 0.06);
+}
+
+.su-cp-action-btn.delete {
+    padding: 0.4rem 0.5rem;
+}
+
+.su-cp-action-btn.delete:hover {
+    color: #ef4444;
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.06);
+}
+
+.su-cp-plan-exercises {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+}
+
+.su-cp-ex-chip {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+}
+
+.su-cp-ex-empty {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.su-cp-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    color: var(--text-muted);
+    gap: 1rem;
+    text-align: center;
+}
+
+/* ── Plan Editor ──────────────────────────────────────── */
+.su-plan-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.su-pe-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+}
+
+.su-pe-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.su-pe-name-input {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--text-main);
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0.875rem;
+    outline: none;
+    min-width: 0;
+}
+
+.su-pe-name-input:focus {
+    border-color: var(--primary);
+}
+
+.su-pe-select {
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-md);
+    background: var(--bg-input);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.875rem;
+}
+
+.su-pe-weeks-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.su-pe-weeks-input {
+    width: 52px;
+    padding: 0.5rem 0.5rem;
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-md);
+    background: var(--bg-input);
+    color: var(--text-main);
+    font-family: inherit;
+    text-align: center;
+}
+
+.su-pe-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.su-pe-exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.su-pe-ex-card {
+    padding: 1.25rem;
+}
+
+.su-pe-ex-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.su-pe-ex-name-input {
+    flex: 1;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--text-main);
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--border-color);
+    padding: 0.25rem 0;
+    outline: none;
+}
+
+.su-pe-ex-name-input:focus {
+    border-bottom-color: var(--primary);
+}
+
+/* Sets table */
+.su-pe-sets-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.su-pe-sets-head {
+    display: grid;
+    grid-template-columns: 28px 120px 80px 80px 60px 80px 32px;
+    gap: 0.5rem;
+    padding: 0 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+.su-pe-set-row {
+    display: grid;
+    grid-template-columns: 28px 120px 80px 80px 60px 80px 32px;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.su-pe-set-num {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.su-pe-inline-select,
+.su-pe-inline-input {
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.8rem;
+    font-family: inherit;
+    color: var(--text-main);
+    background: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-sm);
+    outline: none;
+}
+
+.su-pe-inline-select:focus,
+.su-pe-inline-input:focus {
+    border-color: var(--primary);
+}
+
+.su-pe-add-set-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+    padding: 0.4rem 0.875rem;
+    background: none;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.su-pe-add-set-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.su-pe-add-ex-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.875rem;
+    background: none;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.su-pe-add-ex-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: rgba(37, 99, 235, 0.03);
+}
+
+/* ── Session History ──────────────────────────────────── */
+.su-cp-history-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.su-cp-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.su-cp-history-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.su-cp-history-card:hover {
+    border-color: var(--primary);
+    background-color: rgba(37, 99, 235, 0.02);
+}
+
+.su-cp-hist-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.su-cp-hist-date {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.su-cp-hist-plan {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.su-cp-hist-meta {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* ── Session Detail Modal ─────────────────────────────── */
+.su-session-detail-modal {
+    max-width: 580px;
+    max-height: 80vh;
+    overflow-y: auto;
+    gap: 0;
+}
+
+.su-sd-exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.su-sd-ex-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.su-sd-ex-name {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-main);
+    padding-bottom: 0.375rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.su-sd-sets-table {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.su-sd-sets-head {
+    display: grid;
+    grid-template-columns: 40px 90px 80px 80px 80px;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0;
+}
+
+.su-sd-set-row {
+    display: grid;
+    grid-template-columns: 40px 90px 80px 80px 80px;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.375rem 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.8125rem;
+    color: var(--text-main);
+}
+
+.su-sd-set-row:last-child {
+    border-bottom: none;
+}
+
+.su-sd-set-num {
+    font-weight: 700;
+    color: var(--text-muted);
+    text-align: center;
+}
+
+/* Status badges reused in ClientDetail header */
+.su-status-badge.warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.su-status-badge.inactive {
+    background-color: rgba(148, 163, 184, 0.12);
+    color: var(--text-muted);
+    border-color: var(--border-color);
+}
+
+/* ── Per-Plan History Toggle & Rows ──────────────────────── */
+.su-cp-history-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.875rem;
+    padding: 0.375rem 0.75rem;
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.su-cp-history-toggle:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.su-cp-inline-history {
+    margin-top: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.su-cp-hist-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.su-cp-hist-row:last-child {
+    border-bottom: none;
+}
+
+.su-cp-hist-row:hover {
+    background-color: var(--bg-main);
+}
+
+.su-cp-hist-row-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+/* Tags input inside plan editor */
+.su-pe-ex-tags-input {
+    font-size: 0.8rem;
+    font-family: inherit;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed var(--border-color);
+    padding: 0.2rem 0;
+    outline: none;
+    min-width: 180px;
+}
+
+.su-pe-ex-tags-input:focus {
+    border-bottom-color: var(--primary);
+}
+
+/* ── Skipped Exercise Tag ─────────────────────────────────── */
+.su-skipped-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+}
+
+/* ── Delete Confirm Modal ─────────────────────────────────── */
+.su-confirm-modal {
+    max-width: 400px;
+    text-align: center;
+    gap: 0;
+    padding: 2rem;
+}
+
+.su-confirm-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    margin: 0 auto 1.25rem;
+}
+
+.su-confirm-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 0.625rem;
+}
+
+.su-confirm-body {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0 0 1.75rem;
+    line-height: 1.6;
+}
+
+.su-confirm-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
