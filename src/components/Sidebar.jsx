@@ -10,7 +10,8 @@ import {
     Activity,
     MessageCircle,
     MessageSquare,
-    LogOut
+    LogOut,
+    Target
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import ChatDrawer from './ChatDrawer';
@@ -35,6 +36,7 @@ const Sidebar = ({ isProfessional }) => {
     const clientNavItems = [
         { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
         { name: 'My Training', icon: <Activity size={20} />, path: '/dashboard/training' },
+        { name: 'Objectives', icon: <Target size={20} />, path: '/dashboard/objectives' },
         { name: 'Settings', icon: <Settings size={20} />, path: '/dashboard/settings' },
     ];
 

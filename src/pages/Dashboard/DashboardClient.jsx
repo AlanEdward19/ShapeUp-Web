@@ -1,7 +1,9 @@
-import React from 'react';
-import { Target, TrendingUp, Flame, CalendarDays, Award } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
+import React, { useState, useEffect } from 'react';
 import Card from '../../components/Card';
+import Button from '../../components/Button';
+import Input from '../../components/Input';
+import { Activity, Flame, Map, CheckCircle, TrendingUp, ChevronRight, Target, Scale, Trash2, Award, CalendarDays } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import './DashboardClient.css';
 
 const volumeData = [
@@ -16,11 +18,11 @@ const volumeData = [
 
 const DashboardClient = () => {
     return (
-        <div className="su-client-dashboard">
+        <div className="su-dashboard-client">
             <div className="su-dashboard-header-flex">
                 <div>
                     <h1 className="su-page-title">Welcome back, Mike</h1>
-                    <p className="su-page-subtitle">Here is your progress report for this week.</p>
+                    <p className="su-page-subtitle">You have 1 workout scheduled for today.</p>
                 </div>
             </div>
 

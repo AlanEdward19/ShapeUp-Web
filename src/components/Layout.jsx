@@ -5,9 +5,8 @@ import Header from './Header';
 import './Layout.css';
 
 const Layout = () => {
-    // Hoisting the flip-flop state to the Layout level so it can be passed via context or props if needed
-    // In a real app this would likely be in Redux or a Context provider for user roles.
-    const [isProfessional, setIsProfessional] = useState(true);
+    // Determine role based on what was saved during login
+    const isProfessional = localStorage.getItem('shapeup_role') === 'professional';
 
     // Global profile state for the session
     const [coachProfile, setCoachProfile] = useState({ name: 'Coach Alex', avatar: null });
@@ -23,7 +22,6 @@ const Layout = () => {
             <div className="su-layout-main">
                 <Header
                     isProfessional={isProfessional}
-                    onToggleView={setIsProfessional}
                     profile={currentProfile}
                     sessionTitle={sessionTitle}
                 />

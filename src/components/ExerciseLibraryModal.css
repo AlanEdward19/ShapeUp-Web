@@ -1,0 +1,178 @@
+.su-elm-overlay {
+    z-index: 1000;
+}
+
+.su-elm-box {
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+}
+
+.su-elm-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.su-elm-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 0.25rem 0;
+}
+
+.su-elm-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.su-elm-toolbar {
+    padding: 1rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+}
+
+.su-elm-search {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-main);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-md);
+    padding: 0.5rem 0.75rem;
+}
+
+.su-elm-search input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main);
+    width: 100%;
+}
+
+.su-elm-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 1rem;
+    background: var(--bg-main);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-md);
+    color: var(--text-main);
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.su-elm-filter-btn.active {
+    background: rgba(37, 99, 235, 0.1);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.su-elm-filter-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 1.5rem;
+    width: 300px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: 1rem;
+    z-index: 10;
+    margin-top: 0.5rem;
+}
+
+.su-elm-filter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.su-elm-filter-opt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.su-elm-clear-btn {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--error);
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.su-elm-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.su-elm-item {
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.su-elm-item:hover {
+    border-color: var(--primary);
+    background: rgba(37, 99, 235, 0.05);
+}
+
+.su-elm-item-info strong {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+}
+
+.su-elm-item-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.su-elm-tag {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.su-elm-tag.type {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+}
+
+.su-elm-tag.muscle {
+    background: var(--bg-main);
+    color: var(--text-muted);
+}
+
+.su-elm-empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+}

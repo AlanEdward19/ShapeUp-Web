@@ -8,6 +8,25 @@ import './Login.css';
 const Login = ({ onLogin }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        const email = e.target.email.value;
+        const role = email === 'treinador@outlook.com' ? 'professional' : 'client';
+        localStorage.setItem('shapeup_role', role);
+
+        if (role === 'client') {
+            const storedClients = localStorage.getItem('shapeup_clients');
+            let matchedId = 1; // Default to Mike K. for testing
+
+            if (storedClients) {
+                const clients = JSON.parse(storedClients);
+                const match = clients.find(c => c.email === email || c.name.toLowerCase().includes(email.split('@')[0].toLowerCase()));
+                if (match) {
+                    matchedId = match.id;
+                }
+            }
+            localStorage.setItem('shapeup_client_id', matchedId);
+        }
+
         if (onLogin) onLogin();
     };
 

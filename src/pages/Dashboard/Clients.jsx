@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, MoreVertical, MessageSquare, ExternalLink } from 'lucide-react';
+import { Search, Filter, MessageSquare, ExternalLink, Play, Pause, Trash2 } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -20,15 +20,58 @@ const Clients = () => {
     const navigate = useNavigate();
     const [showInvite, setShowInvite] = useState(false);
     const [clients, setClients] = useState([]);
+    const [clientToDelete, setClientToDelete] = useState(null);
 
     useEffect(() => {
-        const stored = localStorage.getItem('shapeup_clients');
-        if (stored) {
-            setClients(JSON.parse(stored));
-        } else {
-            setClients(initialClientsList);
-            localStorage.setItem('shapeup_clients', JSON.stringify(initialClientsList));
-        }
+        const fetchAndComputeClients = () => {
+            let storedClients = localStorage.getItem('shapeup_clients');
+            let clientsList = storedClients ? JSON.parse(storedClients) : initialClientsList;
+
+            // Compute real compliance for each client from their plan history
+            const updatedList = clientsList.map(c => {
+                const storedPlans = localStorage.getItem(`shapeup_client_plans_${c.id}`);
+                let compliance = c.compliance; // fallback to mock
+                let activePlanName = c.activePlan;
+
+                if (storedPlans) {
+                    const plans = JSON.parse(storedPlans);
+                    if (plans.length > 0) {
+                        activePlanName = plans.length === 1 ? plans[0].name : `${plans.length} Active Plans`;
+                    }
+
+                    const allHistory = plans.flatMap(p => p.history || []);
+                    if (allHistory.length > 0) {
+                        let totalEx = 0;
+                        let skippedEx = 0;
+                        allHistory.forEach(h => {
+                            h.exercises.forEach(ex => {
+                                totalEx++;
+                                if (ex.skipped) skippedEx++;
+                            });
+                        });
+                        compliance = totalEx === 0 ? 100 : Math.round(((totalEx - skippedEx) / totalEx) * 100);
+                    } else if (plans.length > 0) {
+                        compliance = 0; // Has plans but no history yet
+                    }
+                }
+
+                let newStatus = c.status;
+                if (c.status === 'Active' && compliance < 70) {
+                    newStatus = 'Needs Attention';
+                } else if (c.status === 'Needs Attention' && compliance >= 70) {
+                    newStatus = 'Active';
+                }
+
+                return { ...c, compliance, activePlan: activePlanName, status: newStatus };
+            });
+
+            setClients(updatedList);
+            if (!storedClients) {
+                localStorage.setItem('shapeup_clients', JSON.stringify(initialClientsList));
+            }
+        };
+
+        fetchAndComputeClients();
     }, []);
 
     const handleInvite = (email) => {
@@ -50,9 +93,65 @@ const Clients = () => {
         navigate(`/dashboard/clients/${id}`);
     };
 
+    const handleToggleStatus = (id, currentStatus) => {
+        const updated = clients.map(c => {
+            if (c.id === id) {
+                let newStatus;
+                if (currentStatus === 'Inactive') {
+                    // When reactivating, restore the correct status based on compliance
+                    newStatus = c.compliance < 70 ? 'Needs Attention' : 'Active';
+                } else {
+                    newStatus = 'Inactive';
+                }
+                return { ...c, status: newStatus };
+            }
+            return c;
+        });
+        setClients(updated);
+        localStorage.setItem('shapeup_clients', JSON.stringify(updated));
+    };
+
+    const handleDeleteClient = (client) => {
+        setClientToDelete(client);
+    };
+
+    const confirmDeleteClient = () => {
+        if (!clientToDelete) return;
+        const updated = clients.filter(c => c.id !== clientToDelete.id);
+        setClients(updated);
+        localStorage.setItem('shapeup_clients', JSON.stringify(updated));
+        setClientToDelete(null);
+    };
+
     return (
         <div className="su-clients-dashboard">
             {showInvite && <InviteClientModal onClose={() => setShowInvite(false)} onInvite={handleInvite} />}
+
+            {/* Delete Confirmation Modal */}
+            {clientToDelete && (
+                <div className="su-modal-overlay" onClick={() => setClientToDelete(null)}>
+                    <div className="su-modal-box su-confirm-modal" onClick={e => e.stopPropagation()}>
+                        <div className="su-confirm-icon">
+                            <Trash2 size={28} />
+                        </div>
+                        <h3 className="su-confirm-title">Delete Client?</h3>
+                        <p className="su-confirm-body">
+                            <strong>"{clientToDelete.name}"</strong> will be permanently removed from your client list. This action cannot be undone.
+                        </p>
+                        <div className="su-confirm-actions">
+                            <Button variant="outline" onClick={() => setClientToDelete(null)}>
+                                Cancel
+                            </Button>
+                            <Button
+                                style={{ background: '#ef4444', borderColor: '#ef4444' }}
+                                onClick={confirmDeleteClient}
+                            >
+                                Delete Client
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="su-dashboard-header-flex">
                 <div>
                     <h1 className="su-page-title">Client Management</h1>
@@ -132,14 +231,21 @@ const Clients = () => {
                                     {/* Actions */}
                                     <td>
                                         <div className="su-table-actions" onClick={(e) => e.stopPropagation()}>
-                                            <button className="su-icon-btn su-text-muted" title="Send Message">
-                                                <MessageSquare size={16} />
-                                            </button>
-                                            <button className="su-icon-btn su-text-muted" title="View Profile">
-                                                <ExternalLink size={16} />
-                                            </button>
-                                            <button className="su-icon-btn su-text-muted">
-                                                <MoreVertical size={16} />
+
+                                            {/* Activate / Deactivate Toggle */}
+                                            {client.status === 'Inactive' ? (
+                                                <button className="su-icon-btn su-text-muted" title="Activate Client" onClick={() => handleToggleStatus(client.id, client.status)}>
+                                                    <Play size={16} />
+                                                </button>
+                                            ) : (
+                                                <button className="su-icon-btn su-text-muted" title="Deactivate Client" onClick={() => handleToggleStatus(client.id, client.status)}>
+                                                    <Pause size={16} />
+                                                </button>
+                                            )}
+
+                                            {/* Delete Action (Warning Color) */}
+                                            <button className="su-icon-btn" style={{ color: 'var(--error)' }} title="Delete Client" onClick={() => handleDeleteClient(client)}>
+                                                <Trash2 size={16} />
                                             </button>
                                         </div>
                                     </td>

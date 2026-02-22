@@ -4,6 +4,8 @@ import { useOutletContext } from 'react-router-dom';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
+import ExerciseModal from '../../components/ExerciseModal';
+import { exercisesDB } from '../../data/mockExercises';
 import './TrainingPlansClient.css';
 
 const formatTime = (totalSeconds) => {
@@ -21,6 +23,9 @@ const ClientView = () => {
 
     // Session State
     const [sessionActive, setSessionActive] = useState(false);
+    const [activePlan, setActivePlan] = useState(null); // The actual plan data structure being run
+    const [assignedPlans, setAssignedPlans] = useState([]);
+    const [viewingExerciseDef, setViewingExerciseDef] = useState(null); // Controls the ExerciseModal
 
     // Global Workout Timer
     const [workoutTime, setWorkoutTime] = useState(0);
@@ -38,26 +43,43 @@ const ClientView = () => {
 
     // Dynamic Sets Data Structure (Simplified for demo)
     // We store arrays of sets for each exercise block
-    const [exercises, setExercises] = useState([
-        {
-            id: 'ex1',
-            name: 'Incline Dumbbell Press',
-            target: 'Chest • Shoulders',
-            sets: [
-                { id: 's1', type: 'warmup', target: '12-15 reps @ RPE 6', completed: false, failure: false, log: { weight: '', reps: '', rpe: '' } },
-                { id: 's2', type: 'working', target: '8-10 reps @ 75%', instruction: 'Cluster Set: Perform 2 reps, rest 15s. Repeat 3 blocks.', completed: false, failure: false, log: { weight: '', reps: '', rpe: '' } },
-                { id: 's3', type: 'topset', target: '5-8 reps @ 85% | RPE 9+', completed: false, failure: false, log: { weight: '40', reps: '6', rpe: '9' } }
-            ]
-        },
-        {
-            id: 'ex2',
-            name: 'Lat Pulldown',
-            target: 'Back',
-            sets: [
-                { id: 's1', type: 'working', target: '10-12 reps @ 70%', instruction: 'Drop Set: Reduce load by 20% for 2 drops.', completed: false, failure: false, log: { weight: '', reps: '', rpe: '' } }
-            ]
+    // Dynamic Sets Data Structure
+    const [exercises, setExercises] = useState([]);
+
+    // -- Fetch Plans from LocalStorage --
+    useEffect(() => {
+        const clientId = localStorage.getItem('shapeup_client_id') || 1;
+        const storedPlans = localStorage.getItem(`shapeup_client_plans_${clientId}`);
+        if (storedPlans) {
+            setAssignedPlans(JSON.parse(storedPlans));
         }
-    ]);
+    }, []);
+
+    // -- Start A Specific Session --
+    const startSessionForPlan = (plan) => {
+        // Map the plan's exercises into the runtime session engine format
+        const runtimeExercises = plan.exercises.map((ex, exIdx) => {
+            return {
+                id: ex.id || `ex_${exIdx}`,
+                name: ex.name,
+                target: ex.tags || 'General',
+                sets: ex.sets.map((s, sIdx) => ({
+                    id: `s_${exIdx}_${sIdx}`,
+                    type: s.type,
+                    target: `${s.reps} reps @ ${s.load}% | RPE ${s.rpe}`,
+                    completed: false,
+                    failure: false,
+                    prescribedRest: s.rest || 90,
+                    log: { weight: '', reps: '', rpe: '' }
+                }))
+            };
+        });
+
+        setExercises(runtimeExercises);
+        setActivePlan(plan);
+        setSessionActive(true);
+        setSessionTitle(`${plan.name} · ${plan.phase}`);
+    };
 
     // -- Timers Effect --
     useEffect(() => {
@@ -157,53 +179,99 @@ const ClientView = () => {
     };
 
     const skipOverviewAndFinish = () => {
+        // Compute basic stats to save to history
+        const totalVol = exercises.reduce((acc, ex) => {
+            return acc + ex.sets.reduce((setAcc, set) => {
+                const w = parseFloat(set.log.weight) || 0;
+                const r = parseFloat(set.log.reps) || 0;
+                return setAcc + (w * r);
+            }, 0);
+        }, 0);
+
+        // Save session history back to identical plan in localStorage
+        if (activePlan) {
+            const clientId = localStorage.getItem('shapeup_client_id') || 1;
+            const storedPlansRaw = localStorage.getItem(`shapeup_client_plans_${clientId}`);
+            if (storedPlansRaw) {
+                let dbPlans = JSON.parse(storedPlansRaw);
+                const targetPlanIdx = dbPlans.findIndex(p => p.id === activePlan.id);
+                if (targetPlanIdx !== -1) {
+                    const newHistoryEntry = {
+                        id: `h${Date.now()}`,
+                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                        duration: formatTime(workoutTime),
+                        totalVol: `${totalVol.toLocaleString()} kg`,
+                        rpe: sessionFeedback.rpe || 5,
+                        exercises: exercises.map(ex => ({
+                            name: ex.name,
+                            skipped: ex.sets.every(s => !s.completed),
+                            sets: ex.sets.filter(s => s.completed).map((s, idx) => ({
+                                set: idx + 1,
+                                type: s.type,
+                                reps: s.log.reps || 0,
+                                load: s.log.weight || 0,
+                                rpe: s.log.rpe || 0
+                            }))
+                        }))
+                    };
+
+                    dbPlans[targetPlanIdx].history = [newHistoryEntry, ...(dbPlans[targetPlanIdx].history || [])];
+                    localStorage.setItem(`shapeup_client_plans_${clientId}`, JSON.stringify(dbPlans));
+
+                    // Reflect instantly on dashboard plans
+                    setAssignedPlans(dbPlans);
+                }
+            }
+        }
+
         setShowOverviewModal(false);
         // Actual reset
         setSessionFeedback({ rpe: null, comments: '' });
         setSessionActive(false);
+        setActivePlan(null);
         setWorkoutTime(0);
         setIsResting(false);
         setRestTimer(0);
-        const resetExercises = exercises.map(ex => ({
-            ...ex,
-            sets: ex.sets.map(s => ({ ...s, completed: false }))
-        }));
-        setExercises(resetExercises);
+        setExercises([]);
+        setViewingExerciseDef(null);
     };
 
     // 1. Inactive View (Plan Overview)
     if (!sessionActive) {
         return (
             <div className="su-client-dashboard">
-                <h1 className="su-page-title su-mb-6">Active Training Plan</h1>
+                <h1 className="su-page-title su-mb-6">Your Training Plans</h1>
 
-                <Card className="su-active-plan-card">
-                    <div className="su-plan-hero">
-                        <div className="su-plan-hero-content">
-                            <span className="su-tag">Hypertrophy</span>
-                            <h2 className="su-plan-title">Hypertrophy Phase 1 - Upper Power</h2>
-                            <p className="su-coach-credit">Designed by <strong>Coach Alex</strong></p>
+                {assignedPlans.length === 0 ? (
+                    <Card className="su-active-plan-card" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+                        <h3 style={{ marginBottom: '0.5rem' }}>No Plans Assigned</h3>
+                        <p className="su-text-muted">You don't have any training plans assigned to you yet.</p>
+                    </Card>
+                ) : (
+                    assignedPlans.map(plan => (
+                        <Card key={plan.id} className="su-active-plan-card su-mb-4">
+                            <div className="su-plan-hero">
+                                <div className="su-plan-hero-content">
+                                    <span className="su-tag">{plan.phase}</span>
+                                    <h2 className="su-plan-title">{plan.name}</h2>
+                                    <p className="su-coach-credit">Difficulty: <strong>{plan.difficulty}</strong> · {plan.weeks} weeks</p>
 
-                            <div className="su-plan-meta-row">
-                                <div className="su-meta-pill">
-                                    <DumbbellIcon size={16} /> 6 Structural Exercises
+                                    <div className="su-plan-meta-row">
+                                        <div className="su-meta-pill">
+                                            <DumbbellIcon size={16} /> {plan.exercises.length} Exercises
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="su-meta-pill">
-                                    <Clock size={16} /> ~55 mins Est.
+
+                                <div className="su-plan-hero-action">
+                                    <Button size="lg" icon={<Play size={20} fill="currentColor" />} onClick={() => startSessionForPlan(plan)}>
+                                        Start Session
+                                    </Button>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="su-plan-hero-action">
-                            <Button size="lg" icon={<Play size={20} fill="currentColor" />} onClick={() => {
-                                setSessionActive(true);
-                                setSessionTitle('Upper Power · Hypertrophy Phase 1');
-                            }}>
-                                Start Session
-                            </Button>
-                        </div>
-                    </div>
-                </Card>
+                        </Card>
+                    ))
+                )}
 
                 <h3 className="su-section-title su-mt-8">Session History</h3>
                 <div className="su-history-list">
@@ -373,9 +441,33 @@ const ClientView = () => {
             <div className="su-execution-scroll">
                 {exercises.map((exercise, exIndex) => (
                     <Card key={exercise.id} className="su-execution-card">
-                        <div className="su-ex-execution-header">
-                            <h3>{exIndex + 1}. {exercise.name}</h3>
-                            <span className="su-ex-target">{exercise.target}</span>
+                        <div className="su-ex-execution-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div>
+                                <h3>{exIndex + 1}. {exercise.name}</h3>
+                                <span className="su-ex-target">{exercise.target}</span>
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                icon={<Play size={14} />}
+                                onClick={() => {
+                                    // Try to find the detailed exercise definition from the global database
+                                    const exDef = exercisesDB.find(e => e.name.toLowerCase() === exercise.name.toLowerCase());
+                                    // If found, open modal. Otherwise, create a mock fallback to prevent crash
+                                    if (exDef) {
+                                        setViewingExerciseDef(exDef);
+                                    } else {
+                                        setViewingExerciseDef({
+                                            name: exercise.name,
+                                            type: 'Unknown',
+                                            equipment: 'Unknown',
+                                            muscles: ['Unknown']
+                                        });
+                                    }
+                                }}
+                            >
+                                View Details
+                            </Button>
                         </div>
 
                         <div className="su-sets-execution">
@@ -461,10 +553,9 @@ const ClientView = () => {
                                         </label>
                                     </div>
                                     <div className="col-done">
-                                        {/* Defaulting to 90s rest for demo when checking a set */}
                                         <button
                                             className={`su-check-circle ${set.completed ? 'checked' : ''}`}
-                                            onClick={() => toggleSetComplete(exIndex, setIndex, 90)}
+                                            onClick={() => toggleSetComplete(exIndex, setIndex, set.prescribedRest)}
                                         >
                                             <CheckCircle size={28} />
                                         </button>
@@ -488,6 +579,14 @@ const ClientView = () => {
                     </Button>
                 </div>
             </div>
+
+            {/* Exercise Detail Modal Overlay */}
+            {viewingExerciseDef && (
+                <ExerciseModal
+                    exercise={viewingExerciseDef}
+                    onClose={() => setViewingExerciseDef(null)}
+                />
+            )}
         </div>
     );
 };

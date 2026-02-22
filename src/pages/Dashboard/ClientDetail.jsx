@@ -14,6 +14,7 @@ import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
     BarChart, Bar
 } from 'recharts';
+import ExerciseLibraryModal from '../../components/ExerciseLibraryModal';
 import '../../components/InviteClientModal.css';
 import '../Dashboard/TrainingPlansProfessional.css';
 import './ClientDetail.css';
@@ -162,11 +163,17 @@ const PlanEditor = ({ plan, onSave, onCancel }) => {
     const [exercises, setExercises] = useState(
         plan.exercises.map(ex => ({ ...ex, sets: ex.sets.map(s => ({ ...s })) }))
     );
+    const [showExerciseLibrary, setShowExerciseLibrary] = useState(false);
 
-    const addExercise = () => setExercises(prev => [...prev, {
-        id: `e${Date.now()}`, name: 'New Exercise', tags: '', notes: '',
-        sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '75', rpe: '8', rest: '90' }]
-    }]);
+    const addExercise = () => setShowExerciseLibrary(true);
+
+    const handleSelectExercise = (ex) => {
+        setExercises(prev => [...prev, {
+            id: `e${Date.now()}`, name: ex.name, tags: `${ex.type} • ${ex.muscles.join(' • ')}`, notes: '',
+            sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '75', rpe: '8', rest: '90' }]
+        }]);
+        setShowExerciseLibrary(false);
+    };
 
     const removeExercise = idx =>
         setExercises(prev => prev.filter((_, i) => i !== idx));
@@ -441,6 +448,12 @@ const PlanEditor = ({ plan, onSave, onCancel }) => {
                     </Button>
                 </Card>
             </div>
+            {showExerciseLibrary && (
+                <ExerciseLibraryModal
+                    onClose={() => setShowExerciseLibrary(false)}
+                    onSelect={handleSelectExercise}
+                />
+            )}
         </div>
     );
 };
@@ -609,8 +622,76 @@ const ClientDetail = () => {
     const navigate = useNavigate();
     const client = getClientData(parseInt(id));
 
-    const [plans, setPlans] = useState(() => client.hasData ? initPlans : []);
+    const [activeTab, setActiveTab] = useState('analytics');
+    const [plans, setPlans] = useState(() => {
+        const stored = localStorage.getItem('shapeup_client_plans_' + id);
+        if (stored) return JSON.parse(stored);
+        return client.hasData ? initPlans : [];
+    });
     const [editingPlan, setEditingPlan] = useState(null);
+
+    // --- Objectives State ---
+    const [objectives, setObjectives] = useState(() => {
+        const stored = localStorage.getItem(`shapeup_client_objectives_${id}`);
+        if (stored) return JSON.parse(stored);
+        return { goalWeight: '', history: [] };
+    });
+
+    // -- Derived Analytics State --
+    const allHistory = plans.flatMap(p => p.history || []).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const hasRealData = allHistory.length > 0;
+
+    const dynamicVolumeProgress = allHistory.map((h, i) => ({
+        session: `S${i + 1}`,
+        vol: parseInt(h.totalVol.replace(/,/g, '').replace(' kg', '')) || 0,
+        date: h.date
+    }));
+
+    const dynamicRpeTrend = allHistory.map((h, i) => ({
+        session: `S${i + 1}`,
+        rpe: h.rpe || 0,
+        date: h.date
+    }));
+
+    const adherenceStats = { completed: 0, skipped: 0, partial: 0 };
+    if (hasRealData) {
+        allHistory.forEach(h => {
+            const skippedCount = h.exercises.filter(ex => ex.skipped).length;
+            if (skippedCount === 0) {
+                adherenceStats.completed++;
+            } else if (skippedCount === h.exercises.length) {
+                adherenceStats.skipped++;
+            } else {
+                adherenceStats.partial++;
+            }
+        });
+    }
+
+    // If we have history, calculate a generic % based on how many exercises were skipped inside the sessions
+    const compliancePct = hasRealData ? (() => {
+        let totalEx = 0;
+        let skippedEx = 0;
+        allHistory.forEach(h => {
+            h.exercises.forEach(ex => {
+                totalEx++;
+                if (ex.skipped) skippedEx++;
+            });
+        });
+        return totalEx === 0 ? 100 : Math.round(((totalEx - skippedEx) / totalEx) * 100);
+    })() : 0;
+
+    // --- Bodyweight Chart Data ---
+    const dynamicWeightProgress = [...objectives.history].sort((a, b) => a.id - b.id).map((h, i) => ({
+        session: `Entry ${i + 1}`,
+        weight: h.weight,
+        date: h.date
+    }));
+    const hasWeightData = dynamicWeightProgress.length >= 2;
+
+    // Sync plans to localStorage whenever they change
+    React.useEffect(() => {
+        localStorage.setItem('shapeup_client_plans_' + id, JSON.stringify(plans));
+    }, [plans, id]);
 
     const handleSavePlan = (updated) => {
         setPlans(prev => prev.map(p => p.id === updated.id ? updated : p));
@@ -655,19 +736,17 @@ const ClientDetail = () => {
         <div className="su-client-detail-dashboard">
             {/* Page Header */}
             <div className="su-dashboard-header-flex">
-                <div className="su-header-with-back">
-                    <button className="su-back-btn" onClick={() => navigate('/dashboard/clients')}>
-                        <ArrowLeft size={20} />
-                    </button>
-                    <div>
-                        <h1 className="su-page-title">
-                            {client.name}
-                            <span className={`su-status-badge ${client.status === 'Active' ? 'active' : client.status === 'Inactive' ? 'inactive' : 'warning'} su-ml-2`}>
-                                {client.status}
-                            </span>
-                        </h1>
-                        <p className="su-page-subtitle">Goal: <strong>{client.goal}</strong></p>
-                    </div>
+                <button className="su-back-btn" onClick={() => navigate('/dashboard/clients')}>
+                    <ArrowLeft size={20} />
+                </button>
+                <div>
+                    <h1 className="su-page-title">
+                        {client.name}
+                        <span className={`su-status-badge ${client.status === 'Active' ? 'active' : client.status === 'Inactive' ? 'inactive' : 'warning'} su-ml-2`}>
+                            {client.status}
+                        </span>
+                    </h1>
+                    <p className="su-page-subtitle">Goal: <strong>{client.goal}</strong></p>
                 </div>
                 <Button
                     variant="outline"
@@ -691,30 +770,36 @@ const ClientDetail = () => {
             </div>
 
             {/* ── Tab: Analytics ──────────────────────────────────── */}
-            {activeTab === 'analytics' && !client.hasData && (
+            {activeTab === 'analytics' && !hasRealData && (
                 <div className="su-client-empty-state su-mt-4" style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-muted)' }}>
                     <BarChart2 size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
                     <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>No Data Available</h3>
-                    <p>This client hasn't recorded enough workout sessions yet to generate analytics. Check back later once they start training.</p>
+                    <p>This client hasn't recorded any workout sessions yet. Analytics will appear once they complete a session.</p>
                 </div>
             )}
 
-            {activeTab === 'analytics' && client.hasData && (
+            {activeTab === 'analytics' && hasRealData && (
                 <div className="su-client-metrics-grid su-mt-4">
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
                             <TrendingUp size={20} className="su-text-muted" />
-                            <h3 className="su-section-title">Strength Progression (Squat)</h3>
+                            <h3 className="su-section-title">Session Volume Trend</h3>
                         </div>
                         <div className="su-chart-wrapper-med">
                             <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={client.strengthProgress} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <AreaChart data={dynamicVolumeProgress} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="colorVol" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                                    <XAxis dataKey="week" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                                    <YAxis domain={['dataMin - 5', 'dataMax + 5']} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                                    <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} />
-                                    <Line type="monotone" dataKey="load" name="Est. 1RM (kg)" stroke="var(--primary)" strokeWidth={3} dot={{ fill: 'var(--primary)', r: 4 }} activeDot={{ r: 6 }} />
-                                </LineChart>
+                                    <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                                    <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                                    <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload.date} />
+                                    <Area type="monotone" dataKey="vol" name="Total Vol (kg)" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorVol)" />
+                                </AreaChart>
                             </ResponsiveContainer>
                         </div>
                     </Card>
@@ -722,42 +807,52 @@ const ClientDetail = () => {
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
                             <Activity size={20} className="su-text-muted" />
-                            <h3 className="su-section-title">Latest Check-in Readiness</h3>
+                            <h3 className="su-section-title">Session RPE Trend (Effort)</h3>
                         </div>
                         <div className="su-chart-wrapper-med">
                             <ResponsiveContainer width="100%" height="100%">
-                                <RadarChart cx="50%" cy="50%" outerRadius="70%" data={client.readinessRadar}>
-                                    <PolarGrid stroke="var(--border-color)" />
-                                    <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
-                                    <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-                                    <Radar name="Client" dataKey="A" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.4} />
-                                    <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} />
-                                </RadarChart>
+                                <LineChart data={dynamicRpeTrend} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                                    <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                                    <YAxis domain={[0, 10]} ticks={[2, 4, 6, 8, 10]} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                                    <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload.date} />
+                                    <Line type="monotone" dataKey="rpe" name="RPE (Difficulty)" stroke="var(--accent)" strokeWidth={3} dot={{ fill: 'var(--accent)', r: 4 }} activeDot={{ r: 6 }} />
+                                </LineChart>
                             </ResponsiveContainer>
                         </div>
                     </Card>
 
-                    <Card className="su-metric-card-large">
+                    <Card className="su-metric-card-large" style={{ display: 'flex', flexDirection: 'column' }}>
                         <div className="su-card-header-icon">
-                            <Scale size={20} className="su-text-muted" />
+                            <TrendingUp size={20} className="su-text-muted" />
                             <h3 className="su-section-title">Bodyweight Trend</h3>
                         </div>
-                        <div className="su-chart-wrapper-med">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={client.weightProgress} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                    <defs>
-                                        <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="var(--success)" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                                    <XAxis dataKey="week" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                                    <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                                    <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} />
-                                    <Area type="monotone" dataKey="weight" name="Bodyweight (kg)" stroke="var(--success)" strokeWidth={3} fillOpacity={1} fill="url(#colorWeight)" />
-                                </AreaChart>
-                            </ResponsiveContainer>
+                        <div style={{ flex: 1, minHeight: 0, marginTop: '1rem' }}>
+                            {hasWeightData ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={dynamicWeightProgress} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                        <defs>
+                                            <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="var(--success)" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                                        <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                                        <YAxis domain={['dataMin - 2', 'dataMax + 2']} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                                        <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload.date} />
+                                        <Area type="monotone" dataKey="weight" name="Weight (kg)" stroke="var(--success)" strokeWidth={3} fillOpacity={1} fill="url(#colorWeight)" />
+
+                                        {objectives.goalWeight && (
+                                            <Area type="monotone" dataKey={() => parseFloat(objectives.goalWeight)} name="Goal" stroke="var(--text-muted)" strokeDasharray="5 5" fill="none" />
+                                        )}
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textAlign: 'center' }}>
+                                    <p>The client needs to log at least 2 weight entries in their Objectives tab to generate this trend.</p>
+                                </div>
+                            )}
                         </div>
                     </Card>
 
@@ -770,14 +865,14 @@ const ClientDetail = () => {
                             <div className="su-adherence-circle-wrap">
                                 <svg viewBox="0 0 36 36" className="su-circular-chart">
                                     <path className="su-circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                    <path className="su-circle-main" strokeDasharray="85, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                                    <text x="18" y="20.35" className="su-percentage">85%</text>
+                                    <path className="su-circle-main" strokeDasharray={`${compliancePct}, 100`} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <text x="18" y="20.35" className="su-percentage">{compliancePct}%</text>
                                 </svg>
                             </div>
                             <div className="su-adherence-legend">
-                                <div className="su-legend-item"><span className="su-legend-dot primary" /><span className="su-legend-label">Completed</span><span className="su-legend-val">{client.adherence.completed} sessions</span></div>
-                                <div className="su-legend-item"><span className="su-legend-dot error" /><span className="su-legend-label">Skipped</span><span className="su-legend-val">{client.adherence.skipped} sessions</span></div>
-                                <div className="su-legend-item"><span className="su-legend-dot warning" /><span className="su-legend-label">Partial</span><span className="su-legend-val">{client.adherence.partial} sessions</span></div>
+                                <div className="su-legend-item"><span className="su-legend-dot primary" /><span className="su-legend-label">Completed</span><span className="su-legend-val">{adherenceStats.completed} sessions</span></div>
+                                <div className="su-legend-item"><span className="su-legend-dot error" /><span className="su-legend-label">Skipped</span><span className="su-legend-val">{adherenceStats.skipped} sessions</span></div>
+                                <div className="su-legend-item"><span className="su-legend-dot warning" /><span className="su-legend-label">Partial</span><span className="su-legend-val">{adherenceStats.partial} sessions</span></div>
                             </div>
                         </div>
                     </Card>

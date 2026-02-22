@@ -12,6 +12,7 @@ import Feedback from './pages/Dashboard/Feedback';
 import Analytics from './pages/Dashboard/Analytics';
 import Reports from './pages/Dashboard/Reports';
 import Settings from './pages/Dashboard/Settings';
+import ObjectivesClient from './pages/Dashboard/ObjectivesClient';
 
 // Wrapper for the Login page to handle the redirect properly
 const LoginWrapper = () => {
@@ -35,6 +36,7 @@ function App() {
           <Route path="analytics" element={<Analytics />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="objectives" element={<ObjectivesClient />} />
           {/* Mock nested routes below */}
           <Route path="messages" element={<div style={{ padding: '2rem' }}>Messages Placeholder</div>} />
         </Route>

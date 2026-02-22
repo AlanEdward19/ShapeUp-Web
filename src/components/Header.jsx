@@ -3,7 +3,7 @@ import { Bell, User, Dumbbell } from 'lucide-react';
 import NotificationsPanel, { proNotifications, clientNotifications } from './NotificationsPanel';
 import './Header.css';
 
-const Header = ({ isProfessional, onToggleView, profile, sessionTitle }) => {
+const Header = ({ isProfessional, profile, sessionTitle }) => {
     const [showNotifications, setShowNotifications] = useState(false);
 
     const seedData = isProfessional ? proNotifications : clientNotifications;
@@ -36,22 +36,6 @@ const Header = ({ isProfessional, onToggleView, profile, sessionTitle }) => {
             ) : <div />}
 
             <div className="su-header-actions">
-                {/* View Toggle (Flip-Flop) */}
-                <div className="su-view-toggle">
-                    <button
-                        className={`su-toggle-btn ${!isProfessional ? 'active' : ''}`}
-                        onClick={() => onToggleView(false)}
-                    >
-                        Client
-                    </button>
-                    <button
-                        className={`su-toggle-btn ${isProfessional ? 'active' : ''}`}
-                        onClick={() => onToggleView(true)}
-                    >
-                        Professional
-                    </button>
-                </div>
-
                 {/* Bell + Notifications Panel */}
                 <div className="su-notif-wrapper">
                     <button
