@@ -17,11 +17,14 @@ const volumeData = [
 ];
 
 const DashboardClient = () => {
+    const storedName = localStorage.getItem('shapeup_user_name') || 'Mike';
+    const firstName = storedName.split(' ')[0];
+
     return (
         <div className="su-dashboard-client">
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">Welcome back, Mike</h1>
+                    <h1 className="su-page-title">Welcome back, {firstName}</h1>
                     <p className="su-page-subtitle">You have 1 workout scheduled for today.</p>
                 </div>
             </div>

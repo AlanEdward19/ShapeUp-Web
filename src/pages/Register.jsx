@@ -17,20 +17,30 @@ const Register = () => {
 
         // Mock update logic: Find the invited client and update their status
         const stored = localStorage.getItem('shapeup_clients');
-        if (stored) {
-            let clients = JSON.parse(stored);
-            const clientIndex = clients.findIndex(c => c.email === email && c.status === 'Invited');
+        let clients = stored ? JSON.parse(stored) : [];
+        const clientIndex = clients.findIndex(c => c.email === email && c.status === 'Invited');
 
-            if (clientIndex !== -1) {
-                // Update specific fields
-                clients[clientIndex].name = `${firstName} ${lastName}`;
-                clients[clientIndex].status = 'Active';
-                clients[clientIndex].lastCheckin = 'Just now';
-
-                // Save back to localStorage
-                localStorage.setItem('shapeup_clients', JSON.stringify(clients));
-            }
+        if (clientIndex !== -1) {
+            // Update specific fields of invited client
+            clients[clientIndex].name = `${firstName} ${lastName}`;
+            clients[clientIndex].status = 'Active';
+            clients[clientIndex].lastCheckin = 'Just now';
+        } else {
+            // Create a brand new client since they weren't invited
+            const newClient = {
+                id: Date.now(),
+                name: `${firstName} ${lastName}`,
+                email: email,
+                activePlan: '-',
+                compliance: 0,
+                lastCheckin: 'Just now',
+                status: 'Active'
+            };
+            clients.push(newClient);
         }
+
+        // Save back to localStorage
+        localStorage.setItem('shapeup_clients', JSON.stringify(clients));
 
         navigate('/'); // Redirect to login on success
     };

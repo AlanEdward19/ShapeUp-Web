@@ -9,8 +9,9 @@ const Layout = () => {
     const isProfessional = localStorage.getItem('shapeup_role') === 'professional';
 
     // Global profile state for the session
-    const [coachProfile, setCoachProfile] = useState({ name: 'Coach Alex', avatar: null });
-    const [clientProfile, setClientProfile] = useState({ name: 'Jane Doe', avatar: null });
+    const storedName = localStorage.getItem('shapeup_user_name');
+    const [coachProfile, setCoachProfile] = useState({ name: storedName || 'Coach Alan', avatar: null });
+    const [clientProfile, setClientProfile] = useState({ name: storedName || 'Jane Doe', avatar: null });
     const currentProfile = isProfessional ? coachProfile : clientProfile;
 
     // Session title — set by TrainingPlansClient when a session starts/ends

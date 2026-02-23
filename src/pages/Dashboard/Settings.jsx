@@ -16,9 +16,57 @@ const Settings = () => {
     const { theme, toggleTheme } = useTheme();
     const [activeTab, setActiveTab] = useState('profile');
 
-    const fileInputRef = useRef(null);
+    const clientId = localStorage.getItem('shapeup_client_id') || 1;
+    const userEmail = localStorage.getItem('shapeup_user_email') || '';
 
     const activeProfile = isProfessional ? coachProfile : clientProfile;
+
+    const [objectives, setObjectives] = useState(() => {
+        const stored = localStorage.getItem(`shapeup_client_objectives_${clientId}`);
+        return stored ? JSON.parse(stored) : { goalWeight: '', history: [] };
+    });
+
+    const currentWeightEntry = objectives.history.length > 0 ? objectives.history[0].weight : '';
+    const [tempCurrentWeight, setTempCurrentWeight] = useState(currentWeightEntry);
+    const [tempGoalWeight, setTempGoalWeight] = useState(objectives.goalWeight);
+
+    const handleSaveChanges = () => {
+        if (!isProfessional) {
+            let newHistory = [...objectives.history];
+            const parsedCurrent = parseFloat(tempCurrentWeight);
+
+            // Append a new weight entry if it changed
+            if (!isNaN(parsedCurrent) && parsedCurrent.toString() !== currentWeightEntry.toString()) {
+                newHistory = [
+                    {
+                        id: Date.now(),
+                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                        weight: parsedCurrent
+                    },
+                    ...newHistory
+                ];
+            }
+
+            const updatedObjectives = {
+                goalWeight: tempGoalWeight,
+                history: newHistory
+            };
+            setObjectives(updatedObjectives);
+            localStorage.setItem(`shapeup_client_objectives_${clientId}`, JSON.stringify(updatedObjectives));
+        }
+
+        // Save name to localStorage
+        localStorage.setItem('shapeup_user_name', activeProfile.name);
+    };
+
+    const firstName = activeProfile.name.split(' ')[0] || '';
+    const lastName = activeProfile.name.split(' ').slice(1).join(' ') || '';
+
+    const handleNameChange = (first, last) => {
+        updateActiveProfile({ name: `${first} ${last}`.trim() });
+    };
+
+    const fileInputRef = useRef(null);
 
     const updateActiveProfile = (newProfileData) => {
         if (isProfessional) {
@@ -66,7 +114,7 @@ const Settings = () => {
                             : 'Update your personal details and app preferences.'}
                     </p>
                 </div>
-                <Button>Save Changes</Button>
+                <Button onClick={handleSaveChanges}>Save Changes</Button>
             </div>
 
             <div className="su-settings-layout su-mt-4">
@@ -130,15 +178,24 @@ const Settings = () => {
 
                             <div className="su-settings-form-grid">
                                 <div className="su-form-group">
-                                    <label>Full Name</label>
+                                    <label>First Name</label>
                                     <Input
-                                        value={activeProfile.name}
-                                        onChange={(e) => updateActiveProfile({ name: e.target.value })}
+                                        value={firstName}
+                                        onChange={(e) => handleNameChange(e.target.value, lastName)}
+                                        placeholder="First Name"
                                     />
                                 </div>
                                 <div className="su-form-group">
+                                    <label>Last Name</label>
+                                    <Input
+                                        value={lastName}
+                                        onChange={(e) => handleNameChange(firstName, e.target.value)}
+                                        placeholder="Last Name"
+                                    />
+                                </div>
+                                <div className="su-form-group su-col-span-2">
                                     <label>Email Address</label>
-                                    <Input type="email" disabled defaultValue={isProfessional ? "alex@shapeup.fit" : "alan@example.com"} />
+                                    <Input type="email" disabled value={isProfessional ? "alex@shapeup.fit" : userEmail} />
                                 </div>
                                 {isProfessional && (
                                     <div className="su-form-group su-col-span-2">
@@ -154,11 +211,21 @@ const Settings = () => {
                                     <>
                                         <div className="su-form-group">
                                             <label>Current Weight (kg)</label>
-                                            <Input type="number" defaultValue="82.5" />
+                                            <Input
+                                                type="number"
+                                                value={tempCurrentWeight}
+                                                onChange={(e) => setTempCurrentWeight(e.target.value)}
+                                                placeholder="e.g. 82.5"
+                                            />
                                         </div>
                                         <div className="su-form-group">
                                             <label>Target Weight (kg)</label>
-                                            <Input type="number" defaultValue="80.0" />
+                                            <Input
+                                                type="number"
+                                                value={tempGoalWeight}
+                                                onChange={(e) => setTempGoalWeight(e.target.value)}
+                                                placeholder="e.g. 80.0"
+                                            />
                                         </div>
                                     </>
                                 )}

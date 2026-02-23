@@ -27,6 +27,9 @@ const Clients = () => {
             let storedClients = localStorage.getItem('shapeup_clients');
             let clientsList = storedClients ? JSON.parse(storedClients) : initialClientsList;
 
+            // Remove legacy mock clients (id 1-5) so the user only sees newly registered ones
+            clientsList = clientsList.filter(c => c.id > 5);
+
             // Compute real compliance for each client from their plan history
             const updatedList = clientsList.map(c => {
                 const storedPlans = localStorage.getItem(`shapeup_client_plans_${c.id}`);

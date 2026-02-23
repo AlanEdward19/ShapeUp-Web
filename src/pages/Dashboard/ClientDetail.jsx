@@ -21,13 +21,7 @@ import './ClientDetail.css';
 
 // ─── Mock Data ─────────────────────────────────────────────
 
-const clientsDB = {
-    1: { name: 'Mike K.', goal: 'Muscle Gain', status: 'Active' },
-    2: { name: 'Sarah J.', goal: 'Fat Loss', status: 'Needs Attention' },
-    3: { name: 'David R.', goal: 'Strength', status: 'Active' },
-    4: { name: 'Anna B.', goal: 'Endurance', status: 'Active' },
-    5: { name: 'Mark T.', goal: 'General Fitness', status: 'Inactive' },
-};
+const clientsDB = {};
 
 const getClientData = (id) => {
     let baseClient = clientsDB[id];
@@ -70,64 +64,7 @@ const getClientData = (id) => {
 };
 
 // Plans + per-plan session history
-const initPlans = [
-    {
-        id: 'p1', name: 'Hypertrophy Phase 1 – Upper Power', phase: 'Hypertrophy',
-        difficulty: 'Intermediate', weeks: 6, active: true, notes: '',
-        exercises: [
-            {
-                id: 'e1', name: 'Barbell Bench Press', tags: 'Chest • Triceps • Compound', notes: '',
-                sets: [
-                    { type: 'warmup', technique: 'Straight', reps: '15', load: '60', rpe: '6', rest: '60' },
-                    { type: 'working', technique: 'Straight', reps: '8-10', load: '75', rpe: '8', rest: '120' },
-                    { type: 'topset', technique: 'Straight', reps: '5-6', load: '85', rpe: '9', rest: '180' },
-                ]
-            },
-            {
-                id: 'e2', name: 'Incline DB Press', tags: 'Upper Chest • Compound', notes: '',
-                sets: [
-                    { type: 'working', technique: 'Drop', reps: '10-12', load: '70', rpe: '7', rest: '90' },
-                ]
-            },
-        ],
-        history: [
-            {
-                id: 'h1', date: 'Nov 1, 2025', duration: '58 min', totalVol: '12,450 kg', rpe: 8,
-                exercises: [
-                    { name: 'Barbell Bench Press', sets: [{ set: 1, type: 'working', reps: 8, load: 80, rpe: 8 }, { set: 2, type: 'working', reps: 8, load: 80, rpe: 8.5 }, { set: 3, type: 'topset', reps: 6, load: 90, rpe: 9 }] },
-                    { name: 'Incline DB Press', sets: [{ set: 1, type: 'working', reps: 10, load: 30, rpe: 7 }, { set: 2, type: 'working', reps: 9, load: 30, rpe: 8 }] },
-                ]
-            },
-            {
-                id: 'h2', date: 'Oct 29, 2025', duration: '52 min', totalVol: '10,200 kg', rpe: 7,
-                exercises: [
-                    { name: 'Barbell Bench Press', skipped: false, sets: [{ set: 1, type: 'working', reps: 10, load: 77.5, rpe: 7 }, { set: 2, type: 'working', reps: 9, load: 77.5, rpe: 8 }] },
-                    { name: 'Incline DB Press', skipped: true, sets: [] },
-                ]
-            },
-        ]
-    },
-    {
-        id: 'p2', name: 'Lower Body Strength Block', phase: 'Strength',
-        difficulty: 'Advanced', weeks: 4, active: false, notes: '',
-        exercises: [
-            {
-                id: 'e3', name: 'Barbell Squat', tags: 'Quads • Glutes • Compound', notes: '',
-                sets: [
-                    { type: 'topset', technique: 'Straight', reps: '5', load: '85', rpe: '9', rest: '180' },
-                ]
-            },
-        ],
-        history: [
-            {
-                id: 'h3', date: 'Oct 26, 2025', duration: '65 min', totalVol: '15,800 kg', rpe: 9,
-                exercises: [
-                    { name: 'Barbell Squat', sets: [{ set: 1, type: 'topset', reps: 5, load: 120, rpe: 9 }, { set: 2, type: 'topset', reps: 4, load: 120, rpe: 9.5 }] },
-                ]
-            }
-        ]
-    },
-];
+const initPlans = [];
 
 // ─── Helpers ────────────────────────────────────────────────
 
