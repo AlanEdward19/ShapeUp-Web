@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, CalendarDays, Plus, FastForward, Award, TrendingUp, X } from 'lucide-react';
+import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, CalendarDays, Plus, FastForward, Award, TrendingUp, X, Trash2 } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -158,13 +158,20 @@ const ClientView = () => {
         const newSetId = `extra_${Date.now()}`;
         newExercises[exerciseIndex].sets.push({
             id: newSetId,
-            type: 'working', // Default to working, but allow change
+            type: 'working',
             isExtra: true,
             target: 'Extra Volume',
             completed: false,
             failure: false,
-            log: { weight: '', reps: '', rpe: '' }
+            log: { weight: '', reps: '', rpe: '' },
+            prescribedRest: 60 // Default for extra sets
         });
+        setExercises(newExercises);
+    };
+
+    const removeExtraSet = (exerciseIndex, setIndex) => {
+        const newExercises = [...exercises];
+        newExercises[exerciseIndex].sets.splice(setIndex, 1);
         setExercises(newExercises);
     };
 
@@ -613,12 +620,24 @@ const ClientView = () => {
                                         </label>
                                     </div>
                                     <div className="col-done">
-                                        <button
-                                            className={`su-check-circle ${set.completed ? 'checked' : ''}`}
-                                            onClick={() => toggleSetComplete(exIndex, setIndex, set.prescribedRest)}
-                                        >
-                                            <CheckCircle size={28} />
-                                        </button>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            {set.isExtra && !set.completed && (
+                                                <button
+                                                    className="su-btn-icon-danger"
+                                                    onClick={() => removeExtraSet(exIndex, setIndex)}
+                                                    style={{ border: 'none', background: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
+                                                    title="Remove extra set"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            )}
+                                            <button
+                                                className={`su-check-circle ${set.completed ? 'checked' : ''}`}
+                                                onClick={() => toggleSetComplete(exIndex, setIndex, set.prescribedRest)}
+                                            >
+                                                <CheckCircle size={28} />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}

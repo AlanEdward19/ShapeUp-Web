@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Search, Filter } from 'lucide-react';
+import { X, Search, Filter, ChevronRight } from 'lucide-react';
 import { exercisesDB, availableMuscles } from '../data/mockExercises';
 import './ExerciseLibraryModal.css';
 
@@ -25,6 +25,8 @@ const ExerciseLibraryModal = ({ onClose, onSelect }) => {
     return (
         <div className="su-modal-overlay su-elm-overlay" onClick={onClose}>
             <div className="su-modal-box su-elm-box" onClick={e => e.stopPropagation()}>
+
+                {/* Header */}
                 <div className="su-elm-header">
                     <div>
                         <h2 className="su-elm-title">Select Exercise</h2>
@@ -33,12 +35,13 @@ const ExerciseLibraryModal = ({ onClose, onSelect }) => {
                     <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
                 </div>
 
+                {/* Toolbar: Search + Filter */}
                 <div className="su-elm-toolbar">
                     <div className="su-elm-search">
                         <Search size={18} className="su-text-muted" />
                         <input
                             type="text"
-                            placeholder="Search exercises..."
+                            placeholder="Search by name..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
                             autoFocus
@@ -50,49 +53,72 @@ const ExerciseLibraryModal = ({ onClose, onSelect }) => {
                             className={`su-elm-filter-btn ${selectedMuscles.length > 0 ? 'active' : ''}`}
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                         >
-                            <Filter size={16} /> Filters {selectedMuscles.length > 0 && `(${selectedMuscles.length})`}
+                            <Filter size={15} />
+                            Muscle Groups
+                            {selectedMuscles.length > 0 && (
+                                <span className="su-elm-filter-badge">{selectedMuscles.length}</span>
+                            )}
                         </button>
 
                         {isFilterOpen && (
                             <div className="su-elm-filter-dropdown">
-                                <div className="su-elm-filter-grid">
-                                    {availableMuscles.map(m => (
-                                        <label key={m} className="su-elm-filter-opt">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedMuscles.includes(m)}
-                                                onChange={() => toggleMuscle(m)}
-                                            />
-                                            {m}
-                                        </label>
-                                    ))}
+                                {/* Dropdown Header */}
+                                <div className="su-elm-filter-header">
+                                    <span className="su-elm-filter-title">Filter by Muscle Group</span>
                                 </div>
+
+                                {/* Muscle grid - pill toggles */}
+                                <div className="su-elm-filter-body">
+                                    <div className="su-elm-filter-grid">
+                                        {availableMuscles.map(m => (
+                                            <button
+                                                key={m}
+                                                className={`su-elm-muscle-pill ${selectedMuscles.includes(m) ? 'selected' : ''}`}
+                                                onClick={() => toggleMuscle(m)}
+                                                type="button"
+                                            >
+                                                {selectedMuscles.includes(m) && <span className="su-elm-pill-check">✓</span>}
+                                                {m}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Footer */}
                                 {selectedMuscles.length > 0 && (
-                                    <button className="su-elm-clear-btn" onClick={() => setSelectedMuscles([])}>
-                                        Clear Filters
-                                    </button>
+                                    <div className="su-elm-filter-footer">
+                                        <button className="su-elm-clear-btn" onClick={() => setSelectedMuscles([])}>
+                                            Clear all filters
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         )}
                     </div>
                 </div>
 
+                {/* Exercise List */}
                 <div className="su-elm-list">
+                    <div className="su-elm-count">{filteredExercises.length} exercise{filteredExercises.length !== 1 ? 's' : ''}</div>
                     {filteredExercises.map(ex => (
                         <div key={ex.id} className="su-elm-item" onClick={() => onSelect(ex)}>
                             <div className="su-elm-item-info">
                                 <strong>{ex.name}</strong>
                                 <div className="su-elm-item-tags">
                                     <span className="su-elm-tag type">{ex.type}</span>
-                                    {ex.muscles.slice(0, 2).map(m => <span key={m} className="su-elm-tag muscle">{m}</span>)}
+                                    {ex.muscles.slice(0, 3).map(m => <span key={m} className="su-elm-tag muscle">{m}</span>)}
                                 </div>
                             </div>
+                            <ChevronRight size={18} className="su-elm-item-arrow" />
                         </div>
                     ))}
                     {filteredExercises.length === 0 && (
-                        <div className="su-elm-empty">No exercises found.</div>
+                        <div className="su-elm-empty">
+                            <p>No exercises match your filters.</p>
+                        </div>
                     )}
                 </div>
+
             </div>
         </div>
     );
