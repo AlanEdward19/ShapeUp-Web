@@ -416,7 +416,7 @@ const SessionDetailModal = ({ session, planName, onClose }) => (
                     <div key={i} className="su-sd-ex-block">
                         <div className="su-sd-ex-name">
                             {ex.name}
-                            {ex.skipped && <span className="su-skipped-tag" style={{ marginLeft: '0.5rem' }}>Skipped</span>}
+                            {ex.skipped && <span className="su-danger-tag" style={{ marginLeft: '0.5rem', backgroundColor: 'var(--error-light, rgba(239, 68, 68, 0.2))', color: 'var(--error, #ef4444)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Skipped</span>}
                         </div>
                         {ex.skipped ? (
                             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: '0.25rem 0 0' }}>
@@ -510,8 +510,14 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete }) => {
                                         <span className="su-cp-hist-meta">
                                             ⏱ {session.duration} · {session.totalVol} vol · Avg RPE {session.rpe}
                                         </span>
-                                        {session.exercises.some(ex => ex.skipped) && (
-                                            <span className="su-skipped-tag">Skipped Exercise</span>
+                                        {session.status === 'partial' && (
+                                            <span className="su-warning-tag" style={{ backgroundColor: 'var(--warning-light, rgba(245, 158, 11, 0.2))', color: 'var(--warning)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'help' }} title="Client did not complete all prescribed sets">Partial</span>
+                                        )}
+                                        {session.status === 'skipped' && (
+                                            <span className="su-danger-tag" style={{ backgroundColor: 'var(--error-light, rgba(239, 68, 68, 0.2))', color: 'var(--error, #ef4444)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Skipped Session</span>
+                                        )}
+                                        {(!session.status && session.exercises.some(ex => ex.skipped)) && (
+                                            <span className="su-danger-tag" style={{ backgroundColor: 'var(--error-light, rgba(239, 68, 68, 0.2))', color: 'var(--error, #ef4444)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }} title="Client skipped at least one exercise">Skipped Exercise</span>
                                         )}
                                     </div>
                                 </div>
@@ -600,13 +606,18 @@ const ClientDetail = () => {
     const adherenceStats = { completed: 0, skipped: 0, partial: 0 };
     if (hasRealData) {
         allHistory.forEach(h => {
-            const skippedCount = h.exercises.filter(ex => ex.skipped).length;
-            if (skippedCount === 0) {
-                adherenceStats.completed++;
-            } else if (skippedCount === h.exercises.length) {
-                adherenceStats.skipped++;
-            } else {
-                adherenceStats.partial++;
+            if (h.status === 'completed') adherenceStats.completed++;
+            else if (h.status === 'skipped') adherenceStats.skipped++;
+            else if (h.status === 'partial') adherenceStats.partial++;
+            else {
+                const skippedCount = h.exercises.filter(ex => ex.skipped).length;
+                if (skippedCount === 0) {
+                    adherenceStats.completed++;
+                } else if (skippedCount === h.exercises.length) {
+                    adherenceStats.skipped++;
+                } else {
+                    adherenceStats.partial++;
+                }
             }
         });
     }

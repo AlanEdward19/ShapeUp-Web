@@ -119,7 +119,7 @@ const ClientBillingModal = ({ isOpen, onClose, client, onSave }) => {
 
                 </div>
 
-                <div className="su-modal-footer">
+                <div className="su-modal-footer" style={{ display: 'flex', justifyContent: 'center', gap: '1rem', paddingBottom: '1.5rem' }}>
                     <Button variant="outline" onClick={onClose}>Cancel</Button>
                     <Button onClick={handleSave} disabled={billingType === 'plan' && !selectedPlanId}>Apply Billing</Button>
                 </div>

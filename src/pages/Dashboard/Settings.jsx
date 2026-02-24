@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { User, Bell, CreditCard, Link as LinkIcon, Smartphone, Shield, Moon, Sun, Camera } from 'lucide-react';
+import { User, Bell, CreditCard, Link as LinkIcon, Smartphone, Shield, Moon, Sun, Camera, Trash2 } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -93,12 +93,20 @@ const Settings = () => {
         ];
     });
 
+    const [planToDelete, setPlanToDelete] = useState(null);
+
     const handleAddPlan = () => {
         setProPlans([...proPlans, { id: `plan_${Date.now()}`, name: 'New Plan', price: 0, desc: '' }]);
     };
 
-    const handleDeletePlan = (id) => {
-        setProPlans(proPlans.filter(p => p.id !== id));
+    const handleDeletePlanClick = (plan) => {
+        setPlanToDelete(plan);
+    };
+
+    const confirmDeletePlan = () => {
+        if (!planToDelete) return;
+        setProPlans(proPlans.filter(p => p.id !== planToDelete.id));
+        setPlanToDelete(null);
     };
 
     const updatePlan = (id, field, value) => {
@@ -346,12 +354,18 @@ const Settings = () => {
                                 </div>
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    {proPlans.map(plan => (
-                                        <div key={plan.id} style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
-                                            <div className="su-settings-form-grid" style={{ marginBottom: '1rem' }}>
+                                    {proPlans.map((plan, index) => (
+                                        <div key={plan.id} style={{ backgroundColor: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem', position: 'relative' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>Plan Level {index + 1}</h4>
+                                                <button className="su-icon-btn" onClick={() => handleDeletePlanClick(plan)} style={{ color: 'var(--error)' }} title="Remove Plan">
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                            <div className="su-settings-form-grid">
                                                 <div className="su-form-group" style={{ gridColumn: 'span 2' }}>
                                                     <label>Plan Name</label>
-                                                    <Input value={plan.name} onChange={e => updatePlan(plan.id, 'name', e.target.value)} />
+                                                    <Input value={plan.name} onChange={e => updatePlan(plan.id, 'name', e.target.value)} placeholder="e.g. Standard" />
                                                 </div>
                                                 <div className="su-form-group">
                                                     <label>Monthly Price ($)</label>
@@ -359,13 +373,8 @@ const Settings = () => {
                                                 </div>
                                                 <div className="su-form-group su-col-span-2" style={{ gridColumn: 'span 3' }}>
                                                     <label>Description (What's included?)</label>
-                                                    <Input value={plan.desc} onChange={e => updatePlan(plan.id, 'desc', e.target.value)} />
+                                                    <Input value={plan.desc} onChange={e => updatePlan(plan.id, 'desc', e.target.value)} placeholder="App access, 2 monthly check-ins..." />
                                                 </div>
-                                            </div>
-                                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                                <button className="su-btn-text-danger" onClick={() => handleDeletePlan(plan.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--error)' }}>
-                                                    Remove Plan
-                                                </button>
                                             </div>
                                         </div>
                                     ))}
@@ -463,6 +472,32 @@ const Settings = () => {
 
                 </div>
             </div>
+
+            {/* Plan Delete Confirmation Modal */}
+            {planToDelete && (
+                <div className="su-modal-overlay" onClick={() => setPlanToDelete(null)}>
+                    <div className="su-modal-box su-confirm-modal" onClick={e => e.stopPropagation()}>
+                        <div className="su-confirm-icon">
+                            <Trash2 size={28} />
+                        </div>
+                        <h3 className="su-confirm-title">Delete Plan?</h3>
+                        <p className="su-confirm-body">
+                            Are you sure you want to delete the <strong>"{planToDelete.name}"</strong> plan? This action cannot be undone.
+                        </p>
+                        <div className="su-confirm-actions">
+                            <Button variant="outline" onClick={() => setPlanToDelete(null)}>
+                                Cancel
+                            </Button>
+                            <Button
+                                style={{ background: '#ef4444', borderColor: '#ef4444' }}
+                                onClick={confirmDeletePlan}
+                            >
+                                Delete Plan
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };

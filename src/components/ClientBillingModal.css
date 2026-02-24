@@ -39,7 +39,7 @@
 
 .su-plan-selectable {
     position: relative;
-    padding: 1rem;
+    padding: 1rem 3rem 1rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     cursor: pointer;

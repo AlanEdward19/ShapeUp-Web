@@ -202,6 +202,20 @@ const ClientView = () => {
             }, 0);
         }, 0);
 
+        // Determine total session status
+        let totalSetsCount = 0;
+        let completedSetsCount = 0;
+        exercises.forEach(ex => {
+            ex.sets.forEach(s => {
+                totalSetsCount++;
+                if (s.completed) completedSetsCount++;
+            });
+        });
+
+        let sessionStatus = 'completed';
+        if (completedSetsCount === 0) sessionStatus = 'skipped';
+        else if (completedSetsCount < totalSetsCount) sessionStatus = 'partial';
+
         // Save session history back to identical plan in localStorage
         if (activePlan) {
             const clientId = localStorage.getItem('shapeup_client_id') || 1;
@@ -216,6 +230,7 @@ const ClientView = () => {
                         duration: formatTime(workoutTime),
                         totalVol: `${totalVol.toLocaleString()} kg`,
                         rpe: sessionFeedback.rpe || 5,
+                        status: sessionStatus,
                         exercises: exercises.map(ex => ({
                             name: ex.name,
                             skipped: ex.sets.every(s => !s.completed),
