@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, CheckCircle, Clock, ChevronRight, CalendarDays, Plus, FastForward, Award, TrendingUp, X } from 'lucide-react';
+import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, CalendarDays, Plus, FastForward, Award, TrendingUp, X } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -45,6 +45,13 @@ const ClientView = () => {
     // We store arrays of sets for each exercise block
     // Dynamic Sets Data Structure
     const [exercises, setExercises] = useState([]);
+
+    // Session History Pagination state
+    const [historyPage, setHistoryPage] = useState(1);
+    const HISTORY_PER_PAGE = 5;
+
+    const [showSessionModal, setShowSessionModal] = useState(false);
+    const [selectedSession, setSelectedSession] = useState(null);
 
     // -- Fetch Plans from LocalStorage --
     useEffect(() => {
@@ -236,6 +243,18 @@ const ClientView = () => {
         setViewingExerciseDef(null);
     };
 
+    // -- History Calculation --
+    const allHistory = assignedPlans.flatMap(plan =>
+        (plan.history || []).map(h => ({ ...h, planName: plan.name }))
+    ).sort((a, b) => {
+        const timeA = parseInt(a.id.replace('h', '')) || 0;
+        const timeB = parseInt(b.id.replace('h', '')) || 0;
+        return timeB - timeA;
+    });
+
+    const totalPages = Math.ceil(allHistory.length / HISTORY_PER_PAGE);
+    const paginatedHistory = allHistory.slice((historyPage - 1) * HISTORY_PER_PAGE, historyPage * HISTORY_PER_PAGE);
+
     // 1. Inactive View (Plan Overview)
     if (!sessionActive) {
         return (
@@ -274,28 +293,69 @@ const ClientView = () => {
                 )}
 
                 <h3 className="su-section-title su-mt-8">Session History</h3>
-                <div className="su-history-list">
-                    {[
-                        { date: 'Yesterday', title: 'Lower Body Strength', vol: '12,500 kg', pr: true, duration: '1:05:00' },
-                        { date: 'Oct 24', title: 'Upper Body Power', vol: '10,200 kg', pr: false, duration: '0:52:10' },
-                        { date: 'Oct 22', title: 'Leg Day Volume', vol: '14,000 kg', pr: false, duration: '1:12:30' }
-                    ].map((hist, i) => (
-                        <Card key={i} className="su-history-card">
-                            <div className="su-hist-left">
-                                <div className="su-hist-date">
-                                    <CalendarDays size={18} className="su-text-muted" /> {hist.date}
+                <div className="su-history-list" style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                    {allHistory.length === 0 ? (
+                        <p className="su-text-muted">No completed sessions yet. Start a workout to build your history!</p>
+                    ) : (
+                        paginatedHistory.map((hist) => (
+                            <Card
+                                key={hist.id}
+                                className="su-history-card"
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => {
+                                    setSelectedSession(hist);
+                                    setShowSessionModal(true);
+                                }}
+                            >
+                                <div className="su-hist-left">
+                                    <div className="su-hist-date">
+                                        <CalendarDays size={18} className="su-text-muted" /> {hist.date}
+                                    </div>
+                                    <div className="su-hist-title">{hist.planName}</div>
                                 </div>
-                                <div className="su-hist-title">{hist.title}</div>
-                            </div>
-                            <div className="su-hist-right">
-                                {hist.pr && <span className="su-pr-badge">New PR!</span>}
-                                <span className="su-text-muted">⏱ {hist.duration}</span>
-                                <span className="su-hist-vol">{hist.vol} vol</span>
-                                <button className="su-icon-btn"><ChevronRight size={20} /></button>
-                            </div>
-                        </Card>
-                    ))}
+                                <div className="su-hist-right">
+                                    {/* <span className="su-pr-badge">New PR!</span> */}
+                                    <span className="su-text-muted">⏱ {hist.duration}</span>
+                                    <span className="su-hist-vol">{hist.totalVol} vol</span>
+                                </div>
+                            </Card>
+                        ))
+                    )}
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="su-pagination-controls" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                        <Button
+                            variant="outline"
+                            onClick={() => setHistoryPage(p => Math.max(1, p - 1))}
+                            disabled={historyPage === 1}
+                            icon={<ChevronLeft size={16} />}
+                        >
+                            Previous
+                        </Button>
+                        <span className="su-text-muted" style={{ fontSize: '0.9rem' }}>
+                            Page {historyPage} of {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            onClick={() => setHistoryPage(p => Math.min(totalPages, p + 1))}
+                            disabled={historyPage === totalPages}
+                        >
+                            Next <ChevronRight size={16} style={{ marginLeft: '4px' }} />
+                        </Button>
+                    </div>
+                )}
+
+                {showSessionModal && selectedSession && (
+                    <SessionDetailModal
+                        session={selectedSession}
+                        planName={selectedSession.planName}
+                        onClose={() => {
+                            setShowSessionModal(false);
+                            setSelectedSession(null);
+                        }}
+                    />
+                )}
             </div>
         );
     }
@@ -600,5 +660,57 @@ const DumbbellIcon = ({ size }) => (
         <path d="M20 10l2-2" />
     </svg>
 )
+
+// ─── SESSION DETAIL MODAL (matches coach view) ────────────────────
+const SET_TYPE_COLORS = { warmup: '#94a3b8', feeder: '#a78bfa', working: '#60a5fa', topset: '#f59e0b', backoff: '#34d399' };
+const SetTypeBadge = ({ type }) => (
+    <span style={{
+        fontSize: '0.7rem', fontWeight: 700, padding: '0.15rem 0.5rem',
+        borderRadius: 999, color: '#fff', background: SET_TYPE_COLORS[type] || '#94a3b8',
+        textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap'
+    }}>{type}</span>
+);
+
+const SessionDetailModal = ({ session, planName, onClose }) => (
+    <div className="su-modal-overlay" onClick={onClose} style={{ zIndex: 10000 }}>
+        <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()}>
+            <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
+            <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>{planName}</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
+                {session.date} · {session.duration} · {session.totalVol} volume · Avg RPE {session.rpe}
+            </p>
+            <div className="su-sd-exercises" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                {session.exercises.map((ex, i) => (
+                    <div key={i} className="su-sd-ex-block" style={{ marginBottom: '1.5rem' }}>
+                        <div className="su-sd-ex-name" style={{ fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center' }}>
+                            {ex.name}
+                            {ex.skipped && <span className="su-skipped-tag" style={{ marginLeft: '0.5rem', display: 'inline-flex', alignItems: 'center', padding: '0.15rem 0.5rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 600, color: 'var(--danger)', backgroundColor: 'var(--danger-light)', border: '1px solid var(--danger)' }}>Skipped</span>}
+                        </div>
+                        {ex.skipped ? (
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: '0' }}>
+                                This exercise was skipped during the session.
+                            </p>
+                        ) : (
+                            <div className="su-sd-sets-table" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <div className="su-sd-sets-head" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '1px solid var(--border-color)', paddingBottom: '0.25rem' }}>
+                                    <span>Set</span><span>Type</span><span>Reps</span><span>Load</span><span>RPE</span>
+                                </div>
+                                {ex.sets.map((s, si) => (
+                                    <div key={si} className="su-sd-set-row" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', alignItems: 'center', fontSize: '0.95rem' }}>
+                                        <span className="su-sd-set-num" style={{ color: 'var(--text-muted)' }}>{s.set}</span>
+                                        <SetTypeBadge type={s.type} />
+                                        <span>{s.reps} reps</span>
+                                        <span>{s.load} kg</span>
+                                        <span>RPE {s.rpe}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    </div>
+);
 
 export default ClientView;
