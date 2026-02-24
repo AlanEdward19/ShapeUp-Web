@@ -69,7 +69,7 @@ const initPlans = [];
 // ─── Helpers ────────────────────────────────────────────────
 
 const SET_TYPE_COLORS = { warmup: '#94a3b8', feeder: '#a78bfa', working: '#60a5fa', topset: '#f59e0b', backoff: '#34d399' };
-const SetTypeBadge = ({ type }) => (
+export const SetTypeBadge = ({ type }) => (
     <span style={{
         fontSize: '0.7rem', fontWeight: 700, padding: '0.15rem 0.5rem',
         borderRadius: 999, color: '#fff', background: SET_TYPE_COLORS[type] || '#94a3b8',
@@ -77,7 +77,7 @@ const SetTypeBadge = ({ type }) => (
     }}>{type}</span>
 );
 
-const ProSelect = ({ label, value, onChange, options }) => (
+export const ProSelect = ({ label, value, onChange, options }) => (
     <div className="su-input-group">
         {label && <label className="su-input-label">{label}</label>}
         <select className="su-select" value={value} onChange={onChange}>
@@ -91,7 +91,7 @@ const ProSelect = ({ label, value, onChange, options }) => (
 const TECHNIQUES = ['Straight', 'Cluster', 'Drop Set', 'Rest Pause', 'Muscle Round'];
 const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
-const PlanEditor = ({ plan, onSave, onCancel }) => {
+export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
     const [name, setName] = useState(plan.name);
     const [phase, setPhase] = useState(plan.phase);
     const [difficulty, setDiff] = useState(plan.difficulty || 'Intermediate');
@@ -380,6 +380,12 @@ const PlanEditor = ({ plan, onSave, onCancel }) => {
                         onClick={() => onSave({ ...plan, name, phase, difficulty, weeks, notes: planNotes, exercises })}>
                         Save Plan
                     </Button>
+                    {onAssign && (
+                        <Button fullWidth variant="outline" className="su-mt-2" style={{ color: 'var(--text-main)' }}
+                            onClick={() => onAssign({ ...plan, name, phase, difficulty, weeks, notes: planNotes, exercises })}>
+                            Assign to Client
+                        </Button>
+                    )}
                     <Button fullWidth variant="outline" icon={<X size={16} />}
                         onClick={onCancel} style={{ marginTop: '0.5rem' }}>
                         Cancel
