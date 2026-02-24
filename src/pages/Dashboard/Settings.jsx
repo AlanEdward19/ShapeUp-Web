@@ -21,41 +21,24 @@ const Settings = () => {
 
     const activeProfile = isProfessional ? coachProfile : clientProfile;
 
-    const [objectives, setObjectives] = useState(() => {
-        const stored = localStorage.getItem(`shapeup_client_objectives_${clientId}`);
-        return stored ? JSON.parse(stored) : { goalWeight: '', history: [] };
-    });
-
-    const currentWeightEntry = objectives.history.length > 0 ? objectives.history[0].weight : '';
-    const [tempCurrentWeight, setTempCurrentWeight] = useState(currentWeightEntry);
-    const [tempGoalWeight, setTempGoalWeight] = useState(objectives.goalWeight);
-
     const handleSaveChanges = () => {
-        if (!isProfessional) {
-            let newHistory = [...objectives.history];
-            const parsedCurrent = parseFloat(tempCurrentWeight);
-
-            // Append a new weight entry if it changed
-            if (!isNaN(parsedCurrent) && parsedCurrent.toString() !== currentWeightEntry.toString()) {
-                newHistory = [
-                    {
-                        id: Date.now(),
-                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                        weight: parsedCurrent
-                    },
-                    ...newHistory
-                ];
-            }
-
-            const updatedObjectives = {
-                goalWeight: tempGoalWeight,
-                history: newHistory
-            };
-            setObjectives(updatedObjectives);
-            localStorage.setItem(`shapeup_client_objectives_${clientId}`, JSON.stringify(updatedObjectives));
-        }
-
         // Save name to localStorage
+        localStorage.setItem('shapeup_user_name', activeProfile.name);
+
+        if (!isProfessional) {
+            // Also update the shapeup_clients list so the coach sees the new name
+            const storedClients = localStorage.getItem('shapeup_clients');
+            if (storedClients) {
+                const clientsList = JSON.parse(storedClients);
+                const updatedList = clientsList.map(c => {
+                    if (c.id === parseInt(clientId) || c.id === clientId) {
+                        return { ...c, name: activeProfile.name };
+                    }
+                    return c;
+                });
+                localStorage.setItem('shapeup_clients', JSON.stringify(updatedList));
+            }
+        }
         localStorage.setItem('shapeup_user_name', activeProfile.name);
     };
 
@@ -207,28 +190,6 @@ const Settings = () => {
                                         />
                                     </div>
                                 )}
-                                {!isProfessional && (
-                                    <>
-                                        <div className="su-form-group">
-                                            <label>Current Weight (kg)</label>
-                                            <Input
-                                                type="number"
-                                                value={tempCurrentWeight}
-                                                onChange={(e) => setTempCurrentWeight(e.target.value)}
-                                                placeholder="e.g. 82.5"
-                                            />
-                                        </div>
-                                        <div className="su-form-group">
-                                            <label>Target Weight (kg)</label>
-                                            <Input
-                                                type="number"
-                                                value={tempGoalWeight}
-                                                onChange={(e) => setTempGoalWeight(e.target.value)}
-                                                placeholder="e.g. 80.0"
-                                            />
-                                        </div>
-                                    </>
-                                )}
                             </div>
                         </Card>
                     )}
@@ -308,7 +269,7 @@ const Settings = () => {
 
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
