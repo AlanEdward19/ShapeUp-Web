@@ -385,6 +385,17 @@
     transform: scale(1.1);
 }
 
+.su-btn-icon-danger {
+    transition: all var(--transition-fast);
+    opacity: 0.6;
+}
+
+.su-btn-icon-danger:hover {
+    opacity: 1;
+    color: #ef4444 !important;
+    transform: scale(1.1);
+}
+
 .su-check-circle.checked {
     color: var(--success);
 }
