@@ -181,6 +181,7 @@ const TrainingPlansProfessional = () => {
                         <Card className="su-plan-header-card">
                             <div className="su-plan-meta-grid">
                                 <Input label="Plan Name" defaultValue="Hypertrophy Phase 1 - Upper Power" />
+                                <Input label="Duration (Weeks)" type="number" min="1" max="52" defaultValue="6" />
                                 <Select label="Objective" defaultValue="hypertrophy" options={[
                                     { value: 'hypertrophy', label: 'Hypertrophy' },
                                     { value: 'strength', label: 'Strength/Power' },

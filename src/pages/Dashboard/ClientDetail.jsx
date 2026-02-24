@@ -187,6 +187,7 @@ const PlanEditor = ({ plan, onSave, onCancel }) => {
                 <Card className="su-plan-header-card">
                     <div className="su-plan-meta-grid">
                         <Input label="Plan Name" value={name} onChange={e => setName(e.target.value)} />
+                        <Input label="Duration (Weeks)" type="number" min="1" max="52" value={weeks} onChange={e => setWeeks(e.target.value)} />
                         <ProSelect label="Phase / Objective" value={phase} onChange={e => setPhase(e.target.value)}
                             options={[
                                 { value: 'Hypertrophy', label: 'Hypertrophy' },
