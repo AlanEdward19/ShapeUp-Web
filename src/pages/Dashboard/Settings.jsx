@@ -4,6 +4,7 @@ import { User, Bell, CreditCard, Link as LinkIcon, Smartphone, Shield, Moon, Sun
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
+import CreditCardUI from '../../components/CreditCardUI';
 import { useTheme } from '../../ThemeContext';
 import './Settings.css';
 
@@ -38,6 +39,13 @@ const Settings = () => {
                 });
                 localStorage.setItem('shapeup_clients', JSON.stringify(updatedList));
             }
+
+            // Save client card data
+            localStorage.setItem(`shapeup_client_card_${clientId}`, JSON.stringify(cardData));
+        } else {
+            // Predictably save pro billing info
+            localStorage.setItem('shapeup_pro_bank', JSON.stringify(bankDetails));
+            localStorage.setItem('shapeup_pro_plans', JSON.stringify(proPlans));
         }
         localStorage.setItem('shapeup_user_name', activeProfile.name);
     };
@@ -71,6 +79,56 @@ const Settings = () => {
         fileInputRef.current?.click();
     };
 
+    // --- BILLING STATE ---
+    // Professional Billing
+    const [bankDetails, setBankDetails] = useState(() => {
+        const stored = localStorage.getItem('shapeup_pro_bank');
+        return stored ? JSON.parse(stored) : { accountName: '', routingNumber: '', accountNumber: '' };
+    });
+    const [proPlans, setProPlans] = useState(() => {
+        const stored = localStorage.getItem('shapeup_pro_plans');
+        return stored ? JSON.parse(stored) : [
+            { id: 'plan_1', name: 'Standard Coaching', price: 150, desc: 'Monthly app access and programs.' },
+            { id: 'plan_2', name: 'Premium 1-on-1', price: 300, desc: 'Includes weekly video check-ins.' }
+        ];
+    });
+
+    const handleAddPlan = () => {
+        setProPlans([...proPlans, { id: `plan_${Date.now()}`, name: 'New Plan', price: 0, desc: '' }]);
+    };
+
+    const handleDeletePlan = (id) => {
+        setProPlans(proPlans.filter(p => p.id !== id));
+    };
+
+    const updatePlan = (id, field, value) => {
+        setProPlans(proPlans.map(p => p.id === id ? { ...p, [field]: field === 'price' ? Number(value) : value } : p));
+    };
+
+    // Client Billing
+    const [cardData, setCardData] = useState(() => {
+        const stored = localStorage.getItem(`shapeup_client_card_${clientId}`);
+        return stored ? JSON.parse(stored) : { number: '', name: '', expiry: '', cvv: '' };
+    });
+    const [isCardFlipped, setIsCardFlipped] = useState(false);
+
+    const [clientAssignedPlan, setClientAssignedPlan] = useState(() => {
+        const stored = localStorage.getItem('shapeup_clients');
+        if (stored) {
+            const list = JSON.parse(stored);
+            const me = list.find(c => c.id === parseInt(clientId) || c.id === clientId);
+            if (me && me.billingType) {
+                if (me.billingType === 'custom') return { name: 'Custom Individual Rate', price: me.customPrice, desc: 'Special rate assigned by your coach.' };
+                if (me.billingType === 'plan' && me.billingPlanId) {
+                    const allProPlans = JSON.parse(localStorage.getItem('shapeup_pro_plans') || '[]');
+                    const found = allProPlans.find(p => p.id === me.billingPlanId);
+                    if (found) return found;
+                }
+            }
+        }
+        return null; // No assigned plan yet
+    });
+
     const tabsProfessional = [
         { id: 'profile', label: 'Profile & Brand', icon: <User size={18} /> },
         { id: 'notifications', label: 'Notifications', icon: <Bell size={18} /> },
@@ -81,6 +139,7 @@ const Settings = () => {
     const tabsClient = [
         { id: 'profile', label: 'Account Details', icon: <User size={18} /> },
         { id: 'preferences', label: 'App Preferences', icon: <Smartphone size={18} /> },
+        { id: 'billing', label: 'Billing & Plan', icon: <CreditCard size={18} /> },
         { id: 'coach', label: 'My Coach', icon: <Shield size={18} /> }
     ];
 
@@ -256,8 +315,143 @@ const Settings = () => {
                         </Card>
                     )}
 
+                    {isProfessional && activeTab === 'billing' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            <Card className="su-settings-card">
+                                <h2 className="su-settings-section-title">Bank Configuration</h2>
+                                <p className="su-text-muted su-text-sm su-mb-4">Link your bank account to receive payouts directly from client subscriptions.</p>
+                                <div className="su-settings-form-grid">
+                                    <div className="su-form-group su-col-span-2">
+                                        <label>Account Holder Name</label>
+                                        <Input value={bankDetails.accountName} onChange={e => setBankDetails({ ...bankDetails, accountName: e.target.value })} placeholder="E.g., ShapeUp Athletics LLC" />
+                                    </div>
+                                    <div className="su-form-group">
+                                        <label>Routing Number</label>
+                                        <Input value={bankDetails.routingNumber} onChange={e => setBankDetails({ ...bankDetails, routingNumber: e.target.value })} placeholder="9 digits" />
+                                    </div>
+                                    <div className="su-form-group">
+                                        <label>Account Number</label>
+                                        <Input value={bankDetails.accountNumber} onChange={e => setBankDetails({ ...bankDetails, accountNumber: e.target.value })} placeholder="•••• ••••" />
+                                    </div>
+                                </div>
+                            </Card>
+
+                            <Card className="su-settings-card">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                    <div>
+                                        <h2 className="su-settings-section-title" style={{ marginBottom: 0 }}>Subscription Plans</h2>
+                                        <p className="su-text-muted su-text-sm">Create and manage the default billing tiers available for your clients.</p>
+                                    </div>
+                                    <Button size="small" variant="outline" onClick={handleAddPlan}>Add Plan</Button>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    {proPlans.map(plan => (
+                                        <div key={plan.id} style={{ border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem' }}>
+                                            <div className="su-settings-form-grid" style={{ marginBottom: '1rem' }}>
+                                                <div className="su-form-group" style={{ gridColumn: 'span 2' }}>
+                                                    <label>Plan Name</label>
+                                                    <Input value={plan.name} onChange={e => updatePlan(plan.id, 'name', e.target.value)} />
+                                                </div>
+                                                <div className="su-form-group">
+                                                    <label>Monthly Price ($)</label>
+                                                    <Input type="number" value={plan.price} onChange={e => updatePlan(plan.id, 'price', e.target.value)} />
+                                                </div>
+                                                <div className="su-form-group su-col-span-2" style={{ gridColumn: 'span 3' }}>
+                                                    <label>Description (What's included?)</label>
+                                                    <Input value={plan.desc} onChange={e => updatePlan(plan.id, 'desc', e.target.value)} />
+                                                </div>
+                                            </div>
+                                            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                                <button className="su-btn-text-danger" onClick={() => handleDeletePlan(plan.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--error)' }}>
+                                                    Remove Plan
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {proPlans.length === 0 && <p className="su-text-muted su-text-center">No subscription plans created yet.</p>}
+                                </div>
+                            </Card>
+                        </div>
+                    )}
+
+                    {!isProfessional && activeTab === 'billing' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            <Card className="su-settings-card">
+                                <h2 className="su-settings-section-title">Active Subscription</h2>
+                                {clientAssignedPlan ? (
+                                    <div style={{ backgroundColor: 'var(--bg-main)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--primary)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-main)' }}>{clientAssignedPlan.name}</h3>
+                                            <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>${clientAssignedPlan.price}<span style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--text-muted)' }}>/mo</span></span>
+                                        </div>
+                                        <p className="su-text-muted">{clientAssignedPlan.desc}</p>
+                                    </div>
+                                ) : (
+                                    <div className="su-empty-state-large" style={{ padding: '2rem' }}>
+                                        <h3 className="su-text-muted">No Plan Assigned</h3>
+                                        <p className="su-text-muted su-text-sm">Your coach has not assigned a billing plan to your account yet.</p>
+                                    </div>
+                                )}
+                            </Card>
+
+                            <Card className="su-settings-card">
+                                <h2 className="su-settings-section-title">Payment Method</h2>
+                                <p className="su-text-muted su-text-sm su-mb-4">Securely save your card details for automatic monthly billing.</p>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
+                                    <CreditCardUI cardData={cardData} isFlipped={isCardFlipped} />
+                                </div>
+
+                                <div className="su-settings-form-grid">
+                                    <div className="su-form-group su-col-span-2">
+                                        <label>Card Number</label>
+                                        <Input
+                                            value={cardData.number}
+                                            maxLength={16}
+                                            onChange={e => setCardData({ ...cardData, number: e.target.value.replace(/\D/g, '') })}
+                                            placeholder="0000 0000 0000 0000"
+                                            onFocus={() => setIsCardFlipped(false)}
+                                        />
+                                    </div>
+                                    <div className="su-form-group su-col-span-2">
+                                        <label>Cardholder Name</label>
+                                        <Input
+                                            value={cardData.name}
+                                            onChange={e => setCardData({ ...cardData, name: e.target.value })}
+                                            placeholder="JOHN DOE"
+                                            onFocus={() => setIsCardFlipped(false)}
+                                        />
+                                    </div>
+                                    <div className="su-form-group">
+                                        <label>Expiration (MM/YY)</label>
+                                        <Input
+                                            value={cardData.expiry}
+                                            maxLength={5}
+                                            onChange={e => setCardData({ ...cardData, expiry: e.target.value })}
+                                            placeholder="12/26"
+                                            onFocus={() => setIsCardFlipped(false)}
+                                        />
+                                    </div>
+                                    <div className="su-form-group">
+                                        <label>CVV / CVC</label>
+                                        <Input
+                                            value={cardData.cvv}
+                                            maxLength={4}
+                                            type="password"
+                                            onChange={e => setCardData({ ...cardData, cvv: e.target.value.replace(/\D/g, '') })}
+                                            placeholder="•••"
+                                            onFocus={() => setIsCardFlipped(true)}
+                                            onBlur={() => setIsCardFlipped(false)}
+                                        />
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+                    )}
+
                     {/* Placeholder for others */}
-                    {(activeTab === 'billing' || activeTab === 'integrations' || activeTab === 'coach') && (
+                    {(activeTab === 'integrations' || activeTab === 'coach') && (
                         <Card className="su-settings-card su-flex-center">
                             <div className="su-empty-state-large">
                                 <Shield size={48} className="su-text-muted su-mb-4" />

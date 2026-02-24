@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, MessageSquare, ExternalLink, Play, Pause, Trash2 } from 'lucide-react';
+import { Search, Filter, MessageSquare, ExternalLink, Play, Pause, Trash2, DollarSign } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import InviteClientModal from '../../components/InviteClientModal';
+import ClientBillingModal from '../../components/ClientBillingModal';
 import './Clients.css';
 
 // Mock Client Data - Used as initial state if localStorage is empty
@@ -21,6 +22,7 @@ const Clients = () => {
     const [showInvite, setShowInvite] = useState(false);
     const [clients, setClients] = useState([]);
     const [clientToDelete, setClientToDelete] = useState(null);
+    const [billingClient, setBillingClient] = useState(null);
 
     useEffect(() => {
         const fetchAndComputeClients = () => {
@@ -126,9 +128,28 @@ const Clients = () => {
         setClientToDelete(null);
     };
 
+    const handleSaveBilling = (billingData) => {
+        if (!billingClient) return;
+        const updated = clients.map(c => {
+            if (c.id === billingClient.id) {
+                return { ...c, ...billingData };
+            }
+            return c;
+        });
+        setClients(updated);
+        localStorage.setItem('shapeup_clients', JSON.stringify(updated));
+    };
+
     return (
         <div className="su-clients-dashboard">
             {showInvite && <InviteClientModal onClose={() => setShowInvite(false)} onInvite={handleInvite} />}
+
+            <ClientBillingModal
+                isOpen={!!billingClient}
+                client={billingClient}
+                onClose={() => setBillingClient(null)}
+                onSave={handleSaveBilling}
+            />
 
             {/* Delete Confirmation Modal */}
             {clientToDelete && (
@@ -245,6 +266,11 @@ const Clients = () => {
                                                     <Pause size={16} />
                                                 </button>
                                             )}
+
+                                            {/* Billing Action */}
+                                            <button className="su-icon-btn su-text-muted" title="Manage Billing" onClick={() => setBillingClient(client)}>
+                                                <DollarSign size={16} />
+                                            </button>
 
                                             {/* Delete Action (Warning Color) */}
                                             <button className="su-icon-btn" style={{ color: 'var(--error)' }} title="Delete Client" onClick={() => handleDeleteClient(client)}>
