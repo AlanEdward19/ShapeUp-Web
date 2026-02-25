@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import InviteClientModal from '../../components/InviteClientModal';
 import ClientBillingModal from '../../components/ClientBillingModal';
+import { addNotification } from '../../utils/notifications';
 import './Clients.css';
 
 // Mock Client Data - Used as initial state if localStorage is empty
@@ -92,6 +93,22 @@ const Clients = () => {
         const updated = [...clients, newClient];
         setClients(updated);
         localStorage.setItem('shapeup_clients', JSON.stringify(updated));
+
+        // Simulate client registration
+        setTimeout(() => {
+            addNotification('pro', 'system', 'New Client Registered', `${email} has accepted your invite and joined your roster.`, 'primary', {
+                clientId: newClient.id,
+                link: `/dashboard/clients/${newClient.id}`
+            });
+
+            // Optionally, we update the local storage to reflect 'Active' status to complete the illusion
+            const refreshed = JSON.parse(localStorage.getItem('shapeup_clients') || '[]');
+            const finalized = refreshed.map(c => c.id === newClient.id ? { ...c, status: 'Active' } : c);
+            localStorage.setItem('shapeup_clients', JSON.stringify(finalized));
+
+            // If the user is still on the Clients screen, trigger a re-render
+            setClients(prev => prev.map(c => c.id === newClient.id ? { ...c, status: 'Active' } : c));
+        }, 3000);
     };
 
     const handleRowClick = (id) => {

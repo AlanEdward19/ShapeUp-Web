@@ -1,29 +1,21 @@
 import React, { useState } from 'react';
 import { Bell, User, Dumbbell } from 'lucide-react';
-import NotificationsPanel, { proNotifications, clientNotifications } from './NotificationsPanel';
+import NotificationsPanel from './NotificationsPanel';
+import { useNotifications } from '../utils/notifications';
 import './Header.css';
 
 const Header = ({ isProfessional, profile, sessionTitle }) => {
     const [showNotifications, setShowNotifications] = useState(false);
 
-    const seedData = isProfessional ? proNotifications : clientNotifications;
-    const [notifications, setNotifications] = useState(seedData);
+    // Provide 'pro' or the client's ID (mocked as '1' for now since we don't have a full auth context)
+    const targetUserId = isProfessional ? 'pro' : '1';
 
-    // Update notifications when view switches
+    const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications(targetUserId);
+
+    // Close notifications panel on toggle view
     React.useEffect(() => {
-        setNotifications(isProfessional ? proNotifications : clientNotifications);
         setShowNotifications(false);
     }, [isProfessional]);
-
-    const unreadCount = notifications.filter(n => !n.read).length;
-
-    const handleMarkRead = (id) => {
-        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-    };
-
-    const handleMarkAllRead = () => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    };
 
     return (
         <header className="su-header">
@@ -53,8 +45,8 @@ const Header = ({ isProfessional, profile, sessionTitle }) => {
                         <NotificationsPanel
                             isProfessional={isProfessional}
                             notifications={notifications}
-                            onMarkRead={handleMarkRead}
-                            onMarkAllRead={handleMarkAllRead}
+                            onMarkRead={markAsRead}
+                            onMarkAllRead={markAllAsRead}
                             onClose={() => setShowNotifications(false)}
                         />
                     )}

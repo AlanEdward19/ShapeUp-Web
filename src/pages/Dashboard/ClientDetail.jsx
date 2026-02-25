@@ -15,6 +15,7 @@ import {
     BarChart, Bar
 } from 'recharts';
 import ExerciseLibraryModal from '../../components/ExerciseLibraryModal';
+import { addNotification } from '../../utils/notifications';
 import '../../components/InviteClientModal.css';
 import '../Dashboard/TrainingPlansProfessional.css';
 import './ClientDetail.css';
@@ -651,6 +652,9 @@ const ClientDetail = () => {
     const handleSavePlan = (updated) => {
         setPlans(prev => prev.map(p => p.id === updated.id ? updated : p));
         setEditingPlan(null);
+        addNotification(id.toString(), 'alert', 'Plan Updated', `Your coach has updated "${updated.name}"`, 'primary', {
+            link: '/dashboard/training'
+        });
     };
 
     const handleDeletePlan = (planId) =>

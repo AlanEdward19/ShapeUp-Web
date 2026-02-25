@@ -1,17 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, User, Paperclip, Image as ImageIcon, FileText, Check, CheckCheck, Clock, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { addNotification } from '../utils/notifications';
 import './ChatDrawer.css';
 
 const ChatDrawer = ({ isOpen, onClose }) => {
-    const [messages, setMessages] = useState([
-        { id: 1, sender: 'coach', text: 'Hey! I saw you finished Upper Power. How did the bench feel today?', time: '10:00 AM', status: 'read' },
-        { id: 2, sender: 'client', text: 'It was great. Pushed hard on the last set.', time: '11:15 AM', tag: 'rpe report', status: 'read' }
-    ]);
+    // Get active client info
+    const clientId = localStorage.getItem('shapeup_client_id') || 1;
+    const clientName = "Alan Edward"; // Mocked active client name since we don't have a global profile context here yet
+
+    const [messages, setMessages] = useState(() => {
+        const stored = localStorage.getItem('shapeup_messages');
+        let allMessages = stored ? JSON.parse(stored) : [];
+        // Filter messages for this client only
+        let clientMessages = allMessages.filter(m => m.clientId === clientId);
+        if (clientMessages.length === 0) {
+            // Initial mock message for demonstration if empty
+            clientMessages = [
+                {
+                    id: 1, clientId: clientId, clientName: clientName, sender: 'coach',
+                    text: 'Hey! I saw you finished Upper Power. How did the bench feel today?',
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    status: 'read', tag: 'general', isTicket: false
+                }
+            ];
+            allMessages = [...allMessages, ...clientMessages];
+            localStorage.setItem('shapeup_messages', JSON.stringify(allMessages));
+        }
+        return clientMessages;
+    });
     const [newMessage, setNewMessage] = useState('');
     const [selectedTag, setSelectedTag] = useState('general');
     const [attachedFile, setAttachedFile] = useState(null);
     const [editingMsgId, setEditingMsgId] = useState(null);
     const [activeMsgMenu, setActiveMsgMenu] = useState(null);
+    const [replyingTo, setReplyingTo] = useState(null);
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -27,50 +49,119 @@ const ChatDrawer = ({ isOpen, onClose }) => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    useEffect(() => {
-        if (isOpen) {
-            scrollToBottom();
+    const scrollToMessage = (msgId) => {
+        const el = document.getElementById(`msg-${msgId}`);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('su-highlight-msg');
+            setTimeout(() => el.classList.remove('su-highlight-msg'), 2000);
         }
-    }, [isOpen, messages]);
+    };
+
+    useEffect(() => {
+        const loadMessages = () => {
+            const stored = localStorage.getItem('shapeup_messages');
+            if (stored) {
+                const allMessages = JSON.parse(stored);
+                let hasChanges = false;
+
+                const updatedAll = allMessages.map(m => {
+                    if (m.clientId === clientId && m.sender === 'coach' && m.status !== 'read') {
+                        hasChanges = true;
+                        return { ...m, status: 'read' };
+                    }
+                    return m;
+                });
+
+                if (hasChanges && isOpen) {
+                    localStorage.setItem('shapeup_messages', JSON.stringify(updatedAll));
+                    window.dispatchEvent(new Event('shapeup_messages_updated'));
+                }
+
+                setMessages(updatedAll.filter(m => m.clientId === clientId));
+            }
+        };
+
+        if (isOpen) {
+            loadMessages();
+            // Add a small delay for DOM to render the new messages before scrolling
+            setTimeout(scrollToBottom, 100);
+        }
+
+        const handleSync = () => {
+            if (isOpen) loadMessages();
+        };
+
+        window.addEventListener('storage', handleSync);
+        window.addEventListener('shapeup_messages_updated', handleSync);
+
+        return () => {
+            window.removeEventListener('storage', handleSync);
+            window.removeEventListener('shapeup_messages_updated', handleSync);
+        };
+    }, [isOpen, clientId]);
 
     const handleSend = () => {
         if (!newMessage.trim() && !attachedFile) return;
 
         if (editingMsgId) {
-            setMessages(messages.map(msg =>
-                msg.id === editingMsgId
-                    ? { ...msg, text: newMessage, isEdited: true, attachment: attachedFile || msg.attachment }
-                    : msg
-            ));
+            setMessages(prev => {
+                const refreshed = prev.map(msg =>
+                    msg.id === editingMsgId
+                        ? { ...msg, text: newMessage, isEdited: true, attachment: attachedFile || msg.attachment }
+                        : msg
+                );
+                syncToStorage(refreshed);
+                return refreshed;
+            });
             setEditingMsgId(null);
             setNewMessage('');
             setSelectedTag('general');
             setAttachedFile(null);
+            setReplyingTo(null);
             return;
         }
 
         const newMsg = {
             id: Date.now(),
+            clientId: clientId,
+            clientName: clientName,
             sender: 'client',
             text: newMessage,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             tag: selectedTag,
+            isTicket: selectedTag !== 'general',
             attachment: attachedFile,
-            status: 'sending' // Initial status
+            replyTo: replyingTo ? { id: replyingTo.id, text: replyingTo.text, sender: replyingTo.sender } : null,
+            status: 'sent' // changed from sending to sent immediately for simplicity, or we can leave as unread. Let's use 'sent' to show 1 tick.
         };
 
-        setMessages([...messages, newMsg]);
+        const updatedMessages = [...messages, newMsg];
+        setMessages(updatedMessages);
+
+        // Save to global storage
+        const stored = localStorage.getItem('shapeup_messages');
+        const allMessages = stored ? JSON.parse(stored) : [];
+        localStorage.setItem('shapeup_messages', JSON.stringify([...allMessages, newMsg]));
+
+        // Notify professional
+        addNotification('pro', 'message', 'New Message', `${clientName}: ${newMessage || 'Sent an attachment'}`, 'primary', {
+            link: '/dashboard/feedback',
+            state: { clientId: clientId }
+        });
+
         setNewMessage('');
         setSelectedTag('general');
         setAttachedFile(null);
+        setReplyingTo(null);
+        setTimeout(scrollToBottom, 50);
+    };
 
-        // Simulate message status changes
-        setTimeout(() => {
-            setMessages(prev => prev.map(m => m.id === newMsg.id ? { ...m, status: 'sent' } : m));
-            setTimeout(() => {
-                setMessages(prev => prev.map(m => m.id === newMsg.id ? { ...m, status: 'read' } : m));
-            }, 2000);
-        }, 1000);
+    const syncToStorage = (clientMsgs) => {
+        const stored = localStorage.getItem('shapeup_messages');
+        const allMessages = stored ? JSON.parse(stored) : [];
+        const otherMsgs = allMessages.filter(m => m.clientId !== clientId);
+        localStorage.setItem('shapeup_messages', JSON.stringify([...otherMsgs, ...clientMsgs]));
     };
 
     const handleEdit = (msg) => {
@@ -83,7 +174,11 @@ const ChatDrawer = ({ isOpen, onClose }) => {
     };
 
     const handleDelete = (id) => {
-        setMessages(messages.filter(msg => msg.id !== id));
+        setMessages(prev => {
+            const refreshed = prev.filter(msg => msg.id !== id);
+            syncToStorage(refreshed);
+            return refreshed;
+        });
         setActiveMsgMenu(null);
     };
 
@@ -170,7 +265,28 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                                     </div>
                                 )}
 
-                                <div className="su-chat-bubble">
+                                <div
+                                    id={`msg-${msg.id}`}
+                                    className="su-chat-bubble"
+                                    onContextMenu={(e) => {
+                                        e.preventDefault();
+                                        setReplyingTo(msg);
+                                    }}
+                                >
+                                    {msg.replyTo && (
+                                        <div
+                                            style={{ backgroundColor: 'var(--bg-main)', borderLeft: '3px solid var(--primary)', padding: '0.5rem', marginBottom: '0.5rem', borderRadius: '0.25rem', fontSize: '0.8rem', opacity: 0.8, cursor: 'pointer' }}
+                                            onClick={() => scrollToMessage(msg.replyTo.id)}
+                                        >
+                                            <strong style={{ display: 'block', color: msg.replyTo.sender === 'client' ? 'var(--text-main)' : 'var(--primary)', marginBottom: '0.25rem' }}>
+                                                {msg.replyTo.sender === 'client' ? 'You' : 'Coach'}
+                                            </strong>
+                                            <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                                                {msg.replyTo.text || 'Message attachment'}
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {msg.tag && msg.tag !== 'general' && (
                                         <span className={`su-chat-tag ${msg.tag.replace(' ', '-')}`}>
                                             {tags.find(t => t.value === msg.tag)?.label || msg.tag}
@@ -178,19 +294,29 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                                     )}
 
                                     {msg.attachment && (
-                                        <div className={`su-chat-attachment-preview ${msg.attachment.type}`}>
+                                        <div className="su-chat-bubble-attachment" style={{ marginTop: '0.5rem', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                                             {msg.attachment.type === 'image' && (
-                                                <img src={msg.attachment.url} alt="Attached" className="su-chat-attachment-media" />
+                                                <img src={msg.attachment.url} alt="Attachment" style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: 'var(--radius-md)' }} />
                                             )}
                                             {msg.attachment.type === 'video' && (
-                                                <video src={msg.attachment.url} controls className="su-chat-attachment-media" />
+                                                <video src={msg.attachment.url} controls style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: 'var(--radius-md)' }} />
                                             )}
-                                            {msg.attachment.type !== 'image' && msg.attachment.type !== 'video' && (
-                                                <div className="su-chat-attachment-file">
-                                                    <div className="su-chat-attachment-icon">
-                                                        {msg.attachment.type === 'pdf' ? <FileText size={24} /> : <Paperclip size={24} />}
-                                                    </div>
-                                                    <span className="su-chat-attachment-name">{msg.attachment.name}</span>
+                                            {msg.attachment.type === 'pdf' && (
+                                                <div
+                                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--bg-main)', padding: '0.75rem', borderRadius: 'var(--radius-md)', cursor: 'pointer', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
+                                                    onClick={() => window.open(msg.attachment.url, '_blank')}
+                                                >
+                                                    <FileText size={20} className="su-text-primary" />
+                                                    <span style={{ fontSize: '0.85rem', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '180px' }}>{msg.attachment.name}</span>
+                                                </div>
+                                            )}
+                                            {msg.attachment.type === 'file' && (
+                                                <div
+                                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--bg-main)', padding: '0.75rem', borderRadius: 'var(--radius-md)', cursor: 'pointer', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
+                                                    onClick={() => window.open(msg.attachment.url, '_blank')}
+                                                >
+                                                    <Paperclip size={20} className="su-text-muted" />
+                                                    <span style={{ fontSize: '0.85rem', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '180px' }}>{msg.attachment.name}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -220,6 +346,21 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                         </select>
                     </div>
                     <div className="su-chat-input-area">
+                        {replyingTo && (
+                            <div style={{ backgroundColor: 'var(--bg-main)', borderLeft: '3px solid var(--primary)', padding: '0.5rem', margin: '0.5rem 1rem 0 1rem', borderRadius: '0.25rem', fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div style={{ overflow: 'hidden' }}>
+                                    <strong style={{ display: 'block', color: replyingTo.sender === 'client' ? 'var(--text-main)' : 'var(--primary)', marginBottom: '0.25rem' }}>
+                                        Replying to {replyingTo.sender === 'client' ? 'You' : 'Coach'}
+                                    </strong>
+                                    <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', color: 'var(--text-muted)' }}>
+                                        {replyingTo.text || 'Message attachment'}
+                                    </div>
+                                </div>
+                                <button onClick={() => setReplyingTo(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                                    <X size={14} />
+                                </button>
+                            </div>
+                        )}
                         {attachedFile && (
                             <div className="su-chat-active-attachment">
                                 <span className="su-chat-active-attachment-name">{attachedFile.name}</span>

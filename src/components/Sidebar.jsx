@@ -21,6 +21,12 @@ const Sidebar = ({ isProfessional }) => {
     const [showContactModal, setShowContactModal] = useState(false);
     const navigate = useNavigate();
 
+    React.useEffect(() => {
+        const handleOpenChat = () => setShowContactModal(true);
+        window.addEventListener('open_client_chat', handleOpenChat);
+        return () => window.removeEventListener('open_client_chat', handleOpenChat);
+    }, []);
+
     // Navigation structure switches based on context
     const proNavItems = [
         { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },

@@ -1,78 +1,30 @@
 import React, { useEffect, useRef } from 'react';
-import { CheckCheck, X, MessageSquare, TrendingUp, AlertTriangle, Dumbbell, CreditCard, Bell } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { CheckCheck, X, MessageSquare, TrendingUp, AlertTriangle, Dumbbell, CreditCard, Bell, UserPlus } from 'lucide-react';
 import './NotificationsPanel.css';
 
-const proNotifications = [
-    {
-        id: 1,
-        icon: <AlertTriangle size={18} />,
-        iconColor: 'warning',
-        title: 'Client Needs Attention',
-        body: 'Sarah J. missed 2 consecutive sessions this week.',
-        time: '2h ago',
-        read: false,
-    },
-    {
-        id: 2,
-        icon: <MessageSquare size={18} />,
-        iconColor: 'primary',
-        title: 'New Feedback from Mike K.',
-        body: 'Felt a pinch on split squats, RPE was higher than usual.',
-        time: '4h ago',
-        read: false,
-    },
-    {
-        id: 3,
-        icon: <TrendingUp size={18} />,
-        iconColor: 'success',
-        title: 'New PR Logged',
-        body: 'David R. set a new PR on Bench Press — 100kg × 5.',
-        time: 'Yesterday',
-        read: false,
-    },
-    {
-        id: 4,
-        icon: <CreditCard size={18} />,
-        iconColor: 'muted',
-        title: 'Subscription Renewal',
-        body: 'Your Professional plan renews in 7 days.',
-        time: '2 days ago',
-        read: true,
-    },
-];
-
-const clientNotifications = [
-    {
-        id: 1,
-        icon: <Dumbbell size={18} />,
-        iconColor: 'primary',
-        title: 'New Workout Assigned',
-        body: 'Coach Alex assigned you a new plan: Lower Body Strength Phase 2.',
-        time: '1h ago',
-        read: false,
-    },
-    {
-        id: 2,
-        icon: <MessageSquare size={18} />,
-        iconColor: 'success',
-        title: 'Message from Coach Alex',
-        body: 'Great session yesterday! Let\'s push harder on legs this week.',
-        time: '3h ago',
-        read: false,
-    },
-    {
-        id: 3,
-        icon: <TrendingUp size={18} />,
-        iconColor: 'success',
-        title: 'You hit a new PR!',
-        body: 'Squat: 120kg × 3 — your strongest lift yet! 🎉',
-        time: 'Yesterday',
-        read: false,
-    },
-];
+const getIcon = (type) => {
+    switch (type) {
+        case 'message':
+            return <MessageSquare size={18} />;
+        case 'alert':
+            return <AlertTriangle size={18} />;
+        case 'system':
+            return <UserPlus size={18} />;
+        case 'workout':
+            return <Dumbbell size={18} />;
+        case 'pr':
+            return <TrendingUp size={18} />;
+        case 'billing':
+            return <CreditCard size={18} />;
+        default:
+            return <Bell size={18} />;
+    }
+};
 
 const NotificationsPanel = ({ isProfessional, notifications, onMarkRead, onMarkAllRead, onClose }) => {
     const panelRef = useRef(null);
+    const navigate = useNavigate();
 
     // Close on outside click
     useEffect(() => {
@@ -86,6 +38,19 @@ const NotificationsPanel = ({ isProfessional, notifications, onMarkRead, onMarkA
     }, [onClose]);
 
     const unreadCount = notifications.filter(n => !n.read).length;
+
+    const handleNotificationClick = (n) => {
+        onMarkRead(n.id);
+
+        if (n.type === 'message' && !isProfessional) {
+            // Client message notification clicked -> Trigger global chat drawer open
+            window.dispatchEvent(new Event('open_client_chat'));
+        } else if (n.link) {
+            navigate(n.link, { state: n.state });
+        }
+
+        onClose();
+    };
 
     return (
         <div className="su-notif-panel" ref={panelRef}>
@@ -119,10 +84,10 @@ const NotificationsPanel = ({ isProfessional, notifications, onMarkRead, onMarkA
                         <button
                             key={n.id}
                             className={`su-notif-item ${n.read ? 'read' : 'unread'}`}
-                            onClick={() => onMarkRead(n.id)}
+                            onClick={() => handleNotificationClick(n)}
                         >
-                            <div className={`su-notif-icon ${n.iconColor}`}>
-                                {n.icon}
+                            <div className={`su-notif-icon ${n.iconColor || 'primary'}`}>
+                                {getIcon(n.type)}
                             </div>
                             <div className="su-notif-body">
                                 <span className="su-notif-title">{n.title}</span>
@@ -138,5 +103,4 @@ const NotificationsPanel = ({ isProfessional, notifications, onMarkRead, onMarkA
     );
 };
 
-export { proNotifications, clientNotifications };
 export default NotificationsPanel;

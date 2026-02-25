@@ -4,6 +4,7 @@ import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { PlanEditor } from './ClientDetail';
+import { addNotification } from '../../utils/notifications';
 import './TrainingPlansProfessional.css';
 
 const TrainingPlansProfessional = () => {
@@ -63,6 +64,10 @@ const TrainingPlansProfessional = () => {
         const plans = stored ? JSON.parse(stored) : [];
         const newPlan = { ...assigningTemplate, id: `p${Date.now()}` };
         localStorage.setItem(`shapeup_client_plans_${clientId}`, JSON.stringify([...plans, newPlan]));
+
+        addNotification(clientId.toString(), 'alert', 'New Plan Assigned', `Your coach has assigned "${newPlan.name}" to you.`, 'primary', {
+            link: '/dashboard/training'
+        });
 
         alert(`Template assigned successfully!`);
         setAssigningTemplate(null);

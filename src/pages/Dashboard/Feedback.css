@@ -211,6 +211,7 @@
 
 .su-message-bubble {
     max-width: 80%;
+    min-width: 120px;
     padding: 1rem 1.25rem;
     border-radius: var(--radius-lg);
     font-size: 0.875rem;
@@ -301,4 +302,34 @@
 .su-empty-icon {
     color: var(--border-color);
     margin-bottom: 1rem;
+}
+
+@keyframes highlightFade {
+    0% {
+        filter: brightness(1.5);
+        box-shadow: 0 0 10px var(--primary);
+    }
+
+    100% {
+        filter: brightness(1);
+        box-shadow: 0 0 0 transparent;
+    }
+}
+
+.su-highlight-msg {
+    animation: highlightFade 2s ease-out;
+}
+
+.su-chat-status-icon {
+    opacity: 0.8;
+}
+
+.su-chat-status-icon.sent {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.su-chat-status-icon.read {
+    color: #4ade80;
+    /* Bright green for contrast against primary background */
+    opacity: 1;
 }

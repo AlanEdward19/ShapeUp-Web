@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import ExerciseModal from '../../components/ExerciseModal';
 import { exercisesDB } from '../../data/mockExercises';
+import { addNotification } from '../../utils/notifications';
 import './TrainingPlansClient.css';
 
 const formatTime = (totalSeconds) => {
@@ -246,6 +247,37 @@ const ClientView = () => {
 
                     dbPlans[targetPlanIdx].history = [newHistoryEntry, ...(dbPlans[targetPlanIdx].history || [])];
                     localStorage.setItem(`shapeup_client_plans_${clientId}`, JSON.stringify(dbPlans));
+
+                    // Evaluate Notifications / Alerts
+                    const skipCounts = JSON.parse(localStorage.getItem('shapeup_skipped_counts') || '{}');
+                    const activeClientId = localStorage.getItem('shapeup_client_id') || '1';
+
+                    exercises.forEach(ex => {
+                        const isSkipped = ex.sets.every(s => !s.completed);
+                        if (isSkipped) {
+                            skipCounts[ex.name] = (skipCounts[ex.name] || 0) + 1;
+                            if (skipCounts[ex.name] >= 2) {
+                                addNotification('pro', 'alert', 'Skipped Exercise Alert', `Client skipped ${ex.name} multiple times.`, 'warning', { link: `/dashboard/clients/${activeClientId}` });
+                            }
+                        } else {
+                            if (skipCounts[ex.name]) delete skipCounts[ex.name]; // Reset if they finally did it
+                        }
+                    });
+                    localStorage.setItem('shapeup_skipped_counts', JSON.stringify(skipCounts));
+
+                    if (sessionFeedback.rpe >= 8) {
+                        addNotification('pro', 'alert', 'Fatigue Alert', `Client reported high RPE (${sessionFeedback.rpe}) during session.`, 'error', { link: `/dashboard/clients/${activeClientId}` });
+                    }
+
+                    if (sessionStatus === 'skipped') {
+                        const skippedSessions = parseInt(localStorage.getItem('shapeup_skipped_sessions') || '0', 10) + 1;
+                        if (skippedSessions >= 2) {
+                            addNotification('pro', 'alert', 'Missed Session Alert', `Client skipped multiple training days recently.`, 'error', { link: `/dashboard/clients/${activeClientId}` });
+                        }
+                        localStorage.setItem('shapeup_skipped_sessions', skippedSessions.toString());
+                    } else if (sessionStatus === 'completed') {
+                        localStorage.setItem('shapeup_skipped_sessions', '0');
+                    }
 
                     // Reflect instantly on dashboard plans
                     setAssignedPlans(dbPlans);
