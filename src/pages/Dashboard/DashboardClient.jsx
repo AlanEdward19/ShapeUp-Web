@@ -40,15 +40,24 @@ const DashboardClient = () => {
         const storedPlans = localStorage.getItem(`shapeup_client_plans_${clientId}`);
         if (!storedPlans) return;
         const plans = JSON.parse(storedPlans);
+
+        // Sort by session ID (which is a timestamp) for reliable order
+        const getTimestamp = (id) => {
+            if (typeof id === 'number') return id;
+            if (typeof id === 'string') return parseInt(id.replace(/[^0-9]/g, '')) || 0;
+            return 0;
+        };
+
         const history = plans
-            .flatMap(p => p.history || [])
-            .sort((a, b) => new Date(a.date) - new Date(b.date));
+            .flatMap(p => (p.history || []).map(h => ({ ...h, planName: p.name })))
+            .sort((a, b) => getTimestamp(a.id) - getTimestamp(b.id));
+
         setAllHistory(history);
         setPlansData({
             plansWithSessions: plans.filter(p => (p.history || []).length > 0).length,
             totalPlans: plans.length
         });
-    }, []); // empty deps = runs every time component mounts
+    }, [clientId]);
 
     const currentWeekKey = getWeekKey(new Date());
 
@@ -94,26 +103,63 @@ const DashboardClient = () => {
 
     // ─── Recent Improvements ─────────────────────────────────────────
     const recentImprovements = useMemo(() => {
-        const exerciseMap = {};
+        const bestMap = {};
+        const improvementsList = [];
+
+        // allHistory is now reliably sorted by timestamp ascending
         allHistory.forEach(h => {
             (h.exercises || []).forEach(ex => {
                 if (ex.skipped) return;
-                const maxLoad = Math.max(...(ex.sets || [{ load: 0 }]).map(s => parseFloat(s.load) || 0));
-                const maxReps = Math.max(...(ex.sets || [{ reps: 0 }]).map(s => parseFloat(s.reps) || 0));
-                if (!exerciseMap[ex.name]) {
-                    exerciseMap[ex.name] = { first: { load: maxLoad, reps: maxReps }, last: { load: maxLoad, reps: maxReps } };
+
+                const exerciseName = (ex.name || '').trim();
+                if (!exerciseName) return;
+
+                // Find best set in this session
+                let sessionMaxLoad = 0;
+                let sessionMaxReps = 0;
+
+                (ex.sets || []).forEach(s => {
+                    const l = parseFloat(s.load) || 0;
+                    const r = parseInt(s.reps) || 0;
+                    if (l > sessionMaxLoad) {
+                        sessionMaxLoad = l;
+                        sessionMaxReps = r;
+                    } else if (l === sessionMaxLoad && r > sessionMaxReps) {
+                        sessionMaxReps = r;
+                    }
+                });
+
+                if (sessionMaxLoad === 0 && sessionMaxReps === 0) return;
+
+                if (!bestMap[exerciseName]) {
+                    bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps, date: h.date };
                 } else {
-                    exerciseMap[ex.name].last = { load: maxLoad, reps: maxReps };
+                    const best = bestMap[exerciseName];
+                    // PR check: More weight OR same weight with more reps
+                    const isImprovement = sessionMaxLoad > best.load || (sessionMaxLoad === best.load && sessionMaxReps > best.reps);
+
+                    if (isImprovement) {
+                        improvementsList.push({
+                            name: exerciseName,
+                            from: { load: best.load, reps: best.reps },
+                            to: { load: sessionMaxLoad, reps: sessionMaxReps },
+                            date: h.date
+                        });
+                        bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps, date: h.date };
+                    }
                 }
             });
         });
-        return Object.entries(exerciseMap)
-            .filter(([, v]) => v.last.load > v.first.load)
+
+        // Return the 3 most recent improvements
+        // Sort improvements by date descending
+        return improvementsList
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 3)
-            .map(([name, v]) => ({
-                name,
-                from: `${v.first.load}kg × ${v.first.reps}`,
-                to: `${v.last.load}kg × ${v.last.reps}`
+            .map(imp => ({
+                name: imp.name,
+                from: `${imp.from.load}kg × ${imp.from.reps}`,
+                to: `${imp.to.load}kg × ${imp.to.reps}`
             }));
     }, [allHistory]);
 

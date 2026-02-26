@@ -11,32 +11,48 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const firstName = e.target.firstName.value;
-        const lastName = e.target.lastName.value;
-        const email = e.target.email.value;
+        const firstName = e.target.firstName.value.trim();
+        const lastName = e.target.lastName.value.trim();
+        const email = e.target.email.value.trim().toLowerCase();
 
-        // Mock update logic: Find the invited client and update their status
+        // 1. Fetch Clients
         const stored = localStorage.getItem('shapeup_clients');
         let clients = stored ? JSON.parse(stored) : [];
-        const clientIndex = clients.findIndex(c => c.email === email && c.status === 'Invited');
 
-        if (clientIndex !== -1) {
-            // Update specific fields of invited client
-            clients[clientIndex].name = `${firstName} ${lastName}`;
-            clients[clientIndex].status = 'Active';
-            clients[clientIndex].lastCheckin = 'Just now';
+        // 2. Find the invited client (case-insensitive email matching)
+        // We prioritize matching someone with status 'Invited'
+        const invitedIndex = clients.findIndex(c =>
+            c.email?.toLowerCase() === email &&
+            c.status === 'Invited'
+        );
+
+        if (invitedIndex !== -1) {
+            // Update the existing invitation record
+            clients[invitedIndex].name = `${firstName} ${lastName}`;
+            clients[invitedIndex].status = 'Active';
+            clients[invitedIndex].lastCheckin = 'Just now';
+            // Ensure email is stored normalized
+            clients[invitedIndex].email = email;
         } else {
-            // Create a brand new client since they weren't invited
-            const newClient = {
-                id: Date.now(),
-                name: `${firstName} ${lastName}`,
-                email: email,
-                activePlan: '-',
-                compliance: 0,
-                lastCheckin: 'Just now',
-                status: 'Active'
-            };
-            clients.push(newClient);
+            // Check if they already exist as Active (maybe they registered already)
+            const existingIndex = clients.findIndex(c => c.email?.toLowerCase() === email);
+
+            if (existingIndex !== -1) {
+                // Just update the name if it's different
+                clients[existingIndex].name = `${firstName} ${lastName}`;
+            } else {
+                // Create a brand new client since they weren't invited OR recorded before
+                const newClient = {
+                    id: Date.now(),
+                    name: `${firstName} ${lastName}`,
+                    email: email,
+                    activePlan: '-',
+                    compliance: 0,
+                    lastCheckin: 'Just now',
+                    status: 'Active'
+                };
+                clients.push(newClient);
+            }
         }
 
         // Save back to localStorage

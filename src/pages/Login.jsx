@@ -10,27 +10,25 @@ const Login = ({ onLogin }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const email = e.target.email.value;
+        const email = e.target.email.value.trim().toLowerCase();
         const role = email === 'treinador@outlook.com' ? 'professional' : 'client';
         localStorage.setItem('shapeup_role', role);
 
         if (role === 'professional') {
-            localStorage.setItem('shapeup_user_name', 'Coach Alan'); // Or 'Coach' as fallback
+            localStorage.setItem('shapeup_user_name', 'Coach Alan');
         } else {
             const storedClients = localStorage.getItem('shapeup_clients');
-            let matchedId = 1; // Default to Mike K. for testing
-            let userName = 'Client'; // Default name
+            let matchedId = 1;
+            let userName = 'Client';
 
             if (storedClients) {
                 const clients = JSON.parse(storedClients);
-                const match = clients.find(c => c.email === email || c.name.toLowerCase().includes(email.split('@')[0].toLowerCase()));
+                // Exact match by email (normalized)
+                const match = clients.find(c => c.email?.toLowerCase() === email);
+
                 if (match) {
                     matchedId = match.id;
                     userName = match.name;
-                } else if (clients.length > 0) {
-                    // Fallback to first client (primary mock data) if email not found
-                    matchedId = clients[0].id;
-                    userName = clients[0].name;
                 }
             }
             localStorage.setItem('shapeup_client_id', matchedId);
