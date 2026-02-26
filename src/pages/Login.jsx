@@ -27,9 +27,9 @@ const Login = ({ onLogin }) => {
                     matchedId = match.id;
                     userName = match.name;
                 } else if (clients.length > 0) {
-                    // Fallback to latest client if email not found
-                    matchedId = clients[clients.length - 1].id;
-                    userName = clients[clients.length - 1].name;
+                    // Fallback to first client (primary mock data) if email not found
+                    matchedId = clients[0].id;
+                    userName = clients[0].name;
                 }
             }
             localStorage.setItem('shapeup_client_id', matchedId);

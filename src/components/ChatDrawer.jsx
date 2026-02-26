@@ -5,8 +5,8 @@ import './ChatDrawer.css';
 
 const ChatDrawer = ({ isOpen, onClose }) => {
     // Get active client info
-    const clientId = localStorage.getItem('shapeup_client_id') || 1;
-    const clientName = "Alan Edward"; // Mocked active client name since we don't have a global profile context here yet
+    const clientId = String(localStorage.getItem('shapeup_client_id') || '1');
+    const clientName = localStorage.getItem('shapeup_user_name') || 'Client';
 
     const [messages, setMessages] = useState(() => {
         const stored = localStorage.getItem('shapeup_messages');

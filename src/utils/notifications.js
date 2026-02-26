@@ -18,6 +18,20 @@ export const getNotifications = (targetUserId) => {
 };
 
 export const addNotification = (targetUserId, type, title, body, iconColor = 'primary', additionalData = {}) => {
+    // Check user preferences
+    const prefKey = targetUserId === 'pro' ? 'shapeup_notif_prefs_pro' : `shapeup_notif_prefs_client_${targetUserId}`;
+    const storedPrefs = localStorage.getItem(prefKey);
+    const prefs = storedPrefs ? JSON.parse(storedPrefs) : { messages: true, alerts: true, system: true };
+
+    let prefKeyToCheck = type;
+    if (type === 'warning') prefKeyToCheck = 'alerts';
+    if (type === 'alert') prefKeyToCheck = 'alerts';
+    if (type === 'message') prefKeyToCheck = 'messages';
+
+    if (prefs[prefKeyToCheck] === false) {
+        return null; // Silent drop if disabled
+    }
+
     const all = getStoredNotifications();
     const newNotif = {
         id: Date.now(),
@@ -57,6 +71,9 @@ export const useNotifications = (targetUserId) => {
     const [notifications, setNotifications] = useState(() => getNotifications(targetUserId));
 
     useEffect(() => {
+        // Immediate fetch when targetUserId changes
+        setNotifications(getNotifications(targetUserId));
+
         const handleUpdate = () => {
             setNotifications(getNotifications(targetUserId));
         };

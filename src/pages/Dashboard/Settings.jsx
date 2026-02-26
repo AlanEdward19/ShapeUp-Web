@@ -22,6 +22,17 @@ const Settings = () => {
 
     const activeProfile = isProfessional ? coachProfile : clientProfile;
 
+    // --- NOTIFICATION PREFERENCES ---
+    const [notifPrefs, setNotifPrefs] = useState(() => {
+        const key = isProfessional ? 'shapeup_notif_prefs_pro' : `shapeup_notif_prefs_client_${clientId}`;
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : { messages: true, alerts: true, system: true };
+    });
+
+    const toggleNotifPref = (field) => {
+        setNotifPrefs(prev => ({ ...prev, [field]: !prev[field] }));
+    };
+
     const handleSaveChanges = () => {
         // Save name to localStorage
         localStorage.setItem('shapeup_user_name', activeProfile.name);
@@ -48,6 +59,9 @@ const Settings = () => {
             localStorage.setItem('shapeup_pro_plans', JSON.stringify(proPlans));
         }
         localStorage.setItem('shapeup_user_name', activeProfile.name);
+
+        const notifKey = isProfessional ? 'shapeup_notif_prefs_pro' : `shapeup_notif_prefs_client_${clientId}`;
+        localStorage.setItem(notifKey, JSON.stringify(notifPrefs));
     };
 
     const firstName = activeProfile.name.split(' ')[0] || '';
@@ -146,6 +160,7 @@ const Settings = () => {
 
     const tabsClient = [
         { id: 'profile', label: 'Account Details', icon: <User size={18} /> },
+        { id: 'notifications', label: 'Notifications', icon: <Bell size={18} /> },
         { id: 'preferences', label: 'App Preferences', icon: <Smartphone size={18} /> },
         { id: 'billing', label: 'Billing & Plan', icon: <CreditCard size={18} /> },
         { id: 'coach', label: 'My Coach', icon: <Shield size={18} /> }
@@ -268,30 +283,59 @@ const Settings = () => {
                             <div className="su-settings-list">
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>New Client Check-ins</h4>
-                                        <p>Receive an email when a client submits their weekly check-in.</p>
+                                        <h4>Chat Messages</h4>
+                                        <p>Receive alerts when clients send you direct messages.</p>
                                     </div>
-                                    <div className="su-toggle-switch active"></div>
+                                    <div className={`su-toggle-switch ${notifPrefs.messages ? 'active' : ''}`} onClick={() => toggleNotifPref('messages')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Form Validation Videos</h4>
-                                        <p>Push notification when a video is flagged for review.</p>
+                                        <h4>Client Alerts & Performance</h4>
+                                        <p>Push notification for fatigue reports, skipped sessions, and missed exercises.</p>
                                     </div>
-                                    <div className="su-toggle-switch active"></div>
+                                    <div className={`su-toggle-switch ${notifPrefs.alerts ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Daily Summary</h4>
-                                        <p>A morning digest of all logged workouts from yesterday.</p>
+                                        <h4>System Updates</h4>
+                                        <p>Receive notifications when clients accept invites or complete billing.</p>
                                     </div>
-                                    <div className="su-toggle-switch"></div>
+                                    <div className={`su-toggle-switch ${notifPrefs.system ? 'active' : ''}`} onClick={() => toggleNotifPref('system')}></div>
                                 </div>
                             </div>
                         </Card>
                     )}
 
                     {/* -- CLIENT SPECIFIC SECTIONS -- */}
+                    {!isProfessional && activeTab === 'notifications' && (
+                        <Card className="su-settings-card">
+                            <h2 className="su-settings-section-title">Notification Preferences</h2>
+                            <div className="su-settings-list">
+                                <div className="su-settings-list-item">
+                                    <div className="su-item-info">
+                                        <h4>Chat Messages</h4>
+                                        <p>Receive alerts when your coach sends you a direct message.</p>
+                                    </div>
+                                    <div className={`su-toggle-switch ${notifPrefs.messages ? 'active' : ''}`} onClick={() => toggleNotifPref('messages')}></div>
+                                </div>
+                                <div className="su-settings-list-item">
+                                    <div className="su-item-info">
+                                        <h4>Plan Updates</h4>
+                                        <p>Push notification when your assigned training plan is modified.</p>
+                                    </div>
+                                    <div className={`su-toggle-switch ${notifPrefs.alerts ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts')}></div>
+                                </div>
+                                <div className="su-settings-list-item">
+                                    <div className="su-item-info">
+                                        <h4>System Reminders</h4>
+                                        <p>Platform updates, connection status, and automated check-ins.</p>
+                                    </div>
+                                    <div className={`su-toggle-switch ${notifPrefs.system ? 'active' : ''}`} onClick={() => toggleNotifPref('system')}></div>
+                                </div>
+                            </div>
+                        </Card>
+                    )}
+
                     {!isProfessional && activeTab === 'preferences' && (
                         <Card className="su-settings-card">
                             <h2 className="su-settings-section-title">App Preferences</h2>

@@ -7,8 +7,9 @@ import './Header.css';
 const Header = ({ isProfessional, profile, sessionTitle }) => {
     const [showNotifications, setShowNotifications] = useState(false);
 
-    // Provide 'pro' or the client's ID (mocked as '1' for now since we don't have a full auth context)
-    const targetUserId = isProfessional ? 'pro' : '1';
+    // Provide 'pro' or the client's ID dynamically based on auth
+    const storedClientId = String(localStorage.getItem('shapeup_client_id') || '1');
+    const targetUserId = isProfessional ? 'pro' : storedClientId;
 
     const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications(targetUserId);
 
