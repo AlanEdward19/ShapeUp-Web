@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Users, Activity, MessageSquare, CheckCircle, XCircle, TrendingUp, Award, Bell, Search, Filter, ChevronLeft, ChevronRight, Calendar, AlertTriangle, UserPlus } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -7,6 +8,7 @@ import { useNotifications } from '../../utils/notifications';
 import './DashboardProfessional.css';
 
 const DashboardProfessional = () => {
+    const navigate = useNavigate();
     const [showInvite, setShowInvite] = useState(false);
     const [clients, setClients] = useState([]);
     const [globalHistory, setGlobalHistory] = useState([]);
@@ -19,8 +21,8 @@ const DashboardProfessional = () => {
 
     useEffect(() => {
         // 1. Fetch Clients
-        const storedClients = localStorage.getItem('shapeup_clients');
-        const clientsList = storedClients ? JSON.parse(storedClients) : [];
+        let storedClients = localStorage.getItem('shapeup_clients');
+        let clientsList = storedClients ? JSON.parse(storedClients) : [];
         setClients(clientsList);
 
         // 2. Aggregate History from all clients
@@ -82,8 +84,27 @@ const DashboardProfessional = () => {
     const alerts = useMemo(() => {
         return notifications
             .filter(n => n.type === 'alert' || n.type === 'warning' || n.type === 'error')
-            .slice(0, 10); // Show top 10 recent alerts
-    }, [notifications]);
+            .slice(0, 10) // Show top 10 recent alerts
+            .map(n => {
+                const clientId = n.additionalData?.clientId || n.additionalData?.link?.split('/').pop() || '';
+                const clientMatch = clients.find(c => String(c.id) === String(clientId));
+                const clientName = clientMatch ? clientMatch.name : 'Client';
+
+                // Replace generic 'Client' with actual name
+                let personalizedBody = n.body;
+                if (personalizedBody.startsWith('Client reported') || personalizedBody.startsWith('Client skipped')) {
+                    personalizedBody = personalizedBody.replace('Client', clientName);
+                }
+
+                return {
+                    ...n,
+                    clientName,
+                    personalizedBody,
+                    subType: n.additionalData?.subType,
+                    sessionId: n.additionalData?.sessionId
+                };
+            });
+    }, [notifications, clients]);
 
     // Helper for relative time (very simplified)
     const getRelativeTime = (dateStr) => {
@@ -122,7 +143,7 @@ const DashboardProfessional = () => {
         notifications.forEach((n, i) => {
             const clientId = n.additionalData?.clientId || n.additionalData?.link?.split('/').pop() || '';
             const clientNameMatch = clients.find(c => String(c.id) === String(clientId));
-            const clientName = clientNameMatch ? clientNameMatch.name : 'System';
+            const clientName = n.additionalData?.clientName || (clientNameMatch ? clientNameMatch.name : 'System');
 
             let category = 'system';
             if (n.type === 'message') category = 'message';
@@ -381,9 +402,17 @@ const DashboardProfessional = () => {
                                         key={alert.id}
                                         className={`su-alert-status-${alert.iconColor || 'primary'}`}
                                         style={{ cursor: alert.link ? 'pointer' : 'default' }}
-                                        onClick={() => alert.link && (window.location.hash = alert.link)}
+                                        onClick={() => {
+                                            if (alert.link) {
+                                                const state = { tab: 'plans' };
+                                                if (alert.sessionId) {
+                                                    state.highlightSessionId = alert.sessionId;
+                                                }
+                                                navigate(alert.link, { state });
+                                            }
+                                        }}
                                     >
-                                        <strong>{alert.title}:</strong> {alert.body}
+                                        <strong>{alert.clientName || 'Client'} - {alert.title}:</strong> {alert.personalizedBody || alert.body}
                                         <div className="su-alert-time">{alert.time}</div>
                                     </li>
                                 ))}

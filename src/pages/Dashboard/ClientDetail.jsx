@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
     ArrowLeft, TrendingUp, Activity, Scale, CheckCircle2,
     Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp,
@@ -447,10 +447,20 @@ const SessionDetailModal = ({ session, planName, onClose }) => (
 );
 
 // ─── PLAN CARD (with expandable history) ────────────────────
-const PlanCard = ({ plan, onEdit, onCopy, onDelete }) => {
+const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId }) => {
     const [historyOpen, setHistoryOpen] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(false);
+
+    React.useEffect(() => {
+        if (initialHighlightedSessionId && plan.history) {
+            const sessionMatch = plan.history.find(s => String(s.id) === String(initialHighlightedSessionId));
+            if (sessionMatch) {
+                setHistoryOpen(true);
+                setSelectedSession(sessionMatch);
+            }
+        }
+    }, [initialHighlightedSessionId, plan.history]);
 
     return (
         <>
@@ -571,9 +581,10 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete }) => {
 const ClientDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const client = getClientData(parseInt(id));
 
-    const [activeTab, setActiveTab] = useState('analytics');
+    const [activeTab, setActiveTab] = useState(location.state?.tab || 'analytics');
     const [plans, setPlans] = useState(() => {
         const stored = localStorage.getItem('shapeup_client_plans_' + id);
         if (stored) return JSON.parse(stored);
@@ -949,23 +960,24 @@ const ClientDetail = () => {
                                 <h2 className="su-cp-section-title">Assigned Plans ({plans.length})</h2>
                                 <Button icon={<Plus size={16} />} onClick={handleAddPlan}>Add Plan</Button>
                             </div>
-                            <div className="su-cp-plans-list">
-                                {plans.map(plan => (
+                            <div className="su-plans-list">
+                                {plans.map(p => (
                                     <PlanCard
-                                        key={plan.id}
-                                        plan={plan}
+                                        key={p.id}
+                                        plan={p}
                                         onEdit={setEditingPlan}
                                         onCopy={handleCopyPlan}
                                         onDelete={handleDeletePlan}
+                                        initialHighlightedSessionId={location.state?.highlightSessionId}
                                     />
                                 ))}
-                                {plans.length === 0 && (
-                                    <div className="su-cp-empty">
-                                        <Dumbbell size={40} />
-                                        <p>No plans assigned yet. Click "Add Plan" to create one.</p>
-                                    </div>
-                                )}
                             </div>
+                            {plans.length === 0 && (
+                                <div className="su-cp-empty">
+                                    <Dumbbell size={40} />
+                                    <p>No plans assigned yet. Click "Add Plan" to create one.</p>
+                                </div>
+                            )}
                         </>
                     )}
                 </div>
