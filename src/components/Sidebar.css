@@ -29,6 +29,15 @@
     letter-spacing: -0.025em;
 }
 
+.su-sidebar-logo-img {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    margin-left: -20px;
+    /* Offset some of the image's internal padding */
+    margin-right: -10px;
+}
+
 .su-sidebar-nav {
     flex: 1;
     overflow-y: auto;

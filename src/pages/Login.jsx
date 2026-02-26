@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import logo from '../assets/logo.png';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
@@ -49,11 +50,7 @@ const Login = ({ onLogin }) => {
             <div className="login-content">
                 <div className="login-header">
                     <div className="login-logo">
-                        {/* Simple SVG Logo Placeholder */}
-                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="40" height="40" rx="10" fill="var(--primary)" />
-                            <path d="M12 28L20 12L28 28H12Z" fill="white" />
-                        </svg>
+                        <img src={logo} alt="ShapeUp Logo" className="login-logo-img" />
                         <span className="login-logo-text">ShapeUp</span>
                     </div>
                     <h1 className="login-tagline">Train with intelligence.</h1>

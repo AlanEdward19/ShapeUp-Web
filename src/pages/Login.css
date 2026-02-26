@@ -60,6 +60,14 @@
     margin-bottom: 1.5rem;
 }
 
+.login-logo-img {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    margin-right: -20px;
+    /* Pull the text closer due to blank space */
+}
+
 .login-logo-text {
     font-size: 1.5rem;
     font-weight: 700;

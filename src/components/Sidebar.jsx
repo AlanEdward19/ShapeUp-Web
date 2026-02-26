@@ -16,6 +16,7 @@ import {
 import { NavLink, useNavigate } from 'react-router-dom';
 import ChatDrawer from './ChatDrawer';
 import './Sidebar.css';
+import logo from '../assets/logo.png';
 
 const Sidebar = ({ isProfessional }) => {
     const [showContactModal, setShowContactModal] = useState(false);
@@ -52,10 +53,7 @@ const Sidebar = ({ isProfessional }) => {
         <aside className="su-sidebar">
             <div className="su-sidebar-header">
                 <div className="su-sidebar-logo">
-                    <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="40" height="40" rx="10" fill="var(--primary)" />
-                        <path d="M12 28L20 12L28 28H12Z" fill="white" />
-                    </svg>
+                    <img src={logo} alt="ShapeUp Logo" className="su-sidebar-logo-img" />
                     <span className="su-sidebar-logo-text">ShapeUp</span>
                 </div>
             </div>
