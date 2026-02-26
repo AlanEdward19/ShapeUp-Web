@@ -86,9 +86,9 @@ const DashboardProfessional = () => {
             .filter(n => n.type === 'alert' || n.type === 'warning' || n.type === 'error')
             .slice(0, 10) // Show top 10 recent alerts
             .map(n => {
-                const clientId = n.additionalData?.clientId || n.additionalData?.link?.split('/').pop() || '';
+                const clientId = n.clientId || n.link?.split('/').pop() || '';
                 const clientMatch = clients.find(c => String(c.id) === String(clientId));
-                const clientName = clientMatch ? clientMatch.name : 'Client';
+                const clientName = n.clientName || (clientMatch ? clientMatch.name : 'Client');
 
                 // Replace generic 'Client' with actual name
                 let personalizedBody = n.body;
@@ -100,8 +100,8 @@ const DashboardProfessional = () => {
                     ...n,
                     clientName,
                     personalizedBody,
-                    subType: n.additionalData?.subType,
-                    sessionId: n.additionalData?.sessionId
+                    subType: n.subType,
+                    sessionId: n.sessionId
                 };
             });
     }, [notifications, clients]);
@@ -141,9 +141,9 @@ const DashboardProfessional = () => {
 
         // 2. Add Notifications
         notifications.forEach((n, i) => {
-            const clientId = n.additionalData?.clientId || n.additionalData?.link?.split('/').pop() || '';
+            const clientId = n.clientId || n.link?.split('/').pop() || '';
             const clientNameMatch = clients.find(c => String(c.id) === String(clientId));
-            const clientName = n.additionalData?.clientName || (clientNameMatch ? clientNameMatch.name : 'System');
+            const clientName = n.clientName || (clientNameMatch ? clientNameMatch.name : 'System');
 
             let category = 'system';
             if (n.type === 'message') category = 'message';
@@ -293,7 +293,27 @@ const DashboardProfessional = () => {
                     <div className="su-feed-list">
                         {paginatedFeed.length > 0 ? (
                             paginatedFeed.map((item) => (
-                                <Card key={item.id} className="su-feed-item">
+                                <Card
+                                    key={item.id}
+                                    className="su-feed-item"
+                                    style={{ cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s' }}
+                                    onClick={() => {
+                                        if (item.category === 'workout') {
+                                            if (item.clientId) {
+                                                navigate(`/dashboard/clients/${item.clientId}`, { state: { tab: 'plans', highlightSessionId: item.raw.id } });
+                                            }
+                                        } else {
+                                            const link = item.raw?.link;
+                                            if (link) {
+                                                const state = { tab: 'plans' };
+                                                if (item.raw.sessionId) {
+                                                    state.highlightSessionId = item.raw.sessionId;
+                                                }
+                                                navigate(link, { state });
+                                            }
+                                        }
+                                    }}
+                                >
                                     <div className="su-feed-avatar">
                                         {item.clientName !== 'System' ? item.clientName.split(' ').map(n => n[0]).join('').substring(0, 2) : <Activity size={18} />}
                                     </div>
