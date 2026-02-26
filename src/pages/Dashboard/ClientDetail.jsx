@@ -589,7 +589,16 @@ const ClientDetail = () => {
     });
 
     // -- Derived Analytics State --
-    const allHistory = plans.flatMap(p => p.history || []).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const getTimestamp = (id) => {
+        if (typeof id === 'number') return id;
+        if (typeof id === 'string') return parseInt(id.replace(/[^0-9]/g, '')) || 0;
+        return 0;
+    };
+
+    const allHistory = plans
+        .flatMap(p => (p.history || []).map(h => ({ ...h, planName: p.name })))
+        .sort((a, b) => getTimestamp(a.id) - getTimestamp(b.id));
+
     const hasRealData = allHistory.length > 0;
 
     const dynamicVolumeProgress = allHistory.map((h, i) => ({
@@ -603,6 +612,65 @@ const ClientDetail = () => {
         rpe: h.rpe || 0,
         date: h.date
     }));
+
+    // --- Recent Improvements (PR Logic) ---
+    const recentImprovements = React.useMemo(() => {
+        const bestMap = {};
+        const improvementsList = [];
+
+        // allHistory is reliably sorted by timestamp ascending
+        allHistory.forEach(h => {
+            (h.exercises || []).forEach(ex => {
+                if (ex.skipped) return;
+
+                const exerciseName = (ex.name || '').trim();
+                if (!exerciseName) return;
+
+                let sessionMaxLoad = 0;
+                let sessionMaxReps = 0;
+
+                (ex.sets || []).forEach(s => {
+                    const l = parseFloat(s.load) || 0;
+                    const r = parseInt(s.reps) || 0;
+                    if (l > sessionMaxLoad) {
+                        sessionMaxLoad = l;
+                        sessionMaxReps = r;
+                    } else if (l === sessionMaxLoad && r > sessionMaxReps) {
+                        sessionMaxReps = r;
+                    }
+                });
+
+                if (sessionMaxLoad === 0 && sessionMaxReps === 0) return;
+
+                if (!bestMap[exerciseName]) {
+                    bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps, date: h.date };
+                } else {
+                    const best = bestMap[exerciseName];
+                    const isImprovement = sessionMaxLoad > best.load || (sessionMaxLoad === best.load && sessionMaxReps > best.reps);
+
+                    if (isImprovement) {
+                        improvementsList.push({
+                            name: exerciseName,
+                            from: { load: best.load, reps: best.reps },
+                            to: { load: sessionMaxLoad, reps: sessionMaxReps },
+                            date: h.date
+                        });
+                        bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps, date: h.date };
+                    }
+                }
+            });
+        });
+
+        return improvementsList
+            .sort((a, b) => new Date(b.date) - new Date(a.date))
+            .slice(0, 5) // Show 5 for coach
+            .map(imp => ({
+                name: imp.name,
+                from: `${imp.from.load}kg × ${imp.from.reps}`,
+                to: `${imp.to.load}kg × ${imp.to.reps}`,
+                date: imp.date
+            }));
+    }, [allHistory]);
 
     const adherenceStats = { completed: 0, skipped: 0, partial: 0 };
     if (hasRealData) {
@@ -833,6 +901,34 @@ const ClientDetail = () => {
                                 <div className="su-legend-item"><span className="su-legend-dot error" /><span className="su-legend-label">Skipped</span><span className="su-legend-val">{adherenceStats.skipped} sessions</span></div>
                                 <div className="su-legend-item"><span className="su-legend-dot warning" /><span className="su-legend-label">Partial</span><span className="su-legend-val">{adherenceStats.partial} sessions</span></div>
                             </div>
+                        </div>
+                    </Card>
+
+                    <Card className="su-metric-card-large">
+                        <div className="su-card-header-icon">
+                            <TrendingUp size={20} className="su-text-muted" />
+                            <h3 className="su-section-title">Recent PRs & Improvements</h3>
+                        </div>
+                        <div className="su-improvements-list su-mt-2">
+                            {recentImprovements.length > 0 ? (
+                                recentImprovements.map((imp, idx) => (
+                                    <div key={idx} className="su-improvement-item">
+                                        <div className="su-imp-info">
+                                            <span className="su-imp-name">{imp.name}</span>
+                                            <span className="su-imp-date">{imp.date}</span>
+                                        </div>
+                                        <div className="su-imp-values">
+                                            <span className="su-imp-from">{imp.from}</span>
+                                            <ChevronRight size={14} className="su-imp-arrow" />
+                                            <span className="su-imp-to">{imp.to}</span>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="su-text-muted su-p-4" style={{ textAlign: 'center' }}>
+                                    No records broken yet.
+                                </p>
+                            )}
                         </div>
                     </Card>
                 </div>

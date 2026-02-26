@@ -827,3 +827,64 @@
     gap: 0.75rem;
     justify-content: center;
 }
+
+.su-improvements-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.su-improvement-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color var(--transition-fast);
+}
+
+.su-improvement-item:last-child {
+    border-bottom: none;
+}
+
+.su-improvement-item:hover {
+    background-color: var(--bg-main);
+}
+
+.su-imp-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.su-imp-name {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.su-imp-date {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.su-imp-values {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+
+.su-imp-from {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.su-imp-arrow {
+    color: var(--text-muted);
+}
+
+.su-imp-to {
+    color: var(--success);
+}

@@ -9,14 +9,8 @@ import ClientBillingModal from '../../components/ClientBillingModal';
 import { addNotification } from '../../utils/notifications';
 import './Clients.css';
 
-// Mock Client Data - Used as initial state if localStorage is empty
-const initialClientsList = [
-    { id: 1, name: 'Mike K.', activePlan: 'Upper Power Phase 1', compliance: 92, lastCheckin: '2 hours ago', status: 'Active' },
-    { id: 2, name: 'Sarah J.', activePlan: 'Lower Hypertrophy', compliance: 65, lastCheckin: '4 days ago', status: 'Needs Attention' },
-    { id: 3, name: 'David R.', activePlan: 'Full Body Metabolic', compliance: 100, lastCheckin: '1 day ago', status: 'Active' },
-    { id: 4, name: 'Anna B.', activePlan: 'Prep Phase 3', compliance: 88, lastCheckin: '12 hours ago', status: 'Active' },
-    { id: 5, name: 'Mark T.', activePlan: 'Strength Foundations', compliance: 40, lastCheckin: '1 week ago', status: 'Inactive' },
-];
+// Initial state is empty
+const initialClientsList = [];
 
 const Clients = () => {
     const navigate = useNavigate();
@@ -28,10 +22,7 @@ const Clients = () => {
     useEffect(() => {
         const fetchAndComputeClients = () => {
             let storedClients = localStorage.getItem('shapeup_clients');
-            let clientsList = storedClients ? JSON.parse(storedClients) : initialClientsList;
-
-            // Remove legacy mock clients (id 1-5) so the user only sees newly registered ones
-            clientsList = clientsList.filter(c => c.id > 5);
+            let clientsList = storedClients ? JSON.parse(storedClients) : [];
 
             // Compute real compliance for each client from their plan history
             const updatedList = clientsList.map(c => {
@@ -72,19 +63,17 @@ const Clients = () => {
             });
 
             setClients(updatedList);
-            if (!storedClients) {
-                localStorage.setItem('shapeup_clients', JSON.stringify(initialClientsList));
-            }
         };
 
         fetchAndComputeClients();
     }, []);
 
-    const handleInvite = (email) => {
+    const handleInvite = (emailAddress) => {
+        const normalizedEmail = emailAddress.trim().toLowerCase();
         const newClient = {
             id: Date.now(),
-            name: email, // Will be updated on registration
-            email: email, // Used to match during registration
+            name: normalizedEmail, // Will be updated on registration
+            email: normalizedEmail, // Used to match during registration
             activePlan: '-',
             compliance: 0,
             lastCheckin: '-',

@@ -143,28 +143,48 @@ h3.su-section-title {
     margin-top: 0.5rem;
 }
 
+.su-card-title {
+    margin-bottom: 1.25rem !important;
+}
+
 .su-alert-list {
     list-style: none;
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1.25rem;
 }
 
 .su-alert-list li {
     font-size: 0.875rem;
     color: var(--text-main);
-    padding-left: 1rem;
+    padding: 0.75rem 0.75rem 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    background-color: var(--bg-main);
+    border-left: 4px solid var(--primary);
     position: relative;
+    transition: transform var(--transition-fast);
 }
 
-.su-alert-list li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 6px;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background-color: var(--warning);
+.su-alert-list li:hover {
+    transform: translateX(4px);
+}
+
+.su-alert-list li.su-alert-status-warning {
+    border-left-color: var(--warning);
+}
+
+.su-alert-list li.su-alert-status-error {
+    border-left-color: var(--error);
+}
+
+.su-alert-list li.su-alert-status-success {
+    border-left-color: var(--success);
+}
+
+.su-alert-time {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+    text-transform: uppercase;
 }
