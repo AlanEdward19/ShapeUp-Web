@@ -257,7 +257,7 @@ const ClientView = () => {
                         if (isSkipped) {
                             skipCounts[ex.name] = (skipCounts[ex.name] || 0) + 1;
                             if (skipCounts[ex.name] >= 2) {
-                                addNotification('pro', 'alert', 'Skipped Exercise Alert', `Client skipped ${ex.name} multiple times.`, 'warning', { link: `/dashboard/clients/${activeClientId}` });
+                                addNotification('pro', 'alert', 'Skipped Exercise Alert', `Client skipped ${ex.name} multiple times.`, 'warning', { link: `/dashboard/clients/${activeClientId}`, subType: 'alerts_skipped' });
                             }
                         } else {
                             if (skipCounts[ex.name]) delete skipCounts[ex.name]; // Reset if they finally did it
@@ -266,13 +266,13 @@ const ClientView = () => {
                     localStorage.setItem('shapeup_skipped_counts', JSON.stringify(skipCounts));
 
                     if (sessionFeedback.rpe >= 8) {
-                        addNotification('pro', 'alert', 'Fatigue Alert', `Client reported high RPE (${sessionFeedback.rpe}) during session.`, 'error', { link: `/dashboard/clients/${activeClientId}` });
+                        addNotification('pro', 'alert', 'Fatigue Alert', `Client reported high RPE (${sessionFeedback.rpe}) during session.`, 'error', { link: `/dashboard/clients/${activeClientId}`, subType: 'alerts_fatigue' });
                     }
 
                     if (sessionStatus === 'skipped') {
                         const skippedSessions = parseInt(localStorage.getItem('shapeup_skipped_sessions') || '0', 10) + 1;
                         if (skippedSessions >= 2) {
-                            addNotification('pro', 'alert', 'Missed Session Alert', `Client skipped multiple training days recently.`, 'error', { link: `/dashboard/clients/${activeClientId}` });
+                            addNotification('pro', 'alert', 'Missed Session Alert', `Client skipped multiple training days recently.`, 'error', { link: `/dashboard/clients/${activeClientId}`, subType: 'alerts_missed' });
                         }
                         localStorage.setItem('shapeup_skipped_sessions', skippedSessions.toString());
                     } else if (sessionStatus === 'completed') {

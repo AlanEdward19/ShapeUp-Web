@@ -26,7 +26,15 @@ const Settings = () => {
     const [notifPrefs, setNotifPrefs] = useState(() => {
         const key = isProfessional ? 'shapeup_notif_prefs_pro' : `shapeup_notif_prefs_client_${clientId}`;
         const stored = localStorage.getItem(key);
-        return stored ? JSON.parse(stored) : { messages: true, alerts: true, system: true };
+        // Add defaults for the new toggles
+        return stored ? JSON.parse(stored) : {
+            messages: true,
+            alerts: true,
+            alerts_fatigue: true,
+            alerts_skipped: true,
+            alerts_missed: true,
+            system: true
+        };
     });
 
     const toggleNotifPref = (field) => {
@@ -290,10 +298,24 @@ const Settings = () => {
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Client Alerts & Performance</h4>
-                                        <p>Push notification for fatigue reports, skipped sessions, and missed exercises.</p>
+                                        <h4>High Fatigue Reports</h4>
+                                        <p>Alerts when a client reports RPE 8+ after a session.</p>
                                     </div>
-                                    <div className={`su-toggle-switch ${notifPrefs.alerts ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts')}></div>
+                                    <div className={`su-toggle-switch ${notifPrefs.alerts_fatigue ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts_fatigue')}></div>
+                                </div>
+                                <div className="su-settings-list-item">
+                                    <div className="su-item-info">
+                                        <h4>Skipped Exercises</h4>
+                                        <p>Alerts when a client skips an exercise multiple times across sessions.</p>
+                                    </div>
+                                    <div className={`su-toggle-switch ${notifPrefs.alerts_skipped ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts_skipped')}></div>
+                                </div>
+                                <div className="su-settings-list-item">
+                                    <div className="su-item-info">
+                                        <h4>Missed Sessions</h4>
+                                        <p>Alerts when a client skips multiple training days consecutively.</p>
+                                    </div>
+                                    <div className={`su-toggle-switch ${notifPrefs.alerts_missed ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts_missed')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">

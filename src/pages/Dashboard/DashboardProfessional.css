@@ -62,6 +62,35 @@ h3.su-section-title {
     gap: 1rem;
 }
 
+.su-search-wrapper,
+.su-filter-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.su-search-icon,
+.su-filter-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.su-empty-feed {
+    padding: 3rem 1rem;
+    text-align: center;
+    background-color: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px dashed var(--border-color);
+}
+
+.su-empty-feed p {
+    color: var(--text-muted);
+}
+
 .su-feed-item {
     display: flex;
     align-items: flex-start;

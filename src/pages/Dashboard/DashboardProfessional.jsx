@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Users, Activity, MessageSquare, CheckCircle, XCircle, TrendingUp, Award, Bell } from 'lucide-react';
+import { Users, Activity, MessageSquare, CheckCircle, XCircle, TrendingUp, Award, Bell, Search, Filter, ChevronLeft, ChevronRight, Calendar, AlertTriangle, UserPlus } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import InviteClientModal from '../../components/InviteClientModal';
@@ -11,6 +11,11 @@ const DashboardProfessional = () => {
     const [clients, setClients] = useState([]);
     const [globalHistory, setGlobalHistory] = useState([]);
     const { notifications } = useNotifications('pro');
+
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filterType, setFilterType] = useState('all');
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 7;
 
     useEffect(() => {
         // 1. Fetch Clients
@@ -92,6 +97,81 @@ const DashboardProfessional = () => {
         return d.toLocaleDateString();
     };
 
+    // ─── Unified Feed Logic ───────────────────────────────────────────
+    const unifiedFeed = useMemo(() => {
+        let feed = [];
+
+        // 1. Add Workouts
+        globalHistory.forEach((h, i) => {
+            const isSkipped = h.status === 'skipped' || (h.exercises || []).every(ex => ex.skipped);
+            feed.push({
+                id: `workout_${h.clientId}_${h.timestamp}_${i}`,
+                type: isSkipped ? 'skipped' : 'workout',
+                category: 'workout',
+                timestamp: h.timestamp,
+                clientName: h.clientName,
+                clientId: h.clientId,
+                title: isSkipped ? 'Skipped session' : 'Completed session',
+                subtitle: h.planName,
+                dateObj: new Date(h.timestamp),
+                raw: h
+            });
+        });
+
+        // 2. Add Notifications
+        notifications.forEach((n, i) => {
+            const clientId = n.additionalData?.clientId || n.additionalData?.link?.split('/').pop() || '';
+            const clientNameMatch = clients.find(c => String(c.id) === String(clientId));
+            const clientName = clientNameMatch ? clientNameMatch.name : 'System';
+
+            let category = 'system';
+            if (n.type === 'message') category = 'message';
+            if (n.type === 'alert' || n.type === 'warning' || n.type === 'error') category = 'alert';
+
+            feed.push({
+                id: `notif_${n.id}_${i}`,
+                type: n.type,
+                category: category,
+                timestamp: n.id, // Using the Date.now() id as timestamp
+                clientName: clientName,
+                clientId: clientId,
+                title: n.title,
+                subtitle: n.body,
+                dateObj: new Date(n.id),
+                raw: n
+            });
+        });
+
+        // Sort combined feed
+        return feed.sort((a, b) => b.timestamp - a.timestamp);
+    }, [globalHistory, notifications, clients]);
+
+    // ─── Filter & Search ──────────────────────────────────────────────
+    const filteredFeed = useMemo(() => {
+        return unifiedFeed.filter(item => {
+            const q = searchQuery.toLowerCase().trim();
+            const matchesSearch =
+                (item.clientName && String(item.clientName).toLowerCase().includes(q)) ||
+                (item.title && String(item.title).toLowerCase().includes(q)) ||
+                (item.subtitle && String(item.subtitle).toLowerCase().includes(q));
+
+            const matchesFilter = filterType === 'all' || item.category === filterType;
+            return matchesSearch && matchesFilter;
+        });
+    }, [unifiedFeed, searchQuery, filterType]);
+
+    // ─── Pagination ───────────────────────────────────────────────────
+    const totalPages = Math.ceil(filteredFeed.length / ITEMS_PER_PAGE);
+    const paginatedFeed = useMemo(() => {
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        return filteredFeed.slice(start, start + ITEMS_PER_PAGE);
+    }, [filteredFeed, currentPage]);
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery, filterType]);
+
     return (
         <div className="su-pro-dashboard">
             {showInvite && <InviteClientModal onClose={() => setShowInvite(false)} />}
@@ -148,39 +228,107 @@ const DashboardProfessional = () => {
 
                 {/* Recent Client Logs Column */}
                 <div className="su-client-feed">
-                    <h3 className="su-section-title">Global Client Activity Feed</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h3 className="su-section-title" style={{ marginBottom: 0 }}>Global Client Activity Feed</h3>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                            <div className="su-search-wrapper" style={{ width: '200px' }}>
+                                <Search className="su-search-icon" size={18} />
+                                <input
+                                    type="text"
+                                    className="su-input"
+                                    placeholder="Search..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    style={{ paddingLeft: '2.5rem', height: '40px', paddingTop: '0', paddingBottom: '0' }}
+                                />
+                            </div>
+                            <div className="su-filter-wrapper">
+                                <Filter className="su-filter-icon" size={16} />
+                                <select
+                                    className="su-select"
+                                    value={filterType}
+                                    onChange={(e) => setFilterType(e.target.value)}
+                                    style={{ height: '40px', paddingLeft: '2rem', paddingTop: '0', paddingBottom: '0' }}
+                                >
+                                    <option value="all">All Entries</option>
+                                    <option value="workout">Workouts</option>
+                                    <option value="message">Messages</option>
+                                    <option value="alert">Alerts</option>
+                                    <option value="system">System</option>
+                                </select>
+                            </div>
+                            {(searchQuery !== '' || filterType !== 'all') && (
+                                <Button
+                                    variant="secondary"
+                                    onClick={() => { setSearchQuery(''); setFilterType('all'); }}
+                                    style={{ height: '40px', padding: '0 1rem', fontSize: '0.875rem' }}
+                                >
+                                    Clear
+                                </Button>
+                            )}
+                        </div>
+                    </div>
 
                     <div className="su-feed-list">
-                        {globalHistory.length > 0 ? (
-                            globalHistory.slice(0, 10).map((item) => (
+                        {paginatedFeed.length > 0 ? (
+                            paginatedFeed.map((item) => (
                                 <Card key={item.id} className="su-feed-item">
                                     <div className="su-feed-avatar">
-                                        {item.clientName.split(' ').map(n => n[0]).join('')}
+                                        {item.clientName !== 'System' ? item.clientName.split(' ').map(n => n[0]).join('').substring(0, 2) : <Activity size={18} />}
                                     </div>
                                     <div className="su-feed-content">
                                         <div className="su-feed-meta">
                                             <span className="su-feed-name">{item.clientName}</span>
-                                            <span className="su-feed-time">{getRelativeTime(item.date)}</span>
+                                            <span className="su-feed-time">{getRelativeTime(item.dateObj)}</span>
                                         </div>
                                         <div className="su-feed-action">
-                                            Completed session: <strong>{item.planName}</strong>
+                                            {item.title}: <strong>{item.subtitle}</strong>
                                         </div>
 
-                                        {(item.exercises || []).some(ex => !ex.skipped) && (
+                                        {/* Workout Specific Render */}
+                                        {item.category === 'workout' && item.type === 'workout' && (() => {
+                                            const h = item.raw;
+                                            return (
+                                                <>
+                                                    {(h.exercises || []).some(ex => !ex.skipped) && (
+                                                        <div className="su-feed-badges">
+                                                            <span className="su-badge workout-stat">
+                                                                <Activity size={12} /> {h.totalVol}
+                                                            </span>
+                                                            <span className="su-badge duration-stat">
+                                                                <CheckCircle size={12} /> {h.duration}
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                    {h.comments && (
+                                                        <div className="su-feed-comment-bubble">
+                                                            <MessageSquare size={14} />
+                                                            "{h.comments}"
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
+
+                                        {/* Skipped Workout Render */}
+                                        {item.category === 'workout' && item.type === 'skipped' && (
                                             <div className="su-feed-badges">
-                                                <span className="su-badge workout-stat">
-                                                    <Activity size={12} /> {item.totalVol}
-                                                </span>
-                                                <span className="su-badge duration-stat">
-                                                    <CheckCircle size={12} /> {item.duration}
+                                                <span className="su-badge" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)' }}>
+                                                    <XCircle size={12} /> Missed Session
                                                 </span>
                                             </div>
                                         )}
 
-                                        {item.comments && (
-                                            <div className="su-feed-comment-bubble">
-                                                <MessageSquare size={14} />
-                                                "{item.comments}"
+                                        {/* Message/Alert Render */}
+                                        {item.category !== 'workout' && (
+                                            <div className="su-feed-badges">
+                                                <span className={`su-badge`} style={{
+                                                    backgroundColor: item.category === 'alert' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(37, 99, 235, 0.1)',
+                                                    color: item.category === 'alert' ? 'var(--warning)' : 'var(--primary)'
+                                                }}>
+                                                    {item.category === 'alert' ? <AlertTriangle size={12} /> : item.category === 'message' ? <MessageSquare size={12} /> : <UserPlus size={12} />}
+                                                    {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
+                                                </span>
                                             </div>
                                         )}
                                     </div>
@@ -188,10 +336,35 @@ const DashboardProfessional = () => {
                             ))
                         ) : (
                             <div className="su-empty-feed">
-                                <p className="su-text-muted">No client activity recorded yet.</p>
+                                <p className="su-text-muted">No client activity found for these filters.</p>
                             </div>
                         )}
                     </div>
+
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
+                            <Button
+                                variant="secondary"
+                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                style={{ padding: '0.5rem' }}
+                            >
+                                <ChevronLeft size={20} />
+                            </Button>
+                            <span className="su-text-muted" style={{ fontSize: '0.875rem' }}>
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <Button
+                                variant="secondary"
+                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                style={{ padding: '0.5rem' }}
+                            >
+                                <ChevronRight size={20} />
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Sidebar Summary Area */}
