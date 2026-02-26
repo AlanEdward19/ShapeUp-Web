@@ -7,6 +7,7 @@ import Input from '../../components/Input';
 import ExerciseModal from '../../components/ExerciseModal';
 import { exercisesDB } from '../../data/mockExercises';
 import { addNotification } from '../../utils/notifications';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './TrainingPlansClient.css';
 
 const formatTime = (totalSeconds) => {
@@ -21,6 +22,7 @@ const formatTime = (totalSeconds) => {
 
 const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
+    const { t } = useLanguage();
 
     // Session State
     const [sessionActive, setSessionActive] = useState(false);
@@ -314,12 +316,12 @@ const ClientView = () => {
     if (!sessionActive) {
         return (
             <div className="su-client-dashboard">
-                <h1 className="su-page-title su-mb-6">Your Training Plans</h1>
+                <h1 className="su-page-title su-mb-6">{t('client.training.title')}</h1>
 
                 {assignedPlans.length === 0 ? (
                     <Card className="su-active-plan-card" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-                        <h3 style={{ marginBottom: '0.5rem' }}>No Plans Assigned</h3>
-                        <p className="su-text-muted">You don't have any training plans assigned to you yet.</p>
+                        <h3 style={{ marginBottom: '0.5rem' }}>{t('client.training.empty.title')}</h3>
+                        <p className="su-text-muted">{t('client.training.empty.desc')}</p>
                     </Card>
                 ) : (
                     assignedPlans.map(plan => (
@@ -328,18 +330,18 @@ const ClientView = () => {
                                 <div className="su-plan-hero-content">
                                     <span className="su-tag">{plan.phase}</span>
                                     <h2 className="su-plan-title">{plan.name}</h2>
-                                    <p className="su-coach-credit">Difficulty: <strong>{plan.difficulty}</strong> · {plan.weeks} weeks</p>
+                                    <p className="su-coach-credit">{t('client.training.card.difficulty')}: <strong>{plan.difficulty}</strong> · {plan.weeks} {t('client.training.card.weeks')}</p>
 
                                     <div className="su-plan-meta-row">
                                         <div className="su-meta-pill">
-                                            <DumbbellIcon size={16} /> {plan.exercises.length} Exercises
+                                            <DumbbellIcon size={16} /> {plan.exercises.length} {t('client.training.card.exercises')}
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="su-plan-hero-action">
                                     <Button size="lg" icon={<Play size={20} fill="currentColor" />} onClick={() => startSessionForPlan(plan)}>
-                                        Start Session
+                                        {t('client.training.card.btn')}
                                     </Button>
                                 </div>
                             </div>
@@ -347,10 +349,10 @@ const ClientView = () => {
                     ))
                 )}
 
-                <h3 className="su-section-title su-mt-8">Session History</h3>
+                <h3 className="su-section-title su-mt-8">{t('client.training.history.title')}</h3>
                 <div className="su-history-list" style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
                     {allHistory.length === 0 ? (
-                        <p className="su-text-muted">No completed sessions yet. Start a workout to build your history!</p>
+                        <p className="su-text-muted">{t('client.training.history.empty')}</p>
                     ) : (
                         paginatedHistory.map((hist) => (
                             <Card
@@ -371,7 +373,7 @@ const ClientView = () => {
                                 <div className="su-hist-right">
                                     {/* <span className="su-pr-badge">New PR!</span> */}
                                     <span className="su-text-muted">⏱ {hist.duration}</span>
-                                    <span className="su-hist-vol">{hist.totalVol} vol</span>
+                                    <span className="su-hist-vol">{hist.totalVol} {t('client.training.history.vol')}</span>
                                 </div>
                             </Card>
                         ))
@@ -386,17 +388,17 @@ const ClientView = () => {
                             disabled={historyPage === 1}
                             icon={<ChevronLeft size={16} />}
                         >
-                            Previous
+                            {t('client.training.pagination.prev')}
                         </Button>
                         <span className="su-text-muted" style={{ fontSize: '0.9rem' }}>
-                            Page {historyPage} of {totalPages}
+                            {t('client.training.pagination.page')} {historyPage} {t('client.training.pagination.of')} {totalPages}
                         </span>
                         <Button
                             variant="outline"
                             onClick={() => setHistoryPage(p => Math.min(totalPages, p + 1))}
                             disabled={historyPage === totalPages}
                         >
-                            Next <ChevronRight size={16} style={{ marginLeft: '4px' }} />
+                            {t('client.training.pagination.next')} <ChevronRight size={16} style={{ marginLeft: '4px' }} />
                         </Button>
                     </div>
                 )}

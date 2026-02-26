@@ -6,6 +6,7 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import CreditCardUI from '../../components/CreditCardUI';
 import { useTheme } from '../../ThemeContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './Settings.css';
 
 const Settings = () => {
@@ -15,6 +16,7 @@ const Settings = () => {
         clientProfile, setClientProfile
     } = useOutletContext();
     const { theme, toggleTheme } = useTheme();
+    const { language, setLanguage, t } = useLanguage();
     const [activeTab, setActiveTab] = useState('profile');
 
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
@@ -160,18 +162,19 @@ const Settings = () => {
     });
 
     const tabsProfessional = [
-        { id: 'profile', label: 'Profile & Brand', icon: <User size={18} /> },
-        { id: 'notifications', label: 'Notifications', icon: <Bell size={18} /> },
-        { id: 'billing', label: 'Billing & Plan', icon: <CreditCard size={18} /> },
-        { id: 'integrations', label: 'Integrations', icon: <LinkIcon size={18} /> }
+        { id: 'profile', label: t('settings.tabs.profile'), icon: <User size={18} /> },
+        { id: 'notifications', label: t('settings.tabs.notifications'), icon: <Bell size={18} /> },
+        { id: 'preferences', label: t('settings.tabs.preferences'), icon: <Smartphone size={18} /> },
+        { id: 'billing', label: t('settings.tabs.billing'), icon: <CreditCard size={18} /> },
+        { id: 'integrations', label: t('settings.tabs.integrations'), icon: <LinkIcon size={18} /> }
     ];
 
     const tabsClient = [
-        { id: 'profile', label: 'Account Details', icon: <User size={18} /> },
-        { id: 'notifications', label: 'Notifications', icon: <Bell size={18} /> },
-        { id: 'preferences', label: 'App Preferences', icon: <Smartphone size={18} /> },
-        { id: 'billing', label: 'Billing & Plan', icon: <CreditCard size={18} /> },
-        { id: 'coach', label: 'My Coach', icon: <Shield size={18} /> }
+        { id: 'profile', label: t('settings.tabs.profile_client'), icon: <User size={18} /> },
+        { id: 'notifications', label: t('settings.tabs.notifications'), icon: <Bell size={18} /> },
+        { id: 'preferences', label: t('settings.tabs.preferences'), icon: <Smartphone size={18} /> },
+        { id: 'billing', label: t('settings.tabs.billing'), icon: <CreditCard size={18} /> },
+        { id: 'coach', label: t('settings.tabs.coach'), icon: <Shield size={18} /> }
     ];
 
     const activeTabsList = isProfessional ? tabsProfessional : tabsClient;
@@ -180,11 +183,11 @@ const Settings = () => {
         <div className="su-settings-dashboard">
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">Settings</h1>
+                    <h1 className="su-page-title">{t('settings.title')}</h1>
                     <p className="su-page-subtitle">
                         {isProfessional
-                            ? 'Manage your professional coaching profile and subscription.'
-                            : 'Update your personal details and app preferences.'}
+                            ? t('settings.subtitle.pro')
+                            : t('settings.subtitle.client')}
                     </p>
                 </div>
                 <Button onClick={handleSaveChanges}>Save Changes</Button>
@@ -358,33 +361,50 @@ const Settings = () => {
                         </Card>
                     )}
 
-                    {!isProfessional && activeTab === 'preferences' && (
+                    {activeTab === 'preferences' && (
                         <Card className="su-settings-card">
-                            <h2 className="su-settings-section-title">App Preferences</h2>
+                            <h2 className="su-settings-section-title">{t('preferences.title')}</h2>
                             <div className="su-settings-list">
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Appearance (Theme)</h4>
-                                        <p>Toggle between Light and Dark mode globally.</p>
+                                        <h4>{t('preferences.lang.title')}</h4>
+                                        <p>{t('preferences.lang.desc')}</p>
+                                    </div>
+                                    <select
+                                        className="su-settings-select"
+                                        value={language}
+                                        onChange={(e) => setLanguage(e.target.value)}
+                                        style={{ height: '40px', paddingLeft: '1rem', width: '150px' }}
+                                    >
+                                        <option value="en">English (US)</option>
+                                        <option value="pt-BR">Português (BR)</option>
+                                    </select>
+                                </div>
+                                <div className="su-settings-list-item">
+                                    <div className="su-item-info">
+                                        <h4>{t('preferences.theme.title')}</h4>
+                                        <p>{t('preferences.theme.desc')}</p>
                                     </div>
                                     <Button
                                         variant="outline"
                                         icon={theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
                                         onClick={toggleTheme}
                                     >
-                                        {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+                                        {theme === 'dark' ? t('preferences.theme.light') : t('preferences.theme.dark')}
                                     </Button>
                                 </div>
-                                <div className="su-settings-list-item">
-                                    <div className="su-item-info">
-                                        <h4>Measurement Units</h4>
-                                        <p>Choose between Metric (kg/cm) and Imperial (lbs/in).</p>
+                                {!isProfessional && (
+                                    <div className="su-settings-list-item">
+                                        <div className="su-item-info">
+                                            <h4>{t('preferences.units.title')}</h4>
+                                            <p>{t('preferences.units.desc')}</p>
+                                        </div>
+                                        <select className="su-settings-select" style={{ height: '40px', paddingLeft: '1rem', width: '150px' }}>
+                                            <option value="metric">Metric (kg)</option>
+                                            <option value="imperial">Imperial (lbs)</option>
+                                        </select>
                                     </div>
-                                    <select className="su-settings-select">
-                                        <option value="metric">Metric (kg)</option>
-                                        <option value="imperial">Imperial (lbs)</option>
-                                    </select>
-                                </div>
+                                )}
                             </div>
                         </Card>
                     )}

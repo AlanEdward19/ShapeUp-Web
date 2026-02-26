@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Bell, User, Dumbbell } from 'lucide-react';
 import NotificationsPanel from './NotificationsPanel';
 import { useNotifications } from '../utils/notifications';
+import { useLanguage } from '../contexts/LanguageContext';
 import './Header.css';
 
 const Header = ({ isProfessional, profile, sessionTitle }) => {
@@ -12,6 +13,7 @@ const Header = ({ isProfessional, profile, sessionTitle }) => {
     const targetUserId = isProfessional ? 'pro' : storedClientId;
 
     const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications(targetUserId);
+    const { t } = useLanguage();
 
     // Close notifications panel on toggle view
     React.useEffect(() => {
@@ -63,7 +65,7 @@ const Header = ({ isProfessional, profile, sessionTitle }) => {
                     </div>
                     <div className="su-profile-info">
                         <span className="su-profile-name">{profile?.name || (isProfessional ? 'Coach Alex' : 'Jane Doe')}</span>
-                        <span className="su-profile-role">{isProfessional ? 'Professional' : 'Client'}</span>
+                        <span className="su-profile-role">{isProfessional ? t('header.role.pro') : t('header.role.client')}</span>
                     </div>
                 </div>
             </div>

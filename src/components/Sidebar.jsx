@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import ChatDrawer from './ChatDrawer';
+import { useLanguage } from '../contexts/LanguageContext';
 import './Sidebar.css';
 import logo from '../assets/logo.png';
 
@@ -28,23 +29,25 @@ const Sidebar = ({ isProfessional }) => {
         return () => window.removeEventListener('open_client_chat', handleOpenChat);
     }, []);
 
+    const { t } = useLanguage();
+
     // Navigation structure switches based on context
     const proNavItems = [
-        { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-        { name: 'Clients', icon: <Users size={20} />, path: '/dashboard/clients' },
-        { name: 'Training Plans', icon: <Dumbbell size={20} />, path: '/dashboard/training' },
-        { name: 'Exercises Library', icon: <LibrarySquare size={20} />, path: '/dashboard/exercises' },
-        { name: 'Reports', icon: <FileBarChart size={20} />, path: '/dashboard/reports' },
-        { name: 'Feedback', icon: <MessageSquare size={20} />, path: '/dashboard/feedback' },
-        { name: 'Analytics', icon: <LineChart size={20} />, path: '/dashboard/analytics' },
-        { name: 'Settings', icon: <Settings size={20} />, path: '/dashboard/settings' },
+        { name: t('nav.dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+        { name: t('nav.clients'), icon: <Users size={20} />, path: '/dashboard/clients' },
+        { name: t('nav.training_plans'), icon: <Dumbbell size={20} />, path: '/dashboard/training' },
+        { name: t('nav.exercises_library'), icon: <LibrarySquare size={20} />, path: '/dashboard/exercises' },
+        { name: t('nav.reports'), icon: <FileBarChart size={20} />, path: '/dashboard/reports' },
+        { name: t('nav.feedback'), icon: <MessageSquare size={20} />, path: '/dashboard/feedback' },
+        { name: t('nav.analytics'), icon: <LineChart size={20} />, path: '/dashboard/analytics' },
+        { name: t('nav.settings'), icon: <Settings size={20} />, path: '/dashboard/settings' },
     ];
 
     const clientNavItems = [
-        { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-        { name: 'My Training', icon: <Activity size={20} />, path: '/dashboard/training' },
-        { name: 'Objectives', icon: <Target size={20} />, path: '/dashboard/objectives' },
-        { name: 'Settings', icon: <Settings size={20} />, path: '/dashboard/settings' },
+        { name: t('nav.dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+        { name: t('nav.my_training'), icon: <Activity size={20} />, path: '/dashboard/training' },
+        { name: t('nav.objectives'), icon: <Target size={20} />, path: '/dashboard/objectives' },
+        { name: t('nav.settings'), icon: <Settings size={20} />, path: '/dashboard/settings' },
     ];
 
     const navItems = isProfessional ? proNavItems : clientNavItems;
@@ -79,7 +82,7 @@ const Sidebar = ({ isProfessional }) => {
                 {!isProfessional && (
                     <button className="su-contact-coach-btn" onClick={() => setShowContactModal(true)}>
                         <MessageCircle size={18} />
-                        <span>Chat with Coach</span>
+                        <span>{t('sidebar.chat')}</span>
                     </button>
                 )}
                 <button
@@ -87,7 +90,7 @@ const Sidebar = ({ isProfessional }) => {
                     onClick={() => navigate('/')}
                 >
                     <LogOut size={18} />
-                    <span>Log out</span>
+                    <span>{t('sidebar.logout')}</span>
                 </button>
             </div>
 

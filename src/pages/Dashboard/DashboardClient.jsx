@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import Card from '../../components/Card';
 import { TrendingUp, Flame, CalendarDays, Award, Target } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './DashboardClient.css';
 
 // ─── Helper: normalize any date string to YYYY-MM-DD in LOCAL time ───
@@ -28,6 +29,7 @@ const getWeekKey = (date) => {
 };
 
 const DashboardClient = () => {
+    const { t } = useLanguage();
     const storedName = localStorage.getItem('shapeup_user_name') || 'Athlete';
     const firstName = storedName.split(' ')[0];
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
@@ -170,11 +172,11 @@ const DashboardClient = () => {
         <div className="su-dashboard-client">
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">Welcome back, {firstName}</h1>
+                    <h1 className="su-page-title">{t('client.dashboard.welcome')} {firstName}</h1>
                     <p className="su-page-subtitle">
                         {hasData
-                            ? `${plansWithSessions} of ${totalPlans} training plan${totalPlans !== 1 ? 's' : ''} completed.`
-                            : 'Go to My Training to start your first session!'}
+                            ? `${plansWithSessions} / ${totalPlans} ${t('client.dashboard.trend.sessions.plans')}`
+                            : t('client.dashboard.subtitle.nodata')}
                     </p>
                 </div>
             </div>
@@ -183,7 +185,7 @@ const DashboardClient = () => {
             <div className="su-metrics-grid su-mt-4">
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Weekly Volume</span>
+                        <span className="su-metric-label">{t('client.dashboard.metric.weekly')}</span>
                         <TrendingUp size={20} className="su-primary-text" />
                     </div>
                     <div className="su-metric-value">
@@ -191,34 +193,33 @@ const DashboardClient = () => {
                         {hasData && <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}> kg</span>}
                     </div>
                     <span className={`su-metric-trend ${!weeklyDiff ? '' : weeklyDiff >= 0 ? 'positive' : 'negative'}`}>
-                        {!hasData ? 'No sessions yet' : weeklyDiff === null ? 'First week!' : weeklyDiff >= 0 ? `↑ ${weeklyDiff}% vs last week` : `↓ ${Math.abs(weeklyDiff)}% vs last week`}
+                        {!hasData ? t('client.dashboard.trend.weekly.nosessions') : weeklyDiff === null ? t('client.dashboard.trend.weekly.first') : weeklyDiff >= 0 ? `↑ ${weeklyDiff}%` : `↓ ${Math.abs(weeklyDiff)}%`}
                     </span>
                 </Card>
 
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Current Streak</span>
+                        <span className="su-metric-label">{t('client.dashboard.metric.streak')}</span>
                         <Flame size={20} className="su-warning-text" />
                     </div>
                     <div className="su-metric-value">
                         {streakDays}
-                        <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}> {streakDays === 1 ? 'day' : 'days'}</span>
                     </div>
                     <span className="su-metric-trend positive">
-                        {streakDays === 0 ? 'Start your streak!' : streakDays >= 7 ? '🔥 Great consistency!' : 'Keep it up!'}
+                        {streakDays === 0 ? t('client.dashboard.trend.streak.start') : streakDays >= 7 ? t('client.dashboard.trend.streak.great') : t('client.dashboard.trend.streak.keep')}
                     </span>
                 </Card>
 
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Sessions Completed</span>
+                        <span className="su-metric-label">{t('client.dashboard.metric.sessions')}</span>
                         <CalendarDays size={20} className="su-accent-text" />
                     </div>
                     <div className="su-metric-value">
                         {plansWithSessions}
                         <span style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>/{totalPlans}</span>
                     </div>
-                    <span className="su-metric-trend">{totalPlans === 0 ? 'No plans assigned yet' : 'Training plans'}</span>
+                    <span className="su-metric-trend">{totalPlans === 0 ? t('client.dashboard.trend.sessions.noplans') : t('client.dashboard.trend.sessions.plans')}</span>
                 </Card>
             </div>
 
@@ -227,7 +228,7 @@ const DashboardClient = () => {
                 {/* Main Chart Area */}
                 <div className="su-main-chart-area">
                     <Card className="su-chart-card">
-                        <h3 className="su-section-title">Volume Progression</h3>
+                        <h3 className="su-section-title">{t('client.dashboard.chart.title')}</h3>
                         <div className="su-area-chart-container">
                             {chartData.length >= 2 ? (
                                 <ResponsiveContainer width="100%" height="100%">
@@ -247,7 +248,7 @@ const DashboardClient = () => {
                                 </ResponsiveContainer>
                             ) : (
                                 <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem' }}>
-                                    Complete at least 2 sessions to see your volume trend.
+                                    {t('client.dashboard.chart.nodata')}
                                 </div>
                             )}
                         </div>
@@ -259,7 +260,7 @@ const DashboardClient = () => {
                     <Card className="su-achievements-card">
                         <h3 className="su-section-title">
                             <Award size={20} style={{ verticalAlign: 'text-bottom', marginRight: '8px', color: 'var(--warning)' }} />
-                            Recent Improvements
+                            {t('client.dashboard.achievements.title')}
                         </h3>
 
                         <div className="su-pr-list">
@@ -277,7 +278,7 @@ const DashboardClient = () => {
                                 ))
                             ) : (
                                 <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                                    Keep training and your improvements will appear here!
+                                    {t('client.dashboard.achievements.nodata')}
                                 </div>
                             )}
                         </div>

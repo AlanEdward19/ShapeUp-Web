@@ -14,6 +14,7 @@ import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
     BarChart, Bar
 } from 'recharts';
+import { useLanguage } from '../../contexts/LanguageContext';
 import ExerciseLibraryModal from '../../components/ExerciseLibraryModal';
 import { addNotification } from '../../utils/notifications';
 import '../../components/InviteClientModal.css';
@@ -93,6 +94,7 @@ const TECHNIQUES = ['Straight', 'Cluster', 'Drop Set', 'Rest Pause', 'Muscle Rou
 const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
 export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
+    const { t } = useLanguage();
     const [name, setName] = useState(plan.name);
     const [phase, setPhase] = useState(plan.phase);
     const [difficulty, setDiff] = useState(plan.difficulty || 'Intermediate');
@@ -187,29 +189,29 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
             <div className="su-plan-builder">
                 <Card className="su-plan-header-card">
                     <div className="su-plan-meta-grid">
-                        <Input label="Plan Name" value={name} onChange={e => setName(e.target.value)} />
-                        <Input label="Duration (Weeks)" type="number" min="1" max="52" value={weeks} onChange={e => setWeeks(e.target.value)} />
-                        <ProSelect label="Phase / Objective" value={phase} onChange={e => setPhase(e.target.value)}
+                        <Input label={t('pro.builder.name')} value={name} onChange={e => setName(e.target.value)} />
+                        <Input label={t('pro.builder.weeks')} type="number" min="1" max="52" value={weeks} onChange={e => setWeeks(e.target.value)} />
+                        <ProSelect label={t('pro.builder.phase')} value={phase} onChange={e => setPhase(e.target.value)}
                             options={[
                                 { value: 'Hypertrophy', label: 'Hypertrophy' },
                                 { value: 'Strength', label: 'Strength / Power' },
                                 { value: 'Endurance', label: 'Endurance' },
                                 { value: 'Deload', label: 'Deload' },
                             ]} />
-                        <ProSelect label="Difficulty" value={difficulty} onChange={e => setDiff(e.target.value)}
+                        <ProSelect label={t('pro.builder.diff')} value={difficulty} onChange={e => setDiff(e.target.value)}
                             options={['Beginner', 'Intermediate', 'Advanced']} />
                     </div>
                     <div className="su-mt-4">
-                        <Input label="General Plan Notes" value={planNotes}
+                        <Input label={t('pro.builder.notes')} value={planNotes}
                             onChange={e => setPlanNotes(e.target.value)}
-                            placeholder="e.g. Focus on progressive overload over 6 weeks..." />
+                            placeholder={t('pro.builder.notes.ph')} />
                     </div>
                 </Card>
 
                 <div className="su-exercise-stack">
                     <div className="su-stack-header">
-                        <h2>Exercise Stack</h2>
-                        <Button icon={<Plus size={16} />} onClick={addExercise}>Add Exercise</Button>
+                        <h2>{t('pro.builder.stack')}</h2>
+                        <Button icon={<Plus size={16} />} onClick={addExercise}>{t('pro.builder.add.ex')}</Button>
                     </div>
 
                     <div className="su-sortable-list">
@@ -223,13 +225,13 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                                                 className="su-pe-ex-name-input"
                                                 value={ex.name}
                                                 onChange={e => updateEx(exIdx, 'name', e.target.value)}
-                                                placeholder="Exercise name"
+                                                placeholder={t('pro.builder.ex.name.ph')}
                                             />
                                             <input
                                                 className="su-pe-ex-tags-input"
                                                 value={ex.tags}
                                                 onChange={e => updateEx(exIdx, 'tags', e.target.value)}
-                                                placeholder="Tags e.g. Chest • Compound"
+                                                placeholder={t('pro.builder.ex.tags.ph')}
                                             />
                                         </div>
                                         <div className="su-ex-toggles">
@@ -243,19 +245,19 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                                         <Input
                                             value={ex.notes}
                                             onChange={e => updateEx(exIdx, 'notes', e.target.value)}
-                                            placeholder="Execution notes (e.g. 3 sec eccentric, pause at bottom)..."
+                                            placeholder={t('pro.builder.ex.notes.ph')}
                                         />
                                     </div>
 
                                     <div className="su-sets-builder">
                                         <div className="su-sets-header-labels">
                                             <span></span>
-                                            <span>Type</span>
-                                            <span>Technique</span>
-                                            <span>Reps</span>
-                                            <span>Load %</span>
-                                            <span>RPE</span>
-                                            <span>Rest (s)</span>
+                                            <span>{t('pro.builder.set.type')}</span>
+                                            <span>{t('pro.builder.set.tech')}</span>
+                                            <span>{t('pro.builder.set.reps')}</span>
+                                            <span>{t('pro.builder.set.load')}</span>
+                                            <span>{t('pro.builder.set.rpe')}</span>
+                                            <span>{t('pro.builder.set.rest')}</span>
                                             <span></span>
                                         </div>
 
@@ -289,7 +291,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                                         ))}
 
                                         <Button variant="outline" icon={<Plus size={16} />} className="su-mt-2"
-                                            onClick={() => addSet(exIdx)}>Add Set</Button>
+                                            onClick={() => addSet(exIdx)}>{t('pro.builder.add.set')}</Button>
                                     </div>
                                 </div>
                             </div>
@@ -297,7 +299,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                     </div>
 
                     <button className="su-pe-add-ex-btn" onClick={addExercise}>
-                        <Plus size={18} /> Add Exercise
+                        <Plus size={18} /> {t('pro.builder.add.ex')}
                     </button>
                 </div>
             </div>
@@ -308,33 +310,33 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                     <div className="su-card-header-flex">
                         <h3 className="su-card-title">
                             <Dumbbell size={18} style={{ marginRight: '8px', verticalAlign: 'text-bottom' }} />
-                            Plan Summary
+                            {t('pro.builder.summary.title')}
                         </h3>
                     </div>
 
                     <div className="su-intelligence-metrics">
                         <div className="su-metric-item">
-                            <span className="su-metric-label">Total Exercises</span>
+                            <span className="su-metric-label">{t('pro.builder.summary.ex')}</span>
                             <span className="su-metric-val">{exercises.length}</span>
                         </div>
                         <div className="su-metric-item">
-                            <span className="su-metric-label">Total Sets</span>
-                            <span className="su-metric-val">{totalSets} sets</span>
+                            <span className="su-metric-label">{t('pro.builder.summary.sets')}</span>
+                            <span className="su-metric-val">{totalSets} {t('pro.builder.summary.sets.val')}</span>
                         </div>
                         <div className="su-metric-item">
-                            <span className="su-metric-label">Est. Duration</span>
+                            <span className="su-metric-label">{t('pro.builder.summary.time')}</span>
                             <span className="su-metric-val">{estMins}</span>
                         </div>
                         <div className="su-metric-item">
-                            <span className="su-metric-label">Avg RPE Target</span>
+                            <span className="su-metric-label">{t('pro.builder.summary.rpe')}</span>
                             <span className="su-metric-val">{avgRpe}</span>
                         </div>
                         <div className="su-metric-item">
-                            <span className="su-metric-label">Phase</span>
+                            <span className="su-metric-label">{t('pro.builder.summary.phase')}</span>
                             <span className="su-metric-val">{phase}</span>
                         </div>
                         <div className="su-metric-item">
-                            <span className="su-metric-label">Difficulty</span>
+                            <span className="su-metric-label">{t('pro.builder.summary.diff')}</span>
                             <span className="su-metric-val">{difficulty}</span>
                         </div>
                     </div>
@@ -342,7 +344,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                     {/* Intensity Distribution */}
                     {intensityDist.length > 0 && (
                         <div className="su-chart-section">
-                            <h4 className="su-chart-subhead">Intensity Distribution</h4>
+                            <h4 className="su-chart-subhead">{t('pro.builder.chart.intensity')}</h4>
                             <div className="su-mini-chart">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={intensityDist} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -359,7 +361,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                     {/* Technique Usage */}
                     {techniqueUsage.length > 0 && (
                         <div className="su-chart-section">
-                            <h4 className="su-chart-subhead">Technique Usage</h4>
+                            <h4 className="su-chart-subhead">{t('pro.builder.chart.tech')}</h4>
                             <div className="su-tech-bars">
                                 {techniqueUsage.map(tech => (
                                     <div key={tech.name} className="su-tech-bar-row">
@@ -379,17 +381,17 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
 
                     <Button fullWidth icon={<Save size={16} />}
                         onClick={() => onSave({ ...plan, name, phase, difficulty, weeks, notes: planNotes, exercises })}>
-                        Save Plan
+                        {t('pro.builder.btn.save')}
                     </Button>
                     {onAssign && (
                         <Button fullWidth variant="outline" className="su-mt-2" style={{ color: 'var(--text-main)' }}
                             onClick={() => onAssign({ ...plan, name, phase, difficulty, weeks, notes: planNotes, exercises })}>
-                            Assign to Client
+                            {t('pro.builder.btn.assign')}
                         </Button>
                     )}
                     <Button fullWidth variant="outline" icon={<X size={16} />}
                         onClick={onCancel} style={{ marginTop: '0.5rem' }}>
-                        Cancel
+                        {t('pro.builder.btn.cancel')}
                     </Button>
                 </Card>
             </div>
@@ -404,50 +406,54 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
 };
 
 // ─── SESSION DETAIL MODAL ───────────────────────────────────
-const SessionDetailModal = ({ session, planName, onClose }) => (
-    <div className="su-modal-overlay" onClick={onClose}>
-        <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()}>
-            <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
-            <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>{planName}</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
-                {session.date} · {session.duration} · {session.totalVol} volume · Avg RPE {session.rpe}
-            </p>
-            <div className="su-sd-exercises">
-                {session.exercises.map((ex, i) => (
-                    <div key={i} className="su-sd-ex-block">
-                        <div className="su-sd-ex-name">
-                            {ex.name}
-                            {ex.skipped && <span className="su-danger-tag" style={{ marginLeft: '0.5rem', backgroundColor: 'var(--error-light, rgba(239, 68, 68, 0.2))', color: 'var(--error, #ef4444)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Skipped</span>}
-                        </div>
-                        {ex.skipped ? (
-                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: '0.25rem 0 0' }}>
-                                This exercise was skipped during the session.
-                            </p>
-                        ) : (
-                            <div className="su-sd-sets-table">
-                                <div className="su-sd-sets-head">
-                                    <span>Set</span><span>Type</span><span>Reps</span><span>Load</span><span>RPE</span>
-                                </div>
-                                {ex.sets.map((s, si) => (
-                                    <div key={si} className="su-sd-set-row">
-                                        <span className="su-sd-set-num">{s.set}</span>
-                                        <SetTypeBadge type={s.type} />
-                                        <span>{s.reps} reps</span>
-                                        <span>{s.load} kg</span>
-                                        <span>RPE {s.rpe}</span>
-                                    </div>
-                                ))}
+const SessionDetailModal = ({ session, planName, onClose }) => {
+    const { t } = useLanguage();
+    return (
+        <div className="su-modal-overlay" onClick={onClose}>
+            <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()}>
+                <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
+                <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>{planName}</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
+                    {session.date} · {session.duration} · {session.totalVol} {t('pro.plan.history.vol')} · Avg RPE {session.rpe}
+                </p>
+                <div className="su-sd-exercises">
+                    {session.exercises.map((ex, i) => (
+                        <div key={i} className="su-sd-ex-block">
+                            <div className="su-sd-ex-name">
+                                {ex.name}
+                                {ex.skipped && <span className="su-danger-tag" style={{ marginLeft: '0.5rem', backgroundColor: 'var(--error-light, rgba(239, 68, 68, 0.2))', color: 'var(--error, #ef4444)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>{t('pro.client.plan.history.tag.skipped.ex')}</span>}
                             </div>
-                        )}
-                    </div>
-                ))}
+                            {ex.skipped ? (
+                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: '0.25rem 0 0' }}>
+                                    This exercise was skipped during the session.
+                                </p>
+                            ) : (
+                                <div className="su-sd-sets-table">
+                                    <div className="su-sd-sets-head">
+                                        <span>Set</span><span>{t('pro.builder.set.type')}</span><span>{t('pro.builder.set.reps')}</span><span>{t('pro.builder.set.load')}</span><span>{t('pro.builder.set.rpe')}</span>
+                                    </div>
+                                    {ex.sets.map((s, si) => (
+                                        <div key={si} className="su-sd-set-row">
+                                            <span className="su-sd-set-num">{s.set}</span>
+                                            <SetTypeBadge type={s.type} />
+                                            <span>{s.reps} reps</span>
+                                            <span>{s.load} kg</span>
+                                            <span>RPE {s.rpe}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 // ─── PLAN CARD (with expandable history) ────────────────────
 const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId }) => {
+    const { t } = useLanguage();
     const [historyOpen, setHistoryOpen] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -467,16 +473,16 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
             <Card className={`su-cp-plan-card ${plan.active ? 'active-plan' : ''}`}>
                 <div className="su-cp-plan-header">
                     <div className="su-cp-plan-info">
-                        {plan.active && <span className="su-active-plan-badge">Active</span>}
+                        {plan.active && <span className="su-active-plan-badge">{t('pro.client.plan.active')}</span>}
                         <h3 className="su-cp-plan-name">{plan.name}</h3>
-                        <p className="su-cp-plan-meta">{plan.phase} · {plan.difficulty} · {plan.weeks} weeks · {plan.exercises.length} exercises</p>
+                        <p className="su-cp-plan-meta">{plan.phase} · {plan.difficulty} · {plan.weeks} {t('pro.client.plan.weeks')} · {plan.exercises.length} {t('pro.client.plan.exercises')}</p>
                     </div>
                     <div className="su-cp-plan-actions">
                         <button className="su-cp-action-btn edit" onClick={() => onEdit(plan)} title="Edit Plan">
-                            <Settings2 size={16} /> Edit
+                            <Settings2 size={16} /> {t('pro.client.plan.btn.edit')}
                         </button>
                         <button className="su-cp-action-btn copy" onClick={() => onCopy(plan)} title="Copy Plan">
-                            <Copy size={16} /> Copy
+                            <Copy size={16} /> {t('pro.client.plan.btn.copy')}
                         </button>
                         <button className="su-cp-action-btn delete" onClick={() => setConfirmDelete(true)} title="Delete Plan">
                             <Trash2 size={16} />
@@ -490,7 +496,7 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
                         <span key={ex.id} className="su-cp-ex-chip">{ex.name}</span>
                     ))}
                     {plan.exercises.length === 0 && (
-                        <span className="su-cp-ex-empty">No exercises yet — click Edit to add some</span>
+                        <span className="su-cp-ex-empty">{t('pro.client.plan.empty.ex')}</span>
                     )}
                 </div>
 
@@ -501,7 +507,7 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
                         onClick={() => setHistoryOpen(v => !v)}
                     >
                         <History size={14} />
-                        {historyOpen ? 'Hide' : 'Show'} session history ({plan.history.length})
+                        {historyOpen ? t('pro.client.plan.history.hide') : t('pro.client.plan.history.show')} ({plan.history.length})
                         {historyOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                     </button>
                 )}
@@ -519,16 +525,16 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
                                     <span className="su-cp-hist-date">{session.date}</span>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                                         <span className="su-cp-hist-meta">
-                                            ⏱ {session.duration} · {session.totalVol} vol · Avg RPE {session.rpe}
+                                            ⏱ {session.duration} · {session.totalVol} {t('pro.plan.history.vol')} · Avg RPE {session.rpe}
                                         </span>
                                         {session.status === 'partial' && (
-                                            <span className="su-warning-tag" style={{ backgroundColor: 'var(--warning-light, rgba(245, 158, 11, 0.2))', color: 'var(--warning)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'help' }} title="Client did not complete all prescribed sets">Partial</span>
+                                            <span className="su-warning-tag" style={{ backgroundColor: 'var(--warning-light, rgba(245, 158, 11, 0.2))', color: 'var(--warning)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'help' }} title="Client did not complete all prescribed sets">{t('pro.client.plan.history.tag.partial')}</span>
                                         )}
                                         {session.status === 'skipped' && (
-                                            <span className="su-danger-tag" style={{ backgroundColor: 'var(--error-light, rgba(239, 68, 68, 0.2))', color: 'var(--error, #ef4444)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>Skipped Session</span>
+                                            <span className="su-danger-tag" style={{ backgroundColor: 'var(--error-light, rgba(239, 68, 68, 0.2))', color: 'var(--error, #ef4444)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }}>{t('pro.client.plan.history.tag.skipped.sess')}</span>
                                         )}
                                         {(!session.status && session.exercises.some(ex => ex.skipped)) && (
-                                            <span className="su-danger-tag" style={{ backgroundColor: 'var(--error-light, rgba(239, 68, 68, 0.2))', color: 'var(--error, #ef4444)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }} title="Client skipped at least one exercise">Skipped Exercise</span>
+                                            <span className="su-danger-tag" style={{ backgroundColor: 'var(--error-light, rgba(239, 68, 68, 0.2))', color: 'var(--error, #ef4444)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600 }} title="Client skipped at least one exercise">{t('pro.client.plan.history.tag.skipped.ex')}</span>
                                         )}
                                     </div>
                                 </div>
@@ -546,19 +552,19 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
                         <div className="su-confirm-icon">
                             <Trash2 size={28} />
                         </div>
-                        <h3 className="su-confirm-title">Delete Plan?</h3>
+                        <h3 className="su-confirm-title">{t('pro.client.plan.delete.title')}</h3>
                         <p className="su-confirm-body">
-                            <strong>"{plan.name}"</strong> will be permanently removed. This action cannot be undone.
+                            <strong>"{plan.name}"</strong> {t('pro.client.plan.delete.desc')}
                         </p>
                         <div className="su-confirm-actions">
                             <Button variant="outline" onClick={() => setConfirmDelete(false)}>
-                                Cancel
+                                {t('pro.client.plan.delete.cancel')}
                             </Button>
                             <Button
                                 style={{ background: '#ef4444', borderColor: '#ef4444' }}
                                 onClick={() => { onDelete(plan.id); setConfirmDelete(false); }}
                             >
-                                Delete Plan
+                                {t('pro.client.plan.delete.confirm')}
                             </Button>
                         </div>
                     </div>
@@ -579,6 +585,7 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
 
 // ─── MAIN COMPONENT ─────────────────────────────────────────
 const ClientDetail = () => {
+    const { t } = useLanguage();
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -766,8 +773,8 @@ const ClientDetail = () => {
     };
 
     const tabs = [
-        { id: 'analytics', label: 'Analytics', icon: <BarChart2 size={16} /> },
-        { id: 'plans', label: 'Training Plans', icon: <Dumbbell size={16} /> },
+        { id: 'analytics', label: t('pro.client.tabs.analytics'), icon: <BarChart2 size={16} /> },
+        { id: 'plans', label: t('pro.client.tabs.plans'), icon: <Dumbbell size={16} /> },
     ];
 
     return (
@@ -790,7 +797,7 @@ const ClientDetail = () => {
                     variant="outline"
                     onClick={() => navigate('/dashboard/feedback', { state: { clientName: client.name } })}
                 >
-                    Message Client
+                    {t('pro.client.btn.message')}
                 </Button>
             </div>
 
@@ -811,8 +818,8 @@ const ClientDetail = () => {
             {activeTab === 'analytics' && !hasRealData && (
                 <div className="su-client-empty-state su-mt-4" style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-muted)' }}>
                     <BarChart2 size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
-                    <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>No Data Available</h3>
-                    <p>This client hasn't recorded any workout sessions yet. Analytics will appear once they complete a session.</p>
+                    <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>{t('pro.client.empty.analytics.title')}</h3>
+                    <p>{t('pro.client.empty.analytics.desc')}</p>
                 </div>
             )}
 
@@ -821,7 +828,7 @@ const ClientDetail = () => {
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
                             <TrendingUp size={20} className="su-text-muted" />
-                            <h3 className="su-section-title">Session Volume Trend</h3>
+                            <h3 className="su-section-title">{t('pro.client.chart.volume')}</h3>
                         </div>
                         <div className="su-chart-wrapper-med">
                             <ResponsiveContainer width="100%" height="100%">
@@ -845,7 +852,7 @@ const ClientDetail = () => {
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
                             <Activity size={20} className="su-text-muted" />
-                            <h3 className="su-section-title">Session RPE Trend (Effort)</h3>
+                            <h3 className="su-section-title">{t('pro.client.chart.rpe')}</h3>
                         </div>
                         <div className="su-chart-wrapper-med">
                             <ResponsiveContainer width="100%" height="100%">
@@ -863,7 +870,7 @@ const ClientDetail = () => {
                     <Card className="su-metric-card-large" style={{ display: 'flex', flexDirection: 'column' }}>
                         <div className="su-card-header-icon">
                             <TrendingUp size={20} className="su-text-muted" />
-                            <h3 className="su-section-title">Bodyweight Trend</h3>
+                            <h3 className="su-section-title">{t('pro.client.chart.weight')}</h3>
                         </div>
                         <div style={{ flex: 1, minHeight: 0, marginTop: '1rem' }}>
                             {hasWeightData ? (
@@ -888,7 +895,7 @@ const ClientDetail = () => {
                                 </ResponsiveContainer>
                             ) : (
                                 <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textAlign: 'center' }}>
-                                    <p>The client needs to log at least 2 weight entries in their Objectives tab to generate this trend.</p>
+                                    <p>{t('pro.client.chart.weight.empty')}</p>
                                 </div>
                             )}
                         </div>
@@ -897,7 +904,7 @@ const ClientDetail = () => {
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
                             <CheckCircle2 size={20} className="su-text-muted" />
-                            <h3 className="su-section-title">Adherence (Last 30 Days)</h3>
+                            <h3 className="su-section-title">{t('pro.client.chart.adherence')}</h3>
                         </div>
                         <div className="su-adherence-stats">
                             <div className="su-adherence-circle-wrap">
@@ -908,9 +915,9 @@ const ClientDetail = () => {
                                 </svg>
                             </div>
                             <div className="su-adherence-legend">
-                                <div className="su-legend-item"><span className="su-legend-dot primary" /><span className="su-legend-label">Completed</span><span className="su-legend-val">{adherenceStats.completed} sessions</span></div>
-                                <div className="su-legend-item"><span className="su-legend-dot error" /><span className="su-legend-label">Skipped</span><span className="su-legend-val">{adherenceStats.skipped} sessions</span></div>
-                                <div className="su-legend-item"><span className="su-legend-dot warning" /><span className="su-legend-label">Partial</span><span className="su-legend-val">{adherenceStats.partial} sessions</span></div>
+                                <div className="su-legend-item"><span className="su-legend-dot primary" /><span className="su-legend-label">{t('pro.client.adherence.completed')}</span><span className="su-legend-val">{adherenceStats.completed} {t('pro.builder.summary.sets.val')}</span></div>
+                                <div className="su-legend-item"><span className="su-legend-dot error" /><span className="su-legend-label">{t('pro.client.adherence.skipped')}</span><span className="su-legend-val">{adherenceStats.skipped} {t('pro.builder.summary.sets.val')}</span></div>
+                                <div className="su-legend-item"><span className="su-legend-dot warning" /><span className="su-legend-label">{t('pro.client.adherence.partial')}</span><span className="su-legend-val">{adherenceStats.partial} {t('pro.builder.summary.sets.val')}</span></div>
                             </div>
                         </div>
                     </Card>
@@ -918,7 +925,7 @@ const ClientDetail = () => {
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
                             <TrendingUp size={20} className="su-text-muted" />
-                            <h3 className="su-section-title">Recent PRs & Improvements</h3>
+                            <h3 className="su-section-title">{t('pro.client.chart.prs')}</h3>
                         </div>
                         <div className="su-improvements-list su-mt-2">
                             {recentImprovements.length > 0 ? (
@@ -937,7 +944,7 @@ const ClientDetail = () => {
                                 ))
                             ) : (
                                 <p className="su-text-muted su-p-4" style={{ textAlign: 'center' }}>
-                                    No records broken yet.
+                                    {t('pro.client.prs.empty')}
                                 </p>
                             )}
                         </div>
@@ -957,8 +964,8 @@ const ClientDetail = () => {
                     ) : (
                         <>
                             <div className="su-cp-plans-toolbar">
-                                <h2 className="su-cp-section-title">Assigned Plans ({plans.length})</h2>
-                                <Button icon={<Plus size={16} />} onClick={handleAddPlan}>Add Plan</Button>
+                                <h2 className="su-cp-section-title">{t('pro.client.plans.title')} ({plans.length})</h2>
+                                <Button icon={<Plus size={16} />} onClick={handleAddPlan}>{t('pro.client.plans.btn.add')}</Button>
                             </div>
                             <div className="su-plans-list">
                                 {plans.map(p => (
@@ -975,7 +982,7 @@ const ClientDetail = () => {
                             {plans.length === 0 && (
                                 <div className="su-cp-empty">
                                     <Dumbbell size={40} />
-                                    <p>No plans assigned yet. Click "Add Plan" to create one.</p>
+                                    <p>{t('pro.client.plans.empty')}</p>
                                 </div>
                             )}
                         </>

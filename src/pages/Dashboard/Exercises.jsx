@@ -5,11 +5,13 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import ExerciseModal from '../../components/ExerciseModal';
 import SuggestExerciseModal from '../../components/SuggestExerciseModal';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './Exercises.css';
 
 import { exercisesDB, availableMuscles } from '../../data/mockExercises';
 
 const Exercises = () => {
+    const { t } = useLanguage();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMuscles, setSelectedMuscles] = useState([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -36,10 +38,10 @@ const Exercises = () => {
         <div className="su-exercises-dashboard">
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">Exercise Library</h1>
-                    <p className="su-page-subtitle">Browse and manage the global exercise database.</p>
+                    <h1 className="su-page-title">{t('pro.exercises.title')}</h1>
+                    <p className="su-page-subtitle">{t('pro.exercises.subtitle')}</p>
                 </div>
-                <Button icon={<Lightbulb size={16} />} onClick={() => setShowSuggest(true)}>Suggest New Exercise</Button>
+                <Button icon={<Lightbulb size={16} />} onClick={() => setShowSuggest(true)}>{t('pro.exercises.btn.suggest')}</Button>
             </div>
 
             <Card className="su-exercises-container su-mt-4">
@@ -49,7 +51,7 @@ const Exercises = () => {
                         <Search size={18} className="su-text-muted" />
                         <input
                             type="text"
-                            placeholder="Search exercises by name..."
+                            placeholder={t('pro.exercises.search')}
                             className="su-bare-input"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -62,12 +64,12 @@ const Exercises = () => {
                             icon={<Filter size={16} />}
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                         >
-                            Muscles {selectedMuscles.length > 0 && `(${selectedMuscles.length})`}
+                            {t('pro.exercises.filter')} {selectedMuscles.length > 0 && `(${selectedMuscles.length})`}
                         </Button>
 
                         {isFilterOpen && (
                             <div className="su-filter-dropdown">
-                                <div className="su-filter-dropdown-header">Filter by Target Muscle</div>
+                                <div className="su-filter-dropdown-header">{t('pro.exercises.filter.header')}</div>
                                 <div className="su-filter-options-grid">
                                     {availableMuscles.map(muscle => (
                                         <label key={muscle} className="su-filter-option">
@@ -82,7 +84,7 @@ const Exercises = () => {
                                 </div>
                                 {selectedMuscles.length > 0 && (
                                     <div className="su-filter-actions">
-                                        <button className="su-text-btn" onClick={() => setSelectedMuscles([])}>Clear Filters</button>
+                                        <button className="su-text-btn" onClick={() => setSelectedMuscles([])}>{t('pro.exercises.filter.clear')}</button>
                                     </div>
                                 )}
                             </div>
@@ -110,7 +112,7 @@ const Exercises = () => {
                         </div>
                     ))}
                     {filteredExercises.length === 0 && (
-                        <div className="su-empty-state">No exercises found matching your criteria.</div>
+                        <div className="su-empty-state">{t('pro.exercises.empty')}</div>
                     )}
                 </div>
             </Card>

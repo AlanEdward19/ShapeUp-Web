@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Activity, MessageSquare, CheckCircle, XCircle, TrendingUp, Award, Bell, Search, Filter, ChevronLeft, ChevronRight, Calendar, AlertTriangle, UserPlus } from 'lucide-react';
+import { UserPlus, Calendar, Activity, CheckCircle, FileText, ArrowRight, MessageCircle, AlertTriangle, Users, Settings, Plus, XCircle, Search, Filter, MessageSquare, ExternalLink, Bell, TrendingUp, Award, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar } from 'recharts';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import InviteClientModal from '../../components/InviteClientModal';
 import { useNotifications } from '../../utils/notifications';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './DashboardProfessional.css';
 
 const DashboardProfessional = () => {
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [showInvite, setShowInvite] = useState(false);
     const [clients, setClients] = useState([]);
     const [globalHistory, setGlobalHistory] = useState([]);
@@ -199,48 +202,48 @@ const DashboardProfessional = () => {
 
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">Coach Overview</h1>
-                    <p className="su-page-subtitle">A high-level look at your active clients and recent activity.</p>
+                    <h1 className="su-page-title">{t('pro.dashboard.title')}</h1>
+                    <p className="su-page-subtitle">{t('pro.dashboard.subtitle')}</p>
                 </div>
-                <Button onClick={() => setShowInvite(true)}>Invite New Client</Button>
+                <Button onClick={() => setShowInvite(true)}>{t('pro.dashboard.invite')}</Button>
             </div>
 
             {/* Aggregate Metrics Grid */}
             <div className="su-metrics-grid su-mt-4">
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Active Clients</span>
+                        <span className="su-metric-label">{t('pro.dashboard.metric.active')}</span>
                         <Users size={20} className="su-text-muted" />
                     </div>
                     <div className="su-metric-value">{stats.activeClients}</div>
-                    <span className="su-metric-trend positive">Total assigned</span>
+                    <span className="su-metric-trend positive">{t('pro.dashboard.metric.active.sub')}</span>
                 </Card>
 
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Workouts Completed</span>
+                        <span className="su-metric-label">{t('pro.dashboard.metric.completed')}</span>
                         <CheckCircle size={20} className="su-success-text" />
                     </div>
                     <div className="su-metric-value">{stats.workoutsCompleted}</div>
-                    <span className="su-metric-trend positive">Lifetime total</span>
+                    <span className="su-metric-trend positive">{t('pro.dashboard.metric.completed.sub')}</span>
                 </Card>
 
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Workouts Skipped</span>
+                        <span className="su-metric-label">{t('pro.dashboard.metric.skipped')}</span>
                         <XCircle size={20} className="su-error-text" />
                     </div>
                     <div className="su-metric-value">{stats.workoutsSkipped}</div>
-                    <span className="su-metric-trend negative">Estimated</span>
+                    <span className="su-metric-trend negative">{t('pro.dashboard.metric.skipped.sub')}</span>
                 </Card>
 
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Client Engagement</span>
+                        <span className="su-metric-label">{t('pro.dashboard.metric.engagement')}</span>
                         <Activity size={20} className="su-accent-text" />
                     </div>
                     <div className="su-metric-value">{stats.engagement}%</div>
-                    <span className="su-metric-trend">Avg. compliance</span>
+                    <span className="su-metric-trend">{t('pro.dashboard.metric.engagement.sub')}</span>
                 </Card>
             </div>
 
@@ -250,14 +253,14 @@ const DashboardProfessional = () => {
                 {/* Recent Client Logs Column */}
                 <div className="su-client-feed">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                        <h3 className="su-section-title" style={{ marginBottom: 0 }}>Global Client Activity Feed</h3>
+                        <h3 className="su-section-title" style={{ marginBottom: 0 }}>{t('pro.dashboard.feed.title')}</h3>
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                             <div className="su-search-wrapper" style={{ width: '200px' }}>
                                 <Search className="su-search-icon" size={18} />
                                 <input
                                     type="text"
                                     className="su-input"
-                                    placeholder="Search..."
+                                    placeholder={t('pro.dashboard.search')}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     style={{ paddingLeft: '2.5rem', height: '40px', paddingTop: '0', paddingBottom: '0' }}
@@ -271,11 +274,11 @@ const DashboardProfessional = () => {
                                     onChange={(e) => setFilterType(e.target.value)}
                                     style={{ height: '40px', paddingLeft: '2rem', paddingTop: '0', paddingBottom: '0' }}
                                 >
-                                    <option value="all">All Entries</option>
-                                    <option value="workout">Workouts</option>
-                                    <option value="message">Messages</option>
-                                    <option value="alert">Alerts</option>
-                                    <option value="system">System</option>
+                                    <option value="all">{t('pro.dashboard.filter.all')}</option>
+                                    <option value="workout">{t('pro.dashboard.filter.workout')}</option>
+                                    <option value="message">{t('pro.dashboard.filter.message')}</option>
+                                    <option value="alert">{t('pro.dashboard.filter.alert')}</option>
+                                    <option value="system">{t('pro.dashboard.filter.system')}</option>
                                 </select>
                             </div>
                             {(searchQuery !== '' || filterType !== 'all') && (
@@ -284,7 +287,7 @@ const DashboardProfessional = () => {
                                     onClick={() => { setSearchQuery(''); setFilterType('all'); }}
                                     style={{ height: '40px', padding: '0 1rem', fontSize: '0.875rem' }}
                                 >
-                                    Clear
+                                    {t('pro.dashboard.btn.clear')}
                                 </Button>
                             )}
                         </div>
@@ -377,7 +380,7 @@ const DashboardProfessional = () => {
                             ))
                         ) : (
                             <div className="su-empty-feed">
-                                <p className="su-text-muted">No client activity found for these filters.</p>
+                                <p className="su-text-muted">{t('pro.dashboard.feed.empty')}</p>
                             </div>
                         )}
                     </div>
@@ -394,7 +397,7 @@ const DashboardProfessional = () => {
                                 <ChevronLeft size={20} />
                             </Button>
                             <span className="su-text-muted" style={{ fontSize: '0.875rem' }}>
-                                Page {currentPage} of {totalPages}
+                                {t('pro.dashboard.feed.page')} {currentPage} {t('pro.dashboard.feed.of')} {totalPages}
                             </span>
                             <Button
                                 variant="secondary"
@@ -413,7 +416,7 @@ const DashboardProfessional = () => {
                     <Card className="su-attention-card">
                         <h3 className="su-card-title">
                             <Bell size={18} style={{ verticalAlign: 'middle', marginRight: '8px' }} />
-                            Client Alerts
+                            {t('pro.dashboard.alerts.title')}
                         </h3>
                         {alerts.length > 0 ? (
                             <ul className="su-alert-list">
@@ -439,7 +442,7 @@ const DashboardProfessional = () => {
                             </ul>
                         ) : (
                             <p className="su-text-muted" style={{ fontSize: '0.875rem' }}>
-                                All clients are currently on track.
+                                {t('pro.dashboard.alerts.empty')}
                             </p>
                         )}
                     </Card>

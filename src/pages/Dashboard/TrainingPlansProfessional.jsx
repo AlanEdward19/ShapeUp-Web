@@ -5,9 +5,11 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { PlanEditor } from './ClientDetail';
 import { addNotification } from '../../utils/notifications';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './TrainingPlansProfessional.css';
 
 const TrainingPlansProfessional = () => {
+    const { t } = useLanguage();
     const [templates, setTemplates] = useState(() => {
         const stored = localStorage.getItem('shapeup_plan_templates');
         if (stored) return JSON.parse(stored);
@@ -77,14 +79,14 @@ const TrainingPlansProfessional = () => {
         <div className="su-pro-dashboard">
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">{activeTemplate ? 'Plan Builder' : 'Training Library'}</h1>
-                    <p className="su-page-subtitle">{activeTemplate ? 'Build reusable training templates and analyze structural volume.' : 'Manage your training templates and assign them to clients.'}</p>
+                    <h1 className="su-page-title">{activeTemplate ? t('pro.training.title.builder') : t('pro.training.title.library')}</h1>
+                    <p className="su-page-subtitle">{activeTemplate ? t('pro.training.subtitle.builder') : t('pro.training.subtitle.library')}</p>
                 </div>
                 {!activeTemplate && (
-                    <Button icon={<Plus size={16} />} onClick={openNewTemplate}>Create New Plan</Button>
+                    <Button icon={<Plus size={16} />} onClick={openNewTemplate}>{t('pro.training.btn.create')}</Button>
                 )}
                 {activeTemplate && (
-                    <Button variant="outline" onClick={() => setActiveTemplate(null)}>Back to Library</Button>
+                    <Button variant="outline" onClick={() => setActiveTemplate(null)}>{t('pro.training.btn.back')}</Button>
                 )}
             </div>
 
@@ -102,11 +104,11 @@ const TrainingPlansProfessional = () => {
                             <div className="su-empty-icon-wrap">
                                 <Dumbbell size={32} />
                             </div>
-                            <h2 className="su-empty-title">No Training Plans Yet</h2>
+                            <h2 className="su-empty-title">{t('pro.training.empty.title')}</h2>
                             <p className="su-empty-desc">
-                                Create reusable workout templates to easily assign structured training blocks to your clients.
+                                {t('pro.training.empty.desc')}
                             </p>
-                            <Button icon={<Plus size={16} />} onClick={openNewTemplate}>Create First Plan</Button>
+                            <Button icon={<Plus size={16} />} onClick={openNewTemplate}>{t('pro.training.empty.btn')}</Button>
                         </div>
                     ) : (
                         <div className="su-grid-cards">
@@ -134,23 +136,23 @@ const TrainingPlansProfessional = () => {
                                             <div className="su-template-metrics-clean">
                                                 <div className="su-metric-clean">
                                                     <span className="su-metric-clean-val">{tmpl.exercises.length}</span>
-                                                    <span className="su-metric-clean-lbl">Exercises</span>
+                                                    <span className="su-metric-clean-lbl">{t('pro.training.card.exercises')}</span>
                                                 </div>
                                                 <div className="su-metric-divider"></div>
                                                 <div className="su-metric-clean">
                                                     <span className="su-metric-clean-val">{totalSets}</span>
-                                                    <span className="su-metric-clean-lbl">Sets</span>
+                                                    <span className="su-metric-clean-lbl">{t('pro.training.card.sets')}</span>
                                                 </div>
                                                 <div className="su-metric-divider"></div>
                                                 <div className="su-metric-clean">
                                                     <span className="su-metric-clean-val">{estMins}m</span>
-                                                    <span className="su-metric-clean-lbl">Est. Time</span>
+                                                    <span className="su-metric-clean-lbl">{t('pro.training.card.time')}</span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div className="su-template-footer-actions">
-                                            <Button variant="outline" fullWidth onClick={() => setActiveTemplate(tmpl)}>Edit Plan</Button>
-                                            <Button fullWidth onClick={() => setAssigningTemplate(tmpl)}>Assign to Client</Button>
+                                            <Button variant="outline" fullWidth onClick={() => setActiveTemplate(tmpl)}>{t('pro.training.card.btn.edit')}</Button>
+                                            <Button fullWidth onClick={() => setAssigningTemplate(tmpl)}>{t('pro.training.card.btn.assign')}</Button>
                                         </div>
                                     </Card>
                                 );

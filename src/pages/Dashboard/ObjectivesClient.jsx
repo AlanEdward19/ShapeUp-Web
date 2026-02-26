@@ -4,9 +4,11 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import { Target, Scale, Trash2, TrendingUp } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './DashboardClient.css';
 
 const ObjectivesClient = () => {
+    const { t } = useLanguage();
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
 
     // --- Objectives State ---
@@ -68,7 +70,7 @@ const ObjectivesClient = () => {
 
     return (
         <div className="su-objectives-tab">
-            <h1 className="su-page-title su-mb-6">Your Objectives</h1>
+            <h1 className="su-page-title su-mb-6">{t('client.objectives.title')}</h1>
 
             <div className="su-overview-layout">
                 {/* Left Column: Data Entry & History */}
@@ -78,19 +80,19 @@ const ObjectivesClient = () => {
                     <Card className="su-mb-4">
                         <div className="su-card-header-icon su-mb-4">
                             <Target size={20} className="su-text-muted" />
-                            <h3 className="su-section-title" style={{ margin: 0 }}>Target Goal</h3>
+                            <h3 className="su-section-title" style={{ margin: 0 }}>{t('client.objectives.target.title')}</h3>
                         </div>
                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
                             <div style={{ flex: 1 }}>
                                 <Input
-                                    label="Goal Weight (kg)"
+                                    label={t('client.objectives.target.label')}
                                     type="number"
                                     placeholder="e.g. 75"
                                     value={tempGoalWeight}
                                     onChange={(e) => setTempGoalWeight(e.target.value)}
                                 />
                             </div>
-                            <Button onClick={handleSaveGoal}>Save Goal</Button>
+                            <Button onClick={handleSaveGoal}>{t('client.objectives.target.btn')}</Button>
                         </div>
                     </Card>
 
@@ -98,24 +100,24 @@ const ObjectivesClient = () => {
                     <Card>
                         <div className="su-card-header-icon su-mb-4">
                             <Scale size={20} className="su-text-muted" />
-                            <h3 className="su-section-title" style={{ margin: 0 }}>Log Current Weight</h3>
+                            <h3 className="su-section-title" style={{ margin: 0 }}>{t('client.objectives.log.title')}</h3>
                         </div>
                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
                             <div style={{ flex: 1 }}>
                                 <Input
-                                    label="Today's Weight (kg)"
+                                    label={t('client.objectives.log.label')}
                                     type="number"
                                     placeholder="e.g. 82.5"
                                     value={newWeightEntry}
                                     onChange={(e) => setNewWeightEntry(e.target.value)}
                                 />
                             </div>
-                            <Button onClick={handleLogWeight}>Log Weight</Button>
+                            <Button onClick={handleLogWeight}>{t('client.objectives.log.btn')}</Button>
                         </div>
 
-                        <h4 className="su-text-muted su-mb-4" style={{ fontSize: '0.875rem' }}>History</h4>
+                        <h4 className="su-text-muted su-mb-4" style={{ fontSize: '0.875rem' }}>{t('client.objectives.history.title')}</h4>
                         {objectives.history.length === 0 ? (
-                            <p className="su-text-muted">No weight entries logged yet.</p>
+                            <p className="su-text-muted">{t('client.objectives.history.empty')}</p>
                         ) : (
                             <div className="su-history-list">
                                 {objectives.history.map(entry => (
@@ -144,7 +146,7 @@ const ObjectivesClient = () => {
                     <Card className="su-metric-card-large" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
                         <div className="su-card-header-icon">
                             <TrendingUp size={20} className="su-text-muted" />
-                            <h3 className="su-section-title">Bodyweight Trend</h3>
+                            <h3 className="su-section-title">{t('client.objectives.chart.title')}</h3>
                         </div>
                         <div style={{ flex: 1, minHeight: 0, marginTop: '1rem' }}>
                             {chartData.length >= 2 ? (
@@ -170,7 +172,7 @@ const ObjectivesClient = () => {
                                 </ResponsiveContainer>
                             ) : (
                                 <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem' }}>
-                                    Log at least 2 weight entries to see your trend chart.
+                                    {t('client.objectives.chart.empty')}
                                 </div>
                             )}
                         </div>

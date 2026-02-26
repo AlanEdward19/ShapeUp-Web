@@ -6,9 +6,11 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip,
     BarChart, Bar, Legend
 } from 'recharts';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './Analytics.css';
 
 const Analytics = () => {
+    const { t, language } = useLanguage();
     const [metrics, setMetrics] = useState({
         mrr: 0,
         activeClients: 0,
@@ -86,7 +88,6 @@ const Analytics = () => {
         ]);
 
         // 5. Generate Trailing 6 Month Growth Mock Data (ending at current active)
-        const monthsStr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const currentMonthIdx = new Date().getMonth();
 
         let buildGrowth = [];
@@ -97,8 +98,11 @@ const Analytics = () => {
             let mIdx = currentMonthIdx - i;
             if (mIdx < 0) mIdx += 12;
 
+            const date = new Date(2000, mIdx, 1);
+            const formattedMonth = date.toLocaleString(language === 'pt-BR' ? 'pt-BR' : 'en-US', { month: 'short' });
+
             buildGrowth.unshift({
-                month: monthsStr[mIdx],
+                month: formattedMonth,
                 active: Math.max(0, simulatedActive),
                 churned: Math.floor(Math.random() * 3) // random 0-2 churn
             });
@@ -108,54 +112,54 @@ const Analytics = () => {
 
         setGrowthData(buildGrowth);
 
-    }, []);
+    }, [language]);
 
     return (
         <div className="su-analytics-dashboard">
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">Business Analytics</h1>
-                    <p className="su-page-subtitle">Track your coaching business growth and overall client performance.</p>
+                    <h1 className="su-page-title">{t('pro.analytics.title')}</h1>
+                    <p className="su-page-subtitle">{t('pro.analytics.subtitle')}</p>
                 </div>
-                <Button variant="outline" icon={<Download size={16} />}>Export Report</Button>
+                <Button variant="outline" icon={<Download size={16} />}>{t('pro.analytics.btn.export')}</Button>
             </div>
 
             {/* Metrics Grid */}
             <div className="su-analytics-metrics-grid su-mt-4">
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Monthly Recurring Revenue</span>
+                        <span className="su-metric-label">{t('pro.analytics.metric.mrr')}</span>
                         <DollarSign size={20} className="su-success-text" />
                     </div>
                     <div className="su-metric-value">${metrics.mrr.toLocaleString()}</div>
-                    <span className="su-metric-trend positive">Based on Current Subscriptions</span>
+                    <span className="su-metric-trend positive">{t('pro.analytics.metric.mrr.trend')}</span>
                 </Card>
 
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Active Clients</span>
+                        <span className="su-metric-label">{t('pro.analytics.metric.clients')}</span>
                         <Users size={20} className="su-primary-text" />
                     </div>
                     <div className="su-metric-value">{metrics.activeClients}</div>
-                    <span className="su-metric-trend positive">Real-time Rosters</span>
+                    <span className="su-metric-trend positive">{t('pro.analytics.metric.clients.trend')}</span>
                 </Card>
 
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Global Adherence</span>
+                        <span className="su-metric-label">{t('pro.analytics.metric.adherence')}</span>
                         <Activity size={20} className="su-accent-text" />
                     </div>
                     <div className="su-metric-value">{metrics.globalAdherence}%</div>
-                    <span className="su-metric-trend positive">Computed from Active P.</span>
+                    <span className="su-metric-trend positive">{t('pro.analytics.metric.adherence.trend')}</span>
                 </Card>
 
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">Avg. Client Lifespan</span>
+                        <span className="su-metric-label">{t('pro.analytics.metric.lifespan')}</span>
                         <TrendingUp size={20} className="su-warning-text" />
                     </div>
-                    <div className="su-metric-value">{metrics.avgLifespan} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>mo</span></div>
-                    <span className="su-metric-trend">Stable</span>
+                    <div className="su-metric-value">{metrics.avgLifespan} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>{t('pro.analytics.metric.lifespan.unit')}</span></div>
+                    <span className="su-metric-trend">{t('pro.analytics.metric.lifespan.trend')}</span>
                 </Card>
             </div>
 
@@ -164,7 +168,7 @@ const Analytics = () => {
 
                 {/* Client Growth Chart */}
                 <Card className="su-chart-card su-col-span-2">
-                    <h3 className="su-section-title">Client Growth & Retention</h3>
+                    <h3 className="su-section-title">{t('pro.analytics.chart.growth')}</h3>
                     <div className="su-chart-container-large">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={growthData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -178,8 +182,8 @@ const Analytics = () => {
                                 <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                                 <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} />
-                                <Area type="monotone" name="Active Clients" dataKey="active" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorActive)" />
-                                <Area type="monotone" name="Churned" dataKey="churned" stroke="var(--error)" strokeWidth={2} fill="transparent" strokeDasharray="5 5" />
+                                <Area type="monotone" name={t('pro.analytics.chart.growth.active')} dataKey="active" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorActive)" />
+                                <Area type="monotone" name={t('pro.analytics.chart.growth.churned')} dataKey="churned" stroke="var(--error)" strokeWidth={2} fill="transparent" strokeDasharray="5 5" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
@@ -187,14 +191,14 @@ const Analytics = () => {
 
                 {/* Adherence Distribution Chart */}
                 <Card className="su-chart-card">
-                    <h3 className="su-section-title">Adherence Distribution</h3>
+                    <h3 className="su-section-title">{t('pro.analytics.chart.adherence')}</h3>
                     <div className="su-chart-container-large">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={distData} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
                                 <XAxis type="number" hide />
                                 <YAxis dataKey="range" type="category" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" width={70} />
                                 <RechartsTooltip cursor={{ fill: 'var(--bg-main)' }} contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} />
-                                <Bar dataKey="clients" name="Clients" fill="var(--accent)" radius={[0, 4, 4, 0]} barSize={24} />
+                                <Bar dataKey="clients" name={t('pro.analytics.chart.adherence.clients')} fill="var(--accent)" radius={[0, 4, 4, 0]} barSize={24} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

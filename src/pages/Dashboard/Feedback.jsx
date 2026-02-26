@@ -4,10 +4,12 @@ import { Search, Filter, MessageSquare, Video, Reply, CheckCircle, Paperclip, X,
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { addNotification } from '../../utils/notifications';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './Feedback.css';
 
 const Feedback = () => {
     const location = useLocation();
+    const { t } = useLanguage();
     const [allMessages, setAllMessages] = useState([]);
     const [selectedClientId, setSelectedClientId] = useState(null);
     const [replyText, setReplyText] = useState('');
@@ -240,8 +242,8 @@ const Feedback = () => {
         <div className="su-feedback-dashboard">
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">Feedback & Inbox</h1>
-                    <p className="su-page-subtitle">Review client check-ins, form videos, and direct messages.</p>
+                    <h1 className="su-page-title">{t('pro.feedback.title')}</h1>
+                    <p className="su-page-subtitle">{t('pro.feedback.subtitle')}</p>
                 </div>
             </div>
 
@@ -251,13 +253,13 @@ const Feedback = () => {
                     <div className="su-inbox-header">
                         <div className="su-search-box su-inbox-search">
                             <Search size={16} className="su-text-muted" />
-                            <input type="text" placeholder="Search messages..." className="su-bare-input" />
+                            <input type="text" placeholder={t('pro.feedback.search')} className="su-bare-input" />
                         </div>
                         <button className="su-icon-btn su-text-muted"><Filter size={18} /></button>
                     </div>
 
                     <div className="su-inbox-list">
-                        {inboxFeed.length === 0 && <p className="su-text-muted su-mt-4" style={{ textAlign: 'center' }}>No messages yet.</p>}
+                        {inboxFeed.length === 0 && <p className="su-text-muted su-mt-4" style={{ textAlign: 'center' }}>{t('pro.feedback.empty.list')}</p>}
                         {inboxFeed.map(group => (
                             <div
                                 key={group.clientId}
@@ -273,7 +275,7 @@ const Feedback = () => {
                                 </div>
                                 <div className="su-inbox-item-subject">
                                     <span className="su-inbox-type-dot" style={{ backgroundColor: getTypeColor(group.activeTicketTag || 'general') }}></span>
-                                    {group.activeTicketTag ? `Needs Attention: ${group.activeTicketTag}` : 'General Chat'}
+                                    {group.activeTicketTag ? `${t('pro.feedback.ticket.needs')}${group.activeTicketTag}` : t('pro.feedback.ticket.general')}
                                 </div>
                                 <p className="su-inbox-preview">{group.lastMsgText}</p>
                             </div>
@@ -296,7 +298,7 @@ const Feedback = () => {
                                                 <>
                                                     <span style={{ color: getTypeColor(activeThread.activeTicketTag), fontWeight: 600, textTransform: 'capitalize' }}>{activeThread.activeTicketTag}</span>
                                                     <span className="su-dot-separator">•</span>
-                                                    <span className="su-danger-text" style={{ color: 'var(--error)' }}>Action Required</span>
+                                                    <span className="su-danger-text" style={{ color: 'var(--error)' }}>{t('pro.feedback.ticket.action')}</span>
                                                 </>
                                             ) : (
                                                 <span className="su-text-muted">Chat History</span>
@@ -306,7 +308,7 @@ const Feedback = () => {
                                 </div>
                                 <div className="su-thread-actions">
                                     {activeThread.activeTicketTag && (
-                                        <Button variant="outline" size="small" icon={<CheckCircle size={16} />} onClick={handleResolve}>Mark Resolved</Button>
+                                        <Button variant="outline" size="small" icon={<CheckCircle size={16} />} onClick={handleResolve}>{t('pro.feedback.btn.resolve')}</Button>
                                     )}
                                 </div>
                             </div>
@@ -318,7 +320,7 @@ const Feedback = () => {
                                         {msg.id === firstUnreadId && (
                                             <div className="su-unread-divider" ref={firstUnreadRef} style={{ display: 'flex', alignItems: 'center', textAlign: 'center', margin: '1.5rem 0', color: 'var(--primary)' }}>
                                                 <div style={{ flex: 1, borderBottom: '1px solid var(--primary)', opacity: 0.3 }}></div>
-                                                <span style={{ margin: '0 1rem', fontSize: '0.8rem', fontWeight: 600 }}>New Messages Below</span>
+                                                <span style={{ margin: '0 1rem', fontSize: '0.8rem', fontWeight: 600 }}>{t('pro.feedback.unread.new')}</span>
                                                 <div style={{ flex: 1, borderBottom: '1px solid var(--primary)', opacity: 0.3 }}></div>
                                             </div>
                                         )}
@@ -336,10 +338,10 @@ const Feedback = () => {
                                                     onClick={() => scrollToMessage(msg.replyTo.id)}
                                                 >
                                                     <strong style={{ display: 'block', color: msg.replyTo.sender === 'coach' ? 'var(--primary)' : 'var(--text-main)', marginBottom: '0.25rem' }}>
-                                                        {msg.replyTo.sender === 'coach' ? 'You' : msg.clientName}
+                                                        {msg.replyTo.sender === 'coach' ? t('pro.feedback.you') : msg.clientName}
                                                     </strong>
                                                     <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
-                                                        {msg.replyTo.text || 'Message attachment'}
+                                                        {msg.replyTo.text || t('pro.feedback.attachment.doc')}
                                                     </div>
                                                 </div>
                                             )}
@@ -393,10 +395,10 @@ const Feedback = () => {
                                     <div style={{ backgroundColor: 'var(--bg-card)', borderLeft: '3px solid var(--primary)', padding: '0.5rem', marginBottom: '0.75rem', borderRadius: '0.25rem', fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--border-color)' }}>
                                         <div style={{ overflow: 'hidden' }}>
                                             <strong style={{ display: 'block', color: replyingTo.sender === 'coach' ? 'var(--primary)' : 'var(--text-main)', marginBottom: '0.25rem' }}>
-                                                Replying to {replyingTo.sender === 'coach' ? 'You' : activeThread.clientName}
+                                                {t('pro.feedback.replying')}{replyingTo.sender === 'coach' ? t('pro.feedback.you') : activeThread.clientName}
                                             </strong>
                                             <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', color: 'var(--text-muted)' }}>
-                                                {replyingTo.text || 'Message attachment'}
+                                                {replyingTo.text || t('pro.feedback.attachment.doc')}
                                             </div>
                                         </div>
                                         <button onClick={() => setReplyingTo(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center' }}>
@@ -420,7 +422,7 @@ const Feedback = () => {
                                         className="su-reply-textarea"
                                         value={replyText}
                                         onChange={e => setReplyText(e.target.value)}
-                                        placeholder={`Reply to ${activeThread.clientName.split(' ')[0]}...`}
+                                        placeholder={`${t('pro.feedback.input.placeholder')}${activeThread.clientName.split(' ')[0]}...`}
                                         style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)' }}
                                         onKeyDown={e => {
                                             if (e.key === 'Enter' && !e.shiftKey) {
@@ -438,7 +440,7 @@ const Feedback = () => {
                                             accept="image/*,video/*,application/pdf"
                                             onChange={handleFileChange}
                                         />
-                                        <Button icon={<Reply size={16} />} onClick={handleReply}>Send Reply</Button>
+                                        <Button icon={<Reply size={16} />} onClick={handleReply}>{t('pro.feedback.input.btn')}</Button>
                                     </div>
                                 </div>
                             </div>
@@ -446,8 +448,8 @@ const Feedback = () => {
                     ) : (
                         <div className="su-thread-empty">
                             <MessageSquare size={48} className="su-empty-icon" />
-                            <h3>No Message Selected</h3>
-                            <p>Select a conversation from the active feed to view details.</p>
+                            <h3>{t('pro.feedback.empty.thread.title')}</h3>
+                            <p>{t('pro.feedback.empty.thread.desc')}</p>
                         </div>
                     )}
                 </Card>

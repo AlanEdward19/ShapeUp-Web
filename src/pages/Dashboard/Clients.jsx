@@ -7,6 +7,7 @@ import Input from '../../components/Input';
 import InviteClientModal from '../../components/InviteClientModal';
 import ClientBillingModal from '../../components/ClientBillingModal';
 import { addNotification } from '../../utils/notifications';
+import { useLanguage } from '../../contexts/LanguageContext';
 import './Clients.css';
 
 // Initial state is empty
@@ -14,6 +15,7 @@ const initialClientsList = [];
 
 const Clients = () => {
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [showInvite, setShowInvite] = useState(false);
     const [clients, setClients] = useState([]);
     const [clientToDelete, setClientToDelete] = useState(null);
@@ -164,19 +166,19 @@ const Clients = () => {
                         <div className="su-confirm-icon">
                             <Trash2 size={28} />
                         </div>
-                        <h3 className="su-confirm-title">Delete Client?</h3>
+                        <h3 className="su-confirm-title">{t('clients.modal.delete.title')}</h3>
                         <p className="su-confirm-body">
-                            <strong>"{clientToDelete.name}"</strong> will be permanently removed from your client list. This action cannot be undone.
+                            <strong>"{clientToDelete.name}"</strong> {t('clients.modal.delete.body') || 'will be permanently removed from your client list. This action cannot be undone.'}
                         </p>
                         <div className="su-confirm-actions">
                             <Button variant="outline" onClick={() => setClientToDelete(null)}>
-                                Cancel
+                                {t('clients.modal.delete.cancel')}
                             </Button>
                             <Button
                                 style={{ background: '#ef4444', borderColor: '#ef4444' }}
                                 onClick={confirmDeleteClient}
                             >
-                                Delete Client
+                                {t('clients.modal.delete.confirm')}
                             </Button>
                         </div>
                     </div>
@@ -184,10 +186,10 @@ const Clients = () => {
             )}
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">Client Management</h1>
-                    <p className="su-page-subtitle">Directory of your {clients.length} active and inactive trainees.</p>
+                    <h1 className="su-page-title">{t('clients.title')}</h1>
+                    <p className="su-page-subtitle">{t('clients.subtitle')}</p>
                 </div>
-                <Button onClick={() => setShowInvite(true)}>Invite New Client</Button>
+                <Button onClick={() => setShowInvite(true)}>{t('clients.invite')}</Button>
             </div>
 
             <Card className="su-clients-container su-mt-4">
@@ -195,10 +197,10 @@ const Clients = () => {
                 <div className="su-clients-toolbar">
                     <div className="su-search-box">
                         <Search size={18} className="su-text-muted" />
-                        <input type="text" placeholder="Search clients..." className="su-bare-input" />
+                        <input type="text" placeholder={t('clients.search')} className="su-bare-input" />
                     </div>
                     <div className="su-toolbar-actions">
-                        <Button variant="outline" icon={<Filter size={16} />}>Filter</Button>
+                        <Button variant="outline" icon={<Filter size={16} />}>{t('clients.filter')}</Button>
                     </div>
                 </div>
 
@@ -207,12 +209,12 @@ const Clients = () => {
                     <table className="su-clients-table">
                         <thead>
                             <tr>
-                                <th>Client</th>
-                                <th>Active Plan</th>
-                                <th>Compliance</th>
-                                <th>Last Check-in</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th>{t('clients.table.client')}</th>
+                                <th>{t('clients.table.plan')}</th>
+                                <th>{t('clients.table.compliance')}</th>
+                                <th>{t('clients.table.checkin')}</th>
+                                <th>{t('clients.table.status')}</th>
+                                <th>{t('clients.table.actions')}</th>
                             </tr>
                         </thead>
                         <tbody>
