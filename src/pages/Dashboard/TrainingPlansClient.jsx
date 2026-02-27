@@ -233,6 +233,7 @@ const ClientView = () => {
                         duration: formatTime(workoutTime),
                         totalVol: `${totalVol.toLocaleString()} kg`,
                         rpe: sessionFeedback.rpe || 5,
+                        comments: sessionFeedback.comments || '',
                         status: sessionStatus,
                         exercises: exercises.map(ex => ({
                             name: ex.name,
