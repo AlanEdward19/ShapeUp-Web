@@ -334,7 +334,22 @@ export const LanguageProvider = ({ children }) => {
             'reports.history.btn.download': 'Download',
             'reports.history.status.completed': 'Completed',
             'reports.warning.scope.title': 'Specific Scope Required:',
-            'reports.warning.scope.desc': 'Client history reports can only be generated for a single specific client. Please change the Target Scope above.'
+            'reports.warning.scope.desc': 'Client history reports can only be generated for a single specific client. Please change the Target Scope above.',
+
+            'client.chat.title': 'Coach Alex',
+            'client.chat.status.online': 'Online',
+            'client.chat.input.placeholder': 'Message Coach...',
+            'client.chat.input.editing': 'Editing message...',
+            'client.chat.replying': 'Replying to ',
+            'client.chat.you': 'You',
+            'client.chat.coach': 'Coach',
+            'client.chat.edited': '(edited)',
+            'client.chat.menu.reply': 'Reply to Message',
+            'client.chat.tag.general': 'General',
+            'client.chat.tag.form_check': 'Form Check',
+            'client.chat.tag.rpe_report': 'RPE Report',
+            'client.chat.tag.question': 'Question',
+            'client.chat.tag.checkin': 'Check-in'
         },
         'pt-BR': {
             'nav.dashboard': 'Painel',
@@ -644,7 +659,22 @@ export const LanguageProvider = ({ children }) => {
             'reports.history.btn.download': 'Baixar',
             'reports.history.status.completed': 'Concluído',
             'reports.warning.scope.title': 'Escopo Específico Necessário:',
-            'reports.warning.scope.desc': 'Relatórios de histórico do cliente só podem ser gerados para um único cliente específico. Por favor, altere o Escopo Alvo acima.'
+            'reports.warning.scope.desc': 'Relatórios de histórico do cliente só podem ser gerados para um único cliente específico. Por favor, altere o Escopo Alvo acima.',
+
+            'client.chat.title': 'Treinador Alex',
+            'client.chat.status.online': 'Online',
+            'client.chat.input.placeholder': 'Falar com Treinador...',
+            'client.chat.input.editing': 'Editando mensagem...',
+            'client.chat.replying': 'Respondendo a ',
+            'client.chat.you': 'Você',
+            'client.chat.coach': 'Treinador',
+            'client.chat.edited': '(editado)',
+            'client.chat.menu.reply': 'Responder Mensagem',
+            'client.chat.tag.general': 'Geral',
+            'client.chat.tag.form_check': 'Análise de Técnica',
+            'client.chat.tag.rpe_report': 'Relato de Esforço',
+            'client.chat.tag.question': 'Dúvida',
+            'client.chat.tag.checkin': 'Check-in'
         }
     };
 

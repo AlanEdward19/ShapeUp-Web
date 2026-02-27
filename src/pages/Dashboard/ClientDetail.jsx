@@ -532,7 +532,7 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
                 </div>
 
                 {/* History toggle */}
-                {plan.history.length > 0 && (
+                {plan.history && plan.history.length > 0 && (
                     <button
                         className="su-cp-history-toggle"
                         onClick={() => setHistoryOpen(v => !v)}
@@ -544,7 +544,7 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
                 )}
 
                 {/* Inline history list */}
-                {historyOpen && (
+                {historyOpen && plan.history && (
                     <div className="su-cp-inline-history">
                         {plan.history.map(session => (
                             <button

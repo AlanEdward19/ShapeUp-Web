@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, User, Paperclip, Image as ImageIcon, FileText, Check, CheckCheck, Clock, MoreVertical, Edit2, Trash2 } from 'lucide-react';
+import { X, Send, User, Paperclip, Image as ImageIcon, FileText, Check, CheckCheck, Clock, MoreVertical, Edit2, Trash2, Reply } from 'lucide-react';
 import { addNotification } from '../utils/notifications';
+import { useLanguage } from '../contexts/LanguageContext';
 import './ChatDrawer.css';
 
 const ChatDrawer = ({ isOpen, onClose }) => {
+    const { t } = useLanguage();
     // Get active client info
     const clientId = String(localStorage.getItem('shapeup_client_id') || '1');
     const clientName = localStorage.getItem('shapeup_user_name') || 'Client';
@@ -34,15 +36,16 @@ const ChatDrawer = ({ isOpen, onClose }) => {
     const [editingMsgId, setEditingMsgId] = useState(null);
     const [activeMsgMenu, setActiveMsgMenu] = useState(null);
     const [replyingTo, setReplyingTo] = useState(null);
+    const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, message: null });
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
     const tags = [
-        { value: 'general', label: 'General' },
-        { value: 'form check', label: 'Form Check' },
-        { value: 'rpe report', label: 'RPE Report' },
-        { value: 'question', label: 'Question' },
-        { value: 'check-in', label: 'Check-in' }
+        { value: 'general', label: t('client.chat.tag.general') },
+        { value: 'form check', label: t('client.chat.tag.form_check') },
+        { value: 'rpe report', label: t('client.chat.tag.rpe_report') },
+        { value: 'question', label: t('client.chat.tag.question') },
+        { value: 'check-in', label: t('client.chat.tag.checkin') }
     ];
 
     const scrollToBottom = () => {
@@ -57,6 +60,14 @@ const ChatDrawer = ({ isOpen, onClose }) => {
             setTimeout(() => el.classList.remove('su-highlight-msg'), 2000);
         }
     };
+
+    useEffect(() => {
+        const handleClickOutside = () => {
+            if (contextMenu.visible) setContextMenu({ ...contextMenu, visible: false });
+        };
+        window.addEventListener('click', handleClickOutside);
+        return () => window.removeEventListener('click', handleClickOutside);
+    }, [contextMenu]);
 
     useEffect(() => {
         const loadMessages = () => {
@@ -204,6 +215,16 @@ const ChatDrawer = ({ isOpen, onClose }) => {
         fileInputRef.current.click();
     };
 
+    const handleContextMenu = (e, msg) => {
+        e.preventDefault();
+        setContextMenu({
+            visible: true,
+            x: e.clientX,
+            y: e.clientY,
+            message: msg
+        });
+    };
+
     if (!isOpen) return null;
 
     const renderMessageStatus = (status) => {
@@ -228,8 +249,8 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                             <User size={20} />
                         </div>
                         <div className="su-chat-user-details">
-                            <h3>Coach Alex</h3>
-                            <span className="su-chat-status">Online</span>
+                            <h3>{t('client.chat.title')}</h3>
+                            <span className="su-chat-status">{t('client.chat.status.online')}</span>
                         </div>
                     </div>
                     <button className="su-chat-close-btn" onClick={onClose}>
@@ -255,10 +276,10 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                                         {activeMsgMenu === msg.id && (
                                             <div className="su-chat-msg-menu">
                                                 <button onClick={() => handleEdit(msg)}>
-                                                    <Edit2 size={14} /> Edit
+                                                    <Edit2 size={14} /> {t('common.edit') || 'Edit'}
                                                 </button>
                                                 <button className="del" onClick={() => handleDelete(msg.id)}>
-                                                    <Trash2 size={14} /> Delete
+                                                    <Trash2 size={14} /> {t('common.delete') || 'Delete'}
                                                 </button>
                                             </div>
                                         )}
@@ -268,10 +289,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                                 <div
                                     id={`msg-${msg.id}`}
                                     className="su-chat-bubble"
-                                    onContextMenu={(e) => {
-                                        e.preventDefault();
-                                        setReplyingTo(msg);
-                                    }}
+                                    onContextMenu={(e) => handleContextMenu(e, msg)}
                                 >
                                     {msg.replyTo && (
                                         <div
@@ -279,10 +297,10 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                                             onClick={() => scrollToMessage(msg.replyTo.id)}
                                         >
                                             <strong style={{ display: 'block', color: msg.replyTo.sender === 'client' ? 'var(--text-main)' : 'var(--primary)', marginBottom: '0.25rem' }}>
-                                                {msg.replyTo.sender === 'client' ? 'You' : 'Coach'}
+                                                {msg.replyTo.sender === 'client' ? t('client.chat.you') : t('client.chat.coach')}
                                             </strong>
                                             <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
-                                                {msg.replyTo.text || 'Message attachment'}
+                                                {msg.replyTo.text || t('pro.feedback.attachment.doc')}
                                             </div>
                                         </div>
                                     )}
@@ -324,7 +342,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
 
                                     {msg.text && <p>{msg.text}</p>}
                                     <div className="su-chat-meta">
-                                        {msg.isEdited && <span className="su-chat-edited-val">(editado)</span>}
+                                        {msg.isEdited && <span className="su-chat-edited-val">{t('client.chat.edited')}</span>}
                                         <span className="su-chat-time">{msg.time}</span>
                                         {msg.sender === 'client' && renderMessageStatus(msg.status)}
                                     </div>
@@ -350,10 +368,10 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                             <div style={{ backgroundColor: 'var(--bg-main)', borderLeft: '3px solid var(--primary)', padding: '0.5rem', margin: '0.5rem 1rem 0 1rem', borderRadius: '0.25rem', fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ overflow: 'hidden' }}>
                                     <strong style={{ display: 'block', color: replyingTo.sender === 'client' ? 'var(--text-main)' : 'var(--primary)', marginBottom: '0.25rem' }}>
-                                        Replying to {replyingTo.sender === 'client' ? 'You' : 'Coach'}
+                                        {t('client.chat.replying')}{replyingTo.sender === 'client' ? t('client.chat.you') : t('client.chat.coach')}
                                     </strong>
                                     <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', color: 'var(--text-muted)' }}>
-                                        {replyingTo.text || 'Message attachment'}
+                                        {replyingTo.text || t('pro.feedback.attachment.doc')}
                                     </div>
                                 </div>
                                 <button onClick={() => setReplyingTo(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
@@ -387,7 +405,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                             <textarea
                                 value={newMessage}
                                 onChange={e => setNewMessage(e.target.value)}
-                                placeholder={editingMsgId ? "Editing message..." : "Message Coach..."}
+                                placeholder={editingMsgId ? t('client.chat.input.editing') : t('client.chat.input.placeholder')}
                                 onKeyDown={e => {
                                     if (e.key === 'Enter' && !e.shiftKey) {
                                         e.preventDefault();
@@ -415,6 +433,28 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                     </div>
                 </div>
             </div>
+
+            {contextMenu.visible && (
+                <div
+                    className="su-context-menu"
+                    style={{
+                        top: contextMenu.y,
+                        left: contextMenu.x
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <button
+                        className="su-context-menu-item"
+                        onClick={() => {
+                            setReplyingTo(contextMenu.message);
+                            setContextMenu({ ...contextMenu, visible: false });
+                        }}
+                    >
+                        <Reply size={16} />
+                        <span>{t('client.chat.menu.reply')}</span>
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

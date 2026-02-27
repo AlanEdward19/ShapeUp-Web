@@ -65,7 +65,7 @@ const TrainingPlansProfessional = () => {
     const handleAssign = (clientId) => {
         const stored = localStorage.getItem(`shapeup_client_plans_${clientId}`);
         const plans = stored ? JSON.parse(stored) : [];
-        const newPlan = { ...assigningTemplate, id: `p${Date.now()}` };
+        const newPlan = { ...assigningTemplate, id: `p${Date.now()}`, history: [] };
         localStorage.setItem(`shapeup_client_plans_${clientId}`, JSON.stringify([...plans, newPlan]));
 
         addNotification(clientId.toString(), 'alert', 'New Plan Assigned', `Your coach has assigned "${newPlan.name}" to you.`, 'primary', {
