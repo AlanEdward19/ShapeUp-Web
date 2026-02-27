@@ -36,8 +36,7 @@ const ClientView = () => {
     // Rest Timer State
     const [restTimer, setRestTimer] = useState(0);
     const [isResting, setIsResting] = useState(false);
-    const [showRestModal, setShowRestModal] = useState(false);
-    const [customRestInput, setCustomRestInput] = useState(60);
+
 
     // Post-Session Flow States
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -117,7 +116,13 @@ const ClientView = () => {
     const startRest = (seconds) => {
         setRestTimer(seconds);
         setIsResting(true);
-        setShowRestModal(false);
+    };
+
+    const adjustRest = (amount) => {
+        setRestTimer(prev => Math.max(0, prev + amount));
+        if (!isResting && amount > 0) {
+            setIsResting(true);
+        }
     };
 
     const skipRest = () => {
@@ -424,23 +429,40 @@ const ClientView = () => {
 
             {/* Sticky Header with Timers */}
             <div className="su-session-header-sticky">
-                <div className="su-session-title-area">
-                    <Button variant="outline" onClick={finishSession} size="sm">End Session</Button>
+                <div className="su-session-header-left">
+                    <Button variant="outline" onClick={finishSession} size="sm">Cancel Session</Button>
                 </div>
 
                 {/* Rest Timer Group */}
                 <div className={`su-rest-timer-group ${isResting ? 'active' : ''}`}>
-                    <button
-                        className="su-rest-clock-btn"
-                        onClick={() => setShowRestModal(true)}
-                        title="Set Custom Rest Time"
-                    >
-                        <Clock size={20} />
-                        <span className="su-timer-digits">
-                            {formatTime(restTimer)}
-                        </span>
-                        {isResting && <span className="su-timer-label">Resting</span>}
-                    </button>
+                    <div className="su-rest-controls">
+                        <button
+                            className="su-adjust-rest-btn minus"
+                            onClick={() => adjustRest(-15)}
+                            title="Remove 15 seconds"
+                        >
+                            -15s
+                        </button>
+
+                        <div className="su-rest-clock-display">
+                            <Clock size={20} />
+                            <span className="su-timer-digits">
+                                {formatTime(restTimer)}
+                            </span>
+                        </div>
+
+                        <button
+                            className="su-adjust-rest-btn plus"
+                            onClick={() => adjustRest(15)}
+                            title="Add 15 seconds"
+                        >
+                            +15s
+                        </button>
+                    </div>
+                </div>
+
+                <div className="su-session-header-right">
+                    {isResting && <span className="su-timer-label">Resting</span>}
                     {isResting && (
                         <button className="su-skip-rest-btn" onClick={skipRest} title="Skip Rest">
                             <FastForward size={16} />
@@ -450,29 +472,7 @@ const ClientView = () => {
                 </div>
             </div>
 
-            {/* Custom Rest Modal Overlay */}
-            {showRestModal && (
-                <div className="su-rest-modal-overlay" onClick={() => setShowRestModal(false)}>
-                    <div className="su-rest-modal-content" onClick={e => e.stopPropagation()}>
-                        <h3>Set Custom Rest</h3>
-                        <div className="su-rest-quick-options">
-                            <button onClick={() => startRest(30)}>30s</button>
-                            <button onClick={() => startRest(60)}>60s</button>
-                            <button onClick={() => startRest(90)}>90s</button>
-                            <button onClick={() => startRest(120)}>120s</button>
-                        </div>
-                        <div className="su-rest-custom-input">
-                            <Input
-                                type="number"
-                                value={customRestInput}
-                                onChange={e => setCustomRestInput(e.target.value)}
-                                placeholder="Seconds..."
-                            />
-                            <Button onClick={() => startRest(Number(customRestInput))}>Start Timer</Button>
-                        </div>
-                    </div>
-                </div>
-            )}
+
 
             {/* Application Flow Overlays */}
 
@@ -593,6 +593,7 @@ const ClientView = () => {
                             <div className="su-exec-row su-exec-header">
                                 <div className="col-set" title="The current set sequence or type">Set</div>
                                 <div className="col-target" title="Prescribed target range and load">Target</div>
+                                <div className="col-rest" title="Prescribed rest time">Rest</div>
                                 <div className="col-log" title="Actual weight logged for this set">Weight</div>
                                 <div className="col-log" title="Actual reps logged for this set">Reps</div>
                                 <div className="col-log" title="Rate of Perceived Exertion (1-10)">RPE</div>
@@ -629,6 +630,12 @@ const ClientView = () => {
                                                 {set.instruction}
                                             </div>
                                         )}
+                                    </div>
+                                    <div className="col-rest">
+                                        <div className="su-rest-display">
+                                            <Clock size={16} />
+                                            <span>{set.prescribedRest}s</span>
+                                        </div>
                                     </div>
                                     <div className="col-log">
                                         <input

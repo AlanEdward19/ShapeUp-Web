@@ -163,11 +163,30 @@
     margin-bottom: 1.5rem;
 }
 
-.su-session-title-area {
+.su-session-header-left {
     display: flex;
     align-items: center;
     gap: 1rem;
+    flex: 1;
 }
+
+.su-session-header-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.su-rest-timer-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+
 
 .su-engine-title {
     font-size: 1.25rem;
@@ -243,13 +262,32 @@
 
 .su-exec-row {
     display: grid;
-    grid-template-columns: 80px minmax(200px, 1fr) 80px 80px 80px 60px 80px;
+    grid-template-columns: 80px minmax(180px, 1fr) 80px 80px 80px 80px 60px 80px;
     gap: 1rem;
     align-items: center;
     padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--border-color);
     transition: all var(--transition-fast);
 }
+
+.col-rest {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--warning);
+    font-weight: 600;
+}
+
+.su-rest-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(245, 158, 11, 0.1);
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
 
 .su-exec-row:last-child {
     border-bottom: none;
@@ -347,6 +385,20 @@
     padding: 0.5rem;
     border-radius: var(--radius-sm);
     border-left: 2px solid var(--accent);
+}
+
+.su-target-rest {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--warning);
+    font-weight: 500;
+}
+
+.su-target-rest svg {
+    opacity: 0.8;
 }
 
 /* Inputs */
@@ -708,30 +760,55 @@
     gap: 0.5rem;
 }
 
-.su-rest-clock-btn {
+.su-rest-timer-group.active .su-rest-clock-display {
+    color: var(--warning);
+}
+
+.su-rest-controls {
+    display: flex;
+    align-items: center;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.su-rest-clock-display {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.5rem 1rem;
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-muted);
+    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
+}
+
+.su-adjust-rest-btn {
     background: transparent;
     border: none;
+    color: var(--text-muted);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
     cursor: pointer;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-md);
     transition: all var(--transition-fast);
 }
 
-.su-rest-clock-btn:hover {
-    background-color: var(--bg-card);
-    color: var(--text-main);
+.su-adjust-rest-btn:hover {
+    background-color: var(--bg-hover);
+    color: var(--primary);
 }
 
-.su-rest-timer-group.active .su-rest-clock-btn {
-    color: var(--warning);
-    animation: pulse 2s infinite;
+.su-adjust-rest-btn.minus:hover {
+    color: var(--error);
 }
+
+.su-adjust-rest-btn.plus:hover {
+    color: var(--success);
+}
+
 
 .su-skip-rest-btn {
     display: flex;
