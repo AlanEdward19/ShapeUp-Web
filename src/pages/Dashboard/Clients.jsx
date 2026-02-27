@@ -256,7 +256,10 @@ const Clients = () => {
                                     {/* Status Badge */}
                                     <td>
                                         <span className={`su-status-badge ${client.status.toLowerCase().replace(' ', '-')}`}>
-                                            {client.status}
+                                            {client.status === 'Active' ? t('clients.status.active') :
+                                                client.status === 'Needs Attention' ? t('clients.status.attention') :
+                                                    client.status === 'Invited' ? t('clients.status.invited') :
+                                                        client.status === 'Inactive' ? t('clients.status.inactive') : client.status}
                                         </span>
                                     </td>
 

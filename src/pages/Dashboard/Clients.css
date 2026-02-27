@@ -144,6 +144,16 @@
     color: var(--text-muted);
 }
 
+.su-status-badge.invited {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--primary);
+}
+
+/* Ensure the status column is explicitly left-aligned if it's being centered elsewhere */
+.su-clients-table td:nth-child(5) {
+    text-align: left;
+}
+
 /* Actions */
 .su-table-actions {
     display: flex;

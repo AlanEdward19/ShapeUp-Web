@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, Activity, Tag, Plus, GripVertical, Settings2, Trash2, Copy, BarChart3, Dumbbell, X } from 'lucide-react';
+import { Target, Activity, Tag, Plus, GripVertical, Settings2, Trash2, Copy, BarChart3, Dumbbell, X, CheckCircle2 } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -23,6 +23,7 @@ const TrainingPlansProfessional = () => {
 
     const [activeTemplate, setActiveTemplate] = useState(null); // null means showing library, object means editing
     const [assigningTemplate, setAssigningTemplate] = useState(null); // For assigning to client
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const [clients, setClients] = useState(() => {
         const stored = localStorage.getItem('shapeup_clients');
@@ -64,15 +65,15 @@ const TrainingPlansProfessional = () => {
     const handleAssign = (clientId) => {
         const stored = localStorage.getItem(`shapeup_client_plans_${clientId}`);
         const plans = stored ? JSON.parse(stored) : [];
-        const newPlan = { ...assigningTemplate, id: `p${Date.now()}` };
+        const newPlan = { ...assigningTemplate, id: `p${Date.now()}`, history: [] };
         localStorage.setItem(`shapeup_client_plans_${clientId}`, JSON.stringify([...plans, newPlan]));
 
         addNotification(clientId.toString(), 'alert', 'New Plan Assigned', `Your coach has assigned "${newPlan.name}" to you.`, 'primary', {
             link: '/dashboard/training'
         });
 
-        alert(`Template assigned successfully!`);
         setAssigningTemplate(null);
+        setShowSuccessModal(true);
     };
 
     return (
@@ -166,13 +167,13 @@ const TrainingPlansProfessional = () => {
                 <div className="su-modal-overlay" onClick={() => setAssigningTemplate(null)} style={{ zIndex: 9999 }}>
                     <div className="su-modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
                         <button className="su-modal-close" onClick={() => setAssigningTemplate(null)}><X size={20} /></button>
-                        <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '1rem' }}>Assign to Client</h2>
+                        <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '1rem' }}>{t('pro.training.assign.modal.title')}</h2>
                         <p className="su-text-muted su-mb-4" style={{ fontSize: '0.9rem' }}>
-                            Select a client to assign <strong>{assigningTemplate.name}</strong> to:
+                            {t('pro.training.assign.modal.desc')} <strong>{assigningTemplate.name}</strong>:
                         </p>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '300px', overflowY: 'auto' }}>
                             {clients.length === 0 ? (
-                                <p className="su-text-muted" style={{ textAlign: 'center', padding: '1rem 0' }}>No active clients found.</p>
+                                <p className="su-text-muted" style={{ textAlign: 'center', padding: '1rem 0' }}>{t('pro.training.assign.empty')}</p>
                             ) : (
                                 clients.map(c => (
                                     <Button key={c.id} variant="outline" fullWidth style={{ justifyContent: 'flex-start' }} onClick={() => handleAssign(c.id)}>
@@ -185,6 +186,25 @@ const TrainingPlansProfessional = () => {
                                     </Button>
                                 ))
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showSuccessModal && (
+                <div className="su-modal-overlay su-alert-modal-overlay" onClick={() => setShowSuccessModal(false)}>
+                    <div className="su-modal-box su-alert-modal-box" onClick={e => e.stopPropagation()}>
+                        <div className="su-alert-icon-wrap" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)' }}>
+                            <CheckCircle2 size={32} />
+                        </div>
+                        <h2 className="su-modal-title">{t('pro.training.assign.success.title')}</h2>
+                        <p className="su-modal-subtitle">
+                            {t('pro.training.assign.success.message')}
+                        </p>
+                        <div className="su-modal-actions">
+                            <Button fullWidth onClick={() => setShowSuccessModal(false)}>
+                                {t('pro.training.assign.success.btn')}
+                            </Button>
                         </div>
                     </div>
                 </div>

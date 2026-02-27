@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { X, Mail, CheckCircle, Send } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import './InviteClientModal.css';
 
 const InviteClientModal = ({ onClose, onInvite }) => {
+    const { t } = useLanguage();
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
     const [error, setError] = useState('');
@@ -11,11 +13,11 @@ const InviteClientModal = ({ onClose, onInvite }) => {
 
     const handleSend = () => {
         if (!email.trim()) {
-            setError('Please enter an email address.');
+            setError(t('clients.invite.error.empty'));
             return;
         }
         if (!isValidEmail(email)) {
-            setError('Please enter a valid email address.');
+            setError(t('clients.invite.error.invalid'));
             return;
         }
         setError('');
@@ -39,20 +41,20 @@ const InviteClientModal = ({ onClose, onInvite }) => {
                                 <Mail size={24} />
                             </div>
                         </div>
-                        <h2 className="su-modal-title">Invite New Client</h2>
+                        <h2 className="su-modal-title">{t('clients.invite.title')}</h2>
                         <p className="su-modal-subtitle">
-                            Send an invitation email to your client. They'll receive a link to create their ShapeUp account and connect with you.
+                            {t('clients.invite.subtitle')}
                         </p>
 
                         <div className="su-modal-form">
-                            <label className="su-modal-label">Client Email Address</label>
+                            <label className="su-modal-label">{t('clients.invite.label')}</label>
                             <div className="su-modal-input-row">
                                 <Mail size={16} className="su-modal-input-icon" />
                                 <input
                                     autoFocus
                                     type="email"
                                     className={`su-modal-input ${error ? 'su-modal-input-error' : ''}`}
-                                    placeholder="client@example.com"
+                                    placeholder={t('clients.invite.placeholder')}
                                     value={email}
                                     onChange={(e) => { setEmail(e.target.value); setError(''); }}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -62,9 +64,9 @@ const InviteClientModal = ({ onClose, onInvite }) => {
                         </div>
 
                         <div className="su-modal-actions">
-                            <button className="su-modal-btn-cancel" onClick={onClose}>Cancel</button>
+                            <button className="su-modal-btn-cancel" onClick={onClose}>{t('clients.invite.btn.cancel')}</button>
                             <button className="su-modal-btn-primary" onClick={handleSend}>
-                                <Send size={16} /> Send Invite
+                                <Send size={16} /> {t('clients.invite.btn.send')}
                             </button>
                         </div>
                     </>
@@ -73,13 +75,14 @@ const InviteClientModal = ({ onClose, onInvite }) => {
                         <div className="su-modal-success-icon">
                             <CheckCircle size={48} />
                         </div>
-                        <h2 className="su-modal-title">Invite Sent!</h2>
+                        <h2 className="su-modal-title">{t('clients.invite.success.title')}</h2>
                         <p className="su-modal-subtitle">
-                            An invitation has been sent to <strong>{email}</strong>.<br />
-                            They'll receive an email with a link to join your coaching program.
+                            {t('clients.invite.success.desc').split('{{email}}')[0]}
+                            <strong>{email}</strong>
+                            {t('clients.invite.success.desc').split('{{email}}')[1]}
                         </p>
                         <button className="su-modal-btn-primary" style={{ alignSelf: 'center', marginTop: '1rem' }} onClick={onClose}>
-                            Done
+                            {t('clients.invite.success.btn')}
                         </button>
                     </div>
                 )}
