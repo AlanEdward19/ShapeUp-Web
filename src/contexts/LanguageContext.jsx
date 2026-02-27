@@ -319,7 +319,7 @@ export const LanguageProvider = ({ children }) => {
             'nav.exercises_library': 'Biblioteca de Exercícios',
             'nav.reports': 'Relatórios',
             'nav.feedback': 'E-mail / Dúvidas',
-            'nav.analytics': 'Analítica',
+            'nav.analytics': 'Insights',
             'nav.settings': 'Configurações',
             'nav.objectives': 'Objetivos',
             'sidebar.chat': 'Falar com Treinador',
