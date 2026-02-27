@@ -284,6 +284,35 @@
     color: var(--primary);
 }
 
+.su-warning-alert {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #fffbeb;
+    border: 1px solid #fef3c7;
+    border-radius: var(--radius-md);
+    color: #92400e;
+    font-size: 0.875rem;
+    align-items: flex-start;
+}
+
+.su-warning-alert svg {
+    flex-shrink: 0;
+    color: #f59e0b;
+    margin-top: 0.1rem;
+}
+
+.su-warning-alert strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #78350f;
+}
+
+.su-warning-alert p {
+    margin: 0;
+    opacity: 0.9;
+}
+
 @media (max-width: 768px) {
     .su-form-row {
         flex-direction: column;

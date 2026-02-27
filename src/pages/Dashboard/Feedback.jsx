@@ -15,6 +15,7 @@ const Feedback = () => {
     const [replyText, setReplyText] = useState('');
     const [attachedFile, setAttachedFile] = useState(null);
     const [replyingTo, setReplyingTo] = useState(null);
+    const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, message: null });
     const [firstUnreadId, setFirstUnreadId] = useState(null);
     const fileInputRef = useRef(null);
     const threadEndRef = useRef(null);
@@ -38,6 +39,24 @@ const Feedback = () => {
             window.removeEventListener('shapeup_messages_updated', loadMessages);
         };
     }, []);
+
+    useEffect(() => {
+        const handleClickOutside = () => setContextMenu({ ...contextMenu, visible: false });
+        if (contextMenu.visible) {
+            window.addEventListener('click', handleClickOutside);
+        }
+        return () => window.removeEventListener('click', handleClickOutside);
+    }, [contextMenu]);
+
+    const handleContextMenu = (e, msg) => {
+        e.preventDefault();
+        setContextMenu({
+            visible: true,
+            x: e.clientX,
+            y: e.clientY,
+            message: msg
+        });
+    };
 
     // Grouping logic
     const inboxGroups = {};
@@ -327,10 +346,7 @@ const Feedback = () => {
                                         <div
                                             id={`msg-${msg.id}`}
                                             className={`su-message-bubble ${msg.sender}`}
-                                            onContextMenu={(e) => {
-                                                e.preventDefault();
-                                                setReplyingTo(msg);
-                                            }}
+                                            onContextMenu={(e) => handleContextMenu(e, msg)}
                                         >
                                             {msg.replyTo && (
                                                 <div
@@ -454,6 +470,27 @@ const Feedback = () => {
                     )}
                 </Card>
             </div>
+
+            {/* Global Context Menu */}
+            {contextMenu.visible && (
+                <div
+                    className="su-context-menu"
+                    style={{ top: contextMenu.y, left: contextMenu.x }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <button
+                        className="su-context-menu-item"
+                        onClick={() => {
+                            setReplyingTo(contextMenu.message);
+                            setContextMenu({ ...contextMenu, visible: false });
+                        }}
+                    >
+                        <Reply size={16} />
+                        <span>{t('pro.feedback.menu.reply')}</span>
+                    </button>
+                    {/* Future options could go here (delete, copy, etc) */}
+                </div>
+            )}
         </div>
     );
 };

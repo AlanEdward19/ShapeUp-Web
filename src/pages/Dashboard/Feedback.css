@@ -333,3 +333,61 @@
     /* Bright green for contrast against primary background */
     opacity: 1;
 }
+
+/* Context Menu */
+.su-context-menu {
+    position: fixed;
+    z-index: 1000;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 180px;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    animation: su-fade-in 0.1s ease-out;
+}
+
+.su-context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+}
+
+.su-context-menu-item:hover {
+    background-color: var(--bg-main);
+    color: var(--primary);
+}
+
+.su-context-menu-item svg {
+    color: var(--text-muted);
+}
+
+.su-context-menu-item:hover svg {
+    color: var(--primary);
+}
+
+@keyframes su-fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { FileText, Download, Calendar, Users, Filter, Plus, ChevronDown, CheckCircle, XCircle, Clock, MoreVertical } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { FileText, Download, Calendar, Users, Filter, Plus, ChevronDown, CheckCircle, XCircle, Clock, MoreVertical, AlertTriangle } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Card from '../../components/Card';
@@ -15,6 +16,7 @@ const reportHistory = [
 ];
 
 const Reports = () => {
+    const { t } = useLanguage();
     const [reportType, setReportType] = useState('performance');
     const [targetScope, setTargetScope] = useState('all');
     const [selectedClientId, setSelectedClientId] = useState('');
@@ -254,14 +256,6 @@ const Reports = () => {
     };
 
     const generateClientHistoryReport = (doc) => {
-        // Validation: Requires a specific client
-        if (targetScope !== 'specific' || !selectedClientId) {
-            doc.setFontSize(14);
-            doc.setTextColor(239, 68, 68);
-            doc.text('Error: Specific Client required for this report.', 14, 45);
-            return;
-        }
-
         const client = clients.find(c => String(c.id) === String(selectedClientId));
         if (!client) return;
 
@@ -549,8 +543,8 @@ const Reports = () => {
         <div className="su-reports-dashboard">
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">Reports & Exports</h1>
-                    <p className="su-page-subtitle">Generate custom data exports for billing, adherence, and client history.</p>
+                    <h1 className="su-page-title">{t('reports.title')}</h1>
+                    <p className="su-page-subtitle">{t('reports.subtitle')}</p>
                 </div>
             </div>
 
@@ -559,22 +553,21 @@ const Reports = () => {
                 <Card className="su-reports-generator">
                     <div className="su-generator-header">
                         <FileText size={24} className="su-text-primary" />
-                        <h2>Create New Report</h2>
+                        <h2>{t('reports.generator.title')}</h2>
                     </div>
 
                     <div className="su-generator-form">
                         <div className="su-form-group">
-                            <label className="su-form-label">Report Type</label>
+                            <label className="su-form-label">{t('reports.form.type')}</label>
                             <div className="su-select-wrapper">
                                 <select
                                     className="su-select su-full-width"
                                     value={reportType}
                                     onChange={(e) => setReportType(e.target.value)}
                                 >
-                                    <option value="performance">Overall Roster Performance & Adherence</option>
-                                    <option value="billing">Billing & Revenue Summary</option>
-                                    <option value="client_history">Specific Client History (Workouts & Logs)</option>
-                                    <option value="exercises">Exercises Database Export</option>
+                                    <option value="performance">{t('reports.type.performance')}</option>
+                                    <option value="billing">{t('reports.type.billing')}</option>
+                                    <option value="client_history">{t('reports.type.history')}</option>
                                 </select>
                                 <ChevronDown size={16} className="su-select-icon" />
                             </div>
@@ -582,7 +575,7 @@ const Reports = () => {
 
                         <div className="su-form-row">
                             <div className="su-form-group su-flex-1">
-                                <label className="su-form-label"><Users size={14} /> Target Scope</label>
+                                <label className="su-form-label"><Users size={14} /> {t('reports.form.scope')}</label>
                                 <div className="su-select-wrapper">
                                     <select
                                         className="su-select su-full-width"
@@ -590,8 +583,8 @@ const Reports = () => {
                                         onChange={(e) => setTargetScope(e.target.value)}
                                         disabled={reportType === 'exercises'}
                                     >
-                                        <option value="all">All Active Clients ({clients.length})</option>
-                                        <option value="specific">Specific Client...</option>
+                                        <option value="all">{t('reports.scope.all')} ({clients.length})</option>
+                                        <option value="specific">{t('reports.scope.specific')}</option>
                                     </select>
                                     <ChevronDown size={16} className="su-select-icon" />
                                 </div>
@@ -599,14 +592,14 @@ const Reports = () => {
 
                             {targetScope === 'specific' && (
                                 <div className="su-form-group su-flex-1">
-                                    <label className="su-form-label">Select Client</label>
+                                    <label className="su-form-label">{t('reports.form.client')}</label>
                                     <div className="su-select-wrapper">
                                         <select
                                             className="su-select su-full-width"
                                             value={selectedClientId}
                                             onChange={(e) => setSelectedClientId(e.target.value)}
                                         >
-                                            <option value="">Choose a client...</option>
+                                            <option value="">{t('reports.form.client.placeholder')}</option>
                                             {clients.map(client => (
                                                 <option key={client.id} value={client.id}>{client.name}</option>
                                             ))}
@@ -617,17 +610,17 @@ const Reports = () => {
                             )}
 
                             <div className="su-form-group su-flex-1">
-                                <label className="su-form-label"><Calendar size={14} /> Date Range</label>
+                                <label className="su-form-label"><Calendar size={14} /> {t('reports.form.range')}</label>
                                 <div className="su-select-wrapper">
                                     <select
                                         className="su-select su-full-width"
                                         value={dateRange}
                                         onChange={(e) => setDateRange(e.target.value)}
                                     >
-                                        <option value="last_30">Last 30 Days</option>
-                                        <option value="last_month">Last Month</option>
-                                        <option value="ytd">Year to Date (YTD)</option>
-                                        <option value="custom">Custom Range...</option>
+                                        <option value="last_30">{t('reports.range.30days')}</option>
+                                        <option value="last_month">{t('reports.range.lastmonth')}</option>
+                                        <option value="ytd">{t('reports.range.ytd')}</option>
+                                        <option value="custom">{t('reports.range.custom')}</option>
                                     </select>
                                     <ChevronDown size={16} className="su-select-icon" />
                                 </div>
@@ -637,7 +630,7 @@ const Reports = () => {
                         {dateRange === 'custom' && (
                             <div className="su-form-row su-mt-4">
                                 <div className="su-form-group su-flex-1">
-                                    <label className="su-form-label">Start Date</label>
+                                    <label className="su-form-label">{t('reports.form.start')}</label>
                                     <input
                                         type="date"
                                         className="su-input su-full-width"
@@ -646,7 +639,7 @@ const Reports = () => {
                                     />
                                 </div>
                                 <div className="su-form-group su-flex-1">
-                                    <label className="su-form-label">End Date</label>
+                                    <label className="su-form-label">{t('reports.form.end')}</label>
                                     <input
                                         type="date"
                                         className="su-input su-full-width"
@@ -657,12 +650,22 @@ const Reports = () => {
                             </div>
                         )}
 
+                        {reportType === 'client_history' && targetScope !== 'specific' && (
+                            <div className="su-warning-alert su-mt-4">
+                                <AlertTriangle size={18} />
+                                <div>
+                                    <strong>{t('reports.warning.scope.title')}</strong>
+                                    <p>{t('reports.warning.scope.desc')}</p>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="su-form-group">
-                            <label className="su-form-label">Export Format</label>
+                            <label className="su-form-label">{t('reports.form.format')}</label>
                             <div className="su-format-toggles">
                                 {[
-                                    { value: 'pdf', label: 'PDF Document' },
-                                    { value: 'csv', label: 'CSV / Excel' },
+                                    { value: 'pdf', label: t('reports.format.pdf') },
+                                    { value: 'csv', label: t('reports.format.csv') },
                                 ].map(opt => (
                                     <button
                                         key={opt.value}
@@ -682,12 +685,17 @@ const Reports = () => {
                                 icon={isGenerating ? <Clock size={16} /> : <Plus size={16} />}
                                 className="su-generate-btn"
                                 onClick={handleGenerateReport}
-                                disabled={isGenerating || (targetScope === 'specific' && !selectedClientId) || (dateRange === 'custom' && (!customStartDate || !customEndDate))}
+                                disabled={
+                                    isGenerating ||
+                                    (targetScope === 'specific' && !selectedClientId) ||
+                                    (dateRange === 'custom' && (!customStartDate || !customEndDate)) ||
+                                    (reportType === 'client_history' && targetScope !== 'specific')
+                                }
                             >
-                                {isGenerating ? 'Generating...' : 'Generate Report'}
+                                {isGenerating ? t('reports.btn.generating') : t('reports.btn.generate')}
                             </Button>
                             <span className="su-form-help">
-                                {isGenerating ? 'Please wait, preparing your document...' : 'Generation usually takes 1-2 seconds.'}
+                                {isGenerating ? t('reports.help.wait') : t('reports.help.ready')}
                             </span>
                         </div>
                     </div>
@@ -696,26 +704,26 @@ const Reports = () => {
                 {/* Report History */}
                 <Card className="su-reports-history">
                     <div className="su-history-header">
-                        <h2>Recent Reports</h2>
-                        <Button variant="outline" size="sm">View All</Button>
+                        <h2>{t('reports.history.title')}</h2>
+                        <Button variant="outline" size="sm">{t('reports.history.view_all')}</Button>
                     </div>
 
                     <div className="su-history-table-wrapper">
                         <table className="su-history-table">
                             <thead>
                                 <tr>
-                                    <th>Report Name</th>
-                                    <th>Type</th>
-                                    <th>Generated</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
+                                    <th>{t('reports.history.col.name')}</th>
+                                    <th>{t('reports.history.col.type')}</th>
+                                    <th>{t('reports.history.col.date')}</th>
+                                    <th>{t('reports.history.col.status')}</th>
+                                    <th>{t('reports.history.col.actions')}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {reportsHistory.length === 0 ? (
                                     <tr>
                                         <td colSpan="5" className="su-empty-history">
-                                            No reports generated yet.
+                                            {t('reports.history.empty')}
                                         </td>
                                     </tr>
                                 ) : (
@@ -731,13 +739,13 @@ const Reports = () => {
                                             <td>{report.date}</td>
                                             <td>
                                                 <span className="su-status-badge completed">
-                                                    <CheckCircle size={12} /> {report.status}
+                                                    <CheckCircle size={12} /> {t('reports.history.status.completed')}
                                                 </span>
                                             </td>
                                             <td>
                                                 <button className="su-download-action-btn" onClick={() => alert('Download again feature coming soon')}>
                                                     <Download size={14} />
-                                                    <span>Download</span>
+                                                    <span>{t('reports.history.btn.download')}</span>
                                                 </button>
                                             </td>
                                         </tr>
