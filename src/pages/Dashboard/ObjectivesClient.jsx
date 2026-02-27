@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
-import { Target, Scale, Trash2, TrendingUp } from 'lucide-react';
+import { Target, Scale, Trash2, TrendingUp, Check } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import './DashboardClient.css';
@@ -24,6 +24,7 @@ const ObjectivesClient = () => {
     // Form States
     const [tempGoalWeight, setTempGoalWeight] = useState(objectives.goalWeight);
     const [newWeightEntry, setNewWeightEntry] = useState('');
+    const [showSaveSuccess, setShowSaveSuccess] = useState(false);
 
     // Persistence Effect
     useEffect(() => {
@@ -33,6 +34,8 @@ const ObjectivesClient = () => {
     // Handlers
     const handleSaveGoal = () => {
         setObjectives(prev => ({ ...prev, goalWeight: tempGoalWeight }));
+        setShowSaveSuccess(true);
+        setTimeout(() => setShowSaveSuccess(false), 3000);
     };
 
     const handleLogWeight = () => {
@@ -92,7 +95,15 @@ const ObjectivesClient = () => {
                                     onChange={(e) => setTempGoalWeight(e.target.value)}
                                 />
                             </div>
-                            <Button onClick={handleSaveGoal}>{t('client.objectives.target.btn')}</Button>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem' }}>
+                                {showSaveSuccess && (
+                                    <div className="su-success-text" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem', fontWeight: 600, animation: 'fadeIn 0.3s ease' }}>
+                                        <Check size={14} />
+                                        {t('client.objectives.target.saved')}
+                                    </div>
+                                )}
+                                <Button onClick={handleSaveGoal}>{t('client.objectives.target.btn')}</Button>
+                            </div>
                         </div>
                     </Card>
 
@@ -127,8 +138,8 @@ const ObjectivesClient = () => {
                                             <div className="su-text-muted" style={{ fontSize: '0.85rem' }}>{entry.date}</div>
                                         </div>
                                         <button
+                                            className="su-delete-history-btn"
                                             onClick={() => handleDeleteWeight(entry.id)}
-                                            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0.5rem' }}
                                             title="Delete Entry"
                                         >
                                             <Trash2 size={16} />

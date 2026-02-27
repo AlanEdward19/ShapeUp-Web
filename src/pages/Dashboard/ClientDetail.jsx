@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
     ArrowLeft, TrendingUp, Activity, Scale, CheckCircle2,
-    Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp,
+    Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp, AlertTriangle,
     GripVertical, X, Save, Settings2, BarChart2, Dumbbell, ClipboardList, History
 } from 'lucide-react';
 import Card from '../../components/Card';
@@ -104,10 +104,22 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
         plan.exercises.map(ex => ({ ...ex, sets: ex.sets.map(s => ({ ...s })) }))
     );
     const [showExerciseLibrary, setShowExerciseLibrary] = useState(false);
+    const [alertModal, setAlertModal] = useState({ visible: false, title: '', message: '' });
 
     const addExercise = () => setShowExerciseLibrary(true);
 
     const handleSelectExercise = (ex) => {
+        // Prevent duplicates
+        const isDuplicate = exercises.some(e => e.name.toLowerCase() === ex.name.toLowerCase());
+        if (isDuplicate) {
+            setAlertModal({
+                visible: true,
+                title: t('pro.builder.error.title'),
+                message: t('pro.builder.error.duplicate')
+            });
+            return;
+        }
+
         setExercises(prev => [...prev, {
             id: `e${Date.now()}`, name: ex.name, tags: `${ex.type} • ${ex.muscles.join(' • ')}`, notes: '',
             sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '75', rpe: '8', rest: '90' }]
@@ -400,6 +412,25 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                     onClose={() => setShowExerciseLibrary(false)}
                     onSelect={handleSelectExercise}
                 />
+            )}
+
+            {alertModal.visible && (
+                <div className="su-modal-overlay su-alert-modal-overlay" onClick={() => setAlertModal({ ...alertModal, visible: false })}>
+                    <div className="su-modal-box su-alert-modal-box" onClick={e => e.stopPropagation()}>
+                        <div className="su-alert-icon-wrap">
+                            <AlertTriangle size={32} />
+                        </div>
+                        <h2 className="su-modal-title">{alertModal.title}</h2>
+                        <p className="su-modal-subtitle">
+                            {alertModal.message}
+                        </p>
+                        <div className="su-modal-actions">
+                            <Button fullWidth onClick={() => setAlertModal({ ...alertModal, visible: false })}>
+                                {t('pro.builder.error.btn')}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
@@ -788,7 +819,10 @@ const ClientDetail = () => {
                     <h1 className="su-page-title">
                         {client.name}
                         <span className={`su-status-badge ${client.status === 'Active' ? 'active' : client.status === 'Inactive' ? 'inactive' : 'warning'} su-ml-2`}>
-                            {client.status}
+                            {client.status === 'Active' ? t('clients.status.active') :
+                                client.status === 'Needs Attention' ? t('clients.status.attention') :
+                                    client.status === 'Invited' ? t('clients.status.invited') :
+                                        client.status === 'Inactive' ? t('clients.status.inactive') : client.status}
                         </span>
                     </h1>
                     <p className="su-page-subtitle">Goal: <strong>{client.goal}</strong></p>

@@ -110,3 +110,22 @@
     font-size: 0.75rem;
     color: var(--text-main);
 }
+
+.su-delete-history-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+}
+
+.su-delete-history-btn:hover {
+    color: var(--error);
+    background-color: rgba(239, 68, 68, 0.1);
+    transform: scale(1.1);
+}
