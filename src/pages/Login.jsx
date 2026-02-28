@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import logo from '../assets/logo.png';
+import Logo from '../components/Logo/Logo';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
@@ -48,7 +48,7 @@ const Login = ({ onLogin }) => {
             <div className="login-content">
                 <div className="login-header">
                     <div className="login-logo">
-                        <img src={logo} alt="ShapeUp Logo" className="login-logo-img" />
+                        <Logo className="login-logo-img" />
                         <span className="login-logo-text">ShapeUp</span>
                     </div>
                     <h1 className="login-tagline">Train with intelligence.</h1>
