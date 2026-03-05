@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTour } from '@reactour/tour';
 import { UserPlus, Calendar, Activity, CheckCircle, FileText, ArrowRight, MessageCircle, AlertTriangle, Users, Settings, Plus, XCircle, Search, Filter, MessageSquare, ExternalLink, Bell, TrendingUp, Award, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar } from 'recharts';
 import Card from '../../components/Card';
@@ -12,6 +13,7 @@ import './DashboardProfessional.css';
 const DashboardProfessional = () => {
     const navigate = useNavigate();
     const { t } = useLanguage();
+    const { setIsOpen, setSteps } = useTour();
     const [showInvite, setShowInvite] = useState(false);
     const [clients, setClients] = useState([]);
     const [globalHistory, setGlobalHistory] = useState([]);
@@ -52,6 +54,37 @@ const DashboardProfessional = () => {
         allEvents.sort((a, b) => b.timestamp - a.timestamp);
         setGlobalHistory(allEvents);
     }, []);
+
+    // ─── Tour trigger ─────────────────────────────────────────────────
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('shapeup_pro_dashboard_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="pro-header"]',
+                    content: 'Bem-vindo ao Painel do Profissional! Aqui você tem o controle total dos seus alunos e gerencia seus planos de treino.',
+                },
+                {
+                    selector: '[data-tour="pro-metrics"]',
+                    content: 'Acompanhe rapidamente os indicadores principais do seu negócio, como clientes ativos, assiduidade e engajamento geral.',
+                },
+                {
+                    selector: '[data-tour="pro-feed"]',
+                    content: 'Neste feed, você acompanha de perto todas as atividades dos seus clientes: treinos concluídos, ignorados, e notificações do sistema.',
+                },
+                {
+                    selector: '[data-tour="pro-alerts"]',
+                    content: 'Fique de olho nos alertas! Feedbacks urgentes ou avisos importantes sobre os treinos dos clientes aparecerão aqui.',
+                }
+            ];
+            setSteps(tourSteps);
+            // Pequeno delay para garantir que a interface foi renderizada
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 500);
+            localStorage.setItem('shapeup_pro_dashboard_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps]);
 
     // ─── Metrics ──────────────────────────────────────────────────────
     const stats = useMemo(() => {
@@ -200,7 +233,7 @@ const DashboardProfessional = () => {
         <div className="su-pro-dashboard">
             {showInvite && <InviteClientModal onClose={() => setShowInvite(false)} />}
 
-            <div className="su-dashboard-header-flex">
+            <div className="su-dashboard-header-flex" data-tour="pro-header">
                 <div>
                     <h1 className="su-page-title">{t('pro.dashboard.title')}</h1>
                     <p className="su-page-subtitle">{t('pro.dashboard.subtitle')}</p>
@@ -209,7 +242,7 @@ const DashboardProfessional = () => {
             </div>
 
             {/* Aggregate Metrics Grid */}
-            <div className="su-metrics-grid su-mt-4">
+            <div className="su-metrics-grid su-mt-4" data-tour="pro-metrics">
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
                         <span className="su-metric-label">{t('pro.dashboard.metric.active')}</span>
@@ -251,7 +284,7 @@ const DashboardProfessional = () => {
             <div className="su-overview-layout">
 
                 {/* Recent Client Logs Column */}
-                <div className="su-client-feed">
+                <div className="su-client-feed" data-tour="pro-feed">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                         <h3 className="su-section-title" style={{ marginBottom: 0 }}>{t('pro.dashboard.feed.title')}</h3>
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -412,7 +445,7 @@ const DashboardProfessional = () => {
                 </div>
 
                 {/* Sidebar Summary Area */}
-                <div className="su-overview-sidebar">
+                <div className="su-overview-sidebar" data-tour="pro-alerts">
                     <Card className="su-attention-card">
                         <h3 className="su-card-title">
                             <Bell size={18} style={{ verticalAlign: 'middle', marginRight: '8px' }} />

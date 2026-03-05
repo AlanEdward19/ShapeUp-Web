@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useTour } from '@reactour/tour';
 import {
     ArrowLeft, TrendingUp, Activity, Scale, CheckCircle2,
     Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp, AlertTriangle,
@@ -98,6 +99,7 @@ const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
 export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
     const { t } = useLanguage();
+    const { setIsOpen, setSteps } = useTour();
     const [name, setName] = useState(plan.name);
     const [phase, setPhase] = useState(plan.phase);
     const [difficulty, setDiff] = useState(plan.difficulty || 'Intermediate');
@@ -157,6 +159,34 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
         return u;
     });
 
+    // ─── Plan Editor Tour Trigger ────────────────────────────────────
+    React.useEffect(() => {
+        const hasSeenTour = localStorage.getItem('shapeup_plan_editor_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="pe-settings"]',
+                    content: 'Neste bloco superior você define as regras e o escopo do plano de treino, como o Nome do Plano, a Duração em Semanas e a Fase (Hipertrofia, Força, etc).',
+                },
+                {
+                    selector: '[data-tour="pe-stack"]',
+                    content: 'Aqui é a sua Mesa de Especialista! Adicione exercícios clicando no botão e depois prescreva as séries ajustando Tipo (Aquecimento, Top set, etc), Repetições, Carga e RPE para cada linha.',
+                },
+                {
+                    selector: '[data-tour="pe-summary"]',
+                    content: 'Nosso painel de Inteligência acompanha suas edições em tempo real. Ele calcula o tempo estimado de duração do treino, a distribuição da intensidade nas séries e entrega um resumo valioso!',
+                }
+            ];
+
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 700);
+
+            localStorage.setItem('shapeup_plan_editor_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps]);
+
     // Derived summary values (live computed)
     const totalSets = exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
     const avgRpe = (() => {
@@ -202,7 +232,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
         <div className="su-builder-layout">
             {/* LEFT: Plan builder */}
             <div className="su-plan-builder">
-                <Card className="su-plan-header-card">
+                <Card className="su-plan-header-card" data-tour="pe-settings">
                     <div className="su-plan-meta-grid">
                         <Input label={t('pro.builder.name')} value={name} onChange={e => setName(e.target.value)} />
                         <Input label={t('pro.builder.weeks')} type="number" min="1" max="52" value={weeks} onChange={e => setWeeks(e.target.value)} />
@@ -223,7 +253,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                     </div>
                 </Card>
 
-                <div className="su-exercise-stack">
+                <div className="su-exercise-stack" data-tour="pe-stack">
                     <div className="su-stack-header">
                         <h2>{t('pro.builder.stack')}</h2>
                         <Button icon={<Plus size={16} />} onClick={addExercise}>{t('pro.builder.add.ex')}</Button>
@@ -320,7 +350,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
             </div>
 
             {/* RIGHT: Sticky summary sidebar */}
-            <div className="su-structural-analytics">
+            <div className="su-structural-analytics" data-tour="pe-summary">
                 <Card className="su-sticky-card">
                     <div className="su-card-header-flex">
                         <h3 className="su-card-title">
@@ -623,6 +653,7 @@ const ClientDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
+    const { setIsOpen, setSteps } = useTour();
     const client = getClientData(parseInt(id));
 
     const [activeTab, setActiveTab] = useState(location.state?.tab || 'analytics');
@@ -665,6 +696,42 @@ const ClientDetail = () => {
         rpe: h.rpe || 0,
         date: h.date
     }));
+
+    // ─── Tour Trigger ─────────────────────────────────────────────────
+    React.useEffect(() => {
+        const hasSeenTour = localStorage.getItem('shapeup_client_detail_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="cd-header"]',
+                    content: 'Nesta tela você tem a visão completa do perfil do seu cliente. Você pode visualizar o alerta se houver "Necessidade de Atenção" no quadro dele.',
+                },
+                {
+                    selector: '[data-tour="cd-tabs"]',
+                    content: 'Navegue entre Analytics (Métricas e Gráficos de Evolução) e os Planos de Treino (Criar e atribuir rotinas).',
+                }
+            ];
+
+            if (hasRealData) {
+                tourSteps.push({
+                    selector: '[data-tour="cd-charts"]',
+                    content: 'Na guia de Analytics, este painel concentra gráficos e indicadores vitais, como Volume, Assiduidade, Histórico de Peso e Quebra de Recordes Pessoais (PRs).',
+                });
+            } else {
+                tourSteps.push({
+                    selector: '.su-client-empty-state',
+                    content: 'Como este cliente ainda não registrou nenhum treino, a área de Analytics aparece vazia. Os gráficos e painéis vitais surgirão aqui automaticamente assim que ele completar a primeira sessão!',
+                });
+            }
+
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 600);
+
+            localStorage.setItem('shapeup_client_detail_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps, hasRealData]);
 
     // --- Recent Improvements (PR Logic) ---
     const recentImprovements = React.useMemo(() => {
@@ -819,7 +886,7 @@ const ClientDetail = () => {
     return (
         <div className="su-client-detail-dashboard">
             {/* Page Header */}
-            <div className="su-dashboard-header-flex">
+            <div className="su-dashboard-header-flex" data-tour="cd-header">
                 <button className="su-back-btn" onClick={() => navigate('/dashboard/clients')}>
                     <ArrowLeft size={20} />
                 </button>
@@ -844,7 +911,7 @@ const ClientDetail = () => {
             </div>
 
             {/* Tabs */}
-            <div className="su-cp-tabs su-mt-4">
+            <div className="su-cp-tabs su-mt-4" data-tour="cd-tabs">
                 {tabs.map(t => (
                     <button
                         key={t.id}
@@ -866,7 +933,7 @@ const ClientDetail = () => {
             )}
 
             {activeTab === 'analytics' && hasRealData && (
-                <div className="su-client-metrics-grid su-mt-4">
+                <div className="su-client-metrics-grid su-mt-4" data-tour="cd-charts">
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
                             <TrendingUp size={20} className="su-text-muted" />

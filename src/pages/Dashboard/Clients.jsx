@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTour } from '@reactour/tour';
 import { Search, Filter, MessageSquare, ExternalLink, Play, Pause, Trash2, DollarSign } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -16,10 +17,13 @@ const initialClientsList = [];
 const Clients = () => {
     const navigate = useNavigate();
     const { t } = useLanguage();
+    const { setIsOpen, setSteps } = useTour();
     const [showInvite, setShowInvite] = useState(false);
     const [clients, setClients] = useState([]);
+    const [clientsLoaded, setClientsLoaded] = useState(false);
     const [clientToDelete, setClientToDelete] = useState(null);
     const [billingClient, setBillingClient] = useState(null);
+    const [justInvitedClient, setJustInvitedClient] = useState(false);
 
     useEffect(() => {
         const fetchAndComputeClients = () => {
@@ -65,10 +69,90 @@ const Clients = () => {
             });
 
             setClients(updatedList);
+            setClientsLoaded(true);
         };
 
         fetchAndComputeClients();
     }, []);
+
+    // ─── Tour Trigger ─────────────────────────────────────────────────
+    useEffect(() => {
+        if (!clientsLoaded) return; // Wait for initial data to be loaded
+        const hasSeenTour = localStorage.getItem('shapeup_clients_tour_seen');
+        if (!hasSeenTour) {
+            // Base steps
+            const tourSteps = [
+                {
+                    selector: '[data-tour="clients-header"]',
+                    content: 'Nesta tela você gerencia toda a sua carteira de clientes, acompanhando status e acesso aos detalhes de cada um.',
+                },
+                {
+                    selector: '[data-tour="clients-invite-btn"]',
+                    content: 'Você sempre pode convidar um novo aluno clicando aqui.',
+                },
+                {
+                    selector: '[data-tour="clients-toolbar"]',
+                    content: 'Use a barra de pesquisa para buscar pelo nome, e o filtro para exibir clientes por status (Ativos, Inativos, etc).',
+                }
+            ];
+
+            // If we have clients, we can add steps pointing to the table rows
+            if (clients.length > 0) {
+                tourSteps.push({
+                    selector: '[data-tour="clients-row"]:first-child',
+                    content: 'Clique em qualquer lugar da linha para abrir o perfil detalhado do cliente.',
+                });
+                tourSteps.push({
+                    selector: '[data-tour="clients-actions"]:first-child',
+                    content: 'Aqui você tem atalhos rápidos: suspender acesso temporariamente (pausar), gerenciar faturamento, ou excluir o cliente.',
+                });
+            } else {
+                tourSteps.push({
+                    selector: '.su-clients-table',
+                    content: 'Seus clientes cadastrados aparecerão aqui nesta tabela em formato de lista.',
+                });
+            }
+
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 600); // Slight delay for render
+
+            localStorage.setItem('shapeup_clients_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps, clients.length, clientsLoaded]); // Depend on clients.length so we capture the first load of data
+
+    // ─── Post-Invite Tour Trigger ─────────────────────────────────────
+    useEffect(() => {
+        // Wait until the modal is closed and we have just invited someone
+        if (justInvitedClient && !showInvite) {
+            const hasSeenPostInviteTour = localStorage.getItem('shapeup_clients_post_invite_tour_seen');
+            if (!hasSeenPostInviteTour) {
+                const tourSteps = [
+                    {
+                        selector: '[data-tour="clients-row"]:last-child',
+                        content: 'Pronto! Seu novo convite foi enviado. Observe que o novo cliente já aparece na sua lista, inicialmente com o status de "Convidado".',
+                    },
+                    {
+                        selector: '[data-tour="clients-actions"]:last-child',
+                        content: 'Assim que ele criar a conta com o e-mail convidado, seu status mudará para "Ativo" e a assiduidade e o último check-in começarão a ser rastreados automaticamente!',
+                    }
+                ];
+                setSteps(tourSteps);
+                setTimeout(() => {
+                    setIsOpen(true);
+                }, 1000); // 1000ms delay to wait for modal fade out
+
+                localStorage.setItem('shapeup_clients_post_invite_tour_seen', 'true');
+            }
+
+            // Wait slightly before resetting the flag to let the UI settle
+            setTimeout(() => {
+                setJustInvitedClient(false);
+            }, 2000);
+        }
+    }, [justInvitedClient, showInvite, setIsOpen, setSteps]);
+
 
     const handleInvite = (emailAddress) => {
         const normalizedEmail = emailAddress.trim().toLowerCase();
@@ -84,6 +168,7 @@ const Clients = () => {
         const updated = [...clients, newClient];
         setClients(updated);
         localStorage.setItem('shapeup_clients', JSON.stringify(updated));
+        setJustInvitedClient(true); // Flag that we just invited a client
 
         // Simulate client registration
         setTimeout(() => {
@@ -184,17 +269,17 @@ const Clients = () => {
                     </div>
                 </div>
             )}
-            <div className="su-dashboard-header-flex">
+            <div className="su-dashboard-header-flex" data-tour="clients-header">
                 <div>
                     <h1 className="su-page-title">{t('clients.title')}</h1>
                     <p className="su-page-subtitle">{t('clients.subtitle')}</p>
                 </div>
-                <Button onClick={() => setShowInvite(true)}>{t('clients.invite')}</Button>
+                <Button onClick={() => setShowInvite(true)} data-tour="clients-invite-btn">{t('clients.invite')}</Button>
             </div>
 
             <Card className="su-clients-container su-mt-4">
                 {/* Toolbar */}
-                <div className="su-clients-toolbar">
+                <div className="su-clients-toolbar" data-tour="clients-toolbar">
                     <div className="su-search-box">
                         <Search size={18} className="su-text-muted" />
                         <input type="text" placeholder={t('clients.search')} className="su-bare-input" />
@@ -223,6 +308,7 @@ const Clients = () => {
                                     key={client.id}
                                     className="su-clickable-row"
                                     onClick={() => handleRowClick(client.id)}
+                                    data-tour="clients-row"
                                 >
                                     {/* Client Name/Avatar */}
                                     <td>
@@ -265,7 +351,7 @@ const Clients = () => {
 
                                     {/* Actions */}
                                     <td>
-                                        <div className="su-table-actions" onClick={(e) => e.stopPropagation()}>
+                                        <div className="su-table-actions" onClick={(e) => e.stopPropagation()} data-tour="clients-actions">
 
                                             {/* Activate / Deactivate Toggle */}
                                             {client.status === 'Inactive' ? (

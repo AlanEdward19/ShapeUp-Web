@@ -1,13 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Mail, CheckCircle, Send } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTour } from '@reactour/tour';
 import './InviteClientModal.css';
 
 const InviteClientModal = ({ onClose, onInvite }) => {
     const { t } = useLanguage();
+    const { setIsOpen, setSteps } = useTour();
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('shapeup_invite_client_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="invite-email"]',
+                    content: 'Insira o endereço de e-mail do seu cliente aqui. Ele receberá o convite para criar uma conta ou associar uma conta existente à você.',
+                },
+                {
+                    selector: '[data-tour="invite-send"]',
+                    content: 'Após preencher o e-mail, clique aqui para enviar o convite.',
+                }
+            ];
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 600); // Wait for modal animation
+            localStorage.setItem('shapeup_invite_client_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps]);
 
     const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
@@ -46,7 +69,7 @@ const InviteClientModal = ({ onClose, onInvite }) => {
                             {t('clients.invite.subtitle')}
                         </p>
 
-                        <div className="su-modal-form">
+                        <div className="su-modal-form" data-tour="invite-email">
                             <label className="su-modal-label">{t('clients.invite.label')}</label>
                             <div className="su-modal-input-row">
                                 <Mail size={16} className="su-modal-input-icon" />
@@ -65,7 +88,7 @@ const InviteClientModal = ({ onClose, onInvite }) => {
 
                         <div className="su-modal-actions">
                             <button className="su-modal-btn-cancel" onClick={onClose}>{t('clients.invite.btn.cancel')}</button>
-                            <button className="su-modal-btn-primary" onClick={handleSend}>
+                            <button className="su-modal-btn-primary" onClick={handleSend} data-tour="invite-send">
                                 <Send size={16} /> {t('clients.invite.btn.send')}
                             </button>
                         </div>
