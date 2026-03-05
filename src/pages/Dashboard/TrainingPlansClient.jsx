@@ -41,6 +41,7 @@ const ClientView = () => {
     // Post-Session Flow States
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     const [showOverviewModal, setShowOverviewModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
     const [sessionFeedback, setSessionFeedback] = useState({ rpe: null, comments: '' });
 
     // Dynamic Sets Data Structure (Simplified for demo)
@@ -306,6 +307,18 @@ const ClientView = () => {
         setViewingExerciseDef(null);
     };
 
+    const handleCancelSessionConfirm = () => {
+        setShowCancelModal(false);
+        setSessionFeedback({ rpe: null, comments: '' });
+        setSessionActive(false);
+        setActivePlan(null);
+        setWorkoutTime(0);
+        setIsResting(false);
+        setRestTimer(0);
+        setExercises([]);
+        setViewingExerciseDef(null);
+    };
+
     // -- History Calculation --
     const allHistory = assignedPlans.flatMap(plan =>
         (plan.history || []).map(h => ({ ...h, planName: plan.name }))
@@ -430,7 +443,7 @@ const ClientView = () => {
             {/* Sticky Header with Timers */}
             <div className="su-session-header-sticky">
                 <div className="su-session-header-left">
-                    <Button variant="outline" onClick={finishSession} size="sm">Cancel Session</Button>
+                    <Button variant="outline" onClick={() => setShowCancelModal(true)} size="sm">Cancel Session</Button>
                 </div>
 
                 {/* Rest Timer Group */}
@@ -475,6 +488,30 @@ const ClientView = () => {
 
 
             {/* Application Flow Overlays */}
+
+            {/* Cancel Session Confirmation Modal */}
+            {showCancelModal && (
+                <div className="su-rest-modal-overlay" style={{ zIndex: 11000 }}>
+                    <div className="su-feedback-modal-content" style={{ textAlign: 'center' }}>
+                        <h3 style={{ marginBottom: '1rem' }}>Cancel Workout?</h3>
+                        <p className="su-text-muted su-mb-6">
+                            Are you sure you want to cancel this session? All progress and logged sets will be lost.
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <Button variant="outline" fullWidth onClick={() => setShowCancelModal(false)}>
+                                Keep Training
+                            </Button>
+                            <Button
+                                fullWidth
+                                onClick={handleCancelSessionConfirm}
+                                style={{ backgroundColor: 'var(--danger)', borderColor: 'var(--danger)', color: 'white' }}
+                            >
+                                Cancel Session
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Post-Session Feedback Modal */}
             {showFeedbackModal && (
