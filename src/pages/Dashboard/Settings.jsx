@@ -190,7 +190,7 @@ const Settings = () => {
                             : t('settings.subtitle.client')}
                     </p>
                 </div>
-                <Button onClick={handleSaveChanges}>Save Changes</Button>
+                <Button onClick={handleSaveChanges}>{t('settings.btn.save')}</Button>
             </div>
 
             <div className="su-settings-layout su-mt-4">
@@ -218,7 +218,7 @@ const Settings = () => {
                     {activeTab === 'profile' && (
                         <Card className="su-settings-card">
                             <h2 className="su-settings-section-title">
-                                {isProfessional ? 'Professional Brand' : 'Personal Information'}
+                                {isProfessional ? t('settings.profile.title.pro') : t('settings.profile.title.client')}
                             </h2>
 
                             <div className="su-settings-avatar-upload">
@@ -231,7 +231,7 @@ const Settings = () => {
                                 </div>
                                 <div className="su-settings-avatar-actions">
                                     <Button variant="outline" onClick={triggerFileInput} icon={<Camera size={16} />}>
-                                        Change Photo
+                                        {t('settings.profile.photo.change')}
                                     </Button>
                                     <input
                                         type="file"
@@ -246,7 +246,7 @@ const Settings = () => {
                                             onClick={() => updateActiveProfile({ avatar: null })}
                                             style={{ marginTop: '0.5rem', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8rem', color: 'var(--danger)' }}
                                         >
-                                            Remove Photo
+                                            {t('settings.profile.photo.remove')}
                                         </button>
                                     )}
                                 </div>
@@ -254,28 +254,28 @@ const Settings = () => {
 
                             <div className="su-settings-form-grid">
                                 <div className="su-form-group">
-                                    <label>First Name</label>
+                                    <label>{t('settings.profile.form.first_name')}</label>
                                     <Input
                                         value={firstName}
                                         onChange={(e) => handleNameChange(e.target.value, lastName)}
-                                        placeholder="First Name"
+                                        placeholder={t('settings.profile.form.first_name')}
                                     />
                                 </div>
                                 <div className="su-form-group">
-                                    <label>Last Name</label>
+                                    <label>{t('settings.profile.form.last_name')}</label>
                                     <Input
                                         value={lastName}
                                         onChange={(e) => handleNameChange(firstName, e.target.value)}
-                                        placeholder="Last Name"
+                                        placeholder={t('settings.profile.form.last_name')}
                                     />
                                 </div>
                                 <div className="su-form-group su-col-span-2">
-                                    <label>Email Address</label>
+                                    <label>{t('settings.profile.form.email')}</label>
                                     <Input type="email" disabled value={isProfessional ? "alex@shapeup.fit" : userEmail} />
                                 </div>
                                 {isProfessional && (
                                     <div className="su-form-group su-col-span-2">
-                                        <label>Bio / Specialties</label>
+                                        <label>{t('settings.profile.form.bio')}</label>
                                         <textarea
                                             className="su-bare-textarea"
                                             defaultValue="Strength & Conditioning Specialist. Helping athletes reach peak performance."
@@ -290,40 +290,40 @@ const Settings = () => {
                     {/* -- PROFESSIONAL SPECIFIC SECTIONS -- */}
                     {isProfessional && activeTab === 'notifications' && (
                         <Card className="su-settings-card">
-                            <h2 className="su-settings-section-title">Notification Routing</h2>
+                            <h2 className="su-settings-section-title">{t('pro.settings.notifications.title')}</h2>
                             <div className="su-settings-list">
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Chat Messages</h4>
-                                        <p>Receive alerts when clients send you direct messages.</p>
+                                        <h4>{t('pro.settings.notifications.messages.title')}</h4>
+                                        <p>{t('pro.settings.notifications.messages.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.messages ? 'active' : ''}`} onClick={() => toggleNotifPref('messages')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>High Fatigue Reports</h4>
-                                        <p>Alerts when a client reports RPE 8+ after a session.</p>
+                                        <h4>{t('pro.settings.notifications.fatigue.title')}</h4>
+                                        <p>{t('pro.settings.notifications.fatigue.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.alerts_fatigue ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts_fatigue')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Skipped Exercises</h4>
-                                        <p>Alerts when a client skips an exercise multiple times across sessions.</p>
+                                        <h4>{t('pro.settings.notifications.skipped.title')}</h4>
+                                        <p>{t('pro.settings.notifications.skipped.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.alerts_skipped ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts_skipped')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Missed Sessions</h4>
-                                        <p>Alerts when a client skips multiple training days consecutively.</p>
+                                        <h4>{t('pro.settings.notifications.missed.title')}</h4>
+                                        <p>{t('pro.settings.notifications.missed.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.alerts_missed ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts_missed')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>System Updates</h4>
-                                        <p>Receive notifications when clients accept invites or complete billing.</p>
+                                        <h4>{t('pro.settings.notifications.system.title')}</h4>
+                                        <p>{t('pro.settings.notifications.system.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.system ? 'active' : ''}`} onClick={() => toggleNotifPref('system')}></div>
                                 </div>
@@ -334,26 +334,26 @@ const Settings = () => {
                     {/* -- CLIENT SPECIFIC SECTIONS -- */}
                     {!isProfessional && activeTab === 'notifications' && (
                         <Card className="su-settings-card">
-                            <h2 className="su-settings-section-title">Notification Preferences</h2>
+                            <h2 className="su-settings-section-title">{t('client.settings.notifications.title')}</h2>
                             <div className="su-settings-list">
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Chat Messages</h4>
-                                        <p>Receive alerts when your coach sends you a direct message.</p>
+                                        <h4>{t('client.settings.notifications.chat.title')}</h4>
+                                        <p>{t('client.settings.notifications.chat.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.messages ? 'active' : ''}`} onClick={() => toggleNotifPref('messages')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Plan Updates</h4>
-                                        <p>Push notification when your assigned training plan is modified.</p>
+                                        <h4>{t('client.settings.notifications.plan.title')}</h4>
+                                        <p>{t('client.settings.notifications.plan.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.alerts ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>System Reminders</h4>
-                                        <p>Platform updates, connection status, and automated check-ins.</p>
+                                        <h4>{t('client.settings.notifications.system.title')}</h4>
+                                        <p>{t('client.settings.notifications.system.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.system ? 'active' : ''}`} onClick={() => toggleNotifPref('system')}></div>
                                 </div>
@@ -412,19 +412,19 @@ const Settings = () => {
                     {isProfessional && activeTab === 'billing' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             <Card className="su-settings-card">
-                                <h2 className="su-settings-section-title">Bank Configuration</h2>
-                                <p className="su-text-muted su-text-sm su-mb-4">Link your bank account to receive payouts directly from client subscriptions.</p>
+                                <h2 className="su-settings-section-title">{t('pro.settings.billing.bank.title')}</h2>
+                                <p className="su-text-muted su-text-sm su-mb-4">{t('pro.settings.billing.bank.desc')}</p>
                                 <div className="su-settings-form-grid">
                                     <div className="su-form-group su-col-span-2">
-                                        <label>Account Holder Name</label>
+                                        <label>{t('pro.settings.billing.bank.holder')}</label>
                                         <Input value={bankDetails.accountName} onChange={e => setBankDetails({ ...bankDetails, accountName: e.target.value })} placeholder="E.g., ShapeUp Athletics LLC" />
                                     </div>
                                     <div className="su-form-group">
-                                        <label>Routing Number</label>
+                                        <label>{t('pro.settings.billing.bank.routing')}</label>
                                         <Input value={bankDetails.routingNumber} onChange={e => setBankDetails({ ...bankDetails, routingNumber: e.target.value })} placeholder="9 digits" />
                                     </div>
                                     <div className="su-form-group">
-                                        <label>Account Number</label>
+                                        <label>{t('pro.settings.billing.bank.account')}</label>
                                         <Input value={bankDetails.accountNumber} onChange={e => setBankDetails({ ...bankDetails, accountNumber: e.target.value })} placeholder="•••• ••••" />
                                     </div>
                                 </div>
@@ -433,28 +433,28 @@ const Settings = () => {
                             <Card className="su-settings-card">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                                     <div>
-                                        <h2 className="su-settings-section-title" style={{ marginBottom: 0 }}>Subscription Plans</h2>
-                                        <p className="su-text-muted su-text-sm">Create and manage the default billing tiers available for your clients.</p>
+                                        <h2 className="su-settings-section-title" style={{ marginBottom: 0 }}>{t('pro.settings.billing.plans.title')}</h2>
+                                        <p className="su-text-muted su-text-sm">{t('pro.settings.billing.plans.desc')}</p>
                                     </div>
-                                    <Button size="small" variant="outline" onClick={handleAddPlan}>Add Plan</Button>
+                                    <Button size="small" variant="outline" onClick={handleAddPlan}>{t('pro.settings.billing.plans.add')}</Button>
                                 </div>
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     {proPlans.map((plan, index) => (
                                         <div key={plan.id} style={{ backgroundColor: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem', position: 'relative' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>Plan Level {index + 1}</h4>
+                                                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>{t('pro.settings.billing.plans.level')} {index + 1}</h4>
                                                 <button className="su-icon-btn" onClick={() => handleDeletePlanClick(plan)} style={{ color: 'var(--error)' }} title="Remove Plan">
                                                     <Trash2 size={18} />
                                                 </button>
                                             </div>
                                             <div className="su-settings-form-grid">
                                                 <div className="su-form-group" style={{ gridColumn: 'span 2' }}>
-                                                    <label>Plan Name</label>
+                                                    <label>{t('pro.settings.billing.plans.name')}</label>
                                                     <Input value={plan.name} onChange={e => updatePlan(plan.id, 'name', e.target.value)} placeholder="e.g. Standard" />
                                                 </div>
                                                 <div className="su-form-group">
-                                                    <label>Monthly Price ($)</label>
+                                                    <label>{t('pro.settings.billing.plans.price')}</label>
                                                     <Input type="number" value={plan.price} onChange={e => updatePlan(plan.id, 'price', e.target.value)} />
                                                 </div>
                                                 <div className="su-form-group su-col-span-2" style={{ gridColumn: 'span 3' }}>
@@ -473,7 +473,7 @@ const Settings = () => {
                     {!isProfessional && activeTab === 'billing' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             <Card className="su-settings-card">
-                                <h2 className="su-settings-section-title">Active Subscription</h2>
+                                <h2 className="su-settings-section-title">{t('client.settings.billing.active.title')}</h2>
                                 {clientAssignedPlan ? (
                                     <div style={{ backgroundColor: 'var(--bg-main)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--primary)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -484,15 +484,15 @@ const Settings = () => {
                                     </div>
                                 ) : (
                                     <div className="su-empty-state-large" style={{ padding: '2rem' }}>
-                                        <h3 className="su-text-muted">No Plan Assigned</h3>
-                                        <p className="su-text-muted su-text-sm">Your coach has not assigned a billing plan to your account yet.</p>
+                                        <h3 className="su-text-muted">{t('client.settings.billing.active.empty.title')}</h3>
+                                        <p className="su-text-muted su-text-sm">{t('client.settings.billing.active.empty.desc')}</p>
                                     </div>
                                 )}
                             </Card>
 
                             <Card className="su-settings-card">
-                                <h2 className="su-settings-section-title">Payment Method</h2>
-                                <p className="su-text-muted su-text-sm su-mb-4">Securely save your card details for automatic monthly billing.</p>
+                                <h2 className="su-settings-section-title">{t('client.settings.billing.payment.title')}</h2>
+                                <p className="su-text-muted su-text-sm su-mb-4">{t('client.settings.billing.payment.desc')}</p>
 
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '2rem' }}>
                                     <CreditCardUI cardData={cardData} isFlipped={isCardFlipped} />
@@ -500,7 +500,7 @@ const Settings = () => {
 
                                 <div className="su-settings-form-grid">
                                     <div className="su-form-group su-col-span-2">
-                                        <label>Card Number</label>
+                                        <label>{t('client.settings.billing.payment.card_num')}</label>
                                         <Input
                                             value={cardData.number}
                                             maxLength={16}
@@ -510,7 +510,7 @@ const Settings = () => {
                                         />
                                     </div>
                                     <div className="su-form-group su-col-span-2">
-                                        <label>Cardholder Name</label>
+                                        <label>{t('client.settings.billing.payment.card_name')}</label>
                                         <Input
                                             value={cardData.name}
                                             onChange={e => setCardData({ ...cardData, name: e.target.value })}
@@ -519,7 +519,7 @@ const Settings = () => {
                                         />
                                     </div>
                                     <div className="su-form-group">
-                                        <label>Expiration (MM/YY)</label>
+                                        <label>{t('client.settings.billing.payment.expiry')}</label>
                                         <Input
                                             value={cardData.expiry}
                                             maxLength={5}
@@ -550,8 +550,8 @@ const Settings = () => {
                         <Card className="su-settings-card su-flex-center">
                             <div className="su-empty-state-large">
                                 <Shield size={48} className="su-text-muted su-mb-4" />
-                                <h3>{activeTabsList.find(t => t.id === activeTab)?.label} Configuration</h3>
-                                <p className="su-text-muted">This module is currently disabled in the prototype environment.</p>
+                                <h3>{t('client.settings.placeholder.title')} {activeTabsList.find(t => t.id === activeTab)?.label}</h3>
+                                <p className="su-text-muted">{t('client.settings.placeholder.desc')}</p>
                             </div>
                         </Card>
                     )}
