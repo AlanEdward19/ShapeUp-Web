@@ -469,9 +469,12 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
     );
 };
 
-// ─── SESSION DETAIL MODAL ───────────────────────────────────
 const SessionDetailModal = ({ session, planName, onClose }) => {
-    const { t } = useLanguage();
+    const { t, unitSystem, convertWeight } = useLanguage();
+
+    // Inflate original unit based on string
+    const originUnit = (session.totalVol || '').includes('lbs') ? 'imperial' : 'metric';
+
     return (
         <div className="su-modal-overlay" onClick={onClose}>
             <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()}>
@@ -501,7 +504,7 @@ const SessionDetailModal = ({ session, planName, onClose }) => {
                                             <span className="su-sd-set-num">{s.set}</span>
                                             <div><SetTypeBadge type={s.type} /></div>
                                             <span style={{ textAlign: 'center', fontSize: '0.85rem' }}>{s.reps} reps</span>
-                                            <span style={{ wordBreak: 'break-word', textAlign: 'center', fontSize: '0.85rem' }}>{s.load} kg</span>
+                                            <span style={{ wordBreak: 'break-word', textAlign: 'center', fontSize: '0.85rem' }}>{convertWeight(parseFloat(s.load) || 0, originUnit) % 1 === 0 ? convertWeight(parseFloat(s.load) || 0, originUnit).toString() : convertWeight(parseFloat(s.load) || 0, originUnit).toFixed(1)} {unitSystem === 'imperial' ? 'lbs' : 'kg'}</span>
                                             <span style={{ textAlign: 'center', fontSize: '0.85rem' }}>RPE {s.rpe}</span>
                                         </div>
                                     ))}
@@ -649,7 +652,7 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
 
 // ─── MAIN COMPONENT ─────────────────────────────────────────
 const ClientDetail = () => {
-    const { t } = useLanguage();
+    const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -685,11 +688,17 @@ const ClientDetail = () => {
 
     const hasRealData = allHistory.length > 0;
 
-    const dynamicVolumeProgress = allHistory.map((h, i) => ({
-        session: `S${i + 1}`,
-        vol: parseInt(h.totalVol.replace(/,/g, '').replace(' kg', '')) || 0,
-        date: h.date
-    }));
+    const dynamicVolumeProgress = allHistory.map((h, i) => {
+        const rawVol = h.totalVol || '0';
+        const numPart = parseInt(rawVol.replace(/,/g, '').replace(' kg', '').replace(' lbs', '')) || 0;
+        const originUnit = rawVol.includes('lbs') ? 'imperial' : 'metric';
+
+        return {
+            session: `S${i + 1}`,
+            vol: convertWeight(numPart, originUnit),
+            date: h.date
+        };
+    });
 
     const dynamicRpeTrend = allHistory.map((h, i) => ({
         session: `S${i + 1}`,
@@ -786,14 +795,25 @@ const ClientDetail = () => {
         return improvementsList
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 5) // Show 5 for coach
-            .map(imp => ({
-                name: imp.name,
-                from: `${imp.from.load}kg × ${imp.from.reps}`,
-                to: `${imp.to.load}kg × ${imp.to.reps}`,
-                date: imp.date,
-                fromSession: imp.fromSession,
-                toSession: imp.toSession
-            }));
+            .map(imp => {
+                const fromOriginUnit = imp.fromSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric';
+                const toOriginUnit = imp.toSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric';
+
+                const fromLoadConverted = convertWeight(imp.from.load, fromOriginUnit);
+                const toLoadConverted = convertWeight(imp.to.load, toOriginUnit);
+
+                const fromFormatted = fromLoadConverted % 1 === 0 ? fromLoadConverted.toString() : fromLoadConverted.toFixed(1);
+                const toFormatted = toLoadConverted % 1 === 0 ? toLoadConverted.toString() : toLoadConverted.toFixed(1);
+
+                return {
+                    name: imp.name,
+                    from: `${fromFormatted}${unitSystem === 'imperial' ? 'lbs' : 'kg'} × ${imp.from.reps}`,
+                    to: `${toFormatted}${unitSystem === 'imperial' ? 'lbs' : 'kg'} × ${imp.to.reps}`,
+                    date: imp.date,
+                    fromSession: imp.fromSession,
+                    toSession: imp.toSession
+                };
+            });
     }, [allHistory]);
 
     const adherenceStats = { completed: 0, skipped: 0, partial: 0 };
@@ -1100,7 +1120,7 @@ const ClientDetail = () => {
                                                 <div key={si} className="su-sd-set-row" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
                                                     <span className="su-sd-set-num">{s.set}</span>
                                                     <span>{s.reps}</span>
-                                                    <span>{s.load} kg</span>
+                                                    <span>{convertWeight(parseFloat(s.load) || 0, selectedPRComparison.fromSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric') % 1 === 0 ? convertWeight(parseFloat(s.load) || 0, selectedPRComparison.fromSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric').toString() : convertWeight(parseFloat(s.load) || 0, selectedPRComparison.fromSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric').toFixed(1)} {unitSystem === 'imperial' ? 'lbs' : 'kg'}</span>
                                                     <span>{s.rpe}</span>
                                                 </div>
                                             ))}
@@ -1132,7 +1152,7 @@ const ClientDetail = () => {
                                                 <div key={si} className="su-sd-set-row" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
                                                     <span className="su-sd-set-num">{s.set}</span>
                                                     <span>{s.reps}</span>
-                                                    <span style={{ fontWeight: 'bold', color: 'var(--text-main)' }}>{s.load} kg</span>
+                                                    <span style={{ fontWeight: 'bold', color: 'var(--text-main)' }}>{convertWeight(parseFloat(s.load) || 0, selectedPRComparison.toSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric') % 1 === 0 ? convertWeight(parseFloat(s.load) || 0, selectedPRComparison.toSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric').toString() : convertWeight(parseFloat(s.load) || 0, selectedPRComparison.toSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric').toFixed(1)} {unitSystem === 'imperial' ? 'lbs' : 'kg'}</span>
                                                     <span>{s.rpe}</span>
                                                 </div>
                                             ))}

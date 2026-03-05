@@ -16,7 +16,7 @@ const Settings = () => {
         clientProfile, setClientProfile
     } = useOutletContext();
     const { theme, toggleTheme } = useTheme();
-    const { language, setLanguage, t } = useLanguage();
+    const { language, setLanguage, t, unitSystem, setUnitSystem } = useLanguage();
     const [activeTab, setActiveTab] = useState('profile');
 
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
@@ -393,18 +393,21 @@ const Settings = () => {
                                         {theme === 'dark' ? t('preferences.theme.light') : t('preferences.theme.dark')}
                                     </Button>
                                 </div>
-                                {!isProfessional && (
-                                    <div className="su-settings-list-item">
-                                        <div className="su-item-info">
-                                            <h4>{t('preferences.units.title')}</h4>
-                                            <p>{t('preferences.units.desc')}</p>
-                                        </div>
-                                        <select className="su-settings-select" style={{ height: '40px', paddingLeft: '1rem', width: '150px' }}>
-                                            <option value="metric">Metric (kg)</option>
-                                            <option value="imperial">Imperial (lbs)</option>
-                                        </select>
+                                <div className="su-settings-list-item">
+                                    <div className="su-item-info">
+                                        <h4>{t('preferences.units.title')}</h4>
+                                        <p>{t('preferences.units.desc')}</p>
                                     </div>
-                                )}
+                                    <select
+                                        className="su-settings-select"
+                                        style={{ height: '40px', paddingLeft: '1rem', width: '150px' }}
+                                        value={unitSystem}
+                                        onChange={(e) => setUnitSystem(e.target.value)}
+                                    >
+                                        <option value="metric">Metric (kg)</option>
+                                        <option value="imperial">Imperial (lbs)</option>
+                                    </select>
+                                </div>
                             </div>
                         </Card>
                     )}

@@ -23,6 +23,37 @@ export const LanguageProvider = ({ children }) => {
         localStorage.setItem('shapeup_language', lang);
     };
 
+    const [unitSystem, setUnitSystemState] = useState(localStorage.getItem('shapeup_unit_system') || 'metric');
+
+    const setUnitSystem = (unit) => {
+        setUnitSystemState(unit);
+        localStorage.setItem('shapeup_unit_system', unit);
+    };
+
+    // Helper: Safely converts a number assuming it was originally logged in one system, but we need it in another
+    // defaultOrigin = 'metric' means "if we don't know what it was logged in, assume it was kg"
+    const convertWeight = (value, originUnit = 'metric', targetUnit = unitSystem) => {
+        const val = parseFloat(value);
+        if (isNaN(val)) return 0;
+
+        if (originUnit === targetUnit) return val;
+
+        if (originUnit === 'metric' && targetUnit === 'imperial') {
+            return val * 2.20462; // kg to lbs
+        }
+        if (originUnit === 'imperial' && targetUnit === 'metric') {
+            return val / 2.20462; // lbs to kg
+        }
+        return val;
+    };
+
+    const formatWeight = (value, originUnit = 'metric') => {
+        const converted = convertWeight(value, originUnit, unitSystem);
+        // show 1 decimal place if it's not a whole number
+        const formatted = converted % 1 === 0 ? converted.toString() : converted.toFixed(1);
+        return `${formatted} ${unitSystem === 'imperial' ? 'lbs' : 'kg'}`;
+    };
+
     // Dictionary for the Settings page and Sidebar
     const translations = {
         'en': {
@@ -1006,7 +1037,7 @@ export const LanguageProvider = ({ children }) => {
     };
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t }}>
+        <LanguageContext.Provider value={{ language, setLanguage, t, unitSystem, setUnitSystem, convertWeight, formatWeight }}>
             {children}
         </LanguageContext.Provider>
     );

@@ -16,7 +16,7 @@ const reportHistory = [
 ];
 
 const Reports = () => {
-    const { t } = useLanguage();
+    const { t, unitSystem } = useLanguage();
     const [reportType, setReportType] = useState('performance');
     const [targetScope, setTargetScope] = useState('all');
     const [selectedClientId, setSelectedClientId] = useState('');
@@ -126,14 +126,13 @@ const Reports = () => {
         let headers = [];
         let rows = [];
 
-        // Helper to parse volume string correctly
+        // Helper to parse volume string correctly (returns in user's preferred unit)
         const parseVolume = (val) => {
-            if (typeof val === 'number') return val;
-            if (typeof val === 'string') {
-                const cleaned = val.replace(/[^\d.]/g, '');
-                return parseFloat(cleaned) || 0;
-            }
-            return 0;
+            if (!val) return 0;
+            const strVal = val.toString();
+            const cleaned = parseFloat(strVal.replace(/[^\d.]/g, '')) || 0;
+            const originUnit = strVal.toLowerCase().includes('lbs') ? 'imperial' : 'metric';
+            return convertWeight(cleaned, originUnit);
         };
 
         // Date Range Logic
@@ -149,7 +148,8 @@ const Reports = () => {
         }
 
         if (reportType === 'performance') {
-            headers = [t('reports.export.perf.col.name'), t('reports.export.perf.col.status'), t('reports.export.perf.col.completed'), t('reports.export.perf.col.skipped'), t('reports.export.perf.col.adherence'), t('reports.export.perf.col.volume')];
+            const volHeader = `${t('reports.export.perf.col.volume')} (${unitSystem === 'imperial' ? 'lbs' : 'kg'})`;
+            headers = [t('reports.export.perf.col.name'), t('reports.export.perf.col.status'), t('reports.export.perf.col.completed'), t('reports.export.perf.col.skipped'), t('reports.export.perf.col.adherence'), volHeader];
             let targetClients = clients;
             if (targetScope === 'specific' && selectedClientId) {
                 targetClients = clients.filter(c => String(c.id) === String(selectedClientId));
@@ -179,7 +179,8 @@ const Reports = () => {
                 }
                 const totalSessions = completed + skipped;
                 const adherence = totalSessions > 0 ? Math.round((completed / totalSessions) * 100) : 0;
-                return [client.name, client.status?.toLowerCase() === 'inactive' ? t('reports.export.val.inactive') : t('reports.export.val.active'), completed, skipped, adherence, totalVolumeSum];
+                const formattedVol = totalVolumeSum % 1 === 0 ? totalVolumeSum : parseFloat(totalVolumeSum.toFixed(1));
+                return [client.name, client.status?.toLowerCase() === 'inactive' ? t('reports.export.val.inactive') : t('reports.export.val.active'), completed, skipped, `${adherence}%`, formattedVol];
             });
         }
         else if (reportType === 'billing') {
@@ -322,7 +323,7 @@ const Reports = () => {
                     const logSummary = sets.map(s => {
                         const weight = s.load || s.weight || 0;
                         const rpe = s.rpe ? ` @ RPE ${s.rpe}` : '';
-                        return `${s.reps}x${weight}kg${rpe}`;
+                        return `${s.reps}x${weight}${unitSystem === 'imperial' ? 'lbs' : 'kg'}${rpe}`;
                     }).join(', ');
 
                     return [
@@ -463,15 +464,13 @@ const Reports = () => {
         doc.setTextColor(100, 100, 100);
         doc.text(`${t('reports.export.pdf.period')} ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, 14, 52);
 
-        // Helper to parse volume string correctly
+        // Helper to parse volume string correctly (converted to user unit)
         const parseVolume = (val) => {
-            if (typeof val === 'number') return val;
-            if (typeof val === 'string') {
-                // Extract only numbers and dots
-                const cleaned = val.replace(/[^\d.]/g, '');
-                return parseFloat(cleaned) || 0;
-            }
-            return 0;
+            if (!val) return 0;
+            const strVal = val.toString();
+            const cleaned = parseFloat(strVal.replace(/[^\d.]/g, '')) || 0;
+            const originUnit = strVal.toLowerCase().includes('lbs') ? 'imperial' : 'metric';
+            return convertWeight(cleaned, originUnit);
         };
 
         // Collect data for each client
@@ -507,13 +506,13 @@ const Reports = () => {
                 completed.toString(),
                 skipped.toString(),
                 `${adherence}%`,
-                `${totalVolumeSum.toLocaleString()} kg`
+                `${totalVolumeSum % 1 === 0 ? totalVolumeSum : totalVolumeSum.toFixed(1)} ${unitSystem === 'imperial' ? 'lbs' : 'kg'}`
             ];
         });
 
         autoTable(doc, {
             startY: 60,
-            head: [[t('reports.export.perf.col.name'), t('reports.export.perf.col.status'), t('reports.export.perf.col.completed'), t('reports.export.perf.col.skipped'), t('reports.export.perf.col.adherence').replace(' %', ''), t('reports.export.perf.col.volume').replace(' (kg)', '')]],
+            head: [[t('reports.export.perf.col.name'), t('reports.export.perf.col.status'), t('reports.export.perf.col.completed'), t('reports.export.perf.col.skipped'), t('reports.export.perf.col.adherence').replace(' %', ''), t('reports.export.perf.col.volume').replace(' (kg)', ` (${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)]],
             body: tableData,
             headStyles: { fillColor: [37, 99, 235] },
             alternateRowStyles: { fillColor: [240, 245, 255] },
@@ -535,7 +534,7 @@ const Reports = () => {
         doc.setFontSize(10);
         doc.text(`${t('reports.export.summary.perf.completed')} ${totalCompleted}`, 14, finalY + 7);
         doc.text(`${t('reports.export.summary.perf.skipped')} ${totalSkipped}`, 14, finalY + 14);
-        doc.text(`${t('reports.export.summary.perf.volume')} ${totalVolumeSum.toLocaleString()} kg`, 14, finalY + 21);
+        doc.text(`${t('reports.export.summary.perf.volume')} ${totalVolumeSum.toLocaleString()} ${unitSystem === 'imperial' ? 'lbs' : 'kg'}`, 14, finalY + 21);
         doc.text(`${t('reports.export.summary.perf.adherence')} ${avgAdherence}%`, 14, finalY + 28);
     };
 
