@@ -71,13 +71,16 @@ const initPlans = [];
 // ─── Helpers ────────────────────────────────────────────────
 
 const SET_TYPE_COLORS = { warmup: '#94a3b8', feeder: '#a78bfa', working: '#60a5fa', topset: '#f59e0b', backoff: '#34d399' };
-export const SetTypeBadge = ({ type }) => (
-    <span style={{
-        fontSize: '0.7rem', fontWeight: 700, padding: '0.15rem 0.5rem',
-        borderRadius: 999, color: '#fff', background: SET_TYPE_COLORS[type] || '#94a3b8',
-        textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap'
-    }}>{type}</span>
-);
+export const SetTypeBadge = ({ type }) => {
+    const { t } = useLanguage();
+    return (
+        <span style={{
+            fontSize: '0.7rem', fontWeight: 700, padding: '0.15rem 0.5rem',
+            borderRadius: 999, color: '#fff', background: SET_TYPE_COLORS[type] || '#94a3b8',
+            textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap'
+        }}>{t(`client.session.set_type.${type}`) || type}</span>
+    );
+};
 
 export const ProSelect = ({ label, value, onChange, options }) => (
     <div className="su-input-group">
@@ -444,8 +447,8 @@ const SessionDetailModal = ({ session, planName, onClose }) => {
             <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()}>
                 <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
                 <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>{planName}</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
-                    {session.date} · {session.duration} · {session.totalVol} {t('pro.plan.history.vol')} · Avg RPE {session.rpe}
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem', lineHeight: '1.4' }}>
+                    {session.date} &middot; {session.duration} &middot; {session.totalVol} {t('pro.plan.history.vol')} &middot; Avg RPE {session.rpe}
                 </p>
                 <div className="su-sd-exercises">
                     {session.exercises.map((ex, i) => (
@@ -456,20 +459,20 @@ const SessionDetailModal = ({ session, planName, onClose }) => {
                             </div>
                             {ex.skipped ? (
                                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: '0.25rem 0 0' }}>
-                                    This exercise was skipped during the session.
+                                    {t('pro.client.plan.history.tag.skipped.desc')}
                                 </p>
                             ) : (
                                 <div className="su-sd-sets-table">
-                                    <div className="su-sd-sets-head">
-                                        <span>Set</span><span>{t('pro.builder.set.type')}</span><span>{t('pro.builder.set.reps')}</span><span>{t('pro.builder.set.load')}</span><span>{t('pro.builder.set.rpe')}</span>
+                                    <div className="su-sd-sets-head" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', gap: '8px' }}>
+                                        <span>Set</span><span>{t('pro.builder.set.type')}</span><span style={{ textAlign: 'center' }}>{t('pro.builder.set.reps')}</span><span style={{ textAlign: 'center' }}>{t('pro.builder.set.load')}</span><span style={{ textAlign: 'center' }}>{t('pro.builder.set.rpe')}</span>
                                     </div>
                                     {ex.sets.map((s, si) => (
-                                        <div key={si} className="su-sd-set-row">
+                                        <div key={si} className="su-sd-set-row" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', gap: '8px', alignItems: 'center' }}>
                                             <span className="su-sd-set-num">{s.set}</span>
-                                            <SetTypeBadge type={s.type} />
-                                            <span>{s.reps} reps</span>
-                                            <span>{s.load} kg</span>
-                                            <span>RPE {s.rpe}</span>
+                                            <div><SetTypeBadge type={s.type} /></div>
+                                            <span style={{ textAlign: 'center', fontSize: '0.85rem' }}>{s.reps} reps</span>
+                                            <span style={{ wordBreak: 'break-word', textAlign: 'center', fontSize: '0.85rem' }}>{s.load} kg</span>
+                                            <span style={{ textAlign: 'center', fontSize: '0.85rem' }}>RPE {s.rpe}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -882,7 +885,7 @@ const ClientDetail = () => {
                                     <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                                     <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                                     <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload.date} />
-                                    <Area type="monotone" dataKey="vol" name="Total Vol (kg)" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorVol)" />
+                                    <Area type="monotone" dataKey="vol" name={t('client.analysis.chart.vol')} stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorVol)" />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
@@ -900,7 +903,7 @@ const ClientDetail = () => {
                                     <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                                     <YAxis domain={[0, 10]} ticks={[2, 4, 6, 8, 10]} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                                     <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload.date} />
-                                    <Line type="monotone" dataKey="rpe" name="RPE (Difficulty)" stroke="var(--accent)" strokeWidth={3} dot={{ fill: 'var(--accent)', r: 4 }} activeDot={{ r: 6 }} />
+                                    <Line type="monotone" dataKey="rpe" name={t('client.analysis.chart.rpe')} stroke="var(--accent)" strokeWidth={3} dot={{ fill: 'var(--accent)', r: 4 }} activeDot={{ r: 6 }} />
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>

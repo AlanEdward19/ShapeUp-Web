@@ -290,40 +290,40 @@ const Settings = () => {
                     {/* -- PROFESSIONAL SPECIFIC SECTIONS -- */}
                     {isProfessional && activeTab === 'notifications' && (
                         <Card className="su-settings-card">
-                            <h2 className="su-settings-section-title">Notification Routing</h2>
+                            <h2 className="su-settings-section-title">{t('pro.settings.notifications.title')}</h2>
                             <div className="su-settings-list">
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Chat Messages</h4>
-                                        <p>Receive alerts when clients send you direct messages.</p>
+                                        <h4>{t('pro.settings.notifications.messages.title')}</h4>
+                                        <p>{t('pro.settings.notifications.messages.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.messages ? 'active' : ''}`} onClick={() => toggleNotifPref('messages')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>High Fatigue Reports</h4>
-                                        <p>Alerts when a client reports RPE 8+ after a session.</p>
+                                        <h4>{t('pro.settings.notifications.fatigue.title')}</h4>
+                                        <p>{t('pro.settings.notifications.fatigue.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.alerts_fatigue ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts_fatigue')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Skipped Exercises</h4>
-                                        <p>Alerts when a client skips an exercise multiple times across sessions.</p>
+                                        <h4>{t('pro.settings.notifications.skipped.title')}</h4>
+                                        <p>{t('pro.settings.notifications.skipped.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.alerts_skipped ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts_skipped')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>Missed Sessions</h4>
-                                        <p>Alerts when a client skips multiple training days consecutively.</p>
+                                        <h4>{t('pro.settings.notifications.missed.title')}</h4>
+                                        <p>{t('pro.settings.notifications.missed.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.alerts_missed ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts_missed')}></div>
                                 </div>
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
-                                        <h4>System Updates</h4>
-                                        <p>Receive notifications when clients accept invites or complete billing.</p>
+                                        <h4>{t('pro.settings.notifications.system.title')}</h4>
+                                        <p>{t('pro.settings.notifications.system.desc')}</p>
                                     </div>
                                     <div className={`su-toggle-switch ${notifPrefs.system ? 'active' : ''}`} onClick={() => toggleNotifPref('system')}></div>
                                 </div>
@@ -412,19 +412,19 @@ const Settings = () => {
                     {isProfessional && activeTab === 'billing' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             <Card className="su-settings-card">
-                                <h2 className="su-settings-section-title">Bank Configuration</h2>
-                                <p className="su-text-muted su-text-sm su-mb-4">Link your bank account to receive payouts directly from client subscriptions.</p>
+                                <h2 className="su-settings-section-title">{t('pro.settings.billing.bank.title')}</h2>
+                                <p className="su-text-muted su-text-sm su-mb-4">{t('pro.settings.billing.bank.desc')}</p>
                                 <div className="su-settings-form-grid">
                                     <div className="su-form-group su-col-span-2">
-                                        <label>Account Holder Name</label>
+                                        <label>{t('pro.settings.billing.bank.holder')}</label>
                                         <Input value={bankDetails.accountName} onChange={e => setBankDetails({ ...bankDetails, accountName: e.target.value })} placeholder="E.g., ShapeUp Athletics LLC" />
                                     </div>
                                     <div className="su-form-group">
-                                        <label>Routing Number</label>
+                                        <label>{t('pro.settings.billing.bank.routing')}</label>
                                         <Input value={bankDetails.routingNumber} onChange={e => setBankDetails({ ...bankDetails, routingNumber: e.target.value })} placeholder="9 digits" />
                                     </div>
                                     <div className="su-form-group">
-                                        <label>Account Number</label>
+                                        <label>{t('pro.settings.billing.bank.account')}</label>
                                         <Input value={bankDetails.accountNumber} onChange={e => setBankDetails({ ...bankDetails, accountNumber: e.target.value })} placeholder="•••• ••••" />
                                     </div>
                                 </div>
@@ -433,28 +433,28 @@ const Settings = () => {
                             <Card className="su-settings-card">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                                     <div>
-                                        <h2 className="su-settings-section-title" style={{ marginBottom: 0 }}>Subscription Plans</h2>
-                                        <p className="su-text-muted su-text-sm">Create and manage the default billing tiers available for your clients.</p>
+                                        <h2 className="su-settings-section-title" style={{ marginBottom: 0 }}>{t('pro.settings.billing.plans.title')}</h2>
+                                        <p className="su-text-muted su-text-sm">{t('pro.settings.billing.plans.desc')}</p>
                                     </div>
-                                    <Button size="small" variant="outline" onClick={handleAddPlan}>Add Plan</Button>
+                                    <Button size="small" variant="outline" onClick={handleAddPlan}>{t('pro.settings.billing.plans.add')}</Button>
                                 </div>
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     {proPlans.map((plan, index) => (
                                         <div key={plan.id} style={{ backgroundColor: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem', position: 'relative' }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>Plan Level {index + 1}</h4>
+                                                <h4 style={{ fontSize: '1.1rem', fontWeight: 600, margin: 0 }}>{t('pro.settings.billing.plans.level')} {index + 1}</h4>
                                                 <button className="su-icon-btn" onClick={() => handleDeletePlanClick(plan)} style={{ color: 'var(--error)' }} title="Remove Plan">
                                                     <Trash2 size={18} />
                                                 </button>
                                             </div>
                                             <div className="su-settings-form-grid">
                                                 <div className="su-form-group" style={{ gridColumn: 'span 2' }}>
-                                                    <label>Plan Name</label>
+                                                    <label>{t('pro.settings.billing.plans.name')}</label>
                                                     <Input value={plan.name} onChange={e => updatePlan(plan.id, 'name', e.target.value)} placeholder="e.g. Standard" />
                                                 </div>
                                                 <div className="su-form-group">
-                                                    <label>Monthly Price ($)</label>
+                                                    <label>{t('pro.settings.billing.plans.price')}</label>
                                                     <Input type="number" value={plan.price} onChange={e => updatePlan(plan.id, 'price', e.target.value)} />
                                                 </div>
                                                 <div className="su-form-group su-col-span-2" style={{ gridColumn: 'span 3' }}>

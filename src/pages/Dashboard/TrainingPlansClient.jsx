@@ -840,13 +840,16 @@ const DumbbellIcon = ({ size }) => (
 
 // ─── SESSION DETAIL MODAL (matches coach view) ────────────────────
 const SET_TYPE_COLORS = { warmup: '#94a3b8', feeder: '#a78bfa', working: '#60a5fa', topset: '#f59e0b', backoff: '#34d399' };
-const SetTypeBadge = ({ type }) => (
-    <span style={{
-        fontSize: '0.7rem', fontWeight: 700, padding: '0.15rem 0.5rem',
-        borderRadius: 999, color: '#fff', background: SET_TYPE_COLORS[type] || '#94a3b8',
-        textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap'
-    }}>{type}</span>
-);
+const SetTypeBadge = ({ type }) => {
+    const { t } = useLanguage();
+    return (
+        <span style={{
+            fontSize: '0.7rem', fontWeight: 700, padding: '0.15rem 0.5rem',
+            borderRadius: 999, color: '#fff', background: SET_TYPE_COLORS[type] || '#94a3b8',
+            textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap'
+        }}>{t(`client.session.set_type.${type}`) || type}</span>
+    );
+};
 
 const SessionDetailModal = ({ session, planName, onClose }) => {
     const { t } = useLanguage();
