@@ -515,46 +515,107 @@ const ClientView = () => {
             )}
 
             {/* Post-Session Gamified Overview Modal */}
-            {showOverviewModal && (
-                <div className="su-gamified-overlay">
-                    <div className="su-gamified-content">
-                        <button className="su-close-gamified" onClick={skipOverviewAndFinish}>
-                            <X size={24} />
-                        </button>
+            {showOverviewModal && (() => {
+                const totalVol = exercises.reduce((acc, ex) => {
+                    return acc + ex.sets.reduce((setAcc, set) => {
+                        const w = parseFloat(set.log.weight) || 0;
+                        const r = parseFloat(set.log.reps) || 0;
+                        return setAcc + (w * r);
+                    }, 0);
+                }, 0);
 
-                        <div className="su-gamified-header">
-                            <div className="su-trophy-icon">🏆</div>
-                            <h2>Workout Complete!</h2>
-                            <p>Great job crushing Upper Power.</p>
-                        </div>
+                // Calculate New PRs dynamically based on previous history
+                const clientId = localStorage.getItem('shapeup_client_id') || 1;
+                const storedPlansRaw = localStorage.getItem(`shapeup_client_plans_${clientId}`);
+                let previousBestMap = {};
 
-                        <div className="su-gamified-stats">
-                            <div className="su-stat-box">
-                                <span className="su-stat-value">12,500</span>
-                                <span className="su-stat-label">Total Vol (kg)</span>
-                                <div className="su-stat-trend up">
-                                    <TrendingUp size={14} /> +5%
+                if (storedPlansRaw) {
+                    const dbPlans = JSON.parse(storedPlansRaw);
+                    dbPlans.forEach(plan => {
+                        (plan.history || []).forEach(h => {
+                            h.exercises.forEach(ex => {
+                                let maxL = 0;
+                                let maxR = 0;
+                                ex.sets.forEach(s => {
+                                    const l = parseFloat(s.load) || 0;
+                                    const r = parseFloat(s.reps) || 0;
+                                    if (l > maxL || (l === maxL && r > maxR)) { maxL = l; maxR = r; }
+                                });
+                                if (maxL > 0 || maxR > 0) {
+                                    const prev = previousBestMap[ex.name] || { load: 0, reps: 0 };
+                                    if (maxL > prev.load || (maxL === prev.load && maxR > prev.reps)) {
+                                        previousBestMap[ex.name] = { load: maxL, reps: maxR };
+                                    }
+                                }
+                            });
+                        });
+                    });
+                }
+
+                // Check current session
+                let newPrsCount = 0;
+                exercises.forEach(ex => {
+                    let maxL = 0;
+                    let maxR = 0;
+                    ex.sets.filter(s => s.completed).forEach(s => {
+                        const l = parseFloat(s.log.weight) || 0;
+                        const r = parseFloat(s.log.reps) || 0;
+                        if (l > maxL || (l === maxL && r > maxR)) { maxL = l; maxR = r; }
+                    });
+
+                    if (maxL > 0 || maxR > 0) {
+                        const prevBest = previousBestMap[ex.name];
+                        if (!prevBest) {
+                            newPrsCount++; // First time logging = PR
+                        } else if (maxL > prevBest.load || (maxL === prevBest.load && maxR > prevBest.reps)) {
+                            newPrsCount++;
+                        }
+                    }
+                });
+
+                return (
+                    <div className="su-gamified-overlay">
+                        <div className="su-gamified-content">
+                            <button className="su-close-gamified" onClick={skipOverviewAndFinish}>
+                                <X size={24} />
+                            </button>
+
+                            <div className="su-gamified-header">
+                                <div className="su-trophy-icon">🏆</div>
+                                <h2>Workout Complete!</h2>
+                                <p>Great job crushing {activePlan?.name || 'your workout'}.</p>
+                            </div>
+
+                            <div className="su-gamified-stats">
+                                <div className="su-stat-box">
+                                    <span className="su-stat-value">{totalVol.toLocaleString()}</span>
+                                    <span className="su-stat-label">Total Vol (kg)</span>
+                                    {totalVol > 0 && (
+                                        <div className="su-stat-trend up">
+                                            <TrendingUp size={14} /> +XP
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="su-stat-box">
+                                    <span className="su-stat-value">{Math.ceil(workoutTime / 60)}m</span>
+                                    <span className="su-stat-label">Duration</span>
+                                </div>
+                                <div className="su-stat-box highlight" style={newPrsCount === 0 ? { opacity: 0.6 } : {}}>
+                                    <span className="su-stat-value">{newPrsCount}</span>
+                                    <span className="su-stat-label">New PRs</span>
+                                    <Award size={18} className="su-stat-icon-abs" />
                                 </div>
                             </div>
-                            <div className="su-stat-box">
-                                <span className="su-stat-value">55m</span>
-                                <span className="su-stat-label">Duration</span>
-                            </div>
-                            <div className="su-stat-box highlight">
-                                <span className="su-stat-value">2</span>
-                                <span className="su-stat-label">New PRs</span>
-                                <Award size={18} className="su-stat-icon-abs" />
-                            </div>
-                        </div>
 
-                        <div className="su-gamified-actions">
-                            <Button size="lg" fullWidth onClick={skipOverviewAndFinish}>
-                                Return to Dashboard
-                            </Button>
+                            <div className="su-gamified-actions">
+                                <Button size="lg" fullWidth onClick={skipOverviewAndFinish}>
+                                    Return to Dashboard
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
 
             <div className="su-execution-scroll">
                 {exercises.map((exercise, exIndex) => (
@@ -718,13 +779,15 @@ const ClientView = () => {
             </div>
 
             {/* Exercise Detail Modal Overlay */}
-            {viewingExerciseDef && (
-                <ExerciseModal
-                    exercise={viewingExerciseDef}
-                    onClose={() => setViewingExerciseDef(null)}
-                />
-            )}
-        </div>
+            {
+                viewingExerciseDef && (
+                    <ExerciseModal
+                        exercise={viewingExerciseDef}
+                        onClose={() => setViewingExerciseDef(null)}
+                    />
+                )
+            }
+        </div >
     );
 };
 
