@@ -629,6 +629,7 @@ const ClientDetail = () => {
         return client.hasData ? initPlans : [];
     });
     const [editingPlan, setEditingPlan] = useState(null);
+    const [selectedPRComparison, setSelectedPRComparison] = useState(null);
 
     // --- Objectives State ---
     const [objectives, setObjectives] = useState(() => {
@@ -692,7 +693,7 @@ const ClientDetail = () => {
                 if (sessionMaxLoad === 0 && sessionMaxReps === 0) return;
 
                 if (!bestMap[exerciseName]) {
-                    bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps, date: h.date };
+                    bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps, date: h.date, session: h };
                 } else {
                     const best = bestMap[exerciseName];
                     const isImprovement = sessionMaxLoad > best.load || (sessionMaxLoad === best.load && sessionMaxReps > best.reps);
@@ -702,9 +703,11 @@ const ClientDetail = () => {
                             name: exerciseName,
                             from: { load: best.load, reps: best.reps },
                             to: { load: sessionMaxLoad, reps: sessionMaxReps },
-                            date: h.date
+                            date: h.date,
+                            fromSession: best.session,
+                            toSession: h
                         });
-                        bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps, date: h.date };
+                        bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps, date: h.date, session: h };
                     }
                 }
             });
@@ -717,7 +720,9 @@ const ClientDetail = () => {
                 name: imp.name,
                 from: `${imp.from.load}kg × ${imp.from.reps}`,
                 to: `${imp.to.load}kg × ${imp.to.reps}`,
-                date: imp.date
+                date: imp.date,
+                fromSession: imp.fromSession,
+                toSession: imp.toSession
             }));
     }, [allHistory]);
 
@@ -964,7 +969,14 @@ const ClientDetail = () => {
                         <div className="su-improvements-list su-mt-2">
                             {recentImprovements.length > 0 ? (
                                 recentImprovements.map((imp, idx) => (
-                                    <div key={idx} className="su-improvement-item">
+                                    <div
+                                        key={idx}
+                                        className="su-improvement-item"
+                                        onClick={() => setSelectedPRComparison(imp)}
+                                        style={{ cursor: 'pointer', transition: 'background-color 0.2s', padding: '0.75rem', borderRadius: '8px' }}
+                                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
+                                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                                    >
                                         <div className="su-imp-info">
                                             <span className="su-imp-name">{imp.name}</span>
                                             <span className="su-imp-date">{imp.date}</span>
@@ -983,6 +995,82 @@ const ClientDetail = () => {
                             )}
                         </div>
                     </Card>
+                </div>
+            )}
+
+            {/* PR Comparison Modal */}
+            {selectedPRComparison && (
+                <div className="su-modal-overlay" onClick={() => setSelectedPRComparison(null)} style={{ zIndex: 12000 }}>
+                    <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px' }}>
+                        <button className="su-modal-close" onClick={() => setSelectedPRComparison(null)}><X size={20} /></button>
+                        <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>PR: {selectedPRComparison.name}</h2>
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
+                            Comparing previous best vs new PR
+                        </p>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                            {/* Previous Session Panel */}
+                            <div style={{ backgroundColor: 'var(--bg-main)', padding: '1rem', borderRadius: '12px' }}>
+                                <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
+                                    <History size={16} /> Previous Record
+                                </h4>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <p style={{ margin: 0, fontWeight: 600 }}>{selectedPRComparison.fromSession.planName}</p>
+                                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>{selectedPRComparison.fromSession.date}</p>
+                                </div>
+
+                                {selectedPRComparison.fromSession.exercises
+                                    .filter(ex => ex.name === selectedPRComparison.name)
+                                    .map((ex, idx) => (
+                                        <div key={idx} className="su-sd-sets-table">
+                                            <div className="su-sd-sets-head" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
+                                                <span>Set</span><span>Reps</span><span>Load</span><span>RPE</span>
+                                            </div>
+                                            {ex.sets.map((s, si) => (
+                                                <div key={si} className="su-sd-set-row" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
+                                                    <span className="su-sd-set-num">{s.set}</span>
+                                                    <span>{s.reps}</span>
+                                                    <span>{s.load} kg</span>
+                                                    <span>{s.rpe}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                            </div>
+
+                            {/* New PR Session Panel */}
+                            <div style={{ backgroundColor: 'var(--bg-main)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--accent)', position: 'relative' }}>
+                                <div style={{ position: 'absolute', top: '-10px', right: '1rem', backgroundColor: 'var(--accent)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                                    NEW PR
+                                </div>
+                                <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--accent)' }}>
+                                    <TrendingUp size={16} /> New Record
+                                </h4>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <p style={{ margin: 0, fontWeight: 600 }}>{selectedPRComparison.toSession.planName}</p>
+                                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>{selectedPRComparison.toSession.date}</p>
+                                </div>
+
+                                {selectedPRComparison.toSession.exercises
+                                    .filter(ex => ex.name === selectedPRComparison.name)
+                                    .map((ex, idx) => (
+                                        <div key={idx} className="su-sd-sets-table">
+                                            <div className="su-sd-sets-head" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
+                                                <span>Set</span><span>Reps</span><span>Load</span><span>RPE</span>
+                                            </div>
+                                            {ex.sets.map((s, si) => (
+                                                <div key={si} className="su-sd-set-row" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
+                                                    <span className="su-sd-set-num">{s.set}</span>
+                                                    <span>{s.reps}</span>
+                                                    <span style={{ fontWeight: 'bold', color: 'var(--text-main)' }}>{s.load} kg</span>
+                                                    <span>{s.rpe}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
 
