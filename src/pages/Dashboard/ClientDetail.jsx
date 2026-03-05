@@ -1003,16 +1003,16 @@ const ClientDetail = () => {
                 <div className="su-modal-overlay" onClick={() => setSelectedPRComparison(null)} style={{ zIndex: 12000 }}>
                     <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '800px' }}>
                         <button className="su-modal-close" onClick={() => setSelectedPRComparison(null)}><X size={20} /></button>
-                        <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>PR: {selectedPRComparison.name}</h2>
+                        <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>{t('pro.client.prs.modal.title')} {selectedPRComparison.name}</h2>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
-                            Comparing previous best vs new PR
+                            {t('pro.client.prs.modal.desc')}
                         </p>
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                             {/* Previous Session Panel */}
                             <div style={{ backgroundColor: 'var(--bg-main)', padding: '1rem', borderRadius: '12px' }}>
                                 <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-                                    <History size={16} /> Previous Record
+                                    <History size={16} /> {t('pro.client.prs.modal.prev')}
                                 </h4>
                                 <div style={{ marginBottom: '1rem' }}>
                                     <p style={{ margin: 0, fontWeight: 600 }}>{selectedPRComparison.fromSession.planName}</p>
@@ -1024,7 +1024,7 @@ const ClientDetail = () => {
                                     .map((ex, idx) => (
                                         <div key={idx} className="su-sd-sets-table">
                                             <div className="su-sd-sets-head" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
-                                                <span>Set</span><span>Reps</span><span>Load</span><span>RPE</span>
+                                                <span>Set</span><span>{t('pro.builder.set.reps')}</span><span>{t('pro.builder.set.load')}</span><span>{t('pro.builder.set.rpe')}</span>
                                             </div>
                                             {ex.sets.map((s, si) => (
                                                 <div key={si} className="su-sd-set-row" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
@@ -1041,10 +1041,10 @@ const ClientDetail = () => {
                             {/* New PR Session Panel */}
                             <div style={{ backgroundColor: 'var(--bg-main)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--accent)', position: 'relative' }}>
                                 <div style={{ position: 'absolute', top: '-10px', right: '1rem', backgroundColor: 'var(--accent)', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                                    NEW PR
+                                    {t('pro.client.prs.modal.tag')}
                                 </div>
                                 <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--accent)' }}>
-                                    <TrendingUp size={16} /> New Record
+                                    <TrendingUp size={16} /> {t('pro.client.prs.modal.new')}
                                 </h4>
                                 <div style={{ marginBottom: '1rem' }}>
                                     <p style={{ margin: 0, fontWeight: 600 }}>{selectedPRComparison.toSession.planName}</p>
@@ -1056,7 +1056,7 @@ const ClientDetail = () => {
                                     .map((ex, idx) => (
                                         <div key={idx} className="su-sd-sets-table">
                                             <div className="su-sd-sets-head" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
-                                                <span>Set</span><span>Reps</span><span>Load</span><span>RPE</span>
+                                                <span>Set</span><span>{t('pro.builder.set.reps')}</span><span>{t('pro.builder.set.load')}</span><span>{t('pro.builder.set.rpe')}</span>
                                             </div>
                                             {ex.sets.map((s, si) => (
                                                 <div key={si} className="su-sd-set-row" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
