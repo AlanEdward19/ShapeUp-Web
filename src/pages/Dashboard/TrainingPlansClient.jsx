@@ -443,7 +443,7 @@ const ClientView = () => {
             {/* Sticky Header with Timers */}
             <div className="su-session-header-sticky">
                 <div className="su-session-header-left">
-                    <Button variant="outline" onClick={() => setShowCancelModal(true)} size="sm">Cancel Session</Button>
+                    <Button variant="outline" onClick={() => setShowCancelModal(true)} size="sm">{t('client.session.btn.cancel')}</Button>
                 </div>
 
                 {/* Rest Timer Group */}
@@ -475,11 +475,11 @@ const ClientView = () => {
                 </div>
 
                 <div className="su-session-header-right">
-                    {isResting && <span className="su-timer-label">Resting</span>}
+                    {isResting && <span className="su-timer-label">{t('client.session.resting')}</span>}
                     {isResting && (
-                        <button className="su-skip-rest-btn" onClick={skipRest} title="Skip Rest">
+                        <button className="su-skip-rest-btn" onClick={skipRest} title={t('client.session.btn.skip')}>
                             <FastForward size={16} />
-                            Skip
+                            {t('client.session.btn.skip')}
                         </button>
                     )}
                 </div>
@@ -493,20 +493,20 @@ const ClientView = () => {
             {showCancelModal && (
                 <div className="su-rest-modal-overlay" style={{ zIndex: 11000 }}>
                     <div className="su-feedback-modal-content" style={{ textAlign: 'center' }}>
-                        <h3 style={{ marginBottom: '1rem' }}>Cancel Workout?</h3>
+                        <h3 style={{ marginBottom: '1rem' }}>{t('client.session.modal.cancel.title')}</h3>
                         <p className="su-text-muted su-mb-6">
-                            Are you sure you want to cancel this session? All progress and logged sets will be lost.
+                            {t('client.session.modal.cancel.desc')}
                         </p>
                         <div style={{ display: 'flex', gap: '1rem' }}>
                             <Button variant="outline" fullWidth onClick={() => setShowCancelModal(false)}>
-                                Keep Training
+                                {t('client.session.modal.cancel.keep')}
                             </Button>
                             <Button
                                 fullWidth
                                 onClick={handleCancelSessionConfirm}
                                 style={{ backgroundColor: 'var(--danger)', borderColor: 'var(--danger)', color: 'white' }}
                             >
-                                Cancel Session
+                                {t('client.session.modal.cancel.confirm')}
                             </Button>
                         </div>
                     </div>
@@ -517,8 +517,8 @@ const ClientView = () => {
             {showFeedbackModal && (
                 <div className="su-rest-modal-overlay">
                     <div className="su-feedback-modal-content">
-                        <h3>How did you feel today?</h3>
-                        <p className="su-text-muted su-mb-4" style={{ textAlign: 'center' }}>Rate your overall session difficulty (RPE).</p>
+                        <h3>{t('client.session.modal.feedback.title')}</h3>
+                        <p className="su-text-muted su-mb-4" style={{ textAlign: 'center' }}>{t('client.session.modal.feedback.desc')}</p>
 
                         <div className="su-feedback-rpe-scale">
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(rating => (
@@ -533,10 +533,10 @@ const ClientView = () => {
                         </div>
 
                         <div className="su-feedback-comments">
-                            <label className="su-input-label">Comments for Coach</label>
+                            <label className="su-input-label">{t('client.session.modal.feedback.comments')}</label>
                             <textarea
                                 className="su-textarea-input"
-                                placeholder="Any pain? Did you feel great? Leave a note..."
+                                placeholder={t('client.session.modal.feedback.placeholder')}
                                 value={sessionFeedback.comments}
                                 onChange={(e) => setSessionFeedback({ ...sessionFeedback, comments: e.target.value })}
                             />
@@ -544,7 +544,7 @@ const ClientView = () => {
 
                         <div className="su-feedback-actions">
                             <Button fullWidth onClick={submitFeedback} disabled={!sessionFeedback.rpe}>
-                                Submit Feedback
+                                {t('client.session.modal.feedback.submit')}
                             </Button>
                         </div>
                     </div>
@@ -619,14 +619,14 @@ const ClientView = () => {
 
                             <div className="su-gamified-header">
                                 <div className="su-trophy-icon">🏆</div>
-                                <h2>Workout Complete!</h2>
-                                <p>Great job crushing {activePlan?.name || 'your workout'}.</p>
+                                <h2>{t('client.session.modal.gamified.title')}</h2>
+                                <p>{t('client.session.modal.gamified.desc')} {activePlan?.name || t('client.session.modal.gamified.fallback')}.</p>
                             </div>
 
                             <div className="su-gamified-stats">
                                 <div className="su-stat-box">
                                     <span className="su-stat-value">{totalVol.toLocaleString()}</span>
-                                    <span className="su-stat-label">Total Vol (kg)</span>
+                                    <span className="su-stat-label">{t('client.session.modal.gamified.vol')}</span>
                                     {totalVol > 0 && (
                                         <div className="su-stat-trend up">
                                             <TrendingUp size={14} /> +XP
@@ -635,18 +635,18 @@ const ClientView = () => {
                                 </div>
                                 <div className="su-stat-box">
                                     <span className="su-stat-value">{Math.ceil(workoutTime / 60)}m</span>
-                                    <span className="su-stat-label">Duration</span>
+                                    <span className="su-stat-label">{t('client.session.modal.gamified.duration')}</span>
                                 </div>
                                 <div className="su-stat-box highlight" style={newPrsCount === 0 ? { opacity: 0.6 } : {}}>
                                     <span className="su-stat-value">{newPrsCount}</span>
-                                    <span className="su-stat-label">New PRs</span>
+                                    <span className="su-stat-label">{t('client.session.modal.gamified.prs')}</span>
                                     <Award size={18} className="su-stat-icon-abs" />
                                 </div>
                             </div>
 
                             <div className="su-gamified-actions">
                                 <Button size="lg" fullWidth onClick={skipOverviewAndFinish}>
-                                    Return to Dashboard
+                                    {t('client.session.modal.gamified.return')}
                                 </Button>
                             </div>
                         </div>
@@ -682,21 +682,21 @@ const ClientView = () => {
                                     }
                                 }}
                             >
-                                View Details
+                                {t('client.session.card.details')}
                             </Button>
                         </div>
 
                         <div className="su-sets-execution">
                             {/* Table Header Row */}
                             <div className="su-exec-row su-exec-header">
-                                <div className="col-set" title="The current set sequence or type">Set</div>
-                                <div className="col-target" title="Prescribed target range and load">Target</div>
-                                <div className="col-rest" title="Prescribed rest time">Rest</div>
-                                <div className="col-log" title="Actual weight logged for this set">Weight</div>
-                                <div className="col-log" title="Actual reps logged for this set">Reps</div>
-                                <div className="col-log" title="Rate of Perceived Exertion (1-10)">RPE</div>
-                                <div className="col-failure" title="Check if muscular failure was reached">Failure</div>
-                                <div className="col-done" title="Mark this set as complete">Done</div>
+                                <div className="col-set" title="The current set sequence or type">{t('client.session.table.set')}</div>
+                                <div className="col-target" title="Prescribed target range and load">{t('client.session.table.target')}</div>
+                                <div className="col-rest" title="Prescribed rest time">{t('client.session.table.rest')}</div>
+                                <div className="col-log" title="Actual weight logged for this set">{t('client.session.table.weight')}</div>
+                                <div className="col-log" title="Actual reps logged for this set">{t('client.session.table.reps')}</div>
+                                <div className="col-log" title="Rate of Perceived Exertion (1-10)">{t('client.session.table.rpe')}</div>
+                                <div className="col-failure" title="Check if muscular failure was reached">{t('client.session.table.failure')}</div>
+                                <div className="col-done" title="Mark this set as complete">{t('client.session.table.done')}</div>
                             </div>
 
                             {/* Sets Iteration */}
@@ -709,15 +709,15 @@ const ClientView = () => {
                                                 value={set.type}
                                                 onChange={(e) => updateSetType(exIndex, setIndex, e.target.value)}
                                             >
-                                                <option value="warmup">Warm-up</option>
-                                                <option value="feeder">Feeder</option>
-                                                <option value="working">Working</option>
-                                                <option value="topset">Top Set</option>
-                                                <option value="dropset">Drop Set</option>
+                                                <option value="warmup">{t('client.session.set_type.warmup')}</option>
+                                                <option value="feeder">{t('client.session.set_type.feeder')}</option>
+                                                <option value="working">{t('client.session.set_type.working')}</option>
+                                                <option value="topset">{t('client.session.set_type.topset')}</option>
+                                                <option value="dropset">{t('client.session.set_type.dropset')}</option>
                                             </select>
                                         ) : (
                                             <span className={`su-set-badge ${set.type}`}>
-                                                {set.type.charAt(0).toUpperCase() + set.type.slice(1)}
+                                                {t(`client.session.set_type.${set.type}`) !== `client.session.set_type.${set.type}` ? t(`client.session.set_type.${set.type}`) : (set.type.charAt(0).toUpperCase() + set.type.slice(1))}
                                             </span>
                                         )}
                                     </div>
@@ -801,7 +801,7 @@ const ClientView = () => {
                             {/* Dynamic + Add Set Action */}
                             <div className="su-add-set-row">
                                 <button className="su-add-set-btn" onClick={() => addExtraSet(exIndex)}>
-                                    <Plus size={16} /> Add Extra Set
+                                    <Plus size={16} /> {t('client.session.btn.add_set')}
                                 </button>
                             </div>
                         </div>
@@ -810,7 +810,7 @@ const ClientView = () => {
 
                 <div className="su-finish-run-container">
                     <Button size="lg" fullWidth className="su-complete-session-btn" onClick={finishSession}>
-                        Finish & Save Session
+                        {t('client.session.btn.finish')}
                     </Button>
                 </div>
             </div>
@@ -848,46 +848,49 @@ const SetTypeBadge = ({ type }) => (
     }}>{type}</span>
 );
 
-const SessionDetailModal = ({ session, planName, onClose }) => (
-    <div className="su-modal-overlay" onClick={onClose} style={{ zIndex: 10000 }}>
-        <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()}>
-            <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
-            <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>{planName}</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
-                {session.date} · {session.duration} · {session.totalVol} volume · Avg RPE {session.rpe}
-            </p>
-            <div className="su-sd-exercises" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                {session.exercises.map((ex, i) => (
-                    <div key={i} className="su-sd-ex-block" style={{ marginBottom: '1.5rem' }}>
-                        <div className="su-sd-ex-name" style={{ fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center' }}>
-                            {ex.name}
-                            {ex.skipped && <span className="su-skipped-tag" style={{ marginLeft: '0.5rem', display: 'inline-flex', alignItems: 'center', padding: '0.15rem 0.5rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 600, color: 'var(--danger)', backgroundColor: 'var(--danger-light)', border: '1px solid var(--danger)' }}>Skipped</span>}
-                        </div>
-                        {ex.skipped ? (
-                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: '0' }}>
-                                This exercise was skipped during the session.
-                            </p>
-                        ) : (
-                            <div className="su-sd-sets-table" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <div className="su-sd-sets-head" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '1px solid var(--border-color)', paddingBottom: '0.25rem' }}>
-                                    <span>Set</span><span>Type</span><span>Reps</span><span>Load</span><span>RPE</span>
-                                </div>
-                                {ex.sets.map((s, si) => (
-                                    <div key={si} className="su-sd-set-row" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', alignItems: 'center', fontSize: '0.95rem' }}>
-                                        <span className="su-sd-set-num" style={{ color: 'var(--text-muted)' }}>{s.set}</span>
-                                        <SetTypeBadge type={s.type} />
-                                        <span>{s.reps} reps</span>
-                                        <span>{s.load} kg</span>
-                                        <span>RPE {s.rpe}</span>
-                                    </div>
-                                ))}
+const SessionDetailModal = ({ session, planName, onClose }) => {
+    const { t } = useLanguage();
+    return (
+        <div className="su-modal-overlay" onClick={onClose} style={{ zIndex: 10000 }}>
+            <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()}>
+                <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
+                <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>{planName}</h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
+                    {session.date} · {session.duration} · {session.totalVol} {t('client.training.history.vol')} · RPE {session.rpe}
+                </p>
+                <div className="su-sd-exercises" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                    {session.exercises.map((ex, i) => (
+                        <div key={i} className="su-sd-ex-block" style={{ marginBottom: '1.5rem' }}>
+                            <div className="su-sd-ex-name" style={{ fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center' }}>
+                                {ex.name}
+                                {ex.skipped && <span className="su-skipped-tag" style={{ marginLeft: '0.5rem', display: 'inline-flex', alignItems: 'center', padding: '0.15rem 0.5rem', borderRadius: '999px', fontSize: '0.7rem', fontWeight: 600, color: 'var(--danger)', backgroundColor: 'var(--danger-light)', border: '1px solid var(--danger)' }}>{t('pro.client.plan.history.tag.skipped.ex')}</span>}
                             </div>
-                        )}
-                    </div>
-                ))}
+                            {ex.skipped ? (
+                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic', margin: '0' }}>
+                                    Skipped
+                                </p>
+                            ) : (
+                                <div className="su-sd-sets-table" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <div className="su-sd-sets-head" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '1px solid var(--border-color)', paddingBottom: '0.25rem' }}>
+                                        <span>{t('client.session.table.set')}</span><span>Type</span><span>{t('client.session.table.reps')}</span><span>{t('client.session.table.weight')}</span><span>RPE</span>
+                                    </div>
+                                    {ex.sets.map((s, si) => (
+                                        <div key={si} className="su-sd-set-row" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', alignItems: 'center', fontSize: '0.95rem' }}>
+                                            <span className="su-sd-set-num" style={{ color: 'var(--text-muted)' }}>{s.set}</span>
+                                            <SetTypeBadge type={s.type} />
+                                            <span>{s.reps} reps</span>
+                                            <span>{s.load} kg</span>
+                                            <span>RPE {s.rpe}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
-    </div>
-);
+    )
+};
 
 export default ClientView;

@@ -925,10 +925,10 @@ const ClientDetail = () => {
                                         <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                                         <YAxis domain={['dataMin - 2', 'dataMax + 2']} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                                         <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload.date} />
-                                        <Area type="monotone" dataKey="weight" name="Weight (kg)" stroke="var(--success)" strokeWidth={3} fillOpacity={1} fill="url(#colorWeight)" />
+                                        <Area type="monotone" dataKey="weight" name={t('client.objectives.chart.series.weight')} stroke="var(--success)" strokeWidth={3} fillOpacity={1} fill="url(#colorWeight)" />
 
                                         {objectives.goalWeight && (
-                                            <Area type="monotone" dataKey={() => parseFloat(objectives.goalWeight)} name="Goal" stroke="var(--text-muted)" strokeDasharray="5 5" fill="none" />
+                                            <Area type="monotone" dataKey={() => parseFloat(objectives.goalWeight)} name={t('client.objectives.chart.series.goal')} stroke="var(--text-muted)" strokeDasharray="5 5" fill="none" />
                                         )}
                                     </AreaChart>
                                 </ResponsiveContainer>

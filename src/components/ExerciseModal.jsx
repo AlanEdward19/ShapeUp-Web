@@ -1,8 +1,10 @@
 import React from 'react';
 import { X, PlayCircle } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import './ExerciseModal.css';
 
 const ExerciseModal = ({ exercise, onClose }) => {
+    const { t } = useLanguage();
     if (!exercise) return null;
 
     return (
@@ -30,7 +32,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     <div className="su-modal-video-section">
                         <div className="su-video-placeholder">
                             <PlayCircle size={48} className="su-video-play-btn" />
-                            <span className="su-video-hint">Official Execution Video</span>
+                            <span className="su-video-hint">{t('client.exercise_modal.video')}</span>
                         </div>
                     </div>
 
@@ -38,7 +40,7 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     <div className="su-modal-info-section">
 
                         <div className="su-info-block">
-                            <h3>Targeted Muscles</h3>
+                            <h3>{t('client.exercise_modal.muscles')}</h3>
                             <div className="su-anatomy-heatmap">
                                 {/* Simulated Anatomy via Badges */}
                                 {exercise.muscles.map((muscle, idx) => (
@@ -50,14 +52,14 @@ const ExerciseModal = ({ exercise, onClose }) => {
                         </div>
 
                         <div className="su-info-block">
-                            <h3>Execution Notes</h3>
+                            <h3>{t('client.exercise_modal.notes.title')}</h3>
                             <p className="su-text-muted">
-                                This is a standardized placeholder description. To perform the {exercise.name}, ensure your form is consistent and you control the eccentric portion of the movement. Keep the selected {exercise.equipment} stable throughout the range of motion.
+                                {t('client.exercise_modal.notes.desc.1')}{exercise.name}{t('client.exercise_modal.notes.desc.2')}{exercise.equipment}{t('client.exercise_modal.notes.desc.3')}
                             </p>
                             <ul className="su-execution-list">
-                                <li>Maintain core stability.</li>
-                                <li>Follow a 2-1-1-0 tempo as a baseline.</li>
-                                <li>Breathe out on the concentric phase.</li>
+                                <li>{t('client.exercise_modal.notes.bullet1')}</li>
+                                <li>{t('client.exercise_modal.notes.bullet2')}</li>
+                                <li>{t('client.exercise_modal.notes.bullet3')}</li>
                             </ul>
                         </div>
                     </div>
