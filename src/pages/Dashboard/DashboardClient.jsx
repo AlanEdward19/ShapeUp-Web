@@ -29,7 +29,7 @@ const getWeekKey = (date) => {
 };
 
 const DashboardClient = () => {
-    const { t } = useLanguage();
+    const { t, convertWeight, formatWeight } = useLanguage();
     const storedName = localStorage.getItem('shapeup_user_name') || 'Athlete';
     const firstName = storedName.split(' ')[0];
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
@@ -67,8 +67,11 @@ const DashboardClient = () => {
     const { weeklyVolumeFormatted, weeklyDiff } = useMemo(() => {
         const lastWeekKey = getWeekKey(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
         const sumVol = sessions => sessions.reduce((acc, h) => {
-            const v = parseFloat((h.totalVol || '0').toString().replace(/[^0-9.]/g, ''));
-            return acc + (isNaN(v) ? 0 : v);
+            const rawStr = h.totalVol || '0';
+            const v = parseFloat(rawStr.toString().replace(/[^0-9.]/g, ''));
+            const originUnit = rawStr.includes('lbs') ? 'imperial' : 'metric';
+            const converted = isNaN(v) ? 0 : convertWeight(v, originUnit);
+            return acc + converted;
         }, 0);
         const thisVol = sumVol(allHistory.filter(h => getWeekKey(h.date) === currentWeekKey));
         const lastVol = sumVol(allHistory.filter(h => getWeekKey(h.date) === lastWeekKey));
@@ -98,8 +101,11 @@ const DashboardClient = () => {
     // ─── Volume Progression chart (last 8 sessions) ───────────────────
     const chartData = useMemo(() => {
         return allHistory.slice(-8).map((h, i) => {
-            const v = parseFloat((h.totalVol || '0').toString().replace(/[^0-9.]/g, ''));
-            return { session: `S${i + 1}`, volume: isNaN(v) ? 0 : v, date: h.date };
+            const rawStr = h.totalVol || '0';
+            const v = parseFloat(rawStr.toString().replace(/[^0-9.]/g, ''));
+            const originUnit = rawStr.includes('lbs') ? 'imperial' : 'metric';
+            const converted = isNaN(v) ? 0 : convertWeight(v, originUnit);
+            return { session: `S${i + 1}`, volume: converted, date: h.date };
         });
     }, [allHistory]);
 
@@ -158,11 +164,23 @@ const DashboardClient = () => {
         return improvementsList
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 3)
-            .map(imp => ({
-                name: imp.name,
-                from: `${imp.from.load}kg × ${imp.from.reps}`,
-                to: `${imp.to.load}kg × ${imp.to.reps}`
-            }));
+            .map(imp => {
+                // Since load doesn't store a string, we have to look up the session's totalVol to find the unit
+                const fromOriginUnit = imp.fromSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric';
+                const toOriginUnit = imp.toSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric';
+
+                const fromLoadConverted = convertWeight(imp.from.load, fromOriginUnit);
+                const toLoadConverted = convertWeight(imp.to.load, toOriginUnit);
+
+                const fromFormatted = fromLoadConverted % 1 === 0 ? fromLoadConverted.toString() : fromLoadConverted.toFixed(1);
+                const toFormatted = toLoadConverted % 1 === 0 ? toLoadConverted.toString() : toLoadConverted.toFixed(1);
+
+                return {
+                    name: imp.name,
+                    from: `${fromFormatted} × ${imp.from.reps}`,
+                    to: `${toFormatted} × ${imp.to.reps}`
+                };
+            });
     }, [allHistory]);
 
     const hasData = allHistory.length > 0;
@@ -190,7 +208,7 @@ const DashboardClient = () => {
                     </div>
                     <div className="su-metric-value">
                         {hasData ? weeklyVolumeFormatted : '—'}
-                        {hasData && <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}> kg</span>}
+                        {hasData && <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}> {formatWeight(0).replace('0 ', '')}</span>}
                     </div>
                     <span className={`su-metric-trend ${!weeklyDiff ? '' : weeklyDiff >= 0 ? 'positive' : 'negative'}`}>
                         {!hasData ? t('client.dashboard.trend.weekly.nosessions') : weeklyDiff === null ? t('client.dashboard.trend.weekly.first') : weeklyDiff >= 0 ? `↑ ${weeklyDiff}%` : `↓ ${Math.abs(weeklyDiff)}%`}
@@ -243,7 +261,7 @@ const DashboardClient = () => {
                                         <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                                         <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload?.date} />
-                                        <Area type="monotone" dataKey="volume" name="Volume (kg)" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorVol)" />
+                                        <Area type="monotone" dataKey="volume" name={`Volume (${formatWeight(0).replace('0 ', '')})`} stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorVol)" />
                                     </AreaChart>
                                 </ResponsiveContainer>
                             ) : (

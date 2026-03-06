@@ -8,7 +8,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import './DashboardClient.css';
 
 const ObjectivesClient = () => {
-    const { t } = useLanguage();
+    const { t, unitSystem, convertWeight } = useLanguage();
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
 
     // --- Objectives State ---
@@ -17,12 +17,13 @@ const ObjectivesClient = () => {
         if (stored) return JSON.parse(stored);
         return {
             goalWeight: '',
-            history: [] // { date, weight }
+            goalUnit: 'metric', // Stored origin unit for the goal
+            history: [] // { id, date, weight, unit }
         };
     });
 
     // Form States
-    const [tempGoalWeight, setTempGoalWeight] = useState(objectives.goalWeight);
+    const [tempGoalWeight, setTempGoalWeight] = useState(objectives.goalWeight ? convertWeight(objectives.goalWeight, objectives.goalUnit || 'metric') : '');
     const [newWeightEntry, setNewWeightEntry] = useState('');
     const [showSaveSuccess, setShowSaveSuccess] = useState(false);
 
@@ -33,7 +34,11 @@ const ObjectivesClient = () => {
 
     // Handlers
     const handleSaveGoal = () => {
-        setObjectives(prev => ({ ...prev, goalWeight: tempGoalWeight }));
+        setObjectives(prev => ({
+            ...prev,
+            goalWeight: tempGoalWeight,
+            goalUnit: unitSystem
+        }));
         setShowSaveSuccess(true);
         setTimeout(() => setShowSaveSuccess(false), 3000);
     };
@@ -47,7 +52,8 @@ const ObjectivesClient = () => {
         const newEntry = {
             id: Date.now(),
             date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            weight: parsedWeight
+            weight: parsedWeight,
+            unit: unitSystem
         };
         // Insert at beginning for chronological descending in list, but chart needs ascending
         setObjectives(prev => ({
@@ -67,7 +73,7 @@ const ObjectivesClient = () => {
     // Chart Data (Ascending dates)
     const chartData = [...objectives.history].sort((a, b) => a.id - b.id).map((h, i) => ({
         session: `Entry ${i + 1}`,
-        weight: h.weight,
+        weight: parseFloat(convertWeight(h.weight, h.unit || 'metric').toFixed(1)), // Fix precision
         date: h.date
     }));
 
@@ -88,7 +94,7 @@ const ObjectivesClient = () => {
                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
                             <div style={{ flex: 1 }}>
                                 <Input
-                                    label={t('client.objectives.target.label')}
+                                    label={t('client.objectives.target.label').replace('(kg)', `(${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)}
                                     type="number"
                                     placeholder="e.g. 75"
                                     value={tempGoalWeight}
@@ -116,7 +122,7 @@ const ObjectivesClient = () => {
                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
                             <div style={{ flex: 1 }}>
                                 <Input
-                                    label={t('client.objectives.log.label')}
+                                    label={t('client.objectives.log.label').replace('(kg)', `(${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)}
                                     type="number"
                                     placeholder="e.g. 82.5"
                                     value={newWeightEntry}
@@ -134,7 +140,7 @@ const ObjectivesClient = () => {
                                 {objectives.history.map(entry => (
                                     <div key={entry.id} className="su-history-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '8px', marginBottom: '0.5rem' }}>
                                         <div>
-                                            <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{entry.weight} kg</div>
+                                            <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{convertWeight(entry.weight, entry.unit || 'metric') % 1 === 0 ? convertWeight(entry.weight, entry.unit || 'metric').toString() : convertWeight(entry.weight, entry.unit || 'metric').toFixed(1)} {unitSystem === 'imperial' ? 'lbs' : 'kg'}</div>
                                             <div className="su-text-muted" style={{ fontSize: '0.85rem' }}>{entry.date}</div>
                                         </div>
                                         <button
@@ -173,11 +179,11 @@ const ObjectivesClient = () => {
                                         <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                                         <YAxis domain={['dataMin - 2', 'dataMax + 2']} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                                         <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload.date} />
-                                        <Area type="monotone" dataKey="weight" name={t('client.objectives.chart.series.weight')} stroke="var(--success)" strokeWidth={3} fillOpacity={1} fill="url(#colorWeightClient)" />
+                                        <Area type="monotone" dataKey="weight" name={t('client.objectives.chart.series.weight').replace('(kg)', `(${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)} stroke="var(--success)" strokeWidth={3} fillOpacity={1} fill="url(#colorWeightClient)" />
 
                                         {/* Optional Reference Line for Goal Weight */}
                                         {objectives.goalWeight && (
-                                            <Area type="monotone" dataKey={() => parseFloat(objectives.goalWeight)} name={t('client.objectives.chart.series.goal')} stroke="var(--text-muted)" strokeDasharray="5 5" fill="none" />
+                                            <Area type="monotone" dataKey={() => parseFloat(convertWeight(objectives.goalWeight, objectives.goalUnit || 'metric').toFixed(1))} name={t('client.objectives.chart.series.goal')} stroke="var(--text-muted)" strokeDasharray="5 5" fill="none" />
                                         )}
                                     </AreaChart>
                                 </ResponsiveContainer>

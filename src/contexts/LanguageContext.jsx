@@ -23,6 +23,37 @@ export const LanguageProvider = ({ children }) => {
         localStorage.setItem('shapeup_language', lang);
     };
 
+    const [unitSystem, setUnitSystemState] = useState(localStorage.getItem('shapeup_unit_system') || 'metric');
+
+    const setUnitSystem = (unit) => {
+        setUnitSystemState(unit);
+        localStorage.setItem('shapeup_unit_system', unit);
+    };
+
+    // Helper: Safely converts a number assuming it was originally logged in one system, but we need it in another
+    // defaultOrigin = 'metric' means "if we don't know what it was logged in, assume it was kg"
+    const convertWeight = (value, originUnit = 'metric', targetUnit = unitSystem) => {
+        const val = parseFloat(value);
+        if (isNaN(val)) return 0;
+
+        if (originUnit === targetUnit) return val;
+
+        if (originUnit === 'metric' && targetUnit === 'imperial') {
+            return val * 2.20462; // kg to lbs
+        }
+        if (originUnit === 'imperial' && targetUnit === 'metric') {
+            return val / 2.20462; // lbs to kg
+        }
+        return val;
+    };
+
+    const formatWeight = (value, originUnit = 'metric') => {
+        const converted = convertWeight(value, originUnit, unitSystem);
+        // show 1 decimal place if it's not a whole number
+        const formatted = converted % 1 === 0 ? converted.toString() : converted.toFixed(1);
+        return `${formatted} ${unitSystem === 'imperial' ? 'lbs' : 'kg'}`;
+    };
+
     // Dictionary for the Settings page and Sidebar
     const translations = {
         'en': {
@@ -460,7 +491,57 @@ export const LanguageProvider = ({ children }) => {
             'client.chat.tag.form_check': 'Form Check',
             'client.chat.tag.rpe_report': 'RPE Report',
             'client.chat.tag.question': 'Question',
-            'client.chat.tag.checkin': 'Check-in'
+            'client.chat.tag.checkin': 'Check-in',
+
+            'reports.export.pdf.performance.title': 'ShapeUp - Performance Report',
+            'reports.export.pdf.billing.title': 'Billing & Revenue Summary',
+            'reports.export.pdf.history.title': 'Client History',
+            'reports.export.pdf.generated': 'Generated on:',
+            'reports.export.pdf.period': 'Period:',
+            'reports.export.pdf.roster_status': 'Active Roster Status as of',
+            'reports.export.pdf.no_history': 'No workout history found for this period.',
+            'reports.export.pdf.not_implemented': 'This report type is not yet implemented for real data.',
+
+            'reports.export.billing.col.name': 'Client Name',
+            'reports.export.billing.col.status': 'Status',
+            'reports.export.billing.col.type': 'Billing Type',
+            'reports.export.billing.col.detail': 'Plan Detail',
+            'reports.export.billing.col.rate': 'Monthly Rate ($)',
+
+            'reports.export.perf.col.name': 'Client Name',
+            'reports.export.perf.col.status': 'Status',
+            'reports.export.perf.col.completed': 'Completed',
+            'reports.export.perf.col.skipped': 'Skipped',
+            'reports.export.perf.col.adherence': 'Adherence %',
+            'reports.export.perf.col.volume': 'Total Volume (kg)',
+
+            'reports.export.history.col.date': 'Date',
+            'reports.export.history.col.plan': 'Plan Name',
+            'reports.export.history.col.status': 'Status',
+            'reports.export.history.col.ex': 'Exercise Name',
+            'reports.export.history.col.logs': 'Set Details',
+            'reports.export.history.col.rpe': 'Exercise RPE',
+            'reports.export.history.col.comments': 'Session Comments',
+            'reports.export.history.pdf.ex': 'Exercise',
+            'reports.export.history.pdf.logs': 'Logs',
+            'reports.export.history.pdf.rpe': 'Session RPE',
+
+            'reports.export.summary.financial': 'Financial Summary',
+            'reports.export.summary.clients': 'Total Clients in Scope:',
+            'reports.export.summary.mrr': 'Total Monthly Recurring Revenue (MRR):',
+            'reports.export.summary.perf': 'Summary Statistics',
+            'reports.export.summary.perf.completed': 'Total Completed Sessions:',
+            'reports.export.summary.perf.skipped': 'Total Skipped Sessions:',
+            'reports.export.summary.perf.volume': 'Total Volume (Roster):',
+            'reports.export.summary.perf.adherence': 'Average Roster Adherence:',
+
+            'reports.export.val.skipped': 'Skipped',
+            'reports.export.val.completed': 'Completed',
+            'reports.export.val.done': 'Done',
+            'reports.export.val.plan': 'Standard Plan',
+            'reports.export.val.custom': 'Custom Agreement',
+            'reports.export.val.active': 'Active',
+            'reports.export.val.inactive': 'Inactive'
         },
         'pt-BR': {
             'nav.dashboard': 'Painel',
@@ -897,7 +978,57 @@ export const LanguageProvider = ({ children }) => {
             'client.chat.tag.form_check': 'Análise de Técnica',
             'client.chat.tag.rpe_report': 'Relato de Esforço',
             'client.chat.tag.question': 'Dúvida',
-            'client.chat.tag.checkin': 'Check-in'
+            'client.chat.tag.checkin': 'Check-in',
+
+            'reports.export.pdf.performance.title': 'ShapeUp - Relatório de Desempenho',
+            'reports.export.pdf.billing.title': 'Resumo de Faturamento e Receita',
+            'reports.export.pdf.history.title': 'Histórico Inicial do Cliente do Cliente',
+            'reports.export.pdf.generated': 'Gerado em:',
+            'reports.export.pdf.period': 'Período:',
+            'reports.export.pdf.roster_status': 'Status da Lista Ativa em',
+            'reports.export.pdf.no_history': 'Nenhum histórico encontrado para este período.',
+            'reports.export.pdf.not_implemented': 'Este tipo de relatório não está implementado para dados reais.',
+
+            'reports.export.billing.col.name': 'Cliente',
+            'reports.export.billing.col.status': 'Status',
+            'reports.export.billing.col.type': 'Tipo de Faturamento',
+            'reports.export.billing.col.detail': 'Plano',
+            'reports.export.billing.col.rate': 'Valor Mensal (R$)',
+
+            'reports.export.perf.col.name': 'Cliente',
+            'reports.export.perf.col.status': 'Status',
+            'reports.export.perf.col.completed': 'Concluído',
+            'reports.export.perf.col.skipped': 'Pulado',
+            'reports.export.perf.col.adherence': 'Adesão %',
+            'reports.export.perf.col.volume': 'Volume Total (kg)',
+
+            'reports.export.history.col.date': 'Data',
+            'reports.export.history.col.plan': 'Nome do Plano',
+            'reports.export.history.col.status': 'Status',
+            'reports.export.history.col.ex': 'Exercício',
+            'reports.export.history.col.logs': 'Séries e Cargas',
+            'reports.export.history.col.rpe': 'RPE do Ex',
+            'reports.export.history.col.comments': 'Comentários',
+            'reports.export.history.pdf.ex': 'Exercício',
+            'reports.export.history.pdf.logs': 'Séries',
+            'reports.export.history.pdf.rpe': 'RPE da Sessão',
+
+            'reports.export.summary.financial': 'Resumo Financeiro',
+            'reports.export.summary.clients': 'Total de Clientes Selecionados:',
+            'reports.export.summary.mrr': 'Receita Recorrente Mensal (MRR):',
+            'reports.export.summary.perf': 'Estatísticas Gerais',
+            'reports.export.summary.perf.completed': 'Total de Sessões Concluídas:',
+            'reports.export.summary.perf.skipped': 'Total de Sessões Puladas:',
+            'reports.export.summary.perf.volume': 'Volume Total (Geral):',
+            'reports.export.summary.perf.adherence': 'Adesão Média da Lista:',
+
+            'reports.export.val.skipped': 'Pulado',
+            'reports.export.val.completed': 'Concluído',
+            'reports.export.val.done': 'Feito',
+            'reports.export.val.plan': 'Plano Padrão',
+            'reports.export.val.custom': 'Acordo Customizado',
+            'reports.export.val.active': 'Ativo',
+            'reports.export.val.inactive': 'Inativo'
         }
     };
 
@@ -906,7 +1037,7 @@ export const LanguageProvider = ({ children }) => {
     };
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t }}>
+        <LanguageContext.Provider value={{ language, setLanguage, t, unitSystem, setUnitSystem, convertWeight, formatWeight }}>
             {children}
         </LanguageContext.Provider>
     );

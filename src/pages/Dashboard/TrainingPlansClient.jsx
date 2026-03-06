@@ -22,7 +22,7 @@ const formatTime = (totalSeconds) => {
 
 const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
-    const { t } = useLanguage();
+    const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
 
     // Session State
     const [sessionActive, setSessionActive] = useState(false);
@@ -237,7 +237,7 @@ const ClientView = () => {
                         id: `h${Date.now()}`,
                         date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
                         duration: formatTime(workoutTime),
-                        totalVol: `${totalVol.toLocaleString()} kg`,
+                        totalVol: formatWeight(totalVol).replace('0 ', ''),
                         rpe: sessionFeedback.rpe || 5,
                         comments: sessionFeedback.comments || '',
                         status: sessionStatus,
@@ -321,7 +321,18 @@ const ClientView = () => {
 
     // -- History Calculation --
     const allHistory = assignedPlans.flatMap(plan =>
-        (plan.history || []).map(h => ({ ...h, planName: plan.name }))
+        (plan.history || []).map(h => {
+            const rawVol = h.totalVol || '0';
+            const v = parseFloat(rawVol.toString().replace(/[^0-9.]/g, ''));
+            const originUnit = rawVol.includes('lbs') ? 'imperial' : 'metric';
+            const converted = isNaN(v) ? 0 : convertWeight(v, originUnit);
+
+            return {
+                ...h,
+                planName: plan.name,
+                convertedVol: formatWeight(converted, unitSystem).replace('0 ', '') // formatWeight attaches the correct string
+            };
+        })
     ).sort((a, b) => {
         const timeA = parseInt(a.id.replace('h', '')) || 0;
         const timeB = parseInt(b.id.replace('h', '')) || 0;
@@ -392,7 +403,7 @@ const ClientView = () => {
                                 <div className="su-hist-right">
                                     {/* <span className="su-pr-badge">New PR!</span> */}
                                     <span className="su-text-muted">⏱ {hist.duration}</span>
-                                    <span className="su-hist-vol">{hist.totalVol} {t('client.training.history.vol')}</span>
+                                    <span className="su-hist-vol">{hist.convertedVol} {t('client.training.history.vol')}</span>
                                 </div>
                             </Card>
                         ))
@@ -626,7 +637,7 @@ const ClientView = () => {
                             <div className="su-gamified-stats">
                                 <div className="su-stat-box">
                                     <span className="su-stat-value">{totalVol.toLocaleString()}</span>
-                                    <span className="su-stat-label">{t('client.session.modal.gamified.vol')}</span>
+                                    <span className="su-stat-label">{t('client.session.modal.gamified.vol').replace('(kg)', `(${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)}</span>
                                     {totalVol > 0 && (
                                         <div className="su-stat-trend up">
                                             <TrendingUp size={14} /> +XP
@@ -852,14 +863,18 @@ const SetTypeBadge = ({ type }) => {
 };
 
 const SessionDetailModal = ({ session, planName, onClose }) => {
-    const { t } = useLanguage();
+    const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
+
+    // We infer the original scale from the session's totalVol
+    const originUnit = (session.totalVol || '').includes('lbs') ? 'imperial' : 'metric';
+
     return (
         <div className="su-modal-overlay" onClick={onClose} style={{ zIndex: 10000 }}>
             <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()}>
                 <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
                 <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>{planName}</h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
-                    {session.date} · {session.duration} · {session.totalVol} {t('client.training.history.vol')} · RPE {session.rpe}
+                    {session.date} · {session.duration} · {session.convertedVol || session.totalVol} {t('client.training.history.vol')} · RPE {session.rpe}
                 </p>
                 <div className="su-sd-exercises" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
                     {session.exercises.map((ex, i) => (
@@ -882,7 +897,7 @@ const SessionDetailModal = ({ session, planName, onClose }) => {
                                             <span className="su-sd-set-num" style={{ color: 'var(--text-muted)' }}>{s.set}</span>
                                             <SetTypeBadge type={s.type} />
                                             <span>{s.reps} reps</span>
-                                            <span>{s.load} kg</span>
+                                            <span>{convertWeight(parseFloat(s.load) || 0, originUnit) % 1 === 0 ? convertWeight(parseFloat(s.load) || 0, originUnit).toString() : convertWeight(parseFloat(s.load) || 0, originUnit).toFixed(1)} {unitSystem === 'imperial' ? 'lbs' : 'kg'}</span>
                                             <span>RPE {s.rpe}</span>
                                         </div>
                                     ))}

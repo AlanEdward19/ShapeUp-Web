@@ -16,7 +16,7 @@ const reportHistory = [
 ];
 
 const Reports = () => {
-    const { t } = useLanguage();
+    const { t, unitSystem } = useLanguage();
     const [reportType, setReportType] = useState('performance');
     const [targetScope, setTargetScope] = useState('all');
     const [selectedClientId, setSelectedClientId] = useState('');
@@ -84,11 +84,11 @@ const Reports = () => {
         // 1. Header
         doc.setFontSize(20);
         doc.setTextColor(40, 40, 40);
-        doc.text('ShapeUp - Performance Report', 14, 22);
+        doc.text(t('reports.export.pdf.performance.title').split(' - ')[0] + ' - ' + t('reports.export.pdf.performance.title').split(' - ')[1], 14, 22);
 
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Generated on: ${dateStr}`, 14, 30);
+        doc.text(`${t('reports.export.pdf.generated')} ${dateStr}`, 14, 30);
 
         if (reportType === 'performance') {
             generatePerformanceReport(doc);
@@ -97,7 +97,7 @@ const Reports = () => {
         } else if (reportType === 'client_history') {
             generateClientHistoryReport(doc);
         } else {
-            doc.text('This report type is not yet implemented for real data.', 14, 45);
+            doc.text(t('reports.export.pdf.not_implemented'), 14, 45);
         }
 
         doc.save(`ShapeUp_Report_${reportType}_${now.getTime()}.pdf`);
@@ -126,14 +126,13 @@ const Reports = () => {
         let headers = [];
         let rows = [];
 
-        // Helper to parse volume string correctly
+        // Helper to parse volume string correctly (returns in user's preferred unit)
         const parseVolume = (val) => {
-            if (typeof val === 'number') return val;
-            if (typeof val === 'string') {
-                const cleaned = val.replace(/[^\d.]/g, '');
-                return parseFloat(cleaned) || 0;
-            }
-            return 0;
+            if (!val) return 0;
+            const strVal = val.toString();
+            const cleaned = parseFloat(strVal.replace(/[^\d.]/g, '')) || 0;
+            const originUnit = strVal.toLowerCase().includes('lbs') ? 'imperial' : 'metric';
+            return convertWeight(cleaned, originUnit);
         };
 
         // Date Range Logic
@@ -149,7 +148,8 @@ const Reports = () => {
         }
 
         if (reportType === 'performance') {
-            headers = ['Client Name', 'Status', 'Completed', 'Skipped', 'Adherence %', 'Total Volume (kg)'];
+            const volHeader = `${t('reports.export.perf.col.volume')} (${unitSystem === 'imperial' ? 'lbs' : 'kg'})`;
+            headers = [t('reports.export.perf.col.name'), t('reports.export.perf.col.status'), t('reports.export.perf.col.completed'), t('reports.export.perf.col.skipped'), t('reports.export.perf.col.adherence'), volHeader];
             let targetClients = clients;
             if (targetScope === 'specific' && selectedClientId) {
                 targetClients = clients.filter(c => String(c.id) === String(selectedClientId));
@@ -179,11 +179,12 @@ const Reports = () => {
                 }
                 const totalSessions = completed + skipped;
                 const adherence = totalSessions > 0 ? Math.round((completed / totalSessions) * 100) : 0;
-                return [client.name, client.status || 'Active', completed, skipped, adherence, totalVolumeSum];
+                const formattedVol = totalVolumeSum % 1 === 0 ? totalVolumeSum : parseFloat(totalVolumeSum.toFixed(1));
+                return [client.name, client.status?.toLowerCase() === 'inactive' ? t('reports.export.val.inactive') : t('reports.export.val.active'), completed, skipped, `${adherence}%`, formattedVol];
             });
         }
         else if (reportType === 'billing') {
-            headers = ['Client Name', 'Status', 'Billing Type', 'Plan Detail', 'Monthly Rate ($)'];
+            headers = [t('reports.export.billing.col.name'), t('reports.export.billing.col.status'), t('reports.export.billing.col.type'), t('reports.export.billing.col.detail'), t('reports.export.billing.col.rate')];
             const storedPlans = localStorage.getItem('shapeup_pro_plans');
             const proPlans = storedPlans ? JSON.parse(storedPlans) : [];
             let targetClients = clients;
@@ -204,12 +205,12 @@ const Reports = () => {
                         billingDetail = p.name;
                     }
                 }
-                return [client.name, client.status || 'Active', client.billingType || 'plan', billingDetail, billingAmount];
+                return [client.name, client.status?.toLowerCase() === 'inactive' ? t('reports.export.val.inactive') : t('reports.export.val.active'), client.billingType === 'plan' ? t('reports.export.val.plan') : t('reports.export.val.custom'), billingDetail, billingAmount];
             });
         }
         else if (reportType === 'client_history') {
-            headers = ['Date', 'Plan Name', 'Status', 'Exercise Name', 'Set Details', 'Exercise RPE', 'Session Comments'];
-            if (targetScope !== 'specific' || !selectedClientId) return alert('Please select a specific client for history export');
+            headers = [t('reports.export.history.col.date'), t('reports.export.history.col.plan'), t('reports.export.history.col.status'), t('reports.export.history.col.ex'), t('reports.export.history.col.logs'), t('reports.export.history.col.rpe'), t('reports.export.history.col.comments')];
+            if (targetScope !== 'specific' || !selectedClientId) return alert(t('reports.warning.scope.desc'));
 
             const client = clients.find(c => String(c.id) === String(selectedClientId));
             if (!client) return;
@@ -235,15 +236,15 @@ const Reports = () => {
                                     rows.push([
                                         dateStr,
                                         plan.name,
-                                        isSkipped ? 'Skipped' : 'Completed',
+                                        isSkipped ? t('reports.export.val.skipped') : t('reports.export.val.completed'),
                                         ex.name,
-                                        ex.skipped ? 'Skipped' : logSummary,
+                                        ex.skipped ? t('reports.export.val.skipped') : logSummary,
                                         h.rpe || '-',
                                         h.comments || ''
                                     ]);
                                 });
                             } else {
-                                rows.push([dateStr, plan.name, 'Skipped', '-', '-', h.rpe || '-', h.comments || '']);
+                                rows.push([dateStr, plan.name, t('reports.export.val.skipped'), '-', '-', h.rpe || '-', h.comments || '']);
                             }
                         }
                     });
@@ -261,7 +262,7 @@ const Reports = () => {
 
         doc.setFontSize(14);
         doc.setTextColor(37, 99, 235);
-        doc.text(`Client History: ${client.name}`, 14, 45);
+        doc.text(`${t('reports.export.pdf.history.title')}: ${client.name}`, 14, 45);
 
         // Date Range Logic
         const now = new Date();
@@ -279,7 +280,7 @@ const Reports = () => {
 
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Period: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, 14, 52);
+        doc.text(`${t('reports.export.pdf.period')} ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, 14, 52);
 
         const storedPlans = localStorage.getItem(`shapeup_client_plans_${client.id}`);
         let sessions = [];
@@ -300,7 +301,7 @@ const Reports = () => {
         sessions.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         if (sessions.length === 0) {
-            doc.text('No workout history found for this period.', 14, 65);
+            doc.text(t('reports.export.pdf.no_history'), 14, 65);
             return;
         }
 
@@ -313,7 +314,7 @@ const Reports = () => {
             // Add Header for each session
             doc.setFontSize(11);
             doc.setTextColor(40, 40, 40);
-            doc.text(`${dateStr} - ${session.planName} ${isSkipped ? '(SKIPPED)' : ''}`, 14, currentY);
+            doc.text(`${dateStr} - ${session.planName} ${isSkipped ? `(${t('reports.export.val.skipped').toUpperCase()})` : ''}`, 14, currentY);
             currentY += 5;
 
             if (!isSkipped && session.exercises && session.exercises.length > 0) {
@@ -322,19 +323,19 @@ const Reports = () => {
                     const logSummary = sets.map(s => {
                         const weight = s.load || s.weight || 0;
                         const rpe = s.rpe ? ` @ RPE ${s.rpe}` : '';
-                        return `${s.reps}x${weight}kg${rpe}`;
+                        return `${s.reps}x${weight}${unitSystem === 'imperial' ? 'lbs' : 'kg'}${rpe}`;
                     }).join(', ');
 
                     return [
                         ex.name,
-                        ex.skipped ? 'Skipped' : (logSummary || 'Done'),
+                        ex.skipped ? t('reports.export.val.skipped') : (logSummary || t('reports.export.val.done')),
                         session.rpe ? `Avg RPE ${session.rpe}` : '-'
                     ];
                 });
 
                 autoTable(doc, {
                     startY: currentY,
-                    head: [['Exercise', 'Logs', 'Session RPE']],
+                    head: [[t('reports.export.history.pdf.ex'), t('reports.export.history.pdf.logs'), t('reports.export.history.pdf.rpe')]],
                     body: exerciseData,
                     headStyles: { fillColor: [71, 85, 105], fontSize: 9 }, // Slate-600
                     bodyStyles: { fontSize: 8 },
@@ -378,11 +379,11 @@ const Reports = () => {
 
         doc.setFontSize(14);
         doc.setTextColor(16, 185, 129); // Success-like color for billing
-        doc.text('Billing & Revenue Summary', 14, 45);
+        doc.text(t('reports.export.pdf.billing.title'), 14, 45);
 
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Active Roster Status as of ${new Date().toLocaleDateString()}`, 14, 52);
+        doc.text(`${t('reports.export.pdf.roster_status')} ${new Date().toLocaleDateString()}`, 14, 52);
 
         let totalExpectedRevenue = 0;
 
@@ -405,8 +406,8 @@ const Reports = () => {
 
             return [
                 client.name,
-                client.status || 'Active',
-                client.billingType === 'plan' ? 'Standard Plan' : 'Custom Agreement',
+                client.status?.toLowerCase() === 'inactive' ? t('reports.export.val.inactive') : t('reports.export.val.active'),
+                client.billingType === 'plan' ? t('reports.export.val.plan') : t('reports.export.val.custom'),
                 billingDetail,
                 `$${billingAmount.toLocaleString()}`
             ];
@@ -414,7 +415,7 @@ const Reports = () => {
 
         autoTable(doc, {
             startY: 60,
-            head: [['Client Name', 'Status', 'Billing Type', 'Plan Detail', 'Monthly Rate']],
+            head: [[t('reports.export.billing.col.name'), t('reports.export.billing.col.status'), t('reports.export.billing.col.type'), t('reports.export.billing.col.detail'), t('reports.export.billing.col.rate').replace(' ($)', '')]],
             body: tableData,
             headStyles: { fillColor: [16, 185, 129] },
             alternateRowStyles: { fillColor: [240, 253, 244] },
@@ -426,12 +427,12 @@ const Reports = () => {
 
         doc.setFontSize(12);
         doc.setTextColor(40, 40, 40);
-        doc.text('Financial Summary', 14, finalY);
+        doc.text(t('reports.export.summary.financial'), 14, finalY);
         doc.setFontSize(10);
-        doc.text(`Total Clients in Scope: ${targetClients.length}`, 14, finalY + 7);
+        doc.text(`${t('reports.export.summary.clients')} ${targetClients.length}`, 14, finalY + 7);
         doc.setFontSize(12);
         doc.setTextColor(16, 185, 129);
-        doc.text(`Total Monthly Recurring Revenue (MRR): $${totalExpectedRevenue.toLocaleString()}`, 14, finalY + 16);
+        doc.text(`${t('reports.export.summary.mrr')} $${totalExpectedRevenue.toLocaleString()}`, 14, finalY + 16);
     };
 
     const generatePerformanceReport = (doc) => {
@@ -443,7 +444,7 @@ const Reports = () => {
 
         doc.setFontSize(14);
         doc.setTextColor(37, 99, 235); // Primary color
-        doc.text('Overall Roster Performance & Adherence', 14, 45);
+        doc.text(t('reports.export.pdf.performance.title'), 14, 45);
 
         // Date Range Logic
         const now = new Date();
@@ -461,17 +462,15 @@ const Reports = () => {
 
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        doc.text(`Period: ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, 14, 52);
+        doc.text(`${t('reports.export.pdf.period')} ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, 14, 52);
 
-        // Helper to parse volume string correctly
+        // Helper to parse volume string correctly (converted to user unit)
         const parseVolume = (val) => {
-            if (typeof val === 'number') return val;
-            if (typeof val === 'string') {
-                // Extract only numbers and dots
-                const cleaned = val.replace(/[^\d.]/g, '');
-                return parseFloat(cleaned) || 0;
-            }
-            return 0;
+            if (!val) return 0;
+            const strVal = val.toString();
+            const cleaned = parseFloat(strVal.replace(/[^\d.]/g, '')) || 0;
+            const originUnit = strVal.toLowerCase().includes('lbs') ? 'imperial' : 'metric';
+            return convertWeight(cleaned, originUnit);
         };
 
         // Collect data for each client
@@ -503,17 +502,17 @@ const Reports = () => {
 
             return [
                 client.name,
-                client.status || 'Active',
+                client.status?.toLowerCase() === 'inactive' ? t('reports.export.val.inactive') : t('reports.export.val.active'),
                 completed.toString(),
                 skipped.toString(),
                 `${adherence}%`,
-                `${totalVolumeSum.toLocaleString()} kg`
+                `${totalVolumeSum % 1 === 0 ? totalVolumeSum : totalVolumeSum.toFixed(1)} ${unitSystem === 'imperial' ? 'lbs' : 'kg'}`
             ];
         });
 
         autoTable(doc, {
             startY: 60,
-            head: [['Client Name', 'Status', 'Completed', 'Skipped', 'Adherence', 'Total Volume']],
+            head: [[t('reports.export.perf.col.name'), t('reports.export.perf.col.status'), t('reports.export.perf.col.completed'), t('reports.export.perf.col.skipped'), t('reports.export.perf.col.adherence').replace(' %', ''), t('reports.export.perf.col.volume').replace(' (kg)', ` (${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)]],
             body: tableData,
             headStyles: { fillColor: [37, 99, 235] },
             alternateRowStyles: { fillColor: [240, 245, 255] },
@@ -531,12 +530,12 @@ const Reports = () => {
 
         doc.setFontSize(12);
         doc.setTextColor(40, 40, 40);
-        doc.text('Summary Statistics', 14, finalY);
+        doc.text(t('reports.export.summary.perf'), 14, finalY);
         doc.setFontSize(10);
-        doc.text(`Total Completed Sessions: ${totalCompleted}`, 14, finalY + 7);
-        doc.text(`Total Skipped Sessions: ${totalSkipped}`, 14, finalY + 14);
-        doc.text(`Total Volume (Roster): ${totalVolumeSum.toLocaleString()} kg`, 14, finalY + 21);
-        doc.text(`Average Roster Adherence: ${avgAdherence}%`, 14, finalY + 28);
+        doc.text(`${t('reports.export.summary.perf.completed')} ${totalCompleted}`, 14, finalY + 7);
+        doc.text(`${t('reports.export.summary.perf.skipped')} ${totalSkipped}`, 14, finalY + 14);
+        doc.text(`${t('reports.export.summary.perf.volume')} ${totalVolumeSum.toLocaleString()} ${unitSystem === 'imperial' ? 'lbs' : 'kg'}`, 14, finalY + 21);
+        doc.text(`${t('reports.export.summary.perf.adherence')} ${avgAdherence}%`, 14, finalY + 28);
     };
 
     return (
