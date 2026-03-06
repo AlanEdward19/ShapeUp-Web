@@ -126,25 +126,21 @@ const Clients = () => {
     useEffect(() => {
         // Wait until the modal is closed and we have just invited someone
         if (justInvitedClient && !showInvite) {
-            const hasSeenPostInviteTour = localStorage.getItem('shapeup_clients_post_invite_tour_seen');
-            if (!hasSeenPostInviteTour) {
-                const tourSteps = [
-                    {
-                        selector: '[data-tour="clients-row"]:last-child',
-                        content: 'Pronto! Seu novo convite foi enviado. Observe que o novo cliente já aparece na sua lista, inicialmente com o status de "Convidado".',
-                    },
-                    {
-                        selector: '[data-tour="clients-actions"]:last-child',
-                        content: 'Assim que ele criar a conta com o e-mail convidado, seu status mudará para "Ativo" e a assiduidade e o último check-in começarão a ser rastreados automaticamente!',
-                    }
-                ];
-                setSteps(tourSteps);
-                setTimeout(() => {
-                    setIsOpen(true);
-                }, 1000); // 1000ms delay to wait for modal fade out
-
-                localStorage.setItem('shapeup_clients_post_invite_tour_seen', 'true');
-            }
+            // Always show the post-invite tour on every fresh invite (it's contextual)
+            const tourSteps = [
+                {
+                    selector: 'tr[data-tour="clients-row"]:last-child',
+                    content: 'Pronto! Seu novo convite foi enviado. Observe que o novo cliente já aparece na sua lista, inicialmente com o status de "Convidado".',
+                },
+                {
+                    selector: 'tr:last-child [data-tour="clients-status"]',
+                    content: 'Assim que ele criar a conta com o e-mail convidado, seu status mudará para "Ativo" e a assiduidade e o último check-in começarão a ser rastreados automaticamente!',
+                }
+            ];
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 1000); // 1000ms delay to wait for modal fade out
 
             // Wait slightly before resetting the flag to let the UI settle
             setTimeout(() => {
@@ -340,7 +336,7 @@ const Clients = () => {
                                     <td className="su-text-muted">{client.lastCheckin}</td>
 
                                     {/* Status Badge */}
-                                    <td>
+                                    <td data-tour="clients-status">
                                         <span className={`su-status-badge ${client.status.toLowerCase().replace(' ', '-')}`}>
                                             {client.status === 'Active' ? t('clients.status.active') :
                                                 client.status === 'Needs Attention' ? t('clients.status.attention') :

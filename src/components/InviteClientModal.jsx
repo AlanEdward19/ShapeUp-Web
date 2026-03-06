@@ -12,7 +12,7 @@ const InviteClientModal = ({ onClose, onInvite }) => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const hasSeenTour = localStorage.getItem('shapeup_invite_client_tour_seen');
+        const hasSeenTour = sessionStorage.getItem('shapeup_invite_client_tour_seen');
         if (!hasSeenTour) {
             const tourSteps = [
                 {
@@ -28,7 +28,7 @@ const InviteClientModal = ({ onClose, onInvite }) => {
             setTimeout(() => {
                 setIsOpen(true);
             }, 600); // Wait for modal animation
-            localStorage.setItem('shapeup_invite_client_tour_seen', 'true');
+            sessionStorage.setItem('shapeup_invite_client_tour_seen', 'true');
         }
     }, [setIsOpen, setSteps]);
 
