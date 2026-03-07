@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search, Filter, MessageSquare, Video, Reply, CheckCircle, Paperclip, X, FileText, Check, CheckCheck, Clock } from 'lucide-react';
+import { useTour } from '@reactour/tour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { addNotification } from '../../utils/notifications';
@@ -10,6 +11,7 @@ import './Feedback.css';
 const Feedback = () => {
     const location = useLocation();
     const { t } = useLanguage();
+    const { setIsOpen, setSteps } = useTour();
     const [allMessages, setAllMessages] = useState([]);
     const [selectedClientId, setSelectedClientId] = useState(null);
     const [replyText, setReplyText] = useState('');
@@ -39,6 +41,32 @@ const Feedback = () => {
             window.removeEventListener('shapeup_messages_updated', loadMessages);
         };
     }, []);
+
+    // ─── Email/Feedback Tour Trigger ───────────────────────────────────
+    useEffect(() => {
+        const hasSeenTour = sessionStorage.getItem('shapeup_feedback_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="fb-header"]',
+                    content: 'Esta é a Central de Mensagens! Aqui você visualiza e responde todas as dúvidas e mensagens enviadas pelos seus clientes, organizadas por conversa.',
+                },
+                {
+                    selector: '[data-tour="fb-sidebar"]',
+                    content: 'O painel esquerdo lista todas as conversas ativas. Conversas com mensagens não lidas aparecem em destaque, e tickets abertos ficam no topo da lista.',
+                },
+                {
+                    selector: '[data-tour="fb-reply"]',
+                    content: 'Digite sua resposta aqui e pressione Enter (ou clique em Enviar) para responder. Você também pode anexar imagens, vídeos ou PDFs clicando no ícone de clipe.',
+                }
+            ];
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 600);
+            sessionStorage.setItem('shapeup_feedback_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps]);
 
     useEffect(() => {
         const handleClickOutside = () => setContextMenu({ ...contextMenu, visible: false });
@@ -259,7 +287,7 @@ const Feedback = () => {
 
     return (
         <div className="su-feedback-dashboard">
-            <div className="su-dashboard-header-flex">
+            <div className="su-dashboard-header-flex" data-tour="fb-header">
                 <div>
                     <h1 className="su-page-title">{t('pro.feedback.title')}</h1>
                     <p className="su-page-subtitle">{t('pro.feedback.subtitle')}</p>
@@ -268,7 +296,7 @@ const Feedback = () => {
 
             <div className="su-inbox-layout">
                 {/* Left Column: Feed List */}
-                <Card className="su-inbox-sidebar">
+                <Card className="su-inbox-sidebar" data-tour="fb-sidebar">
                     <div className="su-inbox-header">
                         <div className="su-search-box su-inbox-search">
                             <Search size={16} className="su-text-muted" />
@@ -433,7 +461,7 @@ const Feedback = () => {
                                         </button>
                                     </div>
                                 )}
-                                <div className="su-thread-reply-box" style={{ padding: 0, border: 'none', backgroundColor: 'transparent' }}>
+                                <div className="su-thread-reply-box" data-tour="fb-reply" style={{ padding: 0, border: 'none', backgroundColor: 'transparent' }}>
                                     <textarea
                                         className="su-reply-textarea"
                                         value={replyText}

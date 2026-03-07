@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { FileText, Download, Calendar, Users, Filter, Plus, ChevronDown, CheckCircle, XCircle, Clock, MoreVertical, AlertTriangle } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
+import { useTour } from '@reactour/tour';
 import './Reports.css';
 
 // Mock History
@@ -17,6 +18,7 @@ const reportHistory = [
 
 const Reports = () => {
     const { t, unitSystem } = useLanguage();
+    const { setIsOpen, setSteps } = useTour();
     const [reportType, setReportType] = useState('performance');
     const [targetScope, setTargetScope] = useState('all');
     const [selectedClientId, setSelectedClientId] = useState('');
@@ -41,6 +43,36 @@ const Reports = () => {
             setReportsHistory(JSON.parse(storedHistory));
         }
     }, []);
+
+    // ─── Reports Tour Trigger ─────────────────────────────────────────
+    useEffect(() => {
+        const hasSeenTour = sessionStorage.getItem('shapeup_reports_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="rep-header"]',
+                    content: 'Aqui está a Central de Relatórios! Você pode gerar exportações detalhadas de Performance, Faturamento e Histórico para todos os seus clientes ou para um individualmente.',
+                },
+                {
+                    selector: '[data-tour="rep-generator"]',
+                    content: 'Configure o relatório aqui: escolha o Tipo (Performance, Faturamento, etc), o Escopo (todos os clientes ou um específico), o Período e o Formato de exportação (PDF ou CSV).',
+                },
+                {
+                    selector: '[data-tour="rep-generate-btn"]',
+                    content: 'Após configurar as opções, clique aqui para gerar e baixar seu relatório. O arquivo será gerado instantaneamente e também salvo no histórico ao lado.',
+                },
+                {
+                    selector: '[data-tour="rep-history"]',
+                    content: 'Seus relatórios gerados aparecem aqui no histórico para referência futura.',
+                }
+            ];
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 500);
+            sessionStorage.setItem('shapeup_reports_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps]);
 
     const handleGenerateReport = async () => {
         setIsGenerating(true);
@@ -540,7 +572,7 @@ const Reports = () => {
 
     return (
         <div className="su-reports-dashboard">
-            <div className="su-dashboard-header-flex">
+            <div className="su-dashboard-header-flex" data-tour="rep-header">
                 <div>
                     <h1 className="su-page-title">{t('reports.title')}</h1>
                     <p className="su-page-subtitle">{t('reports.subtitle')}</p>
@@ -549,7 +581,7 @@ const Reports = () => {
 
             <div className="su-reports-grid su-mt-4">
                 {/* Generator Configurator */}
-                <Card className="su-reports-generator">
+                <Card className="su-reports-generator" data-tour="rep-generator">
                     <div className="su-generator-header">
                         <FileText size={24} className="su-text-primary" />
                         <h2>{t('reports.generator.title')}</h2>
@@ -684,6 +716,7 @@ const Reports = () => {
                                 icon={isGenerating ? <Clock size={16} /> : <Plus size={16} />}
                                 className="su-generate-btn"
                                 onClick={handleGenerateReport}
+                                data-tour="rep-generate-btn"
                                 disabled={
                                     isGenerating ||
                                     (targetScope === 'specific' && !selectedClientId) ||
@@ -701,7 +734,7 @@ const Reports = () => {
                 </Card>
 
                 {/* Report History */}
-                <Card className="su-reports-history">
+                <Card className="su-reports-history" data-tour="rep-history">
                     <div className="su-history-header">
                         <h2>{t('reports.history.title')}</h2>
                         <Button variant="outline" size="sm">{t('reports.history.view_all')}</Button>

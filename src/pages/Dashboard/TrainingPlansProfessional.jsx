@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Target, Activity, Tag, Plus, GripVertical, Settings2, Trash2, Copy, BarChart3, Dumbbell, X, CheckCircle2 } from 'lucide-react';
+import { useTour } from '@reactour/tour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -10,6 +11,7 @@ import './TrainingPlansProfessional.css';
 
 const TrainingPlansProfessional = () => {
     const { t } = useLanguage();
+    const { setIsOpen, setSteps } = useTour();
     const [templates, setTemplates] = useState(() => {
         const stored = localStorage.getItem('shapeup_plan_templates');
         if (stored) return JSON.parse(stored);
@@ -20,6 +22,41 @@ const TrainingPlansProfessional = () => {
     useEffect(() => {
         localStorage.setItem('shapeup_plan_templates', JSON.stringify(templates));
     }, [templates]);
+
+    // ─── Pro Training Plans Tour Trigger ────────────────────────────
+    useEffect(() => {
+        const hasSeenTour = sessionStorage.getItem('shapeup_pro_training_plans_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="tpp-header"]',
+                    content: 'Esta é a sua Biblioteca de Planos. Aqui você cria e gerencia os templates de treino que poderão ser atribuídos para qualquer cliente.',
+                }
+            ];
+
+            if (templates.length > 0) {
+                tourSteps.push({
+                    selector: '[data-tour="tpp-card"]',
+                    content: 'Cada card de template exibe o resumo do plano: fase, dificuldade, número de exercícios, séries e tempo estimado de duração.',
+                });
+                tourSteps.push({
+                    selector: '[data-tour="tpp-card-actions"]',
+                    content: 'Com os dois botões no rodapé do card você pode Editar o template (ajustar exercícios e séries) ou Atribuir diretamente a um cliente da sua lista.',
+                });
+            } else {
+                tourSteps.push({
+                    selector: '.su-empty-library',
+                    content: 'Sua biblioteca está vazia! Clique em "Criar Primeiro Plano" para montar seu primeiro template de treino reutilizável.',
+                });
+            }
+
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 600);
+            sessionStorage.setItem('shapeup_pro_training_plans_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps, templates.length]);
 
     const [activeTemplate, setActiveTemplate] = useState(null); // null means showing library, object means editing
     const [assigningTemplate, setAssigningTemplate] = useState(null); // For assigning to client
@@ -78,7 +115,7 @@ const TrainingPlansProfessional = () => {
 
     return (
         <div className="su-pro-dashboard">
-            <div className="su-dashboard-header-flex">
+            <div className="su-dashboard-header-flex" data-tour="tpp-header">
                 <div>
                     <h1 className="su-page-title">{activeTemplate ? t('pro.training.title.builder') : t('pro.training.title.library')}</h1>
                     <p className="su-page-subtitle">{activeTemplate ? t('pro.training.subtitle.builder') : t('pro.training.subtitle.library')}</p>
@@ -120,7 +157,7 @@ const TrainingPlansProfessional = () => {
                                 const estMins = tmpl.exercises.length === 0 ? 0 : Math.round((totalRest + totalSets * 60) / 60);
 
                                 return (
-                                    <Card key={tmpl.id} className="su-template-card su-clean-card">
+                                    <Card key={tmpl.id} className="su-template-card su-clean-card" data-tour="tpp-card">
                                         <div className="su-template-main-info">
                                             <div className="su-template-header-row" style={{ alignItems: 'flex-start' }}>
                                                 <h3 className="su-template-title-clean" style={{ marginBottom: 0, paddingRight: '1rem' }}>{tmpl.name}</h3>
@@ -151,7 +188,7 @@ const TrainingPlansProfessional = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="su-template-footer-actions">
+                                        <div className="su-template-footer-actions" data-tour="tpp-card-actions">
                                             <Button variant="outline" fullWidth onClick={() => setActiveTemplate(tmpl)}>{t('pro.training.card.btn.edit')}</Button>
                                             <Button fullWidth onClick={() => setAssigningTemplate(tmpl)}>{t('pro.training.card.btn.assign')}</Button>
                                         </div>

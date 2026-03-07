@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, PlayCircle, Plus, Lightbulb } from 'lucide-react';
+import { useTour } from '@reactour/tour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -12,11 +13,38 @@ import { exercisesDB, availableMuscles } from '../../data/mockExercises';
 
 const Exercises = () => {
     const { t } = useLanguage();
+    const { setIsOpen, setSteps } = useTour();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMuscles, setSelectedMuscles] = useState([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [selectedExercise, setSelectedExercise] = useState(null);
     const [showSuggest, setShowSuggest] = useState(false);
+
+    // ─── Exercise Library Tour Trigger ───────────────────────────────
+    useEffect(() => {
+        const hasSeenTour = sessionStorage.getItem('shapeup_exercises_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="ex-header"]',
+                    content: 'Esta é a Biblioteca de Exercícios com todos os movimentos disponíveis na plataforma. Você pode sugerir um novo exercício para inclusão clicando no botão ao lado!',
+                },
+                {
+                    selector: '[data-tour="ex-toolbar"]',
+                    content: 'Use a busca para encontrar exercícios pelo nome, ou clique em Filtrar para selecionar grupos musculares específicos e refinar os resultados.',
+                },
+                {
+                    selector: '[data-tour="ex-card"]',
+                    content: 'Clique em qualquer card para visualizar os detalhes completos do exercício: músculos trabalhados, equipamento necessário e instruções de execução.',
+                }
+            ];
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 500);
+            sessionStorage.setItem('shapeup_exercises_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps]);
 
     // Toggle muscle filter
     const toggleMuscle = (muscle) => {
@@ -36,7 +64,7 @@ const Exercises = () => {
 
     return (
         <div className="su-exercises-dashboard">
-            <div className="su-dashboard-header-flex">
+            <div className="su-dashboard-header-flex" data-tour="ex-header">
                 <div>
                     <h1 className="su-page-title">{t('pro.exercises.title')}</h1>
                     <p className="su-page-subtitle">{t('pro.exercises.subtitle')}</p>
@@ -46,7 +74,7 @@ const Exercises = () => {
 
             <Card className="su-exercises-container su-mt-4">
                 {/* Toolbar */}
-                <div className="su-exercises-toolbar">
+                <div className="su-exercises-toolbar" data-tour="ex-toolbar">
                     <div className="su-search-box">
                         <Search size={18} className="su-text-muted" />
                         <input
@@ -94,8 +122,13 @@ const Exercises = () => {
 
                 {/* Directory Grid */}
                 <div className="su-exercises-grid">
-                    {filteredExercises.map(ex => (
-                        <div key={ex.id} className="su-exercise-thumb-card" onClick={() => setSelectedExercise(ex)}>
+                    {filteredExercises.map((ex, idx) => (
+                        <div
+                            key={ex.id}
+                            className="su-exercise-thumb-card"
+                            onClick={() => setSelectedExercise(ex)}
+                            {...(idx === 0 ? { 'data-tour': 'ex-card' } : {})}
+                        >
                             <div className="su-ex-thumb-visual">
                                 <PlayCircle size={32} className="su-ex-play-icon" />
                             </div>

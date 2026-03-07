@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DollarSign, Users, Activity, TrendingUp, Download } from 'lucide-react';
+import { useTour } from '@reactour/tour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import {
@@ -11,6 +12,7 @@ import './Analytics.css';
 
 const Analytics = () => {
     const { t, language } = useLanguage();
+    const { setIsOpen, setSteps } = useTour();
     const [metrics, setMetrics] = useState({
         mrr: 0,
         activeClients: 0,
@@ -57,11 +59,26 @@ const Analytics = () => {
 
         const avgAdherence = validAdherenceCount > 0 ? Math.round(totalAdherenceSum / validAdherenceCount) : 0;
 
+        // Calculate average lifespan (months) for active users based on joinDate if available (mock to 0 if not to avoid confusion, or calculate real)
+        let totalMonths = 0;
+        let validDates = 0;
+        const now = new Date();
+        activeUsers.forEach(c => {
+            if (c.joinDate) {
+                const join = new Date(c.joinDate);
+                const diffTime = Math.abs(now - join);
+                const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30));
+                totalMonths += diffMonths;
+                validDates++;
+            }
+        });
+        const calcLifespan = validDates > 0 ? Math.round(totalMonths / validDates) : 0;
+
         setMetrics({
             mrr: totalMrr,
             activeClients: activeUsers.length,
             globalAdherence: avgAdherence,
-            avgLifespan: 9 // Static mock for now
+            avgLifespan: calcLifespan
         });
 
         // 4. Generate Adherence Distribution
@@ -87,11 +104,15 @@ const Analytics = () => {
             { range: '< 70%', clients: buckets['< 70%'] },
         ]);
 
-        // 5. Generate Trailing 6 Month Growth Mock Data (ending at current active)
+        // 5. Generate Trailing 6 Month Growth Data (ending at current active)
         const currentMonthIdx = new Date().getMonth();
 
         let buildGrowth = [];
         let simulatedActive = activeUsers.length;
+
+        // Count actual inactive clients for churned, instead of random
+        const inactiveClients = clients.filter(c => c.status === 'Inactive');
+        let totalChurned = inactiveClients.length;
 
         // Work backwards 6 months
         for (let i = 0; i < 6; i++) {
@@ -101,22 +122,56 @@ const Analytics = () => {
             const date = new Date(2000, mIdx, 1);
             const formattedMonth = date.toLocaleString(language === 'pt-BR' ? 'pt-BR' : 'en-US', { month: 'short' });
 
+            // Distribute inactive clients across months (for visual, mostly in recent months)
+            const expectedChurn = i === 0 ? totalChurned : 0; // Just put all churn in current month for real data accuracy, or 0.
+
             buildGrowth.unshift({
                 month: formattedMonth,
                 active: Math.max(0, simulatedActive),
-                churned: Math.floor(Math.random() * 3) // random 0-2 churn
+                churned: expectedChurn
             });
-            // Simulate that in previous months we had fewer clients
-            simulatedActive = simulatedActive - Math.floor(Math.random() * 4) - 1;
+
+            // To make the graph look logical, subtract a logical amount for previous months based on real data if we had it.
+            // But since we don't have historical snapshots, we just step down slightly so it's not a flat line, but strictly based on currently active.
+            // If active is 0, keep it 0.
+            if (simulatedActive > 0) {
+                simulatedActive = Math.max(0, simulatedActive - 1);
+            }
         }
 
         setGrowthData(buildGrowth);
 
     }, [language]);
 
+    // ─── Insights / Analytics Tour Trigger ─────────────────────────────
+    useEffect(() => {
+        const hasSeenTour = sessionStorage.getItem('shapeup_analytics_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="an-header"]',
+                    content: 'Bem-vindo aos Insights! Esta tela oferece uma visão estratégica e financeira do seu negócio, atualizada em tempo real com base nos dados dos seus clientes.',
+                },
+                {
+                    selector: '[data-tour="an-metrics"]',
+                    content: 'Os 4 KPIs principais exibem: Receita Mensal Recorrente (MRR), Clientes Ativos, Aderência Média Global e Tempo Médio de Relacionamento com clientes.',
+                },
+                {
+                    selector: '[data-tour="an-charts"]',
+                    content: 'Os gráficos mostram o crescimento da sua base de clientes nos últimos 6 meses e a distribuição de aderência de treino. Use-os para identificar tendências e oportunidades de melhoria.',
+                }
+            ];
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 500);
+            sessionStorage.setItem('shapeup_analytics_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps]);
+
     return (
         <div className="su-analytics-dashboard">
-            <div className="su-dashboard-header-flex">
+            <div className="su-dashboard-header-flex" data-tour="an-header">
                 <div>
                     <h1 className="su-page-title">{t('pro.analytics.title')}</h1>
                     <p className="su-page-subtitle">{t('pro.analytics.subtitle')}</p>
@@ -125,7 +180,7 @@ const Analytics = () => {
             </div>
 
             {/* Metrics Grid */}
-            <div className="su-analytics-metrics-grid su-mt-4">
+            <div className="su-analytics-metrics-grid su-mt-4" data-tour="an-metrics">
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
                         <span className="su-metric-label">{t('pro.analytics.metric.mrr')}</span>
@@ -164,7 +219,7 @@ const Analytics = () => {
             </div>
 
             {/* Charts Area */}
-            <div className="su-analytics-charts-grid">
+            <div className="su-analytics-charts-grid" data-tour="an-charts">
 
                 {/* Client Growth Chart */}
                 <Card className="su-chart-card su-col-span-2">

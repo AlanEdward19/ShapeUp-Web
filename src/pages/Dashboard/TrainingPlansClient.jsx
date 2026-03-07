@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, CalendarDays, Plus, FastForward, Award, TrendingUp, X, Trash2 } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
+import { useTour } from '@reactour/tour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -23,6 +24,7 @@ const formatTime = (totalSeconds) => {
 const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
+    const { setIsOpen, setSteps } = useTour();
 
     // Session State
     const [sessionActive, setSessionActive] = useState(false);
@@ -64,6 +66,32 @@ const ClientView = () => {
             setAssignedPlans(JSON.parse(storedPlans));
         }
     }, []);
+
+    // -- Training Plans Tour Trigger --
+    useEffect(() => {
+        const hasSeenTour = sessionStorage.getItem('shapeup_training_plans_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="tp-plan-card"]',
+                    content: 'Aqui estão os seus Planos de Treino atribuídos pelo profissional. Cada card mostra a fase, dificuldade e número de exercícios do plano.',
+                },
+                {
+                    selector: '[data-tour="tp-start-btn"]',
+                    content: 'Quando estiver pronto para treinar, clique em "Iniciar Sessão". O sistema vai guiar você por cada exercício e série, cronometrar o descanso e salvar tudo automaticamente.',
+                },
+                {
+                    selector: '[data-tour="tp-history"]',
+                    content: 'Aqui fica o histórico das suas sessões concluídas. Clique em qualquer card para ver os detalhes de exercícios e cargas daquela sessão.',
+                }
+            ];
+            setSteps(tourSteps);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 700);
+            sessionStorage.setItem('shapeup_training_plans_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps]);
 
     // -- Start A Specific Session --
     const startSessionForPlan = (plan) => {
@@ -355,7 +383,7 @@ const ClientView = () => {
                     </Card>
                 ) : (
                     assignedPlans.map(plan => (
-                        <Card key={plan.id} className="su-active-plan-card su-mb-4">
+                        <Card key={plan.id} className="su-active-plan-card su-mb-4" data-tour="tp-plan-card">
                             <div className="su-plan-hero">
                                 <div className="su-plan-hero-content">
                                     <span className="su-tag">{plan.phase}</span>
@@ -370,7 +398,7 @@ const ClientView = () => {
                                 </div>
 
                                 <div className="su-plan-hero-action">
-                                    <Button size="lg" icon={<Play size={20} fill="currentColor" />} onClick={() => startSessionForPlan(plan)}>
+                                    <Button size="lg" icon={<Play size={20} fill="currentColor" />} onClick={() => startSessionForPlan(plan)} data-tour="tp-start-btn">
                                         {t('client.training.card.btn')}
                                     </Button>
                                 </div>
@@ -379,7 +407,7 @@ const ClientView = () => {
                     ))
                 )}
 
-                <h3 className="su-section-title su-mt-8">{t('client.training.history.title')}</h3>
+                <h3 className="su-section-title su-mt-8" data-tour="tp-history">{t('client.training.history.title')}</h3>
                 <div className="su-history-list" style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '0.5rem' }}>
                     {allHistory.length === 0 ? (
                         <p className="su-text-muted">{t('client.training.history.empty')}</p>
