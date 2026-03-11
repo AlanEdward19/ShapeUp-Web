@@ -5,10 +5,12 @@ import Input from '../../components/Input';
 import { Target, Scale, Trash2, TrendingUp, Check } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useTour } from '@reactour/tour';
 import './DashboardClient.css';
 
 const ObjectivesClient = () => {
     const { t, unitSystem, convertWeight } = useLanguage();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
 
     // --- Objectives State ---
@@ -31,6 +33,37 @@ const ObjectivesClient = () => {
     useEffect(() => {
         localStorage.setItem(`shapeup_client_objectives_${clientId}`, JSON.stringify(objectives));
     }, [objectives, clientId]);
+
+    // -- Objectives Tour Trigger --
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('shapeup_objectives_client_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="obj-title"]',
+                    content: t('tour.objectives.1'),
+                },
+                {
+                    selector: '[data-tour="obj-target"]',
+                    content: t('tour.objectives.2'),
+                },
+                {
+                    selector: '[data-tour="obj-chart"]',
+                    content: t('tour.objectives.3'),
+                }
+            ];
+            
+            setSteps(tourSteps);
+            setCurrentStep(0);
+            
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 600);
+            
+            localStorage.setItem('shapeup_objectives_client_tour_seen', 'true');
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setIsOpen, setSteps, setCurrentStep, t]);
 
     // Handlers
     const handleSaveGoal = () => {
@@ -79,14 +112,14 @@ const ObjectivesClient = () => {
 
     return (
         <div className="su-objectives-tab">
-            <h1 className="su-page-title su-mb-6">{t('client.objectives.title')}</h1>
+            <h1 className="su-page-title su-mb-6" data-tour="obj-title">{t('client.objectives.title')}</h1>
 
             <div className="su-overview-layout">
                 {/* Left Column: Data Entry & History */}
                 <div className="su-overview-main">
 
                     {/* Goals Card */}
-                    <Card className="su-mb-4">
+                    <Card className="su-mb-4" data-tour="obj-target">
                         <div className="su-card-header-icon su-mb-4">
                             <Target size={20} className="su-text-muted" />
                             <h3 className="su-section-title" style={{ margin: 0 }}>{t('client.objectives.target.title')}</h3>
@@ -159,7 +192,7 @@ const ObjectivesClient = () => {
                 </div>
 
                 {/* Right Column: Chart */}
-                <div className="su-overview-sidebar">
+                <div className="su-overview-sidebar" data-tour="obj-chart">
                     <Card className="su-metric-card-large" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
                         <div className="su-card-header-icon">
                             <TrendingUp size={20} className="su-text-muted" />

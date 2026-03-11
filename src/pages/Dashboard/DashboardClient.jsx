@@ -3,6 +3,7 @@ import Card from '../../components/Card';
 import { TrendingUp, Flame, CalendarDays, Award, Target } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useTour } from '@reactour/tour';
 import './DashboardClient.css';
 
 // ─── Helper: normalize any date string to YYYY-MM-DD in LOCAL time ───
@@ -30,6 +31,8 @@ const getWeekKey = (date) => {
 
 const DashboardClient = () => {
     const { t, convertWeight, formatWeight } = useLanguage();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
+
     const storedName = localStorage.getItem('shapeup_user_name') || 'Athlete';
     const firstName = storedName.split(' ')[0];
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
@@ -60,6 +63,37 @@ const DashboardClient = () => {
             totalPlans: plans.length
         });
     }, [clientId]);
+
+    // ─── Tour Trigger ─────────────────────────────────────────────────
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('shapeup_client_dashboard_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="client-header"]',
+                    content: t('tour.dashboard_client.1'),
+                },
+                {
+                    selector: '[data-tour="client-metrics"]',
+                    content: t('tour.dashboard_client.3'),
+                },
+                {
+                    selector: '[data-tour="client-achievements"]',
+                    content: t('tour.dashboard_client.4'),
+                }
+            ];
+            
+            setSteps(tourSteps);
+            setCurrentStep(0);
+            
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 600);
+            
+            localStorage.setItem('shapeup_client_dashboard_tour_seen', 'true');
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setIsOpen, setSteps, setCurrentStep, t]);
 
     const currentWeekKey = getWeekKey(new Date());
 
@@ -188,7 +222,7 @@ const DashboardClient = () => {
 
     return (
         <div className="su-dashboard-client">
-            <div className="su-dashboard-header-flex">
+            <div className="su-dashboard-header-flex" data-tour="client-header">
                 <div>
                     <h1 className="su-page-title">{t('client.dashboard.welcome')} {firstName}</h1>
                     <p className="su-page-subtitle">
@@ -200,7 +234,7 @@ const DashboardClient = () => {
             </div>
 
             {/* Aggregate Metrics */}
-            <div className="su-metrics-grid su-mt-4">
+            <div className="su-metrics-grid su-mt-4" data-tour="client-metrics">
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
                         <span className="su-metric-label">{t('client.dashboard.metric.weekly')}</span>
@@ -274,7 +308,7 @@ const DashboardClient = () => {
                 </div>
 
                 {/* Sidebar Info */}
-                <div className="su-overview-sidebar">
+                <div className="su-overview-sidebar" data-tour="client-achievements">
                     <Card className="su-achievements-card">
                         <h3 className="su-section-title">
                             <Award size={20} style={{ verticalAlign: 'text-bottom', marginRight: '8px', color: 'var(--warning)' }} />

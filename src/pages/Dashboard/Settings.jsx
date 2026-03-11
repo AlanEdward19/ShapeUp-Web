@@ -31,15 +31,21 @@ const Settings = () => {
         let storageKey = '';
 
         if (activeTab === 'profile' && !hasSeenProfileTour) {
-            tourSteps = [
+            tourSteps = isProfessional ? [
                 { selector: '.su-dashboard-header-flex', content: t('tour.settings.1') },
                 { selector: '[data-tour="profile-avatar"]', content: t('tour.settings.profile.photo') },
+                { selector: '.su-settings-form-grid', content: t('tour.settings.profile.info') }
+            ] : [
+                { selector: '.su-dashboard-header-flex', content: t('tour.settings_client.1') },
+                { selector: '[data-tour="profile-avatar"]', content: t('tour.settings_client.2') },
                 { selector: '.su-settings-form-grid', content: t('tour.settings.profile.info') }
             ];
             storageKey = 'shapeup_settings_tour_profile';
         } else if (activeTab === 'notifications' && !hasSeenNotifTour) {
-            tourSteps = [
+            tourSteps = isProfessional ? [
                 { selector: '.su-settings-content', content: t('tour.settings.3') }
+            ] : [
+                { selector: '.su-settings-content', content: t('tour.settings_client.4') }
             ];
             storageKey = 'shapeup_settings_tour_notif';
         } else if (activeTab === 'preferences' && !hasSeenPrefTour) {
@@ -52,7 +58,7 @@ const Settings = () => {
                 { selector: '[data-tour="pro-billing-bank"]', content: t('tour.settings.billing.bank') },
                 { selector: '[data-tour="pro-billing-plans"]', content: t('tour.settings.billing.plans') }
             ] : [
-                { selector: '[data-tour="client-billing-active"]', content: t('tour.settings.billing.active') },
+                { selector: '[data-tour="client-billing-active"]', content: t('tour.settings_client.3') },
                 { selector: '[data-tour="client-billing-payment"]', content: t('tour.settings.billing.payment') }
             ];
             storageKey = 'shapeup_settings_tour_billing';

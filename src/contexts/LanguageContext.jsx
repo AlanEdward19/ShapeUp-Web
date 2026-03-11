@@ -597,7 +597,29 @@ export const LanguageProvider = ({ children }) => {
             'tour.clientdetail.4': 'Navigate between Analytics (Metrics and Evolution Charts) and Training Plans (Create and assign routines).',
             'tour.clientdetail.5': 'In the Analytics tab, this dashboard concentrates vital charts and indicators, such as Volume, Attendance, Weight History, and Personal Records (PRs) broken.',
             'tour.clientdetail.6': 'Since this client has not logged any workouts yet, the Analytics area is empty. The vital charts and panels will automatically appear here as soon as they complete their first session!',
-            'tour.clientdetail.7': 'When your client logs their bodyweight, the progression chart will be generated here.'
+            'tour.clientdetail.7': 'When your client logs their bodyweight, the progression chart will be generated here.',
+
+            'tour.dashboard_client.1': 'Welcome to your Dashboard! Here you can check your upcoming workouts and recent performance.',
+            'tour.dashboard_client.2': 'The Daily Check-in helps your coach understand how you feel before you even start exercising.',
+            'tour.dashboard_client.3': 'Here you can quickly see your active training plan and jump straight into your next workout.',
+            'tour.dashboard_client.4': 'Your recent completed activities and unlocked achievements will appear in this timeline.',
+
+            'tour.training_client.1': 'This is your Training Hub. Here you can find all the plans and sessions assigned by your coach.',
+            'tour.training_client.2': 'Click here to begin your session! The ShapeUp Engine will guide you through exercises, rest timers, and track your PRs.',
+            'tour.training_client.3': 'This calendar shows your past workouts. You can click on any completed day to see your results.',
+
+            'tour.objectives.1': 'Welcome to Objectives! This is the place to track your body metrics and specific fitness goals over time.',
+            'tour.objectives.2': 'Set your target weight here. This gives you a clear goal to work towards.',
+            'tour.objectives.3': 'Log your bodyweight regularly. Your entries will automatically draw a trend line showing your progress.',
+
+            'tour.settings.profile.info': 'You can change your name, contact info, and preferred language/units here.',
+            'tour.settings.4': 'Choose between Light and Dark mode, or let the app follow your system settings. You can also change the language and units of measurement here.',
+            'tour.settings.billing.payment': 'Manage your saved payment methods and view your billing history.',
+
+            'tour.settings_client.1': 'Welcome to Settings! You can personalize your app experience here.',
+            'tour.settings_client.2': 'Update your profile photo and personal details in this section.',
+            'tour.settings_client.3': 'Check your active subscription tier and billing cycle here.',
+            'tour.settings_client.4': 'Customize which alerts you want to receive, like workout reminders or new messages from your coach.'
         },
         'pt-BR': {
             'nav.dashboard': 'Painel',
@@ -1140,7 +1162,29 @@ export const LanguageProvider = ({ children }) => {
             'tour.clientdetail.4': 'Navegue entre o Analytics (Métricas e Gráficos de Evolução) e o Planos de Treino (Criação e prescrição de rotinas).',
             'tour.clientdetail.5': 'Na aba Analytics, este painel concentra gráficos e indicadores vitais, como Volume, Assiduidade, Histórico de Peso e Quebra de Recordes Pessoais (PRs).',
             'tour.clientdetail.6': 'Como este aluno ainda não realizou nenhum treino, a área de Analytics está vazia. Os gráficos e painéis vitais aparecerão aqui automaticamente assim que ele completar sua primeira sessão!',
-            'tour.clientdetail.7': 'Quando seu cliente registrar o peso corporal, o gráfico de progressão será gerado aqui.'
+            'tour.clientdetail.7': 'Quando seu cliente registrar o peso corporal, o gráfico de progressão será gerado aqui.',
+
+            'tour.dashboard_client.1': 'Bem-vindo ao seu Painel! Aqui você pode conferir seus próximos treinos e seu desempenho recente.',
+            'tour.dashboard_client.2': 'O Check-in Diário ajuda seu treinador a entender como você se sente antes mesmo de começar a se exercitar.',
+            'tour.dashboard_client.3': 'Aqui você pode ver rapidamente seu plano de treino ativo e pular direto para sua próxima sessão.',
+            'tour.dashboard_client.4': 'Suas atividades recentes concluídas e conquistas desbloqueadas aparecerão nesta linha do tempo.',
+
+            'tour.training_client.1': 'Bem-vindo! Aqui você encontra todos os planos e sessões atribuídos pelo seu treinador.',
+            'tour.training_client.2': 'Clique aqui para começar o treino! O sistema guiará você pelos exercícios, intervalos e registrará seus recordes.',
+            'tour.training_client.3': 'Este calendário mostra seus treinos passados. Clique em qualquer dia concluído para ver seus resultados.',
+
+            'tour.objectives.1': 'Bem-vindo aos Objetivos! Este é o lugar para rastrear suas métricas corporais e metas de condicionamento ao longo do tempo.',
+            'tour.objectives.2': 'Defina seu peso alvo aqui. Isso te dá uma meta clara para focar.',
+            'tour.objectives.3': 'Registre seu peso regularmente. Suas entradas desenharão automaticamente uma linha de tendência mostrando seu progresso.',
+
+            'tour.settings.profile.info': 'Altere seu nome, contato e preferências de idioma e unidades de medida por aqui.',
+            'tour.settings.4': 'Escolha entre o Modo Claro ou Escuro, ou deixe o app seguir a configuração do seu sistema. Aqui também pode escolher o idioma e unidades de medida.',
+            'tour.settings.billing.payment': 'Gerencie seus métodos de pagamento salvos e visualize seu histórico de cobranças.',
+
+            'tour.settings_client.1': 'Bem-vindo às Configurações! Você pode personalizar sua experiência no aplicativo por aqui.',
+            'tour.settings_client.2': 'Atualize sua foto de perfil e dados pessoais nesta seção.',
+            'tour.settings_client.3': 'Verifique seu nível de assinatura ativo e o ciclo de cobrança aqui.',
+            'tour.settings_client.4': 'Personalize quais alertas deseja receber, como lembretes de treino ou novas mensagens do seu treinador.'
         }
     };
 

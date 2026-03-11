@@ -69,7 +69,7 @@ const ClientView = () => {
 
     // -- Training Plans Tour Trigger --
     useEffect(() => {
-        const hasSeenTour = sessionStorage.getItem('shapeup_training_plans_tour_seen');
+        const hasSeenTour = localStorage.getItem('shapeup_training_plans_tour_seen');
         if (!hasSeenTour) {
             const tourSteps = [
                 {
@@ -90,7 +90,7 @@ const ClientView = () => {
 setTimeout(() => {
                 setIsOpen(true);
             }, 700);
-            sessionStorage.setItem('shapeup_training_plans_tour_seen', 'true');
+            localStorage.setItem('shapeup_training_plans_tour_seen', 'true');
         }
     }, [setIsOpen, setSteps]);
 
@@ -383,29 +383,31 @@ setTimeout(() => {
                         <p className="su-text-muted">{t('client.training.empty.desc')}</p>
                     </Card>
                 ) : (
-                    assignedPlans.map(plan => (
-                        <Card key={plan.id} className="su-active-plan-card su-mb-4" data-tour="tp-plan-card">
-                            <div className="su-plan-hero">
-                                <div className="su-plan-hero-content">
-                                    <span className="su-tag">{plan.phase}</span>
-                                    <h2 className="su-plan-title">{plan.name}</h2>
-                                    <p className="su-coach-credit">{t('client.training.card.difficulty')}: <strong>{plan.difficulty}</strong> · {plan.weeks} {t('client.training.card.weeks')}</p>
+                    <div data-tour="tp-plan-card">
+                        {assignedPlans.map(plan => (
+                            <Card key={plan.id} className="su-active-plan-card su-mb-4">
+                                <div className="su-plan-hero">
+                                    <div className="su-plan-hero-content">
+                                        <span className="su-tag">{plan.phase}</span>
+                                        <h2 className="su-plan-title">{plan.name}</h2>
+                                        <p className="su-coach-credit">{t('client.training.card.difficulty')}: <strong>{plan.difficulty}</strong> · {plan.weeks} {t('client.training.card.weeks')}</p>
 
-                                    <div className="su-plan-meta-row">
-                                        <div className="su-meta-pill">
-                                            <DumbbellIcon size={16} /> {plan.exercises.length} {t('client.training.card.exercises')}
+                                        <div className="su-plan-meta-row">
+                                            <div className="su-meta-pill">
+                                                <DumbbellIcon size={16} /> {plan.exercises.length} {t('client.training.card.exercises')}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="su-plan-hero-action">
-                                    <Button size="lg" icon={<Play size={20} fill="currentColor" />} onClick={() => startSessionForPlan(plan)} data-tour="tp-start-btn">
-                                        {t('client.training.card.btn')}
-                                    </Button>
+                                    <div className="su-plan-hero-action" data-tour="tp-start-btn">
+                                        <Button size="lg" icon={<Play size={20} fill="currentColor" />} onClick={() => startSessionForPlan(plan)}>
+                                            {t('client.training.card.btn')}
+                                        </Button>
+                                    </div>
                                 </div>
-                            </div>
-                        </Card>
-                    ))
+                            </Card>
+                        ))}
+                    </div>
                 )}
 
                 <h3 className="su-section-title su-mt-8" data-tour="tp-history">{t('client.training.history.title')}</h3>
