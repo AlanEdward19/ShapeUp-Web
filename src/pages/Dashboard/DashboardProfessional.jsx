@@ -26,18 +26,19 @@ const DashboardProfessional = () => {
     const ITEMS_PER_PAGE = 7;
 
     useEffect(() => {
-        // 1. Fetch Clients
-        let storedClients = localStorage.getItem('shapeup_clients');
-        let clientsList = storedClients ? JSON.parse(storedClients) : [];
-        setClients(clientsList);
+        const fetchClients = () => {
+            // 1. Fetch Clients
+            let storedClients = localStorage.getItem('shapeup_clients');
+            let clientsList = storedClients ? JSON.parse(storedClients) : [];
+            setClients(clientsList);
 
-        // 2. Aggregate History from all clients
-        let allEvents = [];
-        clientsList.forEach(client => {
-            const storedPlans = localStorage.getItem(`shapeup_client_plans_${client.id}`);
-            if (storedPlans) {
-                const plans = JSON.parse(storedPlans);
-                plans.forEach(plan => {
+            // 2. Aggregate History from all clients
+            let allEvents = [];
+            clientsList.forEach(client => {
+                const storedPlans = localStorage.getItem(`shapeup_client_plans_${client.id}`);
+                if (storedPlans) {
+                    const plans = JSON.parse(storedPlans);
+                    plans.forEach(plan => {
                     (plan.history || []).forEach(historyItem => {
                         allEvents.push({
                             ...historyItem,
@@ -51,9 +52,18 @@ const DashboardProfessional = () => {
             }
         });
 
-        // Sort by date descending
-        allEvents.sort((a, b) => b.timestamp - a.timestamp);
-        setGlobalHistory(allEvents);
+            // Sort by date descending
+            allEvents.sort((a, b) => b.timestamp - a.timestamp);
+            setGlobalHistory(allEvents);
+        };
+
+        fetchClients();
+
+        // Listen for updates from other tabs/components
+        const handleClientsUpdated = () => fetchClients();
+        window.addEventListener('shapeup_clients_updated', handleClientsUpdated);
+        
+        return () => window.removeEventListener('shapeup_clients_updated', handleClientsUpdated);
     }, []);
 
     // ─── Tour trigger ─────────────────────────────────────────────────
@@ -188,28 +198,39 @@ const DashboardProfessional = () => {
         return d.toLocaleDateString();
     };
 
-    const handleInvite = (email) => {
-        // Mock logic to add invited client
+    const handleInvite = (emailAddress) => {
+        const normalizedEmail = emailAddress.trim().toLowerCase();
         const newClient = {
             id: Date.now(),
-            name: email.split('@')[0],
-            email: email,
-            status: 'Invited',
+            name: normalizedEmail, // Will be updated on registration
+            email: normalizedEmail, // Used to match during registration
+            activePlan: '-',
             compliance: 0,
-            activePlan: '-'
+            lastCheckin: '-',
+            status: 'Invited'
         };
         const updated = [...clients, newClient];
         setClients(updated);
-        localStorage.setItem('shapeup_clients', JSON.stringify(updated));
         
+        const currentStorage = JSON.parse(localStorage.getItem('shapeup_clients') || '[]');
+        const updatedStorage = [...currentStorage, newClient];
+        localStorage.setItem('shapeup_clients', JSON.stringify(updatedStorage));
+        window.dispatchEvent(new Event('shapeup_clients_updated'));
+
         // Trigger post-invite tour or logic
         setJustInvitedClient(true);
 
         setTimeout(() => {
-            addNotification('pro', 'system', 'New Client Registered', `${email} has accepted your invite.`, 'primary', {
+            addNotification('pro', 'system', 'New Client Registered', `${normalizedEmail} has accepted your invite and joined your roster.`, 'primary', {
                 clientId: newClient.id,
                 link: `/dashboard/clients/${newClient.id}`
             });
+
+            const refreshed = JSON.parse(localStorage.getItem('shapeup_clients') || '[]');
+            const finalized = refreshed.map(c => c.id === newClient.id ? { ...c, status: 'Active' } : c);
+            localStorage.setItem('shapeup_clients', JSON.stringify(finalized));
+
+            setClients(prev => prev.map(c => c.id === newClient.id ? { ...c, status: 'Active' } : c));
         }, 3000);
     };
 

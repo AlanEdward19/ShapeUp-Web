@@ -74,6 +74,12 @@ const Clients = () => {
         };
 
         fetchAndComputeClients();
+
+        // Listen for updates from other tabs/components
+        const handleClientsUpdated = () => fetchAndComputeClients();
+        window.addEventListener('shapeup_clients_updated', handleClientsUpdated);
+        
+        return () => window.removeEventListener('shapeup_clients_updated', handleClientsUpdated);
     }, []);
 
     // ─── Tour Trigger ─────────────────────────────────────────────────
@@ -181,7 +187,12 @@ const Clients = () => {
         };
         const updated = [...clients, newClient];
         setClients(updated);
-        localStorage.setItem('shapeup_clients', JSON.stringify(updated));
+
+        const currentStorage = JSON.parse(localStorage.getItem('shapeup_clients') || '[]');
+        const updatedStorage = [...currentStorage, newClient];
+        localStorage.setItem('shapeup_clients', JSON.stringify(updatedStorage));
+        window.dispatchEvent(new Event('shapeup_clients_updated'));
+
         setJustInvitedClient(true); // Flag that we just invited a client
 
         // Simulate client registration
