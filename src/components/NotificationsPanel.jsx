@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCheck, X, MessageSquare, TrendingUp, AlertTriangle, Dumbbell, CreditCard, Bell, UserPlus } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import './NotificationsPanel.css';
 
 const getIcon = (type) => {
@@ -25,6 +26,7 @@ const getIcon = (type) => {
 const NotificationsPanel = ({ isProfessional, notifications, onMarkRead, onMarkAllRead, onClose }) => {
     const panelRef = useRef(null);
     const navigate = useNavigate();
+    const { t } = useLanguage();
 
     // Close on outside click
     useEffect(() => {
@@ -56,15 +58,15 @@ const NotificationsPanel = ({ isProfessional, notifications, onMarkRead, onMarkA
         <div className="su-notif-panel" ref={panelRef}>
             <div className="su-notif-header">
                 <div className="su-notif-header-left">
-                    <h3>Notifications</h3>
+                    <h3>{t('notif.panel.title')}</h3>
                     {unreadCount > 0 && (
-                        <span className="su-notif-count-badge">{unreadCount} new</span>
+                        <span className="su-notif-count-badge">{unreadCount} {t('notif.panel.new')}</span>
                     )}
                 </div>
                 <div className="su-notif-header-actions">
                     {unreadCount > 0 && (
                         <button className="su-notif-mark-all" onClick={onMarkAllRead} title="Mark all as read">
-                            <CheckCheck size={16} /> All read
+                            <CheckCheck size={16} /> {t('notif.panel.mark_read')}
                         </button>
                     )}
                     <button className="su-notif-close-btn" onClick={onClose}>
@@ -77,7 +79,7 @@ const NotificationsPanel = ({ isProfessional, notifications, onMarkRead, onMarkA
                 {notifications.length === 0 ? (
                     <div className="su-notif-empty">
                         <Bell size={32} className="su-notif-empty-icon" />
-                        <p>You're all caught up!</p>
+                        <p>{t('notif.panel.empty')}</p>
                     </div>
                 ) : (
                     notifications.map(n => (

@@ -613,6 +613,11 @@ export const LanguageProvider = ({ children }) => {
             'tour.session_engine.3': 'Here are your exercises! Log your completed Reps and Weight for each set. Check the Failure box if you pushed to your absolute limit.',
             'tour.session_engine.4': 'Click "+ Set" at the bottom of any exercise to add an extra set, like a drop set or a warmup, if you need to do more than planned.',
             
+            'notif.panel.title': 'Notifications',
+            'notif.panel.new': 'new',
+            'notif.panel.mark_read': 'All read',
+            'notif.panel.empty': "You're all caught up!",
+
             'tour.objectives.1': 'Welcome to Objectives! This is the place to track your body metrics and specific fitness goals over time.',
             'tour.objectives.2': 'Set your target weight here. This gives you a clear goal to work towards.',
             'tour.objectives.3': 'Log your bodyweight regularly. Your entries will automatically draw a trend line showing your progress.',
@@ -1183,6 +1188,11 @@ export const LanguageProvider = ({ children }) => {
             'tour.session_engine.3': 'Aqui estão seus exercícios! Registre suas repetições feitas e a carga de cada série. Marque a caixa de "Falha" se você foi até o seu limite absoluto.',
             'tour.session_engine.4': 'Clique em "+ Série" no final de qualquer exercício para adicionar uma série extra, como um drop set ou aquecimento.',
             
+            'notif.panel.title': 'Notificações',
+            'notif.panel.new': 'novas',
+            'notif.panel.mark_read': 'Marcar de lido',
+            'notif.panel.empty': 'Tudo lido!',
+
             'tour.objectives.1': 'Bem-vindo aos Objetivos! Este é o lugar para rastrear suas métricas corporais e metas de condicionamento ao longo do tempo.',
             'tour.objectives.2': 'Defina seu peso alvo aqui. Isso te dá uma meta clara para focar.',
             'tour.objectives.3': 'Registre seu peso regularmente. Suas entradas desenharão automaticamente uma linha de tendência mostrando seu progresso.',
