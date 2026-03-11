@@ -608,6 +608,11 @@ export const LanguageProvider = ({ children }) => {
             'tour.training_client.2': 'Click here to begin your session! The ShapeUp Engine will guide you through exercises, rest timers, and track your PRs.',
             'tour.training_client.3': 'This calendar shows your past workouts. You can click on any completed day to see your results.',
 
+            'tour.session_engine.1': 'Your global session timer runs here. You can click Cancel at any point to stop without saving.',
+            'tour.session_engine.2': 'Your automated rest timer lives here. It starts when you finish a set. You can manually adjust the rest time by adding or removing 15 seconds, or skip it entirely.',
+            'tour.session_engine.3': 'Here are your exercises! Log your completed Reps and Weight for each set. Check the Failure box if you pushed to your absolute limit.',
+            'tour.session_engine.4': 'Click "+ Set" at the bottom of any exercise to add an extra set, like a drop set or a warmup, if you need to do more than planned.',
+            
             'tour.objectives.1': 'Welcome to Objectives! This is the place to track your body metrics and specific fitness goals over time.',
             'tour.objectives.2': 'Set your target weight here. This gives you a clear goal to work towards.',
             'tour.objectives.3': 'Log your bodyweight regularly. Your entries will automatically draw a trend line showing your progress.',
@@ -1173,6 +1178,11 @@ export const LanguageProvider = ({ children }) => {
             'tour.training_client.2': 'Clique aqui para começar o treino! O sistema guiará você pelos exercícios, intervalos e registrará seus recordes.',
             'tour.training_client.3': 'Este calendário mostra seus treinos passados. Clique em qualquer dia concluído para ver seus resultados.',
 
+            'tour.session_engine.1': 'O cronômetro global do treino roda aqui. Você pode Cancelar a qualquer momento se precisar parar sem salvar.',
+            'tour.session_engine.2': 'Seu cronômetro de descanso automático fica aqui. Ele começa quando você termina uma série. Você pode ajustar adicionando ou removendo 15s, ou até pular o descanso inteiro.',
+            'tour.session_engine.3': 'Aqui estão seus exercícios! Registre suas repetições feitas e a carga de cada série. Marque a caixa de "Falha" se você foi até o seu limite absoluto.',
+            'tour.session_engine.4': 'Clique em "+ Série" no final de qualquer exercício para adicionar uma série extra, como um drop set ou aquecimento.',
+            
             'tour.objectives.1': 'Bem-vindo aos Objetivos! Este é o lugar para rastrear suas métricas corporais e metas de condicionamento ao longo do tempo.',
             'tour.objectives.2': 'Defina seu peso alvo aqui. Isso te dá uma meta clara para focar.',
             'tour.objectives.3': 'Registre seu peso regularmente. Suas entradas desenharão automaticamente uma linha de tendência mostrando seu progresso.',

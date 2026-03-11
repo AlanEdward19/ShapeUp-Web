@@ -92,7 +92,42 @@ setTimeout(() => {
             }, 700);
             localStorage.setItem('shapeup_training_plans_tour_seen', 'true');
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setIsOpen, setSteps]);
+
+    // -- Session Engine Tour Trigger --
+    useEffect(() => {
+        if (sessionActive) {
+            const hasSeenSessionTour = localStorage.getItem('shapeup_session_engine_tour_seen');
+            if (!hasSeenSessionTour) {
+                const tourSteps = [
+                    {
+                        selector: '[data-tour="se-global-timer"]',
+                        content: t('tour.session_engine.1'),
+                    },
+                    {
+                        selector: '[data-tour="se-rest-timer"]',
+                        content: t('tour.session_engine.2'),
+                    },
+                    {
+                        selector: '[data-tour="se-exercises"]',
+                        content: t('tour.session_engine.3'),
+                    },
+                    {
+                        selector: '[data-tour="se-add-set"]',
+                        content: t('tour.session_engine.4'),
+                    }
+                ];
+                setSteps(tourSteps);
+                setCurrentStep(0);
+                setTimeout(() => {
+                    setIsOpen(true);
+                }, 800);
+                localStorage.setItem('shapeup_session_engine_tour_seen', 'true');
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sessionActive, setIsOpen, setSteps, setCurrentStep, t]);
 
     // -- Start A Specific Session --
     const startSessionForPlan = (plan) => {
@@ -378,9 +413,9 @@ setTimeout(() => {
                 <h1 className="su-page-title su-mb-6">{t('client.training.title')}</h1>
 
                 {assignedPlans.length === 0 ? (
-                    <Card className="su-active-plan-card" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+                    <Card className="su-active-plan-card" data-tour="tp-plan-card" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
                         <h3 style={{ marginBottom: '0.5rem' }}>{t('client.training.empty.title')}</h3>
-                        <p className="su-text-muted">{t('client.training.empty.desc')}</p>
+                        <p data-tour="tp-start-btn" className="su-text-muted">{t('client.training.empty.desc')}</p>
                     </Card>
                 ) : (
                     <div data-tour="tp-plan-card">
@@ -483,13 +518,13 @@ setTimeout(() => {
         <div className="su-session-engine">
 
             {/* Sticky Header with Timers */}
-            <div className="su-session-header-sticky">
+            <div className="su-session-header-sticky" data-tour="se-global-timer">
                 <div className="su-session-header-left">
                     <Button variant="outline" onClick={() => setShowCancelModal(true)} size="sm">{t('client.session.btn.cancel')}</Button>
                 </div>
 
                 {/* Rest Timer Group */}
-                <div className={`su-rest-timer-group ${isResting ? 'active' : ''}`}>
+                <div className={`su-rest-timer-group ${isResting ? 'active' : ''}`} data-tour="se-rest-timer">
                     <div className="su-rest-controls">
                         <button
                             className="su-adjust-rest-btn minus"
@@ -696,7 +731,7 @@ setTimeout(() => {
                 );
             })()}
 
-            <div className="su-execution-scroll">
+            <div className="su-execution-scroll" data-tour="se-exercises">
                 {exercises.map((exercise, exIndex) => (
                     <Card key={exercise.id} className="su-execution-card">
                         <div className="su-ex-execution-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -841,7 +876,7 @@ setTimeout(() => {
                             ))}
 
                             {/* Dynamic + Add Set Action */}
-                            <div className="su-add-set-row">
+                            <div className="su-add-set-row" data-tour="se-add-set">
                                 <button className="su-add-set-btn" onClick={() => addExtraSet(exIndex)}>
                                     <Plus size={16} /> {t('client.session.btn.add_set')}
                                 </button>
