@@ -24,7 +24,7 @@ const formatTime = (totalSeconds) => {
 const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
-    const { setIsOpen, setSteps } = useTour();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
 
     // Session State
     const [sessionActive, setSessionActive] = useState(false);
@@ -74,19 +74,20 @@ const ClientView = () => {
             const tourSteps = [
                 {
                     selector: '[data-tour="tp-plan-card"]',
-                    content: 'Aqui estão os seus Planos de Treino atribuídos pelo profissional. Cada card mostra a fase, dificuldade e número de exercícios do plano.',
+                    content: t('tour.training_client.1'),
                 },
                 {
                     selector: '[data-tour="tp-start-btn"]',
-                    content: 'Quando estiver pronto para treinar, clique em "Iniciar Sessão". O sistema vai guiar você por cada exercício e série, cronometrar o descanso e salvar tudo automaticamente.',
+                    content: t('tour.training_client.2'),
                 },
                 {
                     selector: '[data-tour="tp-history"]',
-                    content: 'Aqui fica o histórico das suas sessões concluídas. Clique em qualquer card para ver os detalhes de exercícios e cargas daquela sessão.',
+                    content: t('tour.training_client.3'),
                 }
             ];
             setSteps(tourSteps);
-            setTimeout(() => {
+            setCurrentStep(0);
+setTimeout(() => {
                 setIsOpen(true);
             }, 700);
             sessionStorage.setItem('shapeup_training_plans_tour_seen', 'true');

@@ -12,7 +12,7 @@ import './Analytics.css';
 
 const Analytics = () => {
     const { t, language } = useLanguage();
-    const { setIsOpen, setSteps } = useTour();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [metrics, setMetrics] = useState({
         mrr: 0,
         activeClients: 0,
@@ -150,19 +150,20 @@ const Analytics = () => {
             const tourSteps = [
                 {
                     selector: '[data-tour="an-header"]',
-                    content: 'Bem-vindo aos Insights! Esta tela oferece uma visão estratégica e financeira do seu negócio, atualizada em tempo real com base nos dados dos seus clientes.',
+                    content: t('tour.analytics.1'),
                 },
                 {
                     selector: '[data-tour="an-metrics"]',
-                    content: 'Os 4 KPIs principais exibem: Receita Mensal Recorrente (MRR), Clientes Ativos, Aderência Média Global e Tempo Médio de Relacionamento com clientes.',
+                    content: t('tour.analytics.2'),
                 },
                 {
                     selector: '[data-tour="an-charts"]',
-                    content: 'Os gráficos mostram o crescimento da sua base de clientes nos últimos 6 meses e a distribuição de aderência de treino. Use-os para identificar tendências e oportunidades de melhoria.',
+                    content: t('tour.analytics.3'),
                 }
             ];
             setSteps(tourSteps);
-            setTimeout(() => {
+            setCurrentStep(0);
+setTimeout(() => {
                 setIsOpen(true);
             }, 500);
             sessionStorage.setItem('shapeup_analytics_tour_seen', 'true');

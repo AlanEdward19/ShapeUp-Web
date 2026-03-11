@@ -99,7 +99,7 @@ const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
 export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
     const { t } = useLanguage();
-    const { setIsOpen, setSteps } = useTour();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [name, setName] = useState(plan.name);
     const [phase, setPhase] = useState(plan.phase);
     const [difficulty, setDiff] = useState(plan.difficulty || 'Intermediate');
@@ -166,20 +166,21 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
             const tourSteps = [
                 {
                     selector: '[data-tour="pe-settings"]',
-                    content: 'Neste bloco superior você define as regras e o escopo do plano de treino, como o Nome do Plano, a Duração em Semanas e a Fase (Hipertrofia, Força, etc).',
+                    content: t('tour.clientdetail.7'),
                 },
                 {
                     selector: '[data-tour="pe-stack"]',
-                    content: 'Aqui é a sua Mesa de Especialista! Adicione exercícios clicando no botão e depois prescreva as séries ajustando Tipo (Aquecimento, Top set, etc), Repetições, Carga e RPE para cada linha.',
+                    content: t('tour.clientdetail.1'),
                 },
                 {
                     selector: '[data-tour="pe-summary"]',
-                    content: 'Nosso painel de Inteligência acompanha suas edições em tempo real. Ele calcula o tempo estimado de duração do treino, a distribuição da intensidade nas séries e entrega um resumo valioso!',
+                    content: t('tour.clientdetail.2'),
                 }
             ];
 
             setSteps(tourSteps);
-            setTimeout(() => {
+            setCurrentStep(0);
+setTimeout(() => {
                 setIsOpen(true);
             }, 700);
 
@@ -656,7 +657,7 @@ const ClientDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-    const { setIsOpen, setSteps } = useTour();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const client = getClientData(parseInt(id));
 
     const [activeTab, setActiveTab] = useState(location.state?.tab || 'analytics');
@@ -713,28 +714,29 @@ const ClientDetail = () => {
             const tourSteps = [
                 {
                     selector: '[data-tour="cd-header"]',
-                    content: 'Nesta tela você tem a visão completa do perfil do seu cliente. Você pode visualizar o alerta se houver "Necessidade de Atenção" no quadro dele.',
+                    content: t('tour.clientdetail.3'),
                 },
                 {
                     selector: '[data-tour="cd-tabs"]',
-                    content: 'Navegue entre Analytics (Métricas e Gráficos de Evolução) e os Planos de Treino (Criar e atribuir rotinas).',
+                    content: t('tour.clientdetail.4'),
                 }
             ];
 
             if (hasRealData) {
                 tourSteps.push({
                     selector: '[data-tour="cd-charts"]',
-                    content: 'Na guia de Analytics, este painel concentra gráficos e indicadores vitais, como Volume, Assiduidade, Histórico de Peso e Quebra de Recordes Pessoais (PRs).',
+                    content: t('tour.clientdetail.5'),
                 });
             } else {
                 tourSteps.push({
                     selector: '.su-client-empty-state',
-                    content: 'Como este cliente ainda não registrou nenhum treino, a área de Analytics aparece vazia. Os gráficos e painéis vitais surgirão aqui automaticamente assim que ele completar a primeira sessão!',
+                    content: t('tour.clientdetail.6'),
                 });
             }
 
             setSteps(tourSteps);
-            setTimeout(() => {
+            setCurrentStep(0);
+setTimeout(() => {
                 setIsOpen(true);
             }, 600);
 

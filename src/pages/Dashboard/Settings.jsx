@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useTour } from '@reactour/tour';
 import { User, Bell, CreditCard, Link as LinkIcon, Smartphone, Shield, Moon, Sun, Camera, Trash2 } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -17,7 +18,55 @@ const Settings = () => {
     } = useOutletContext();
     const { theme, toggleTheme } = useTheme();
     const { language, setLanguage, t, unitSystem, setUnitSystem } = useLanguage();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [activeTab, setActiveTab] = useState('profile');
+
+    useEffect(() => {
+        const hasSeenProfileTour = localStorage.getItem('shapeup_settings_tour_profile');
+        const hasSeenNotifTour = localStorage.getItem('shapeup_settings_tour_notif');
+        const hasSeenPrefTour = localStorage.getItem('shapeup_settings_tour_pref');
+        const hasSeenBillingTour = localStorage.getItem('shapeup_settings_tour_billing');
+
+        let tourSteps = null;
+        let storageKey = '';
+
+        if (activeTab === 'profile' && !hasSeenProfileTour) {
+            tourSteps = [
+                { selector: '.su-dashboard-header-flex', content: t('tour.settings.1') },
+                { selector: '[data-tour="profile-avatar"]', content: t('tour.settings.profile.photo') },
+                { selector: '.su-settings-form-grid', content: t('tour.settings.profile.info') }
+            ];
+            storageKey = 'shapeup_settings_tour_profile';
+        } else if (activeTab === 'notifications' && !hasSeenNotifTour) {
+            tourSteps = [
+                { selector: '.su-settings-content', content: t('tour.settings.3') }
+            ];
+            storageKey = 'shapeup_settings_tour_notif';
+        } else if (activeTab === 'preferences' && !hasSeenPrefTour) {
+            tourSteps = [
+                { selector: '.su-settings-content', content: t('tour.settings.4') }
+            ];
+            storageKey = 'shapeup_settings_tour_pref';
+        } else if (activeTab === 'billing' && !hasSeenBillingTour) {
+            tourSteps = isProfessional ? [
+                { selector: '[data-tour="pro-billing-bank"]', content: t('tour.settings.billing.bank') },
+                { selector: '[data-tour="pro-billing-plans"]', content: t('tour.settings.billing.plans') }
+            ] : [
+                { selector: '[data-tour="client-billing-active"]', content: t('tour.settings.billing.active') },
+                { selector: '[data-tour="client-billing-payment"]', content: t('tour.settings.billing.payment') }
+            ];
+            storageKey = 'shapeup_settings_tour_billing';
+        }
+
+        if (tourSteps) {
+            setSteps(tourSteps);
+            setCurrentStep(0);
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 500);
+            localStorage.setItem(storageKey, 'true');
+        }
+    }, [activeTab, setIsOpen, setSteps, setCurrentStep, t]);
 
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
     const userEmail = localStorage.getItem('shapeup_user_email') || '';
@@ -221,7 +270,7 @@ const Settings = () => {
                                 {isProfessional ? t('settings.profile.title.pro') : t('settings.profile.title.client')}
                             </h2>
 
-                            <div className="su-settings-avatar-upload">
+                            <div className="su-settings-avatar-upload" data-tour="profile-avatar">
                                 <div className="su-settings-avatar-preview">
                                     {activeProfile?.avatar ? (
                                         <img src={activeProfile.avatar} alt={activeProfile.name} className="su-settings-avatar-img" />
@@ -414,7 +463,7 @@ const Settings = () => {
 
                     {isProfessional && activeTab === 'billing' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            <Card className="su-settings-card">
+                            <Card className="su-settings-card" data-tour="pro-billing-bank">
                                 <h2 className="su-settings-section-title">{t('pro.settings.billing.bank.title')}</h2>
                                 <p className="su-text-muted su-text-sm su-mb-4">{t('pro.settings.billing.bank.desc')}</p>
                                 <div className="su-settings-form-grid">
@@ -433,7 +482,7 @@ const Settings = () => {
                                 </div>
                             </Card>
 
-                            <Card className="su-settings-card">
+                            <Card className="su-settings-card" data-tour="pro-billing-plans">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                                     <div>
                                         <h2 className="su-settings-section-title" style={{ marginBottom: 0 }}>{t('pro.settings.billing.plans.title')}</h2>
@@ -475,7 +524,7 @@ const Settings = () => {
 
                     {!isProfessional && activeTab === 'billing' && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                            <Card className="su-settings-card">
+                            <Card className="su-settings-card" data-tour="client-billing-active">
                                 <h2 className="su-settings-section-title">{t('client.settings.billing.active.title')}</h2>
                                 {clientAssignedPlan ? (
                                     <div style={{ backgroundColor: 'var(--bg-main)', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--primary)' }}>
@@ -493,7 +542,7 @@ const Settings = () => {
                                 )}
                             </Card>
 
-                            <Card className="su-settings-card">
+                            <Card className="su-settings-card" data-tour="client-billing-payment">
                                 <h2 className="su-settings-section-title">{t('client.settings.billing.payment.title')}</h2>
                                 <p className="su-text-muted su-text-sm su-mb-4">{t('client.settings.billing.payment.desc')}</p>
 

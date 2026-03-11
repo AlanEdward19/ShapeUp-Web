@@ -13,8 +13,9 @@ import './DashboardProfessional.css';
 const DashboardProfessional = () => {
     const navigate = useNavigate();
     const { t } = useLanguage();
-    const { setIsOpen, setSteps } = useTour();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [showInvite, setShowInvite] = useState(false);
+    const [justInvitedClient, setJustInvitedClient] = useState(false);
     const [clients, setClients] = useState([]);
     const [globalHistory, setGlobalHistory] = useState([]);
     const { notifications } = useNotifications('pro');
@@ -62,29 +63,62 @@ const DashboardProfessional = () => {
             const tourSteps = [
                 {
                     selector: '[data-tour="pro-header"]',
-                    content: 'Bem-vindo ao Painel do Profissional! Aqui você tem o controle total dos seus alunos e gerencia seus planos de treino.',
+                    content: t('tour.dashboard_pro.1'),
                 },
                 {
                     selector: '[data-tour="pro-metrics"]',
-                    content: 'Acompanhe rapidamente os indicadores principais do seu negócio, como clientes ativos, assiduidade e engajamento geral.',
+                    content: t('tour.dashboard_pro.2'),
                 },
                 {
                     selector: '[data-tour="pro-feed"]',
-                    content: 'Neste feed, você acompanha de perto todas as atividades dos seus clientes: treinos concluídos, ignorados, e notificações do sistema.',
+                    content: t('tour.dashboard_pro.3'),
                 },
                 {
                     selector: '[data-tour="pro-alerts"]',
-                    content: 'Fique de olho nos alertas! Feedbacks urgentes ou avisos importantes sobre os treinos dos clientes aparecerão aqui.',
+                    content: t('tour.dashboard_pro.4'),
                 }
             ];
             setSteps(tourSteps);
-            // Pequeno delay para garantir que a interface foi renderizada
-            setTimeout(() => {
+            setCurrentStep(0);
+            
+            const tId = setTimeout(() => {
                 setIsOpen(true);
-            }, 500);
+            }, 600);
+            
             localStorage.setItem('shapeup_pro_dashboard_tour_seen', 'true');
         }
-    }, [setIsOpen, setSteps]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setIsOpen, setSteps, setCurrentStep]);
+
+    // ─── Post-Invite Tour Trigger (from Dashboard) ────────────────────
+    useEffect(() => {
+        if (justInvitedClient && !showInvite) {
+            // First time they invite someone, we want to point out the side menu or the metrics
+            // (Since the client list is not fully visible here)
+            const tourSteps = [
+                {
+                    selector: '[data-tour="nav-clients"]',
+                    content: t('tour.clients.7') || 'Seu novo cliente foi convidado com sucesso! Vá para a aba Clientes para gerenciá-lo.',
+                }
+            ];
+            
+            const t1 = setTimeout(() => {
+                setSteps(tourSteps);
+                setCurrentStep(0);
+                setIsOpen(true);
+            }, 800); 
+
+            const t2 = setTimeout(() => {
+                setJustInvitedClient(false);
+            }, 2000);
+            
+            return () => {
+                clearTimeout(t1);
+                clearTimeout(t2);
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [justInvitedClient, showInvite, setIsOpen, setSteps, setCurrentStep]);
 
     // ─── Metrics ──────────────────────────────────────────────────────
     const stats = useMemo(() => {
@@ -152,6 +186,31 @@ const DashboardProfessional = () => {
         if (days === 1) return 'Yesterday';
         if (days < 7) return `${days} days ago`;
         return d.toLocaleDateString();
+    };
+
+    const handleInvite = (email) => {
+        // Mock logic to add invited client
+        const newClient = {
+            id: Date.now(),
+            name: email.split('@')[0],
+            email: email,
+            status: 'Invited',
+            compliance: 0,
+            activePlan: '-'
+        };
+        const updated = [...clients, newClient];
+        setClients(updated);
+        localStorage.setItem('shapeup_clients', JSON.stringify(updated));
+        
+        // Trigger post-invite tour or logic
+        setJustInvitedClient(true);
+
+        setTimeout(() => {
+            addNotification('pro', 'system', 'New Client Registered', `${email} has accepted your invite.`, 'primary', {
+                clientId: newClient.id,
+                link: `/dashboard/clients/${newClient.id}`
+            });
+        }, 3000);
     };
 
     // ─── Unified Feed Logic ───────────────────────────────────────────

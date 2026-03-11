@@ -11,7 +11,7 @@ import './Feedback.css';
 const Feedback = () => {
     const location = useLocation();
     const { t } = useLanguage();
-    const { setIsOpen, setSteps } = useTour();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [allMessages, setAllMessages] = useState([]);
     const [selectedClientId, setSelectedClientId] = useState(null);
     const [replyText, setReplyText] = useState('');
@@ -49,19 +49,20 @@ const Feedback = () => {
             const tourSteps = [
                 {
                     selector: '[data-tour="fb-header"]',
-                    content: 'Esta é a Central de Mensagens! Aqui você visualiza e responde todas as dúvidas e mensagens enviadas pelos seus clientes, organizadas por conversa.',
+                    content: t('tour.feedback.1'),
                 },
                 {
                     selector: '[data-tour="fb-sidebar"]',
-                    content: 'O painel esquerdo lista todas as conversas ativas. Conversas com mensagens não lidas aparecem em destaque, e tickets abertos ficam no topo da lista.',
+                    content: t('tour.feedback.2'),
                 },
                 {
                     selector: '[data-tour="fb-reply"]',
-                    content: 'Digite sua resposta aqui e pressione Enter (ou clique em Enviar) para responder. Você também pode anexar imagens, vídeos ou PDFs clicando no ícone de clipe.',
+                    content: t('tour.feedback.3'),
                 }
             ];
             setSteps(tourSteps);
-            setTimeout(() => {
+            setCurrentStep(0);
+setTimeout(() => {
                 setIsOpen(true);
             }, 600);
             sessionStorage.setItem('shapeup_feedback_tour_seen', 'true');

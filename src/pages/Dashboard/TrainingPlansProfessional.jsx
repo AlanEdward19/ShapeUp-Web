@@ -11,7 +11,7 @@ import './TrainingPlansProfessional.css';
 
 const TrainingPlansProfessional = () => {
     const { t } = useLanguage();
-    const { setIsOpen, setSteps } = useTour();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [templates, setTemplates] = useState(() => {
         const stored = localStorage.getItem('shapeup_plan_templates');
         if (stored) return JSON.parse(stored);
@@ -30,28 +30,29 @@ const TrainingPlansProfessional = () => {
             const tourSteps = [
                 {
                     selector: '[data-tour="tpp-header"]',
-                    content: 'Esta é a sua Biblioteca de Planos. Aqui você cria e gerencia os templates de treino que poderão ser atribuídos para qualquer cliente.',
+                    content: t('tour.training_pro.1'),
                 }
             ];
 
             if (templates.length > 0) {
                 tourSteps.push({
                     selector: '[data-tour="tpp-card"]',
-                    content: 'Cada card de template exibe o resumo do plano: fase, dificuldade, número de exercícios, séries e tempo estimado de duração.',
+                    content: t('tour.training_pro.2'),
                 });
                 tourSteps.push({
                     selector: '[data-tour="tpp-card-actions"]',
-                    content: 'Com os dois botões no rodapé do card você pode Editar o template (ajustar exercícios e séries) ou Atribuir diretamente a um cliente da sua lista.',
+                    content: t('tour.training_pro.3'),
                 });
             } else {
                 tourSteps.push({
                     selector: '.su-empty-library',
-                    content: 'Sua biblioteca está vazia! Clique em "Criar Primeiro Plano" para montar seu primeiro template de treino reutilizável.',
+                    content: t('tour.training_pro.4'),
                 });
             }
 
             setSteps(tourSteps);
-            setTimeout(() => {
+            setCurrentStep(0);
+setTimeout(() => {
                 setIsOpen(true);
             }, 600);
             sessionStorage.setItem('shapeup_pro_training_plans_tour_seen', 'true');

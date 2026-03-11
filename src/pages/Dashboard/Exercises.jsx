@@ -13,7 +13,7 @@ import { exercisesDB, availableMuscles } from '../../data/mockExercises';
 
 const Exercises = () => {
     const { t } = useLanguage();
-    const { setIsOpen, setSteps } = useTour();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMuscles, setSelectedMuscles] = useState([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -27,19 +27,20 @@ const Exercises = () => {
             const tourSteps = [
                 {
                     selector: '[data-tour="ex-header"]',
-                    content: 'Esta é a Biblioteca de Exercícios com todos os movimentos disponíveis na plataforma. Você pode sugerir um novo exercício para inclusão clicando no botão ao lado!',
+                    content: t('tour.exercises.1'),
                 },
                 {
                     selector: '[data-tour="ex-toolbar"]',
-                    content: 'Use a busca para encontrar exercícios pelo nome, ou clique em Filtrar para selecionar grupos musculares específicos e refinar os resultados.',
+                    content: t('tour.exercises.2'),
                 },
                 {
                     selector: '[data-tour="ex-card"]',
-                    content: 'Clique em qualquer card para visualizar os detalhes completos do exercício: músculos trabalhados, equipamento necessário e instruções de execução.',
+                    content: t('tour.exercises.3'),
                 }
             ];
             setSteps(tourSteps);
-            setTimeout(() => {
+            setCurrentStep(0);
+setTimeout(() => {
                 setIsOpen(true);
             }, 500);
             sessionStorage.setItem('shapeup_exercises_tour_seen', 'true');

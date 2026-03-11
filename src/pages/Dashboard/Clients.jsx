@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
-import { Search, Filter, MessageSquare, ExternalLink, Play, Pause, Trash2, DollarSign } from 'lucide-react';
+import { Search, Filter, MessageCircle, TrendingUp, MoreVertical, Edit3, Trash2, Calendar, CheckCircle, Activity, SkipForward, Play, Pause, DollarSign, X, Power, AlertCircle, PauseCircle } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -17,11 +17,12 @@ const initialClientsList = [];
 const Clients = () => {
     const navigate = useNavigate();
     const { t } = useLanguage();
-    const { setIsOpen, setSteps } = useTour();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [showInvite, setShowInvite] = useState(false);
     const [clients, setClients] = useState([]);
     const [clientsLoaded, setClientsLoaded] = useState(false);
     const [clientToDelete, setClientToDelete] = useState(null);
+    const [clientToToggle, setClientToToggle] = useState(null);
     const [billingClient, setBillingClient] = useState(null);
     const [justInvitedClient, setJustInvitedClient] = useState(false);
 
@@ -84,15 +85,15 @@ const Clients = () => {
             const tourSteps = [
                 {
                     selector: '[data-tour="clients-header"]',
-                    content: 'Nesta tela você gerencia toda a sua carteira de clientes, acompanhando status e acesso aos detalhes de cada um.',
+                    content: t('tour.clients.1'),
                 },
                 {
                     selector: '[data-tour="clients-invite-btn"]',
-                    content: 'Você sempre pode convidar um novo aluno clicando aqui.',
+                    content: t('tour.clients.2'),
                 },
                 {
                     selector: '[data-tour="clients-toolbar"]',
-                    content: 'Use a barra de pesquisa para buscar pelo nome, e o filtro para exibir clientes por status (Ativos, Inativos, etc).',
+                    content: t('tour.clients.3'),
                 }
             ];
 
@@ -100,27 +101,35 @@ const Clients = () => {
             if (clients.length > 0) {
                 tourSteps.push({
                     selector: '[data-tour="clients-row"]:first-child',
-                    content: 'Clique em qualquer lugar da linha para abrir o perfil detalhado do cliente.',
+                    content: t('tour.clients.4'),
                 });
                 tourSteps.push({
                     selector: '[data-tour="clients-actions"]:first-child',
-                    content: 'Aqui você tem atalhos rápidos: suspender acesso temporariamente (pausar), gerenciar faturamento, ou excluir o cliente.',
+                    content: t('tour.clients.5'),
+                });
+                tourSteps.push({
+                    selector: '[data-tour="assign-billing-btn"]',
+                    content: t('tour.clients.9') || 'Click here to assign or modify the billing plan for this client.',
                 });
             } else {
                 tourSteps.push({
                     selector: '.su-clients-table',
-                    content: 'Seus clientes cadastrados aparecerão aqui nesta tabela em formato de lista.',
+                    content: t('tour.clients.6'),
                 });
             }
 
             setSteps(tourSteps);
+            setCurrentStep(0);
+            
+            // Allow time for DOM parsing before opening
             setTimeout(() => {
                 setIsOpen(true);
-            }, 600); // Slight delay for render
+            }, 600); 
 
             localStorage.setItem('shapeup_clients_tour_seen', 'true');
         }
-    }, [setIsOpen, setSteps, clients.length, clientsLoaded]); // Depend on clients.length so we capture the first load of data
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setIsOpen, setSteps, setCurrentStep, clientsLoaded]);
 
     // ─── Post-Invite Tour Trigger ─────────────────────────────────────
     useEffect(() => {
@@ -130,24 +139,33 @@ const Clients = () => {
             const tourSteps = [
                 {
                     selector: 'tr[data-tour="clients-row"]:last-child',
-                    content: 'Pronto! Seu novo convite foi enviado. Observe que o novo cliente já aparece na sua lista, inicialmente com o status de "Convidado".',
+                    content: t('tour.clients.7'),
                 },
                 {
                     selector: 'tr:last-child [data-tour="clients-status"]',
-                    content: 'Assim que ele criar a conta com o e-mail convidado, seu status mudará para "Ativo" e a assiduidade e o último check-in começarão a ser rastreados automaticamente!',
+                    content: t('tour.clients.8'),
                 }
             ];
-            setSteps(tourSteps);
-            setTimeout(() => {
+            
+            // Wait for modal to fully disappear and DOM to update
+            const t1 = setTimeout(() => {
+                setSteps(tourSteps);
+                setCurrentStep(0);
                 setIsOpen(true);
-            }, 1000); // 1000ms delay to wait for modal fade out
+            }, 800); 
 
-            // Wait slightly before resetting the flag to let the UI settle
-            setTimeout(() => {
+            // Reset the flag to let UI settle
+            const t2 = setTimeout(() => {
                 setJustInvitedClient(false);
             }, 2000);
+            
+            return () => {
+                clearTimeout(t1);
+                clearTimeout(t2);
+            }
         }
-    }, [justInvitedClient, showInvite, setIsOpen, setSteps]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [justInvitedClient, showInvite, setIsOpen, setSteps, setCurrentStep]);
 
 
     const handleInvite = (emailAddress) => {
@@ -187,11 +205,17 @@ const Clients = () => {
         navigate(`/dashboard/clients/${id}`);
     };
 
-    const handleToggleStatus = (id, currentStatus) => {
+    const handleToggleStatusRequest = (e, client) => {
+        e.stopPropagation();
+        setClientToToggle(client);
+    };
+
+    const confirmToggleStatus = () => {
+        if (!clientToToggle) return;
         const updated = clients.map(c => {
-            if (c.id === id) {
+            if (c.id === clientToToggle.id) {
                 let newStatus;
-                if (currentStatus === 'Inactive') {
+                if (clientToToggle.status === 'Inactive') {
                     // When reactivating, restore the correct status based on compliance
                     newStatus = c.compliance < 70 ? 'Needs Attention' : 'Active';
                 } else {
@@ -203,6 +227,7 @@ const Clients = () => {
         });
         setClients(updated);
         localStorage.setItem('shapeup_clients', JSON.stringify(updated));
+        setClientToToggle(null);
     };
 
     const handleDeleteClient = (client) => {
@@ -260,6 +285,34 @@ const Clients = () => {
                                 onClick={confirmDeleteClient}
                             >
                                 {t('clients.modal.delete.confirm')}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Status Toggle Confirmation Modal */}
+            {clientToToggle && (
+                <div className="su-modal-overlay" onClick={() => setClientToToggle(null)}>
+                    <div className="su-modal-box su-confirm-modal" onClick={e => e.stopPropagation()}>
+                        <div className="su-confirm-icon" style={{ background: clientToToggle.status === 'Inactive' ? '#dcfce7' : '#fee2e2', color: clientToToggle.status === 'Inactive' ? '#166534' : '#991b1b' }}>
+                            {clientToToggle.status === 'Inactive' ? <CheckCircle size={28} /> : <AlertCircle size={28} />}
+                        </div>
+                        <h3 className="su-confirm-title">{clientToToggle.status === 'Inactive' ? t('clients.modal.toggle.title.act') : t('clients.modal.toggle.title.inact')}</h3>
+                        <p className="su-confirm-body">
+                            {clientToToggle.status === 'Inactive' 
+                                ? t('clients.modal.toggle.body.act').replace('{{name}}', clientToToggle.name)
+                                : t('clients.modal.toggle.body.inact').replace('{{name}}', clientToToggle.name)}
+                        </p>
+                        <div className="su-confirm-actions">
+                            <Button variant="outline" onClick={() => setClientToToggle(null)}>
+                                {t('clients.modal.toggle.cancel')}
+                            </Button>
+                            <Button
+                                style={{ background: clientToToggle.status === 'Inactive' ? '#16a34a' : '#ef4444', borderColor: clientToToggle.status === 'Inactive' ? '#16a34a' : '#ef4444' }}
+                                onClick={confirmToggleStatus}
+                            >
+                                {clientToToggle.status === 'Inactive' ? t('clients.modal.toggle.confirm.act') : t('clients.modal.toggle.confirm.inact')}
                             </Button>
                         </div>
                     </div>
@@ -350,15 +403,14 @@ const Clients = () => {
                                         <div className="su-table-actions" onClick={(e) => e.stopPropagation()} data-tour="clients-actions">
 
                                             {/* Activate / Deactivate Toggle */}
-                                            {client.status === 'Inactive' ? (
-                                                <button className="su-icon-btn su-text-muted" title="Activate Client" onClick={() => handleToggleStatus(client.id, client.status)}>
-                                                    <Play size={16} />
-                                                </button>
-                                            ) : (
-                                                <button className="su-icon-btn su-text-muted" title="Deactivate Client" onClick={() => handleToggleStatus(client.id, client.status)}>
-                                                    <Pause size={16} />
-                                                </button>
-                                            )}
+                                            <button
+                                                className="su-icon-btn su-text-muted"
+                                                title="Toggle Status"
+                                                onClick={(e) => handleToggleStatusRequest(e, client)}
+                                                data-tour="clients-actions"
+                                            >
+                                                {client.status === 'Inactive' ? <Power size={18} /> : <PauseCircle size={18} />}
+                                            </button>
 
                                             {/* Billing Action */}
                                             <button className="su-icon-btn su-text-muted" title="Manage Billing" onClick={() => setBillingClient(client)}>

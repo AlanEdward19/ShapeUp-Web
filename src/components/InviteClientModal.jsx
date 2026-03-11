@@ -12,25 +12,30 @@ const InviteClientModal = ({ onClose, onInvite }) => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const hasSeenTour = sessionStorage.getItem('shapeup_invite_client_tour_seen');
+        const hasSeenTour = localStorage.getItem('shapeup_invite_client_tour_seen');
         if (!hasSeenTour) {
             const tourSteps = [
                 {
                     selector: '[data-tour="invite-email"]',
-                    content: 'Insira o endereço de e-mail do seu cliente aqui. Ele receberá o convite para criar uma conta ou associar uma conta existente à você.',
+                    content: t('tour.invite.1'),
                 },
                 {
                     selector: '[data-tour="invite-send"]',
-                    content: 'Após preencher o e-mail, clique aqui para enviar o convite.',
+                    content: t('tour.invite.2'),
                 }
             ];
-            setSteps(tourSteps);
+            
+            console.log("Scheduling invite tour...");
             setTimeout(() => {
+                console.log("Firing invite tour!");
+                setSteps(tourSteps);
                 setIsOpen(true);
             }, 600); // Wait for modal animation
-            sessionStorage.setItem('shapeup_invite_client_tour_seen', 'true');
+            
+            localStorage.setItem('shapeup_invite_client_tour_seen', 'true');
         }
-    }, [setIsOpen, setSteps]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [t]);
 
     const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 

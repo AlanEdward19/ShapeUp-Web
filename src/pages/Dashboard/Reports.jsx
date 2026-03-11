@@ -18,7 +18,7 @@ const reportHistory = [
 
 const Reports = () => {
     const { t, unitSystem } = useLanguage();
-    const { setIsOpen, setSteps } = useTour();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [reportType, setReportType] = useState('performance');
     const [targetScope, setTargetScope] = useState('all');
     const [selectedClientId, setSelectedClientId] = useState('');
@@ -51,23 +51,24 @@ const Reports = () => {
             const tourSteps = [
                 {
                     selector: '[data-tour="rep-header"]',
-                    content: 'Aqui está a Central de Relatórios! Você pode gerar exportações detalhadas de Performance, Faturamento e Histórico para todos os seus clientes ou para um individualmente.',
+                    content: t('tour.reports.1'),
                 },
                 {
                     selector: '[data-tour="rep-generator"]',
-                    content: 'Configure o relatório aqui: escolha o Tipo (Performance, Faturamento, etc), o Escopo (todos os clientes ou um específico), o Período e o Formato de exportação (PDF ou CSV).',
+                    content: t('tour.reports.2'),
                 },
                 {
                     selector: '[data-tour="rep-generate-btn"]',
-                    content: 'Após configurar as opções, clique aqui para gerar e baixar seu relatório. O arquivo será gerado instantaneamente e também salvo no histórico ao lado.',
+                    content: t('tour.reports.3'),
                 },
                 {
                     selector: '[data-tour="rep-history"]',
-                    content: 'Seus relatórios gerados aparecem aqui no histórico para referência futura.',
+                    content: t('tour.reports.4'),
                 }
             ];
             setSteps(tourSteps);
-            setTimeout(() => {
+            setCurrentStep(0);
+setTimeout(() => {
                 setIsOpen(true);
             }, 500);
             sessionStorage.setItem('shapeup_reports_tour_seen', 'true');
