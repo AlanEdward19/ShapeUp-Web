@@ -1,21 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Logo from '../components/Logo/Logo';
+import { useLanguage } from '../contexts/LanguageContext';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
+    const { t } = useLanguage();
+    const [selectedRole, setSelectedRole] = useState(null); // null means auto-detect by email if possible, or force select
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
         const email = e.target.email.value.trim().toLowerCase();
-        const role = email === 'treinador@outlook.com' ? 'professional' : 'client';
+
+        // If user explicitly selected a role, use it. Otherwise, fallback to old logic.
+        let role = selectedRole;
+        if (!role) {
+            role = email === 'treinador@outlook.com' ? 'professional' : 'client';
+        }
         localStorage.setItem('shapeup_role', role);
 
         if (role === 'professional') {
             localStorage.setItem('shapeup_user_name', 'Coach Alan');
+        } else if (role === 'independent') {
+            localStorage.setItem('shapeup_client_id', 'independent');
+            localStorage.setItem('shapeup_user_name', email.split('@')[0]);
         } else {
             const storedClients = localStorage.getItem('shapeup_clients');
             let matchedId = 1;
@@ -77,7 +89,34 @@ const Login = ({ onLogin }) => {
                             </div>
                         </div>
 
-                        <Button type="submit" fullWidth className="btn-sign-in">
+                        <div className="role-selection-group">
+                            <label className="su-input-label">{t('login.role.label')}</label>
+                            <div className="role-options">
+                                <button
+                                    type="button"
+                                    className={`role-opt ${selectedRole === 'professional' ? 'active' : ''}`}
+                                    onClick={() => setSelectedRole('professional')}
+                                >
+                                    {t('header.role.pro')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`role-opt ${selectedRole === 'client' ? 'active' : ''}`}
+                                    onClick={() => setSelectedRole('client')}
+                                >
+                                    {t('header.role.client')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`role-opt ${selectedRole === 'independent' ? 'active' : ''}`}
+                                    onClick={() => setSelectedRole('independent')}
+                                >
+                                    {t('header.role.independent')}
+                                </button>
+                            </div>
+                        </div>
+
+                        <Button type="submit" fullWidth className="btn-sign-in" disabled={!selectedRole}>
                             Sign In
                         </Button>
 

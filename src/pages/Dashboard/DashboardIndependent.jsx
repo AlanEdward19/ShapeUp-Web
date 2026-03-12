@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Card from '../../components/Card';
-import { TrendingUp, Flame, CalendarDays, Award, Target } from 'lucide-react';
+import { TrendingUp, Flame, CalendarDays, Award } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useTour } from '@reactour/tour';
 import './DashboardClient.css';
 
-// ─── Helper: normalize any date string to YYYY-MM-DD in LOCAL time ───
+// --- Helper: normalize any date string to YYYY-MM-DD in LOCAL time ---
 const toLocalDateKey = (dateStr) => {
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return dateStr;
@@ -16,10 +15,6 @@ const toLocalDateKey = (dateStr) => {
     return `${year}-${month}-${day}`;
 };
 
-// ─── Helper: YYYY-MM-DD for today in local time ───────────────────────
-const getTodayKey = () => toLocalDateKey(new Date());
-
-// ─── Helper: ISO week key ─────────────────────────────────────────────
 const getWeekKey = (date) => {
     const d = new Date(date);
     d.setHours(0, 0, 0, 0);
@@ -29,31 +24,25 @@ const getWeekKey = (date) => {
     return `${d.getFullYear()}-W${weekNo}`;
 };
 
-const DashboardClient = () => {
+const DashboardIndependent = () => {
     const { t, convertWeight, formatWeight } = useLanguage();
-    const { setIsOpen, setSteps, setCurrentStep } = useTour();
-
     const storedName = localStorage.getItem('shapeup_user_name') || 'Athlete';
     const firstName = storedName.split(' ')[0];
-    const clientId = localStorage.getItem('shapeup_client_id') || 1;
 
-    // ─── Re-read localStorage on every mount ─────────────────────────
     const [allHistory, setAllHistory] = useState([]);
     const [plansData, setPlansData] = useState({ plansWithSessions: 0, totalPlans: 0 });
-    const [objectives, setObjectives] = useState({ goalWeight: '', history: [] });
 
     useEffect(() => {
-        const storedPlans = localStorage.getItem(`shapeup_client_plans_${clientId}`);
+        const storedPlans = localStorage.getItem('shapeup_independent_plans');
         if (storedPlans) {
             const plans = JSON.parse(storedPlans);
-            const getTimestamp = (id) => {
-                if (typeof id === 'number') return id;
-                if (typeof id === 'string') return parseInt(id.replace(/[^0-9]/g, '')) || 0;
-                return 0;
-            };
             const history = plans
                 .flatMap(p => (p.history || []).map(h => ({ ...h, planName: p.name })))
-                .sort((a, b) => getTimestamp(a.id) - getTimestamp(b.id));
+                .sort((a, b) => {
+                    const idA = a.id?.replace('h', '') || 0;
+                    const idB = b.id?.replace('h', '') || 0;
+                    return parseInt(idA) - parseInt(idB);
+                });
 
             setAllHistory(history);
             setPlansData({
@@ -61,47 +50,10 @@ const DashboardClient = () => {
                 totalPlans: plans.length
             });
         }
-
-        const storedObjs = localStorage.getItem(`shapeup_client_objectives_${clientId}`);
-        if (storedObjs) {
-            setObjectives(JSON.parse(storedObjs));
-        }
-    }, [clientId]);
-
-    // ─── Tour Trigger ─────────────────────────────────────────────────
-    useEffect(() => {
-        const hasSeenTour = localStorage.getItem('shapeup_client_dashboard_tour_seen');
-        if (!hasSeenTour) {
-            const tourSteps = [
-                {
-                    selector: '[data-tour="client-header"]',
-                    content: t('tour.dashboard_client.1'),
-                },
-                {
-                    selector: '[data-tour="client-metrics"]',
-                    content: t('tour.dashboard_client.3'),
-                },
-                {
-                    selector: '[data-tour="client-achievements"]',
-                    content: t('tour.dashboard_client.4'),
-                }
-            ];
-
-            setSteps(tourSteps);
-            setCurrentStep(0);
-
-            setTimeout(() => {
-                setIsOpen(true);
-            }, 600);
-
-            localStorage.setItem('shapeup_client_dashboard_tour_seen', 'true');
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setIsOpen, setSteps, setCurrentStep, t]);
+    }, []);
 
     const currentWeekKey = getWeekKey(new Date());
 
-    // ─── Weekly Volume ────────────────────────────────────────────────
     const { weeklyVolumeFormatted, weeklyDiff } = useMemo(() => {
         const lastWeekKey = getWeekKey(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
         const sumVol = sessions => sessions.reduce((acc, h) => {
@@ -115,10 +67,9 @@ const DashboardClient = () => {
         const lastVol = sumVol(allHistory.filter(h => getWeekKey(h.date) === lastWeekKey));
         const pct = lastVol === 0 ? null : Math.round(((thisVol - lastVol) / lastVol) * 100);
         const formatted = thisVol >= 1000 ? `${(thisVol / 1000).toFixed(1)}k` : thisVol.toFixed(0);
-        return { weeklyVolumeFormatted: formatted, weeklyDiff: pct, hasVolume: thisVol > 0 };
-    }, [allHistory, currentWeekKey]);
+        return { weeklyVolumeFormatted: formatted, weeklyDiff: pct };
+    }, [allHistory, currentWeekKey, convertWeight]);
 
-    // ─── Current Streak (consecutive days, LOCAL timezone) ───────────
     const streakDays = useMemo(() => {
         if (allHistory.length === 0) return 0;
         const daySet = new Set(allHistory.map(h => toLocalDateKey(h.date)));
@@ -136,7 +87,6 @@ const DashboardClient = () => {
         return streak;
     }, [allHistory]);
 
-    // ─── Volume Progression chart (last 8 sessions) ───────────────────
     const chartData = useMemo(() => {
         return allHistory.slice(-8).map((h, i) => {
             const rawStr = h.totalVol || '0';
@@ -145,33 +95,24 @@ const DashboardClient = () => {
             const converted = isNaN(v) ? 0 : convertWeight(v, originUnit);
             return { session: `S${i + 1}`, volume: converted, date: h.date };
         });
-    }, [allHistory]);
+    }, [allHistory, convertWeight]);
 
-
-    // ─── Recent Improvements ─────────────────────────────────────────
     const recentImprovements = useMemo(() => {
         const bestMap = {};
         const improvementsList = [];
 
-        // allHistory is now reliably sorted by timestamp ascending
         allHistory.forEach(h => {
             (h.exercises || []).forEach(ex => {
                 if (ex.skipped) return;
-
                 const exerciseName = (ex.name || '').trim();
-                if (!exerciseName) return;
-
-                // Find best set in this session
                 let sessionMaxLoad = 0;
                 let sessionMaxReps = 0;
 
                 (ex.sets || []).forEach(s => {
                     const l = parseFloat(s.load) || 0;
                     const r = parseInt(s.reps) || 0;
-                    if (l > sessionMaxLoad) {
+                    if (l > sessionMaxLoad || (l === sessionMaxLoad && r > sessionMaxReps)) {
                         sessionMaxLoad = l;
-                        sessionMaxReps = r;
-                    } else if (l === sessionMaxLoad && r > sessionMaxReps) {
                         sessionMaxReps = r;
                     }
                 });
@@ -179,67 +120,48 @@ const DashboardClient = () => {
                 if (sessionMaxLoad === 0 && sessionMaxReps === 0) return;
 
                 if (!bestMap[exerciseName]) {
-                    bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps, date: h.date };
+                    bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps };
                 } else {
                     const best = bestMap[exerciseName];
-                    // PR check: More weight OR same weight with more reps
-                    const isImprovement = sessionMaxLoad > best.load || (sessionMaxLoad === best.load && sessionMaxReps > best.reps);
-
-                    if (isImprovement) {
+                    if (sessionMaxLoad > best.load || (sessionMaxLoad === best.load && sessionMaxReps > best.reps)) {
                         improvementsList.push({
                             name: exerciseName,
                             from: { load: best.load, reps: best.reps },
                             to: { load: sessionMaxLoad, reps: sessionMaxReps },
                             date: h.date
                         });
-                        bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps, date: h.date };
+                        bestMap[exerciseName] = { load: sessionMaxLoad, reps: sessionMaxReps };
                     }
                 }
             });
         });
 
-        // Return the 3 most recent improvements
-        // Sort improvements by date descending
         return improvementsList
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 3)
-            .map(imp => {
-                // Since load doesn't store a string, we have to look up the session's totalVol to find the unit
-                const fromOriginUnit = imp.fromSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric';
-                const toOriginUnit = imp.toSession?.totalVol?.includes('lbs') ? 'imperial' : 'metric';
-
-                const fromLoadConverted = convertWeight(imp.from.load, fromOriginUnit);
-                const toLoadConverted = convertWeight(imp.to.load, toOriginUnit);
-
-                const fromFormatted = fromLoadConverted % 1 === 0 ? fromLoadConverted.toString() : fromLoadConverted.toFixed(1);
-                const toFormatted = toLoadConverted % 1 === 0 ? toLoadConverted.toString() : toLoadConverted.toFixed(1);
-
-                return {
-                    name: imp.name,
-                    from: `${fromFormatted} × ${imp.from.reps}`,
-                    to: `${toFormatted} × ${imp.to.reps}`
-                };
-            });
+            .map(imp => ({
+                name: imp.name,
+                from: `${imp.from.load} × ${imp.from.reps}`,
+                to: `${imp.to.load} × ${imp.to.reps}`
+            }));
     }, [allHistory]);
 
     const hasData = allHistory.length > 0;
-    const { plansWithSessions, totalPlans } = plansData;
 
     return (
         <div className="su-dashboard-client">
-            <div className="su-dashboard-header-flex" data-tour="client-header">
+            <div className="su-dashboard-header-flex">
                 <div>
                     <h1 className="su-page-title">{t('client.dashboard.welcome')} {firstName}</h1>
                     <p className="su-page-subtitle">
                         {hasData
-                            ? `${plansWithSessions} / ${totalPlans} ${t('client.dashboard.trend.sessions.plans')}`
+                            ? `${plansData.plansWithSessions} / ${plansData.totalPlans} ${t('client.dashboard.trend.sessions.plans')}`
                             : t('client.dashboard.subtitle.nodata')}
                     </p>
                 </div>
             </div>
 
-            {/* Aggregate Metrics */}
-            <div className="su-metrics-grid su-mt-4" data-tour="client-metrics">
+            <div className="su-metrics-grid su-mt-4">
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
                         <span className="su-metric-label">{t('client.dashboard.metric.weekly')}</span>
@@ -259,9 +181,7 @@ const DashboardClient = () => {
                         <span className="su-metric-label">{t('client.dashboard.metric.streak')}</span>
                         <Flame size={20} className="su-warning-text" />
                     </div>
-                    <div className="su-metric-value">
-                        {streakDays}
-                    </div>
+                    <div className="su-metric-value">{streakDays}</div>
                     <span className="su-metric-trend positive">
                         {streakDays === 0 ? t('client.dashboard.trend.streak.start') : streakDays >= 7 ? t('client.dashboard.trend.streak.great') : t('client.dashboard.trend.streak.keep')}
                     </span>
@@ -273,16 +193,14 @@ const DashboardClient = () => {
                         <CalendarDays size={20} className="su-accent-text" />
                     </div>
                     <div className="su-metric-value">
-                        {plansWithSessions}
-                        <span style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>/{totalPlans}</span>
+                        {plansData.plansWithSessions}
+                        <span style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>/{plansData.totalPlans}</span>
                     </div>
-                    <span className="su-metric-trend">{totalPlans === 0 ? t('client.dashboard.trend.sessions.noplans') : t('client.dashboard.trend.sessions.plans')}</span>
+                    <span className="su-metric-trend">{plansData.totalPlans === 0 ? t('client.dashboard.trend.sessions.noplans') : t('client.dashboard.trend.sessions.plans')}</span>
                 </Card>
             </div>
 
             <div className="su-overview-layout">
-
-                {/* Main Chart Area */}
                 <div className="su-main-chart-area">
                     <Card className="su-chart-card">
                         <h3 className="su-section-title">{t('client.dashboard.chart.title')}</h3>
@@ -310,17 +228,14 @@ const DashboardClient = () => {
                             )}
                         </div>
                     </Card>
-
                 </div>
 
-                {/* Sidebar Info */}
-                <div className="su-overview-sidebar" data-tour="client-achievements">
+                <div className="su-overview-sidebar">
                     <Card className="su-achievements-card">
                         <h3 className="su-section-title">
                             <Award size={20} style={{ verticalAlign: 'text-bottom', marginRight: '8px', color: 'var(--warning)' }} />
                             {t('client.dashboard.achievements.title')}
                         </h3>
-
                         <div className="su-pr-list">
                             {recentImprovements.length > 0 ? (
                                 recentImprovements.map((imp) => (
@@ -342,12 +257,9 @@ const DashboardClient = () => {
                         </div>
                     </Card>
                 </div>
-
             </div>
-
         </div>
     );
 };
 
-export default DashboardClient;
-
+export default DashboardIndependent;
