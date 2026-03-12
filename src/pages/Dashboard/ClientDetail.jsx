@@ -180,7 +180,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
 
             setSteps(tourSteps);
             setCurrentStep(0);
-setTimeout(() => {
+            setTimeout(() => {
                 setIsOpen(true);
             }, 700);
 
@@ -691,7 +691,9 @@ const ClientDetail = () => {
 
     const dynamicVolumeProgress = allHistory.map((h, i) => {
         const rawVol = h.totalVol || '0';
-        const numPart = parseInt(rawVol.replace(/,/g, '').replace(' kg', '').replace(' lbs', '')) || 0;
+        // Strip out formatting characters (dots, commas) safely
+        const cleanVolStr = rawVol.toString().replace(/[^\d]/g, '');
+        const numPart = parseInt(cleanVolStr) || 0;
         const originUnit = rawVol.includes('lbs') ? 'imperial' : 'metric';
 
         return {
@@ -736,7 +738,7 @@ const ClientDetail = () => {
 
             setSteps(tourSteps);
             setCurrentStep(0);
-setTimeout(() => {
+            setTimeout(() => {
                 setIsOpen(true);
             }, 600);
 
@@ -864,7 +866,13 @@ setTimeout(() => {
     }, [plans, id]);
 
     const handleSavePlan = (updated) => {
-        setPlans(prev => prev.map(p => p.id === updated.id ? updated : p));
+        setPlans(prev => {
+            const exists = prev.find(p => p.id === updated.id);
+            if (exists) {
+                return prev.map(p => p.id === updated.id ? updated : p);
+            }
+            return [...prev, updated];
+        });
         setEditingPlan(null);
         addNotification(id.toString(), 'alert', 'Plan Updated', `Your coach has updated "${updated.name}"`, 'primary', {
             link: '/dashboard/training'
@@ -880,7 +888,6 @@ setTimeout(() => {
             phase: 'Hypertrophy', difficulty: 'Intermediate',
             weeks: 6, active: false, notes: '', exercises: [], history: []
         };
-        setPlans(prev => [...prev, newPlan]);
         setEditingPlan(newPlan);
     };
 
@@ -896,7 +903,6 @@ setTimeout(() => {
                 sets: ex.sets.map(s => ({ ...s }))
             }))
         };
-        setPlans(prev => [...prev, copy]);
         setEditingPlan(copy);
     };
 

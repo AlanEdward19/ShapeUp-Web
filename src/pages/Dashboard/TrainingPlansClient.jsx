@@ -87,12 +87,12 @@ const ClientView = () => {
             ];
             setSteps(tourSteps);
             setCurrentStep(0);
-setTimeout(() => {
+            setTimeout(() => {
                 setIsOpen(true);
             }, 700);
             localStorage.setItem('shapeup_training_plans_tour_seen', 'true');
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setIsOpen, setSteps]);
 
     // -- Session Engine Tour Trigger --
@@ -126,7 +126,7 @@ setTimeout(() => {
                 localStorage.setItem('shapeup_session_engine_tour_seen', 'true');
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionActive, setIsOpen, setSteps, setCurrentStep, t]);
 
     // -- Start A Specific Session --
@@ -160,11 +160,13 @@ setTimeout(() => {
         let globalInterval = null;
         let restInterval = null;
 
-        if (sessionActive) {
+        const isPausedByModal = showFeedbackModal || showOverviewModal || showCancelModal;
+
+        if (sessionActive && !isPausedByModal) {
             globalInterval = setInterval(() => setWorkoutTime(sec => sec + 1), 1000);
         }
 
-        if (isResting && restTimer > 0) {
+        if (isResting && restTimer > 0 && !isPausedByModal) {
             restInterval = setInterval(() => setRestTimer(sec => sec - 1), 1000);
         } else if (restTimer === 0 && isResting) {
             setIsResting(false);
@@ -174,7 +176,7 @@ setTimeout(() => {
             clearInterval(globalInterval);
             clearInterval(restInterval);
         };
-    }, [sessionActive, isResting, restTimer]);
+    }, [sessionActive, isResting, restTimer, showFeedbackModal, showOverviewModal, showCancelModal]);
 
 
     // -- Handlers --
@@ -268,7 +270,7 @@ setTimeout(() => {
     const skipOverviewAndFinish = () => {
         // Compute basic stats to save to history
         const totalVol = exercises.reduce((acc, ex) => {
-            return acc + ex.sets.reduce((setAcc, set) => {
+            return acc + ex.sets.filter(s => s.completed).reduce((setAcc, set) => {
                 const w = parseFloat(set.log.weight) || 0;
                 const r = parseFloat(set.log.reps) || 0;
                 return setAcc + (w * r);
@@ -387,7 +389,10 @@ setTimeout(() => {
     const allHistory = assignedPlans.flatMap(plan =>
         (plan.history || []).map(h => {
             const rawVol = h.totalVol || '0';
-            const v = parseFloat(rawVol.toString().replace(/[^0-9.]/g, ''));
+            // Strip out formatting characters (dots, commas) safely, then convert to float
+            // e.g. "1.680" -> "1680", "1,680" -> "1680"
+            const cleanVolStr = rawVol.toString().replace(/[^\d]/g, '');
+            const v = parseFloat(cleanVolStr);
             const originUnit = rawVol.includes('lbs') ? 'imperial' : 'metric';
             const converted = isNaN(v) ? 0 : convertWeight(v, originUnit);
 
@@ -631,7 +636,7 @@ setTimeout(() => {
             {/* Post-Session Gamified Overview Modal */}
             {showOverviewModal && (() => {
                 const totalVol = exercises.reduce((acc, ex) => {
-                    return acc + ex.sets.reduce((setAcc, set) => {
+                    return acc + ex.sets.filter(s => s.completed).reduce((setAcc, set) => {
                         const w = parseFloat(set.log.weight) || 0;
                         const r = parseFloat(set.log.reps) || 0;
                         return setAcc + (w * r);
@@ -679,9 +684,7 @@ setTimeout(() => {
 
                     if (maxL > 0 || maxR > 0) {
                         const prevBest = previousBestMap[ex.name];
-                        if (!prevBest) {
-                            newPrsCount++; // First time logging = PR
-                        } else if (maxL > prevBest.load || (maxL === prevBest.load && maxR > prevBest.reps)) {
+                        if (prevBest && (maxL > prevBest.load || (maxL === prevBest.load && maxR > prevBest.reps))) {
                             newPrsCount++;
                         }
                     }

@@ -12,7 +12,7 @@ const InviteClientModal = ({ onClose, onInvite }) => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        const hasSeenTour = localStorage.getItem('shapeup_invite_client_tour_seen');
+        const hasSeenTour = sessionStorage.getItem('shapeup_invite_client_tour_seen');
         if (!hasSeenTour) {
             const tourSteps = [
                 {
@@ -24,18 +24,16 @@ const InviteClientModal = ({ onClose, onInvite }) => {
                     content: t('tour.invite.2'),
                 }
             ];
-            
-            console.log("Scheduling invite tour...");
+
             setTimeout(() => {
-                console.log("Firing invite tour!");
                 setSteps(tourSteps);
                 setIsOpen(true);
             }, 600); // Wait for modal animation
-            
-            localStorage.setItem('shapeup_invite_client_tour_seen', 'true');
+
+            sessionStorage.setItem('shapeup_invite_client_tour_seen', 'true');
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [t]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [t, setIsOpen, setSteps]);
 
     const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
