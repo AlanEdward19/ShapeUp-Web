@@ -97,7 +97,7 @@ export const ProSelect = ({ label, value, onChange, options }) => (
 export const TECHNIQUES = ['Straight', 'Cluster', 'Drop Set', 'Rest Pause', 'Muscle Round'];
 export const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
-export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
+export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false }) => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [name, setName] = useState(plan.name);
@@ -161,7 +161,8 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
 
     // ─── Plan Editor Tour Trigger ────────────────────────────────────
     React.useEffect(() => {
-        const hasSeenTour = localStorage.getItem('shapeup_plan_editor_tour_seen');
+        const tourKey = isIndependent ? 'shapeup_idep_plan_editor_tour_seen' : 'shapeup_plan_editor_tour_seen';
+        const hasSeenTour = localStorage.getItem(tourKey);
         if (!hasSeenTour) {
             const tourSteps = [
                 {
@@ -170,11 +171,11 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                 },
                 {
                     selector: '[data-tour="pe-stack"]',
-                    content: t('tour.clientdetail.1'),
+                    content: isIndependent ? t('tour.clientdetail_independent.1') : t('tour.clientdetail.1'),
                 },
                 {
                     selector: '[data-tour="pe-summary"]',
-                    content: t('tour.clientdetail.2'),
+                    content: isIndependent ? t('tour.clientdetail_independent.2') : t('tour.clientdetail.2'),
                 }
             ];
 
@@ -184,9 +185,9 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                 setIsOpen(true);
             }, 700);
 
-            localStorage.setItem('shapeup_plan_editor_tour_seen', 'true');
+            localStorage.setItem(tourKey, 'true');
         }
-    }, [setIsOpen, setSteps]);
+    }, [setIsOpen, setSteps, isIndependent, t]);
 
     // Derived summary values (live computed)
     const totalSets = exercises.reduce((acc, ex) => acc + ex.sets.length, 0);

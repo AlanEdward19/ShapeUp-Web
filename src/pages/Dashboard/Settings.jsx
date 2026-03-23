@@ -13,6 +13,7 @@ import './Settings.css';
 const Settings = () => {
     const {
         isProfessional,
+        isIndependent,
         coachProfile, setCoachProfile,
         clientProfile, setClientProfile
     } = useOutletContext();
@@ -229,7 +230,7 @@ const Settings = () => {
         { id: 'notifications', label: t('settings.tabs.notifications'), icon: <Bell size={18} /> },
         { id: 'preferences', label: t('settings.tabs.preferences'), icon: <Smartphone size={18} /> },
         { id: 'billing', label: t('settings.tabs.billing'), icon: <CreditCard size={18} /> },
-        { id: 'coach', label: t('settings.tabs.coach'), icon: <Shield size={18} /> }
+        ...(isIndependent ? [] : [{ id: 'coach', label: t('settings.tabs.coach'), icon: <Shield size={18} /> }])
     ];
 
     const activeTabsList = isProfessional ? tabsProfessional : tabsClient;
@@ -391,20 +392,24 @@ const Settings = () => {
                         <Card className="su-settings-card">
                             <h2 className="su-settings-section-title">{t('client.settings.notifications.title')}</h2>
                             <div className="su-settings-list">
-                                <div className="su-settings-list-item">
-                                    <div className="su-item-info">
-                                        <h4>{t('client.settings.notifications.chat.title')}</h4>
-                                        <p>{t('client.settings.notifications.chat.desc')}</p>
-                                    </div>
-                                    <div className={`su-toggle-switch ${notifPrefs.messages ? 'active' : ''}`} onClick={() => toggleNotifPref('messages')}></div>
-                                </div>
-                                <div className="su-settings-list-item">
-                                    <div className="su-item-info">
-                                        <h4>{t('client.settings.notifications.plan.title')}</h4>
-                                        <p>{t('client.settings.notifications.plan.desc')}</p>
-                                    </div>
-                                    <div className={`su-toggle-switch ${notifPrefs.alerts ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts')}></div>
-                                </div>
+                                {!isIndependent && (
+                                    <>
+                                        <div className="su-settings-list-item">
+                                            <div className="su-item-info">
+                                                <h4>{t('client.settings.notifications.chat.title')}</h4>
+                                                <p>{t('client.settings.notifications.chat.desc')}</p>
+                                            </div>
+                                            <div className={`su-toggle-switch ${notifPrefs.messages ? 'active' : ''}`} onClick={() => toggleNotifPref('messages')}></div>
+                                        </div>
+                                        <div className="su-settings-list-item">
+                                            <div className="su-item-info">
+                                                <h4>{t('client.settings.notifications.plan.title')}</h4>
+                                                <p>{t('client.settings.notifications.plan.desc')}</p>
+                                            </div>
+                                            <div className={`su-toggle-switch ${notifPrefs.alerts ? 'active' : ''}`} onClick={() => toggleNotifPref('alerts')}></div>
+                                        </div>
+                                    </>
+                                )}
                                 <div className="su-settings-list-item">
                                     <div className="su-item-info">
                                         <h4>{t('client.settings.notifications.system.title')}</h4>

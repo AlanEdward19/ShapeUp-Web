@@ -73,7 +73,10 @@ const TrainingPlansIndependent = () => {
     // ─── STATE MANAGEMENT ──────────────────────────────────────────
 
     // 1. Storage & Navigation
-    const [plans, setPlans] = useState([]);
+    const [plans, setPlans] = useState(() => {
+        const stored = localStorage.getItem('shapeup_independent_plans');
+        return stored ? JSON.parse(stored) : [];
+    });
     const [editingPlan, setEditingPlan] = useState(null);
 
     // 2. Session Engine State
@@ -97,13 +100,39 @@ const TrainingPlansIndependent = () => {
 
     // ─── EFFECTS ───────────────────────────────────────────────────
 
-    // Initial Load
+    // Initial Load handled in useState to prevent race conditions with Sync
+
+    // -- Independent Training Plans Tour Trigger --
     useEffect(() => {
-        const stored = localStorage.getItem('shapeup_independent_plans');
-        if (stored) {
-            setPlans(JSON.parse(stored));
+        if (sessionActive || editingPlan) return;
+
+        const hasSeenTour = localStorage.getItem('shapeup_independent_training_plans_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="idep-tp-header"]',
+                    content: t('tour.training_independent.1'),
+                },
+                {
+                    selector: '[data-tour="idep-tp-card"]',
+                    content: t('tour.training_independent.2'),
+                },
+                {
+                    selector: '[data-tour="idep-tp-history"]',
+                    content: t('tour.training_independent.3'),
+                }
+            ];
+
+            setSteps(tourSteps);
+            setCurrentStep(0);
+
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 600);
+
+            localStorage.setItem('shapeup_independent_training_plans_tour_seen', 'true');
         }
-    }, []);
+    }, [sessionActive, editingPlan, setIsOpen, setSteps, setCurrentStep, t]);
 
     // Sync Plans to Storage
     useEffect(() => {
@@ -489,14 +518,14 @@ const TrainingPlansIndependent = () => {
                     </div>
                     <Button variant="outline" onClick={() => setEditingPlan(null)}>{t('independent.builder.btn.back')}</Button>
                 </div>
-                <PlanEditor plan={editingPlan} onSave={handleSavePlan} onCancel={() => setEditingPlan(null)} />
+                <PlanEditor plan={editingPlan} isIndependent={true} onSave={handleSavePlan} onCancel={() => setEditingPlan(null)} />
             </div>
         );
     }
 
     return (
         <div className="su-client-dashboard">
-            <div className="su-dashboard-header">
+            <div className="su-dashboard-header" data-tour="idep-tp-header">
                 <div>
                     <h1 className="su-page-title">{t('client.training.title')}</h1>
                     <p className="su-text-muted">{t('independent.training.subtitle')}</p>
@@ -504,7 +533,7 @@ const TrainingPlansIndependent = () => {
                 <Button className="su-mt-4" icon={<Plus size={18} />} onClick={handleAddPlan}>{t('independent.training.btn.create')}</Button>
             </div>
 
-            <div className="su-independent-plans-list su-mt-8">
+            <div className="su-independent-plans-list su-mt-8" data-tour="idep-tp-card">
                 {plans.length === 0 ? (
                     <Card className="su-empty-state-card" style={{ textAlign: 'center', padding: '4rem' }}>
                         <DumbbellIcon size={40} className="su-text-muted su-mb-4" />
@@ -525,7 +554,7 @@ const TrainingPlansIndependent = () => {
                 )}
             </div>
 
-            <div className="su-history-section su-mt-12">
+            <div className="su-history-section su-mt-12" data-tour="idep-tp-history">
                 <h3 className="su-section-title su-mb-4">{t('independent.training.history.title')}</h3>
                 <div className="su-independent-history-scroll">
                     {allHistory.length === 0 ? (

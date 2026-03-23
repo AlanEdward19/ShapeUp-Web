@@ -3,6 +3,7 @@ import Card from '../../components/Card';
 import { TrendingUp, Flame, CalendarDays, Award } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useTour } from '@reactour/tour';
 import './DashboardClient.css';
 
 // --- Helper: normalize any date string to YYYY-MM-DD in LOCAL time ---
@@ -26,6 +27,7 @@ const getWeekKey = (date) => {
 
 const DashboardIndependent = () => {
     const { t, convertWeight, formatWeight } = useLanguage();
+    const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const storedName = localStorage.getItem('shapeup_user_name') || 'Athlete';
     const firstName = storedName.split(' ')[0];
 
@@ -51,6 +53,36 @@ const DashboardIndependent = () => {
             });
         }
     }, []);
+
+    // ─── Tour Trigger ─────────────────────────────────────────────────
+    useEffect(() => {
+        const hasSeenTour = localStorage.getItem('shapeup_independent_dashboard_tour_seen');
+        if (!hasSeenTour) {
+            const tourSteps = [
+                {
+                    selector: '[data-tour="idep-header"]',
+                    content: t('tour.dashboard_independent.1'),
+                },
+                {
+                    selector: '[data-tour="idep-metrics"]',
+                    content: t('tour.dashboard_independent.2'),
+                },
+                {
+                    selector: '[data-tour="idep-achievements"]',
+                    content: t('tour.dashboard_independent.3'),
+                }
+            ];
+
+            setSteps(tourSteps);
+            setCurrentStep(0);
+
+            setTimeout(() => {
+                setIsOpen(true);
+            }, 600);
+
+            localStorage.setItem('shapeup_independent_dashboard_tour_seen', 'true');
+        }
+    }, [setIsOpen, setSteps, setCurrentStep, t]);
 
     const currentWeekKey = getWeekKey(new Date());
 
@@ -150,7 +182,7 @@ const DashboardIndependent = () => {
 
     return (
         <div className="su-dashboard-client">
-            <div className="su-dashboard-header-flex">
+            <div className="su-dashboard-header-flex" data-tour="idep-header">
                 <div>
                     <h1 className="su-page-title">{t('client.dashboard.welcome')} {firstName}</h1>
                     <p className="su-page-subtitle">
@@ -161,7 +193,7 @@ const DashboardIndependent = () => {
                 </div>
             </div>
 
-            <div className="su-metrics-grid su-mt-4">
+            <div className="su-metrics-grid su-mt-4" data-tour="idep-metrics">
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
                         <span className="su-metric-label">{t('client.dashboard.metric.weekly')}</span>
@@ -230,7 +262,7 @@ const DashboardIndependent = () => {
                     </Card>
                 </div>
 
-                <div className="su-overview-sidebar">
+                <div className="su-overview-sidebar" data-tour="idep-achievements">
                     <Card className="su-achievements-card">
                         <h3 className="su-section-title">
                             <Award size={20} style={{ verticalAlign: 'text-bottom', marginRight: '8px', color: 'var(--warning)' }} />
