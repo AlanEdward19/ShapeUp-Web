@@ -58,7 +58,7 @@ const Register = () => {
         localStorage.removeItem('shapeup_role');
         localStorage.removeItem('shapeup_client_id');
 
-        navigate('/'); // Redirect to login on success
+        navigate('/login'); // Redirect to login on success
     };
 
     return (
@@ -68,6 +68,10 @@ const Register = () => {
             <div className="login-bg-shape login-bg-shape-2"></div>
 
             <div className="login-content">
+                <Link to="/" className="su-back-to-home" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', textDecoration: 'none', marginBottom: '2rem', fontSize: '0.9rem', fontWeight: 500 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    Voltar para o Início
+                </Link>
                 <div className="login-header">
                     <div className="login-logo">
                         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -160,7 +164,7 @@ const Register = () => {
                 </Card>
 
                 <p className="login-footer-text">
-                    Already have an account? <Link to="/">Sign in</Link>
+                    Already have an account? <Link to="/login">Sign in</Link>
                 </p>
             </div>
         </div>

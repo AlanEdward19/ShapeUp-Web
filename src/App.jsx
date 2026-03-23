@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import { TourProvider } from '@reactour/tour';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import LandingPage from './pages/LandingPage';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import TrainingPlans from './pages/TrainingPlans';
@@ -36,7 +37,8 @@ function App() {
     >
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<LoginWrapper />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginWrapper />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Layout />}>
             <Route index element={<Dashboard />} />
