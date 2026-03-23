@@ -6,7 +6,9 @@ import './Layout.css';
 
 const Layout = () => {
     // Determine role based on what was saved during login
-    const isProfessional = localStorage.getItem('shapeup_role') === 'professional';
+    const role = localStorage.getItem('shapeup_role');
+    const isProfessional = role === 'professional';
+    const isIndependent = role === 'independent';
 
     // Global profile state for the session
     const storedName = localStorage.getItem('shapeup_user_name');
@@ -19,16 +21,18 @@ const Layout = () => {
 
     return (
         <div className="su-layout-wrapper">
-            <Sidebar isProfessional={isProfessional} />
+            <Sidebar isProfessional={isProfessional} isIndependent={isIndependent} />
             <div className="su-layout-main">
                 <Header
                     isProfessional={isProfessional}
+                    isIndependent={isIndependent}
                     profile={currentProfile}
                     sessionTitle={sessionTitle}
                 />
                 <main className="su-layout-content">
                     <Outlet context={{
                         isProfessional,
+                        isIndependent,
                         coachProfile, setCoachProfile,
                         clientProfile, setClientProfile,
                         setSessionTitle

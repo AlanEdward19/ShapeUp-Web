@@ -4,7 +4,7 @@ import { useTour } from '@reactour/tour';
 import {
     ArrowLeft, TrendingUp, Activity, Scale, CheckCircle2,
     Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp, AlertTriangle,
-    GripVertical, X, Save, Settings2, BarChart2, Dumbbell, ClipboardList, History
+    GripVertical, X, Save, Settings2, BarChart2, Dumbbell, ClipboardList, History, Play
 } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -71,7 +71,7 @@ const initPlans = [];
 
 // ─── Helpers ────────────────────────────────────────────────
 
-const SET_TYPE_COLORS = { warmup: '#94a3b8', feeder: '#a78bfa', working: '#60a5fa', topset: '#f59e0b', backoff: '#34d399' };
+export const SET_TYPE_COLORS = { warmup: '#94a3b8', feeder: '#a78bfa', working: '#60a5fa', topset: '#f59e0b', backoff: '#34d399' };
 export const SetTypeBadge = ({ type }) => {
     const { t } = useLanguage();
     return (
@@ -94,8 +94,8 @@ export const ProSelect = ({ label, value, onChange, options }) => (
 
 // ─── Plan Editor (mirrors TrainingPlansProfessional, no analytics) ──
 
-const TECHNIQUES = ['Straight', 'Cluster', 'Drop Set', 'Rest Pause', 'Muscle Round'];
-const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
+export const TECHNIQUES = ['Straight', 'Cluster', 'Drop Set', 'Rest Pause', 'Muscle Round'];
+export const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
 export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
     const { t } = useLanguage();
@@ -197,7 +197,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
     const estMins = exercises.length === 0 ? '—' : (() => {
         const totalRest = exercises.reduce((acc, ex) =>
             acc + ex.sets.reduce((a, s) => a + (parseInt(s.rest) || 90), 0), 0);
-        return `${Math.round((totalRest + totalSets * 45) / 60)}–${Math.round((totalRest + totalSets * 75) / 60)} min`;
+        return `${Math.round((totalRest + totalSets * 45) / 60)}–${Math.round((totalRest + totalSets * 75) / 60)} ${t('pro.builder.summary.time.unit')}`;
     })();
 
     // Intensity distribution (sets grouped by RPE rounded)
@@ -220,13 +220,16 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
         const map = {};
         let total = 0;
         exercises.forEach(ex => ex.sets.forEach(s => {
-            const t = s.technique || 'Straight';
-            map[t] = (map[t] || 0) + 1;
+            const tKey = s.technique || 'Straight';
+            map[tKey] = (map[tKey] || 0) + 1;
             total++;
         }));
         return Object.entries(map)
             .sort((a, b) => b[1] - a[1])
-            .map(([name, count]) => ({ name, value: total ? Math.round(count / total * 100) : 0 }));
+            .map(([name, count]) => ({
+                name: t(`pro.builder.tech.${name.toLowerCase().replace(' ', '')}`) || name,
+                value: total ? Math.round(count / total * 100) : 0
+            }));
     })();
 
     return (
@@ -239,13 +242,17 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                         <Input label={t('pro.builder.weeks')} type="number" min="1" max="52" value={weeks} onChange={e => setWeeks(e.target.value)} />
                         <ProSelect label={t('pro.builder.phase')} value={phase} onChange={e => setPhase(e.target.value)}
                             options={[
-                                { value: 'Hypertrophy', label: 'Hypertrophy' },
-                                { value: 'Strength', label: 'Strength / Power' },
-                                { value: 'Endurance', label: 'Endurance' },
-                                { value: 'Deload', label: 'Deload' },
+                                { value: 'Hypertrophy', label: t('pro.builder.phase.hypertrophy') },
+                                { value: 'Strength', label: t('pro.builder.phase.strength') },
+                                { value: 'Endurance', label: t('pro.builder.phase.endurance') },
+                                { value: 'Deload', label: t('pro.builder.phase.deload') },
                             ]} />
                         <ProSelect label={t('pro.builder.diff')} value={difficulty} onChange={e => setDiff(e.target.value)}
-                            options={['Beginner', 'Intermediate', 'Advanced']} />
+                            options={[
+                                { value: 'Beginner', label: t('pro.builder.diff.beginner') },
+                                { value: 'Intermediate', label: t('pro.builder.diff.intermediate') },
+                                { value: 'Advanced', label: t('pro.builder.diff.advanced') },
+                            ]} />
                     </div>
                     <div className="su-mt-4">
                         <Input label={t('pro.builder.notes')} value={planNotes}
@@ -314,13 +321,13 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                                                     <div className="su-input-group">
                                                         <select className="su-select" value={s.type}
                                                             onChange={e => updateSet(exIdx, sIdx, 'type', e.target.value)}>
-                                                            {SET_TYPES.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+                                                            {SET_TYPES.map(type => <option key={type} value={type}>{t(`client.session.set_type.${type}`)}</option>)}
                                                         </select>
                                                     </div>
                                                     <div className="su-input-group">
                                                         <select className="su-select" value={s.technique}
                                                             onChange={e => updateSet(exIdx, sIdx, 'technique', e.target.value)}>
-                                                            {TECHNIQUES.map(t => <option key={t}>{t}</option>)}
+                                                            {TECHNIQUES.map(tech => <option key={tech} value={tech}>{t(`pro.builder.tech.${tech.toLowerCase().replace(' ', '')}`) || tech}</option>)}
                                                         </select>
                                                     </div>
                                                     <Input value={s.reps} onChange={e => updateSet(exIdx, sIdx, 'reps', e.target.value)} placeholder="8-10" />
@@ -379,11 +386,11 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
                         </div>
                         <div className="su-metric-item">
                             <span className="su-metric-label">{t('pro.builder.summary.phase')}</span>
-                            <span className="su-metric-val">{phase}</span>
+                            <span className="su-metric-val">{t(`pro.builder.phase.${phase.toLowerCase().split(' ')[0]}`) || phase}</span>
                         </div>
                         <div className="su-metric-item">
                             <span className="su-metric-label">{t('pro.builder.summary.diff')}</span>
-                            <span className="su-metric-val">{difficulty}</span>
+                            <span className="su-metric-val">{t(`pro.builder.diff.${difficulty.toLowerCase()}`) || difficulty}</span>
                         </div>
                     </div>
 
@@ -470,7 +477,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign }) => {
     );
 };
 
-const SessionDetailModal = ({ session, planName, onClose }) => {
+export const SessionDetailModal = ({ session, planName, onClose }) => {
     const { t, unitSystem, convertWeight } = useLanguage();
 
     // Inflate original unit based on string
@@ -482,7 +489,7 @@ const SessionDetailModal = ({ session, planName, onClose }) => {
                 <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
                 <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>{planName}</h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem', lineHeight: '1.4' }}>
-                    {session.date} &middot; {session.duration} &middot; {session.totalVol} {t('pro.plan.history.vol')} &middot; Avg RPE {session.rpe}
+                    {session.date} &middot; {session.duration} &middot; {session.totalVol} {t('pro.plan.history.vol')} &middot; {t('pro.builder.summary.avg_rpe')} {session.rpe}
                 </p>
                 <div className="su-sd-exercises">
                     {session.exercises.map((ex, i) => (
@@ -498,7 +505,7 @@ const SessionDetailModal = ({ session, planName, onClose }) => {
                             ) : (
                                 <div className="su-sd-sets-table">
                                     <div className="su-sd-sets-head" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', gap: '8px' }}>
-                                        <span>Set</span><span>{t('pro.builder.set.type')}</span><span style={{ textAlign: 'center' }}>{t('pro.builder.set.reps')}</span><span style={{ textAlign: 'center' }}>{t('pro.builder.set.load')}</span><span style={{ textAlign: 'center' }}>{t('pro.builder.set.rpe')}</span>
+                                        <span>{t('client.session.table.set')}</span><span>{t('pro.builder.set.type')}</span><span style={{ textAlign: 'center' }}>{t('pro.builder.set.reps')}</span><span style={{ textAlign: 'center' }}>{t('pro.builder.set.load')}</span><span style={{ textAlign: 'center' }}>{t('pro.builder.set.rpe')}</span>
                                     </div>
                                     {ex.sets.map((s, si) => (
                                         <div key={si} className="su-sd-set-row" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', gap: '8px', alignItems: 'center' }}>
@@ -520,7 +527,7 @@ const SessionDetailModal = ({ session, planName, onClose }) => {
 };
 
 // ─── PLAN CARD (with expandable history) ────────────────────
-const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId }) => {
+export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighlightedSessionId }) => {
     const { t } = useLanguage();
     const [historyOpen, setHistoryOpen] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
@@ -543,9 +550,16 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
                     <div className="su-cp-plan-info">
                         {plan.active && <span className="su-active-plan-badge">{t('pro.client.plan.active')}</span>}
                         <h3 className="su-cp-plan-name">{plan.name}</h3>
-                        <p className="su-cp-plan-meta">{plan.phase} · {plan.difficulty} · {plan.weeks} {t('pro.client.plan.weeks')} · {plan.exercises.length} {t('pro.client.plan.exercises')}</p>
+                        <p className="su-cp-plan-meta">
+                            {t(`pro.builder.phase.${plan.phase?.toLowerCase().split(' ')[0]}`) || plan.phase} · {t(`pro.builder.diff.${plan.difficulty?.toLowerCase()}`) || plan.difficulty} · {plan.weeks} {t('pro.client.plan.weeks')} · {plan.exercises.length} {t('pro.client.plan.exercises')}
+                        </p>
                     </div>
                     <div className="su-cp-plan-actions">
+                        {onStart && (
+                            <button className="su-cp-action-btn execute" onClick={() => onStart(plan)} title="Start Session">
+                                <Play size={16} fill="currentColor" /> {t('client.training.card.btn')}
+                            </button>
+                        )}
                         <button className="su-cp-action-btn edit" onClick={() => onEdit(plan)} title="Edit Plan">
                             <Settings2 size={16} /> {t('pro.client.plan.btn.edit')}
                         </button>
@@ -593,7 +607,7 @@ const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId 
                                     <span className="su-cp-hist-date">{session.date}</span>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                                         <span className="su-cp-hist-meta">
-                                            ⏱ {session.duration} · {session.totalVol} {t('pro.plan.history.vol')} · Avg RPE {session.rpe}
+                                            ⏱ {session.duration} · {session.totalVol} {t('pro.plan.history.vol')} · {t('pro.builder.summary.avg_rpe')} {session.rpe}
                                         </span>
                                         {session.status === 'partial' && (
                                             <span className="su-warning-tag" style={{ backgroundColor: 'var(--warning-light, rgba(245, 158, 11, 0.2))', color: 'var(--warning)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, cursor: 'help' }} title="Client did not complete all prescribed sets">{t('pro.client.plan.history.tag.partial')}</span>
@@ -1122,7 +1136,7 @@ const ClientDetail = () => {
                                     .map((ex, idx) => (
                                         <div key={idx} className="su-sd-sets-table">
                                             <div className="su-sd-sets-head" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
-                                                <span>Set</span><span>{t('pro.builder.set.reps')}</span><span>{t('pro.builder.set.load')}</span><span>{t('pro.builder.set.rpe')}</span>
+                                                <span>{t('client.session.table.set')}</span><span>{t('pro.builder.set.reps')}</span><span>{t('pro.builder.set.load')}</span><span>{t('pro.builder.set.rpe')}</span>
                                             </div>
                                             {ex.sets.map((s, si) => (
                                                 <div key={si} className="su-sd-set-row" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
@@ -1154,7 +1168,7 @@ const ClientDetail = () => {
                                     .map((ex, idx) => (
                                         <div key={idx} className="su-sd-sets-table">
                                             <div className="su-sd-sets-head" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>
-                                                <span>Set</span><span>{t('pro.builder.set.reps')}</span><span>{t('pro.builder.set.load')}</span><span>{t('pro.builder.set.rpe')}</span>
+                                                <span>{t('client.session.table.set')}</span><span>{t('pro.builder.set.reps')}</span><span>{t('pro.builder.set.load')}</span><span>{t('pro.builder.set.rpe')}</span>
                                             </div>
                                             {ex.sets.map((s, si) => (
                                                 <div key={si} className="su-sd-set-row" style={{ gridTemplateColumns: '40px 1fr 1fr 1fr' }}>

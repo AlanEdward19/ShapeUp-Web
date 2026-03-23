@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import { useLanguage } from '../contexts/LanguageContext';
 import './Login.css'; // Reusing the layout styles
 
 const Register = () => {
+    const { t } = useLanguage();
     const navigate = useNavigate();
+    const [selectedRole, setSelectedRole] = useState('independent');
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -15,48 +18,45 @@ const Register = () => {
         const lastName = e.target.lastName.value.trim();
         const email = e.target.email.value.trim().toLowerCase();
 
-        // 1. Fetch Clients
-        const stored = localStorage.getItem('shapeup_clients');
-        let clients = stored ? JSON.parse(stored) : [];
+        // 1. If it's a coached client, manage the shared clients list (for professionals to see)
+        if (selectedRole === 'client') {
+            const stored = localStorage.getItem('shapeup_clients');
+            let clients = stored ? JSON.parse(stored) : [];
 
-        // 2. Find the invited client (case-insensitive email matching)
-        // We prioritize matching someone with status 'Invited'
-        const invitedIndex = clients.findIndex(c =>
-            c.email?.toLowerCase() === email &&
-            c.status === 'Invited'
-        );
+            // Find the invited client (case-insensitive email matching)
+            const invitedIndex = clients.findIndex(c =>
+                c.email?.toLowerCase() === email &&
+                c.status === 'Invited'
+            );
 
-        if (invitedIndex !== -1) {
-            // Update the existing invitation record
-            clients[invitedIndex].name = `${firstName} ${lastName}`;
-            clients[invitedIndex].status = 'Active';
-            clients[invitedIndex].lastCheckin = 'Just now';
-            // Ensure email is stored normalized
-            clients[invitedIndex].email = email;
-        } else {
-            // Check if they already exist as Active (maybe they registered already)
-            const existingIndex = clients.findIndex(c => c.email?.toLowerCase() === email);
-
-            if (existingIndex !== -1) {
-                // Just update the name if it's different
-                clients[existingIndex].name = `${firstName} ${lastName}`;
+            if (invitedIndex !== -1) {
+                clients[invitedIndex].name = `${firstName} ${lastName}`;
+                clients[invitedIndex].status = 'Active';
+                clients[invitedIndex].lastCheckin = 'Just now';
+                clients[invitedIndex].email = email;
             } else {
-                // Create a brand new client since they weren't invited OR recorded before
-                const newClient = {
-                    id: Date.now(),
-                    name: `${firstName} ${lastName}`,
-                    email: email,
-                    activePlan: '-',
-                    compliance: 0,
-                    lastCheckin: 'Just now',
-                    status: 'Active'
-                };
-                clients.push(newClient);
+                const existingIndex = clients.findIndex(c => c.email?.toLowerCase() === email);
+                if (existingIndex !== -1) {
+                    clients[existingIndex].name = `${firstName} ${lastName}`;
+                } else {
+                    const newClient = {
+                        id: Date.now(),
+                        name: `${firstName} ${lastName}`,
+                        email: email,
+                        activePlan: '-',
+                        compliance: 0,
+                        lastCheckin: 'Just now',
+                        status: 'Active'
+                    };
+                    clients.push(newClient);
+                }
             }
+            localStorage.setItem('shapeup_clients', JSON.stringify(clients));
         }
 
-        // Save back to localStorage
-        localStorage.setItem('shapeup_clients', JSON.stringify(clients));
+        // 2. Clear any lingering session data
+        localStorage.removeItem('shapeup_role');
+        localStorage.removeItem('shapeup_client_id');
 
         navigate('/'); // Redirect to login on success
     };
@@ -125,6 +125,33 @@ const Register = () => {
                             label="Birth Date"
                             required
                         />
+
+                        <div className="role-selection-group">
+                            <label className="su-input-label">{t('login.role.label')}</label>
+                            <div className="role-options">
+                                <button
+                                    type="button"
+                                    className={`role-opt ${selectedRole === 'professional' ? 'active' : ''}`}
+                                    onClick={() => setSelectedRole('professional')}
+                                >
+                                    {t('header.role.pro')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`role-opt ${selectedRole === 'client' ? 'active' : ''}`}
+                                    onClick={() => setSelectedRole('client')}
+                                >
+                                    {t('header.role.client')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`role-opt ${selectedRole === 'independent' ? 'active' : ''}`}
+                                    onClick={() => setSelectedRole('independent')}
+                                >
+                                    {t('header.role.independent')}
+                                </button>
+                            </div>
+                        </div>
 
                         <Button type="submit" fullWidth className="btn-sign-in" style={{ marginTop: '0.5rem' }}>
                             Create account
