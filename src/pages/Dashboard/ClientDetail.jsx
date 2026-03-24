@@ -12,8 +12,7 @@ import Input from '../../components/Input';
 import {
     LineChart, Line, AreaChart, Area, XAxis, YAxis,
     CartesianGrid, ResponsiveContainer, Tooltip,
-    Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
-    BarChart, Bar
+    RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
 } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import ExerciseLibraryModal from '../../components/ExerciseLibraryModal';
@@ -21,6 +20,8 @@ import { addNotification } from '../../utils/notifications';
 import '../../components/InviteClientModal.css';
 import '../Dashboard/TrainingPlansProfessional.css';
 import './ClientDetail.css';
+import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
+import { exercisesDB } from '../../data/mockExercises';
 
 // ─── Mock Data ─────────────────────────────────────────────
 
@@ -683,6 +684,8 @@ const ClientDetail = () => {
     });
     const [editingPlan, setEditingPlan] = useState(null);
     const [selectedPRComparison, setSelectedPRComparison] = useState(null);
+    const [muscleTimeFilter, setMuscleTimeFilter] = useState('30');
+    const [muscleCustomRange, setMuscleCustomRange] = useState({ start: '', end: '' });
 
     // --- Objectives State ---
     const [objectives, setObjectives] = useState(() => {
@@ -723,6 +726,32 @@ const ClientDetail = () => {
         rpe: h.rpe || 0,
         date: h.date
     }));
+
+    const dynamicMuscleVolumeObj = React.useMemo(() => {
+        let historyToUse = allHistory;
+        if (muscleTimeFilter !== 'all') {
+            if (muscleTimeFilter === 'custom') {
+                if (muscleCustomRange.start && muscleCustomRange.end) {
+                    const start = new Date(muscleCustomRange.start + 'T00:00:00');
+                    const end = new Date(muscleCustomRange.end + 'T23:59:59');
+                    historyToUse = allHistory.filter(h => {
+                        const d = new Date(h.date + 'T12:00:00');
+                        return d >= start && d <= end;
+                    });
+                }
+            } else {
+                const cutoff = new Date();
+                cutoff.setDate(cutoff.getDate() - parseInt(muscleTimeFilter));
+                historyToUse = allHistory.filter(h => new Date(h.date + 'T12:00:00') >= cutoff);
+            }
+        }
+        return calculateMuscleSetsTotal(historyToUse, exercisesDB);
+    }, [allHistory, muscleTimeFilter, muscleCustomRange]);
+
+    const dynamicMuscleVolume = Object.entries(dynamicMuscleVolumeObj)
+        .map(([muscle, sets]) => ({ muscle, sets }))
+        .sort((a, b) => b.sets - a.sets)
+        .slice(0, 8); // Show top 8 for RadarChart layout
 
     // ─── Tour Trigger ─────────────────────────────────────────────────
     React.useEffect(() => {
@@ -998,6 +1027,65 @@ const ClientDetail = () => {
                                     <Area type="monotone" dataKey="vol" name={t('client.analysis.chart.vol')} stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorVol)" />
                                 </AreaChart>
                             </ResponsiveContainer>
+                        </div>
+                    </Card>
+
+                    <Card className="su-metric-card-large">
+                        <div className="su-card-header-icon" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Activity size={20} className="su-text-muted" />
+                                <h3 className="su-section-title" style={{ margin: 0 }}>{t('pro.client.chart.muscles') || 'Muscle Volume (Sets)'}</h3>
+                            </div>
+                            <select 
+                                className="su-select" 
+                                style={{ width: 'auto', padding: '4px 24px 4px 8px', fontSize: '0.8rem', minHeight: 'unset', height: '28px' }}
+                                value={muscleTimeFilter}
+                                onChange={(e) => setMuscleTimeFilter(e.target.value)}
+                            >
+                                <option value="7">{t('reports.range.7days') || '7 Days'}</option>
+                                <option value="14">{t('reports.range.14days') || '14 Days'}</option>
+                                <option value="30">{t('reports.range.30days') || '30 Days'}</option>
+                                <option value="90">{t('reports.range.90days') || '90 Days'}</option>
+                                <option value="custom">{t('reports.range.custom') || 'Custom Range'}</option>
+                                <option value="all">{t('reports.range.all') || 'All Time'}</option>
+                            </select>
+                        </div>
+                        {muscleTimeFilter === 'custom' && (
+                            <div style={{ display: 'flex', gap: '8px', padding: '0.5rem 0', alignItems: 'center', justifyContent: 'flex-end', width: '100%', fontSize: '0.8rem' }}>
+                                <input type="date" value={muscleCustomRange.start} onChange={e => setMuscleCustomRange(p => ({ ...p, start: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
+                                <span className="su-text-muted">→</span>
+                                <input type="date" value={muscleCustomRange.end} onChange={e => setMuscleCustomRange(p => ({ ...p, end: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
+                            </div>
+                        )}
+                        <div className="su-chart-wrapper-med" style={{ minHeight: '300px', marginTop: '1rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '1rem', width: '100%' }}>
+                            {dynamicMuscleVolume.length > 0 ? (
+                                <>
+                                    <div style={{ flex: '1 1 250px', height: '300px', minWidth: '250px' }}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={dynamicMuscleVolume}>
+                                                <PolarGrid stroke="var(--border-color)" />
+                                                <PolarAngleAxis dataKey="muscle" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
+                                                <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
+                                                <Radar name="Sets" dataKey="sets" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.6} />
+                                                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} />
+                                            </RadarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <div style={{ flex: '1 1 180px', display: 'flex', flexDirection: 'column', gap: '0.6rem', padding: '1rem', background: 'var(--bg-main)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                                        <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', color: 'var(--text-main)' }}>Detalhamento</h4>
+                                        {dynamicMuscleVolume.map((m) => (
+                                            <div key={m.muscle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
+                                                <span style={{ color: 'var(--text-muted)' }}>{m.muscle}</span>
+                                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{m.sets} <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>séries</span></span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            ) : (
+                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textAlign: 'center' }}>
+                                    <p>{t('pro.client.chart.muscles.empty') || 'No muscle data available'}</p>
+                                </div>
+                            )}
                         </div>
                     </Card>
 

@@ -6,6 +6,8 @@ import autoTable from 'jspdf-autotable';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { useTour } from '@reactour/tour';
+import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
+import { exercisesDB } from '../../data/mockExercises';
 import './Reports.css';
 
 // Mock History
@@ -182,7 +184,7 @@ setTimeout(() => {
 
         if (reportType === 'performance') {
             const volHeader = `${t('reports.export.perf.col.volume')} (${unitSystem === 'imperial' ? 'lbs' : 'kg'})`;
-            headers = [t('reports.export.perf.col.name'), t('reports.export.perf.col.status'), t('reports.export.perf.col.completed'), t('reports.export.perf.col.skipped'), t('reports.export.perf.col.adherence'), volHeader];
+            headers = [t('reports.export.perf.col.name'), t('reports.export.perf.col.status'), t('reports.export.perf.col.completed'), t('reports.export.perf.col.skipped'), t('reports.export.perf.col.adherence'), volHeader, t('reports.export.perf.col.muscles') || 'Muscle Sets'];
             let targetClients = clients;
             if (targetScope === 'specific' && selectedClientId) {
                 targetClients = clients.filter(c => String(c.id) === String(selectedClientId));
@@ -193,6 +195,7 @@ setTimeout(() => {
                 let completed = 0;
                 let skipped = 0;
                 let totalVolumeSum = 0;
+                let clientSessions = [];
 
                 if (storedPlans) {
                     const plans = JSON.parse(storedPlans);
@@ -200,6 +203,7 @@ setTimeout(() => {
                         (plan.history || []).forEach(h => {
                             const hDate = new Date(h.date);
                             if (hDate >= startDate && hDate <= endDate) {
+                                clientSessions.push(h); // Save for muscle calculation
                                 const isSkipped = h.status === 'skipped' || (h.exercises || []).every(ex => ex.skipped);
                                 if (isSkipped) skipped++;
                                 else {
@@ -210,10 +214,16 @@ setTimeout(() => {
                         });
                     });
                 }
+                const clientMuscleObj = calculateMuscleSetsTotal(clientSessions, exercisesDB);
+                const muscleStr = Object.entries(clientMuscleObj)
+                    .sort((a,b) => b[1] - a[1])
+                    .map(([m, s]) => `${m}: ${s}`)
+                    .join(', ');
+
                 const totalSessions = completed + skipped;
                 const adherence = totalSessions > 0 ? Math.round((completed / totalSessions) * 100) : 0;
                 const formattedVol = totalVolumeSum % 1 === 0 ? totalVolumeSum : parseFloat(totalVolumeSum.toFixed(1));
-                return [client.name, client.status?.toLowerCase() === 'inactive' ? t('reports.export.val.inactive') : t('reports.export.val.active'), completed, skipped, `${adherence}%`, formattedVol];
+                return [client.name, client.status?.toLowerCase() === 'inactive' ? t('reports.export.val.inactive') : t('reports.export.val.active'), completed, skipped, `${adherence}%`, formattedVol, muscleStr || '-'];
             });
         }
         else if (reportType === 'billing') {
@@ -507,11 +517,14 @@ setTimeout(() => {
         };
 
         // Collect data for each client
+        let globalMuscleVolumes = {};
+
         const tableData = targetClients.map(client => {
             const storedPlans = localStorage.getItem(`shapeup_client_plans_${client.id}`);
             let completed = 0;
             let skipped = 0;
             let totalVolumeSum = 0;
+            let clientSessions = [];
 
             if (storedPlans) {
                 const plans = JSON.parse(storedPlans);
@@ -519,6 +532,7 @@ setTimeout(() => {
                     (plan.history || []).forEach(h => {
                         const hDate = new Date(h.date);
                         if (hDate >= startDate && hDate <= endDate) {
+                            clientSessions.push(h);
                             const isSkipped = h.status === 'skipped' || (h.exercises || []).every(ex => ex.skipped);
                             if (isSkipped) skipped++;
                             else {
@@ -530,6 +544,16 @@ setTimeout(() => {
                 });
             }
 
+            const clientMuscleObj = calculateMuscleSetsTotal(clientSessions, exercisesDB);
+            const clientMuscleStr = Object.entries(clientMuscleObj)
+                .sort((a,b) => b[1] - a[1])
+                .map(([m, s]) => `${m}: ${s}`)
+                .join(', ');
+
+            Object.entries(clientMuscleObj).forEach(([m, s]) => {
+                globalMuscleVolumes[m] = (globalMuscleVolumes[m] || 0) + s;
+            });
+
             const totalSessions = completed + skipped;
             const adherence = totalSessions > 0 ? Math.round((completed / totalSessions) * 100) : 0;
 
@@ -539,21 +563,26 @@ setTimeout(() => {
                 completed.toString(),
                 skipped.toString(),
                 `${adherence}%`,
-                `${totalVolumeSum % 1 === 0 ? totalVolumeSum : totalVolumeSum.toFixed(1)} ${unitSystem === 'imperial' ? 'lbs' : 'kg'}`
+                `${totalVolumeSum % 1 === 0 ? totalVolumeSum : totalVolumeSum.toFixed(1)}`,
+                clientMuscleStr || '-'
             ];
         });
 
         autoTable(doc, {
             startY: 60,
-            head: [[t('reports.export.perf.col.name'), t('reports.export.perf.col.status'), t('reports.export.perf.col.completed'), t('reports.export.perf.col.skipped'), t('reports.export.perf.col.adherence').replace(' %', ''), t('reports.export.perf.col.volume').replace(' (kg)', ` (${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)]],
+            head: [[t('reports.export.perf.col.name'), t('reports.export.perf.col.status'), t('reports.export.perf.col.completed'), t('reports.export.perf.col.skipped'), t('reports.export.perf.col.adherence').replace(' %', ''), t('reports.export.perf.col.volume').replace(' (kg)', ` (${unitSystem === 'imperial' ? 'lbs' : 'kg'})`), t('reports.export.perf.col.muscles') || 'Muscles (Sets)']],
             body: tableData,
             headStyles: { fillColor: [37, 99, 235] },
             alternateRowStyles: { fillColor: [240, 245, 255] },
             margin: { top: 60 },
+            styles: { cellWidth: 'wrap' },
+            columnStyles: {
+                6: { cellWidth: 50 } // Give more space to the muscles column
+            }
         });
 
         // Summary Statistics
-        const finalY = doc.lastAutoTable.finalY + 10;
+        let finalY = doc.lastAutoTable.finalY + 10;
         const totalCompleted = targetClients.reduce((acc, c, idx) => acc + parseInt(tableData[idx][2]), 0);
         const totalSkipped = targetClients.reduce((acc, c, idx) => acc + parseInt(tableData[idx][3]), 0);
         const totalVolumeSum = tableData.reduce((acc, row) => acc + parseVolume(row[5]), 0);
@@ -569,6 +598,29 @@ setTimeout(() => {
         doc.text(`${t('reports.export.summary.perf.skipped')} ${totalSkipped}`, 14, finalY + 14);
         doc.text(`${t('reports.export.summary.perf.volume')} ${totalVolumeSum.toLocaleString()} ${unitSystem === 'imperial' ? 'lbs' : 'kg'}`, 14, finalY + 21);
         doc.text(`${t('reports.export.summary.perf.adherence')} ${avgAdherence}%`, 14, finalY + 28);
+        
+        finalY += 40;
+        doc.setFontSize(12);
+        doc.setTextColor(40, 40, 40);
+        doc.text(t('reports.export.perf.col.muscles') || 'Global Muscle Distribution (Sets)', 14, finalY);
+        doc.setFontSize(10);
+        
+        const sortedGlobalMuscles = Object.entries(globalMuscleVolumes).sort((a,b) => b[1] - a[1]);
+        if (sortedGlobalMuscles.length > 0) {
+            let colIndex = 0;
+            let currentY = finalY + 7;
+            sortedGlobalMuscles.forEach(([m, s]) => {
+                const text = `${m}: ${s}`;
+                doc.text(text, 14 + (colIndex * 60), currentY);
+                colIndex++;
+                if (colIndex > 2) {
+                    colIndex = 0;
+                    currentY += 7;
+                }
+            });
+        } else {
+            doc.text('-', 14, finalY + 7);
+        }
     };
 
     return (
