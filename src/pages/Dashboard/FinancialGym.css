@@ -1,0 +1,216 @@
+/* FinancialGym.css */
+@import './DashboardGym.css';
+
+/* ── KPI Grid ─────────────────────────────────────── */
+.fin-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+}
+
+.fin-kpi-card {
+    padding: 1.5rem !important;
+}
+
+.fin-value {
+    font-size: 1.35rem !important;
+}
+
+/* ── Mid Grid ─────────────────────────────────────── */
+.fin-mid-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.75rem;
+}
+
+/* ── Card header shared ───────────────────────────── */
+.fin-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+}
+
+.fin-card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* ── Chart card ───────────────────────────────────── */
+.fin-chart-card {
+    padding: 1.5rem !important;
+}
+
+.fin-period-toggle {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--bg-main);
+    border-radius: 8px;
+    padding: 0.2rem;
+}
+
+.fin-period-btn {
+    padding: 0.25rem 0.75rem;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    font-family: inherit;
+    transition: all var(--transition-fast);
+}
+
+.fin-period-btn.active {
+    background: var(--bg-card);
+    color: var(--text-main);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ── Plans card ───────────────────────────────────── */
+.fin-plans-card {
+    padding: 1.5rem !important;
+}
+
+.fin-plans-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.fin-plan-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.fin-plan-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+}
+
+.fin-plan-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.fin-plan-price {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.fin-plan-bar-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fin-plan-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-main);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.fin-plan-bar-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+.fin-plan-pct {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    min-width: 28px;
+    text-align: right;
+}
+
+.fin-plan-revenue {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--success);
+    min-width: 90px;
+    text-align: right;
+}
+
+/* ── Transactions table ───────────────────────────── */
+.fin-tx-card {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.fin-tx-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.fin-tx-table th {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-main);
+    text-align: left;
+}
+
+.fin-tx-table td {
+    padding: 0.9rem 1.25rem;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.fin-tx-table tbody tr:last-child td { border-bottom: none; }
+.fin-tx-table tbody tr:hover { background: var(--bg-main); }
+
+.fin-tx-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+}
+
+.fin-tx-status.paid    { background: rgba(16,185,129,0.1); color: var(--success); }
+.fin-tx-status.pending { background: rgba(245,158,11,0.1); color: var(--warning); }
+.fin-tx-status.overdue { background: rgba(239,68,68,0.1);  color: var(--error);   }
+
+/* ── Export button ────────────────────────────────── */
+.fin-export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all var(--transition-fast);
+}
+
+.fin-export-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+@media (max-width: 900px) {
+    .fin-mid-grid { grid-template-columns: 1fr; }
+}

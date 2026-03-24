@@ -11,7 +11,8 @@ import {
     MessageCircle,
     MessageSquare,
     LogOut,
-    Target
+    Target,
+    DollarSign
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import ChatDrawer from './ChatDrawer';
@@ -59,11 +60,12 @@ const Sidebar = ({ isProfessional, isIndependent, isGym }) => {
     ];
 
     const gymNavItems = [
-        { name: t('nav.dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard' },
-        { name: t('nav.staff'), icon: <Users size={20} />, path: '/dashboard/staff' },
-        { name: t('nav.clients'), icon: <Users size={20} />, path: '/dashboard/clients' },
-        { name: t('nav.turnstile'), icon: <Activity size={20} />, path: '/dashboard/turnstile' },
-        { name: t('nav.settings'), icon: <Settings size={20} />, path: '/dashboard/settings' },
+        { name: t('nav.dashboard'),  icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+        { name: t('nav.staff'),      icon: <Users size={20} />,           path: '/dashboard/staff' },
+        { name: t('nav.clients'),    icon: <Users size={20} />,           path: '/dashboard/clients' },
+        { name: t('nav.turnstile'),  icon: <Activity size={20} />,        path: '/dashboard/turnstile' },
+        { name: t('nav.financial'),  icon: <DollarSign size={20} />,      path: '/dashboard/financial' },
+        { name: t('nav.settings'),   icon: <Settings size={20} />,        path: '/dashboard/settings' },
     ];
 
     const navItems = isGym ? gymNavItems : (isProfessional ? proNavItems : (isIndependent ? independentNavItems : clientNavItems));

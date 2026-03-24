@@ -101,6 +101,13 @@ const DashboardGym = () => {
             path: '/dashboard/staff',
             className: 'gym-feature-staff',
         },
+        {
+            icon: <DollarSign size={20} color="#f59e0b" />,
+            label: t('nav.financial') || 'Financial',
+            desc: t('gym.financial.subtitle') || 'Revenue, expenses and plans',
+            path: '/dashboard/financial',
+            className: '',
+        },
     ];
 
     return (
