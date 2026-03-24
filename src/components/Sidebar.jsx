@@ -19,7 +19,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import './Sidebar.css';
 import Logo from './Logo/Logo';
 
-const Sidebar = ({ isProfessional, isIndependent }) => {
+const Sidebar = ({ isProfessional, isIndependent, isGym }) => {
     const [showContactModal, setShowContactModal] = useState(false);
     const navigate = useNavigate();
 
@@ -58,7 +58,15 @@ const Sidebar = ({ isProfessional, isIndependent }) => {
         { name: t('nav.settings'), icon: <Settings size={20} />, path: '/dashboard/settings' },
     ];
 
-    const navItems = isProfessional ? proNavItems : (isIndependent ? independentNavItems : clientNavItems);
+    const gymNavItems = [
+        { name: t('nav.dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+        { name: t('nav.staff'), icon: <Users size={20} />, path: '/dashboard/staff' },
+        { name: t('nav.clients'), icon: <Users size={20} />, path: '/dashboard/clients' },
+        { name: t('nav.turnstile'), icon: <Activity size={20} />, path: '/dashboard/turnstile' },
+        { name: t('nav.settings'), icon: <Settings size={20} />, path: '/dashboard/settings' },
+    ];
+
+    const navItems = isGym ? gymNavItems : (isProfessional ? proNavItems : (isIndependent ? independentNavItems : clientNavItems));
 
     return (
         <aside className="su-sidebar">
@@ -87,7 +95,7 @@ const Sidebar = ({ isProfessional, isIndependent }) => {
             </nav>
 
             <div className="su-sidebar-footer">
-                {!isProfessional && !isIndependent && (
+                {!isProfessional && !isIndependent && !isGym && (
                     <button className="su-contact-coach-btn" onClick={() => setShowContactModal(true)}>
                         <MessageCircle size={18} />
                         <span>{t('sidebar.chat')}</span>

@@ -15,6 +15,8 @@ import Analytics from './pages/Dashboard/Analytics';
 import Reports from './pages/Dashboard/Reports';
 import Settings from './pages/Dashboard/Settings';
 import ObjectivesClient from './pages/Dashboard/ObjectivesClient';
+import StaffGym from './pages/Dashboard/StaffGym';
+import TurnstileGym from './pages/Dashboard/TurnstileGym'; // <-- NEW
 
 // Wrapper for the Login page to handle the redirect properly
 const LoginWrapper = () => {
@@ -51,6 +53,8 @@ function App() {
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
             <Route path="objectives" element={<ObjectivesClient />} />
+            <Route path="staff" element={<StaffGym />} />
+            <Route path="turnstile" element={<TurnstileGym />} />
             {/* Mock nested routes below */}
             <Route path="messages" element={<div style={{ padding: '2rem' }}>Messages Placeholder</div>} />
           </Route>

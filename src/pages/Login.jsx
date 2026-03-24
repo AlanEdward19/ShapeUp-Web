@@ -25,6 +25,8 @@ const Login = ({ onLogin }) => {
 
         if (role === 'professional') {
             localStorage.setItem('shapeup_user_name', 'Coach Alan');
+        } else if (role === 'gym') {
+            localStorage.setItem('shapeup_user_name', 'Gym Admin');
         } else if (role === 'independent') {
             localStorage.setItem('shapeup_client_id', 'independent');
             localStorage.setItem('shapeup_user_name', email.split('@')[0]);
@@ -116,6 +118,13 @@ const Login = ({ onLogin }) => {
                                     onClick={() => setSelectedRole('independent')}
                                 >
                                     {t('header.role.independent')}
+                                </button>
+                                <button
+                                    type="button"
+                                    className={`role-opt ${selectedRole === 'gym' ? 'active' : ''}`}
+                                    onClick={() => setSelectedRole('gym')}
+                                >
+                                    {t('header.role.gym')}
                                 </button>
                             </div>
                         </div>

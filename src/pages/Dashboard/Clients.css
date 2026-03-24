@@ -4,12 +4,57 @@
 }
 
 .su-clients-toolbar {
-    padding: 1.25rem 1.5rem;
+    padding: 1.5rem 1.5rem;
     border-bottom: 1px solid var(--border-color);
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
 }
+
+.su-filter-select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-md);
+    padding: 0 0.75rem;
+    transition: border-color var(--transition-fast);
+    height: 38px;
+}
+
+.su-filter-select-wrapper:hover {
+    border-color: var(--primary);
+}
+
+.su-filter-select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 0.875rem;
+    padding: 0 1.75rem 0 0.25rem;
+    outline: none;
+    cursor: pointer;
+    font-weight: 500;
+    height: 100%;
+    color-scheme: dark;
+}
+
+.su-filter-select-wrapper::after {
+    content: "▼";
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    position: absolute;
+    right: 0.75rem;
+    pointer-events: none;
+}
+
 
 .su-search-box {
     display: flex;

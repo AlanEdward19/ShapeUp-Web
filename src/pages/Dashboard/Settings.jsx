@@ -14,8 +14,10 @@ const Settings = () => {
     const {
         isProfessional,
         isIndependent,
+        isGym,
         coachProfile, setCoachProfile,
-        clientProfile, setClientProfile
+        clientProfile, setClientProfile,
+        gymProfile, setGymProfile
     } = useOutletContext();
     const { theme, toggleTheme } = useTheme();
     const { language, setLanguage, t, unitSystem, setUnitSystem } = useLanguage();
@@ -78,7 +80,7 @@ const Settings = () => {
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
     const userEmail = localStorage.getItem('shapeup_user_email') || '';
 
-    const activeProfile = isProfessional ? coachProfile : clientProfile;
+    const activeProfile = isProfessional ? coachProfile : (isGym ? gymProfile : clientProfile);
 
     // --- NOTIFICATION PREFERENCES ---
     const [notifPrefs, setNotifPrefs] = useState(() => {
@@ -103,7 +105,9 @@ const Settings = () => {
         // Save name to localStorage
         localStorage.setItem('shapeup_user_name', activeProfile.name);
 
-        if (!isProfessional) {
+        if (isGym) {
+            // No extra client/coach DB updates for Gym Admin yet beside local storage
+        } else if (!isProfessional) {
             // Also update the shapeup_clients list so the coach sees the new name
             const storedClients = localStorage.getItem('shapeup_clients');
             if (storedClients) {
@@ -142,6 +146,8 @@ const Settings = () => {
     const updateActiveProfile = (newProfileData) => {
         if (isProfessional) {
             setCoachProfile({ ...coachProfile, ...newProfileData });
+        } else if (isGym) {
+            setGymProfile({ ...gymProfile, ...newProfileData });
         } else {
             setClientProfile({ ...clientProfile, ...newProfileData });
         }
@@ -233,7 +239,13 @@ const Settings = () => {
         ...(isIndependent ? [] : [{ id: 'coach', label: t('settings.tabs.coach'), icon: <Shield size={18} /> }])
     ];
 
-    const activeTabsList = isProfessional ? tabsProfessional : tabsClient;
+    const tabsGym = [
+        { id: 'profile', label: 'Perfil da Academia', icon: <User size={18} /> },
+        { id: 'notifications', label: t('settings.tabs.notifications'), icon: <Bell size={18} /> },
+        { id: 'preferences', label: t('settings.tabs.preferences'), icon: <Smartphone size={18} /> }
+    ];
+
+    const activeTabsList = isProfessional ? tabsProfessional : (isGym ? tabsGym : tabsClient);
 
     return (
         <div className="su-settings-dashboard">
@@ -241,9 +253,9 @@ const Settings = () => {
                 <div>
                     <h1 className="su-page-title">{t('settings.title')}</h1>
                     <p className="su-page-subtitle">
-                        {isProfessional
-                            ? t('settings.subtitle.pro')
-                            : t('settings.subtitle.client')}
+                        {isProfessional ? t('settings.subtitle.pro') :
+                         isGym ? 'Gerencie as configurações da sua academia e preferências.' :
+                         t('settings.subtitle.client')}
                     </p>
                 </div>
                 <Button onClick={handleSaveChanges}>{t('settings.btn.save')}</Button>

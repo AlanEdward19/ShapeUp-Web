@@ -9,6 +9,8 @@ import InviteClientModal from '../../components/InviteClientModal';
 import ClientBillingModal from '../../components/ClientBillingModal';
 import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useOutletContext } from 'react-router-dom';
+import ClientsGym from './ClientsGym';
 import './Clients.css';
 
 // Initial state is empty
@@ -25,6 +27,9 @@ const Clients = () => {
     const [clientToToggle, setClientToToggle] = useState(null);
     const [billingClient, setBillingClient] = useState(null);
     const [justInvitedClient, setJustInvitedClient] = useState(false);
+
+    const { isGym, isProfessional } = useOutletContext() || {};
+    const [showGymClients, setShowGymClients] = useState(false);
 
     useEffect(() => {
         const fetchAndComputeClients = () => {
@@ -78,7 +83,7 @@ const Clients = () => {
         // Listen for updates from other tabs/components
         const handleClientsUpdated = () => fetchAndComputeClients();
         window.addEventListener('shapeup_clients_updated', handleClientsUpdated);
-        
+
         return () => window.removeEventListener('shapeup_clients_updated', handleClientsUpdated);
     }, []);
 
@@ -126,15 +131,15 @@ const Clients = () => {
 
             setSteps(tourSteps);
             setCurrentStep(0);
-            
+
             // Allow time for DOM parsing before opening
             setTimeout(() => {
                 setIsOpen(true);
-            }, 600); 
+            }, 600);
 
             localStorage.setItem('shapeup_clients_tour_seen', 'true');
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setIsOpen, setSteps, setCurrentStep, clientsLoaded]);
 
     // ─── Post-Invite Tour Trigger ─────────────────────────────────────
@@ -152,25 +157,25 @@ const Clients = () => {
                     content: t('tour.clients.8'),
                 }
             ];
-            
+
             // Wait for modal to fully disappear and DOM to update
             const t1 = setTimeout(() => {
                 setSteps(tourSteps);
                 setCurrentStep(0);
                 setIsOpen(true);
-            }, 800); 
+            }, 800);
 
             // Reset the flag to let UI settle
             const t2 = setTimeout(() => {
                 setJustInvitedClient(false);
             }, 2000);
-            
+
             return () => {
                 clearTimeout(t1);
                 clearTimeout(t2);
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [justInvitedClient, showInvite, setIsOpen, setSteps, setCurrentStep]);
 
 
@@ -311,7 +316,7 @@ const Clients = () => {
                         </div>
                         <h3 className="su-confirm-title">{clientToToggle.status === 'Inactive' ? t('clients.modal.toggle.title.act') : t('clients.modal.toggle.title.inact')}</h3>
                         <p className="su-confirm-body">
-                            {clientToToggle.status === 'Inactive' 
+                            {clientToToggle.status === 'Inactive'
                                 ? t('clients.modal.toggle.body.act').replace('{{name}}', clientToToggle.name)
                                 : t('clients.modal.toggle.body.inact').replace('{{name}}', clientToToggle.name)}
                         </p>
@@ -329,117 +334,131 @@ const Clients = () => {
                     </div>
                 </div>
             )}
-            <div className="su-dashboard-header-flex" data-tour="clients-header">
-                <div>
-                    <h1 className="su-page-title">{t('clients.title')}</h1>
-                    <p className="su-page-subtitle">{t('clients.subtitle')}</p>
-                </div>
-                <Button onClick={() => setShowInvite(true)} data-tour="clients-invite-btn">{t('clients.invite')}</Button>
-            </div>
 
-            <Card className="su-clients-container su-mt-4">
-                {/* Toolbar */}
-                <div className="su-clients-toolbar" data-tour="clients-toolbar">
-                    <div className="su-search-box">
-                        <Search size={18} className="su-text-muted" />
-                        <input type="text" placeholder={t('clients.search')} className="su-bare-input" />
+            {isGym || showGymClients ? (
+                <ClientsGym onBack={() => setShowGymClients(false)} />
+            ) : (
+                <div className="su-dashboard-header-flex" data-tour="clients-header">
+                    <div>
+                        <h1 className="su-page-title">{t('clients.title')}</h1>
+                        <p className="su-page-subtitle">{t('clients.subtitle')}</p>
                     </div>
-                    <div className="su-toolbar-actions">
-                        <Button variant="outline" icon={<Filter size={16} />}>{t('clients.filter')}</Button>
+                    <div style={{ display: 'flex', gap: '0.75rem' }}>
+                        {isProfessional && (
+                            <Button variant="outline" onClick={() => setShowGymClients(true)}>
+                                {t('gym.clients.btn.view_all') || 'Rede da Academia'}
+                            </Button>
+                        )}
+                        <Button onClick={() => setShowInvite(true)} data-tour="clients-invite-btn">{t('clients.invite')}</Button>
                     </div>
                 </div>
+            )}
 
-                {/* Directory Table */}
-                <div className="su-table-responsive">
-                    <table className="su-clients-table">
-                        <thead>
-                            <tr>
-                                <th>{t('clients.table.client')}</th>
-                                <th>{t('clients.table.plan')}</th>
-                                <th>{t('clients.table.compliance')}</th>
-                                <th>{t('clients.table.checkin')}</th>
-                                <th>{t('clients.table.status')}</th>
-                                <th>{t('clients.table.actions')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {clients.map(client => (
-                                <tr
-                                    key={client.id}
-                                    className="su-clickable-row"
-                                    onClick={() => handleRowClick(client.id)}
-                                    data-tour="clients-row"
-                                >
-                                    {/* Client Name/Avatar */}
-                                    <td>
-                                        <div className="su-client-cell-user">
-                                            <div className="su-client-avatar">
-                                                {client.name.includes('@')
-                                                    ? client.name.substring(0, 2).toUpperCase()
-                                                    : client.name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()}
-                                            </div>
-                                            <span className="su-client-name">{client.name}</span>
-                                        </div>
-                                    </td>
+            {!(isGym || showGymClients) && (
+                <Card className="su-clients-container su-mt-4">
+                    {/* Toolbar */}
+                    <div className="su-clients-toolbar" data-tour="clients-toolbar">
+                        <div className="su-search-box">
+                            <Search size={18} className="su-text-muted" />
+                            <input type="text" placeholder={t('clients.search')} className="su-bare-input" />
+                        </div>
+                        <div className="su-toolbar-actions">
+                            <Button variant="outline" icon={<Filter size={16} />}>{t('clients.filter')}</Button>
+                        </div>
+                    </div>
 
-                                    {/* Plan */}
-                                    <td className="su-text-main">{client.activePlan}</td>
-
-                                    {/* Compliance */}
-                                    <td>
-                                        <div className="su-compliance-bar-rail">
-                                            <div
-                                                className={`su-compliance-bar-fill ${client.compliance < 70 ? 'poor' : 'good'}`}
-                                                style={{ width: `${client.compliance}%` }}
-                                            ></div>
-                                        </div>
-                                        <span className="su-compliance-text">{client.compliance}%</span>
-                                    </td>
-
-                                    {/* Checkin */}
-                                    <td className="su-text-muted">{client.lastCheckin}</td>
-
-                                    {/* Status Badge */}
-                                    <td data-tour="clients-status">
-                                        <span className={`su-status-badge ${client.status.toLowerCase().replace(' ', '-')}`}>
-                                            {client.status === 'Active' ? t('clients.status.active') :
-                                                client.status === 'Needs Attention' ? t('clients.status.attention') :
-                                                    client.status === 'Invited' ? t('clients.status.invited') :
-                                                        client.status === 'Inactive' ? t('clients.status.inactive') : client.status}
-                                        </span>
-                                    </td>
-
-                                    {/* Actions */}
-                                    <td>
-                                        <div className="su-table-actions" onClick={(e) => e.stopPropagation()} data-tour="clients-actions">
-
-                                            {/* Activate / Deactivate Toggle */}
-                                            <button
-                                                className="su-icon-btn su-text-muted"
-                                                title="Toggle Status"
-                                                onClick={(e) => handleToggleStatusRequest(e, client)}
-                                                data-tour="clients-actions"
-                                            >
-                                                {client.status === 'Inactive' ? <Power size={18} /> : <PauseCircle size={18} />}
-                                            </button>
-
-                                            {/* Billing Action */}
-                                            <button className="su-icon-btn su-text-muted" title="Manage Billing" onClick={() => setBillingClient(client)}>
-                                                <DollarSign size={16} />
-                                            </button>
-
-                                            {/* Delete Action (Warning Color) */}
-                                            <button className="su-icon-btn" style={{ color: 'var(--error)' }} title="Delete Client" onClick={() => handleDeleteClient(client)}>
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </td>
+                    {/* Directory Table */}
+                    <div className="su-table-responsive">
+                        <table className="su-clients-table">
+                            <thead>
+                                <tr>
+                                    <th>{t('clients.table.client')}</th>
+                                    <th>{t('clients.table.plan')}</th>
+                                    <th>{t('clients.table.compliance')}</th>
+                                    <th>{t('clients.table.checkin')}</th>
+                                    <th>{t('clients.table.status')}</th>
+                                    <th>{t('clients.table.actions')}</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
+                            </thead>
+                            <tbody>
+                                {clients.map(client => (
+                                    <tr
+                                        key={client.id}
+                                        className="su-clickable-row"
+                                        onClick={() => handleRowClick(client.id)}
+                                        data-tour="clients-row"
+                                    >
+                                        {/* Client Name/Avatar */}
+                                        <td>
+                                            <div className="su-client-cell-user">
+                                                <div className="su-client-avatar">
+                                                    {client.name.includes('@')
+                                                        ? client.name.substring(0, 2).toUpperCase()
+                                                        : client.name.split(' ').slice(0, 2).map(n => n[0]).join('').toUpperCase()}
+                                                </div>
+                                                <span className="su-client-name">{client.name}</span>
+                                            </div>
+                                        </td>
+
+                                        {/* Plan */}
+                                        <td className="su-text-main">{client.activePlan}</td>
+
+                                        {/* Compliance */}
+                                        <td>
+                                            <div className="su-compliance-bar-rail">
+                                                <div
+                                                    className={`su-compliance-bar-fill ${client.compliance < 70 ? 'poor' : 'good'}`}
+                                                    style={{ width: `${client.compliance}%` }}
+                                                ></div>
+                                            </div>
+                                            <span className="su-compliance-text">{client.compliance}%</span>
+                                        </td>
+
+                                        {/* Checkin */}
+                                        <td className="su-text-muted">{client.lastCheckin}</td>
+
+                                        {/* Status Badge */}
+                                        <td data-tour="clients-status">
+                                            <span className={`su-status-badge ${client.status.toLowerCase().replace(' ', '-')}`}>
+                                                {client.status === 'Active' ? t('clients.status.active') :
+                                                    client.status === 'Needs Attention' ? t('clients.status.attention') :
+                                                        client.status === 'Invited' ? t('clients.status.invited') :
+                                                            client.status === 'Inactive' ? t('clients.status.inactive') : client.status}
+                                            </span>
+                                        </td>
+
+                                        {/* Actions */}
+                                        <td>
+                                            <div className="su-table-actions" onClick={(e) => e.stopPropagation()} data-tour="clients-actions">
+
+                                                {/* Activate / Deactivate Toggle */}
+                                                <button
+                                                    className="su-icon-btn su-text-muted"
+                                                    title="Toggle Status"
+                                                    onClick={(e) => handleToggleStatusRequest(e, client)}
+                                                    data-tour="clients-actions"
+                                                >
+                                                    {client.status === 'Inactive' ? <Power size={18} /> : <PauseCircle size={18} />}
+                                                </button>
+
+                                                {/* Billing Action */}
+                                                <button className="su-icon-btn su-text-muted" title="Manage Billing" onClick={() => setBillingClient(client)}>
+                                                    <DollarSign size={16} />
+                                                </button>
+
+                                                {/* Delete Action (Warning Color) */}
+                                                <button className="su-icon-btn" style={{ color: 'var(--error)' }} title="Delete Client" onClick={() => handleDeleteClient(client)}>
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </Card>
+            )}
         </div>
     );
 };

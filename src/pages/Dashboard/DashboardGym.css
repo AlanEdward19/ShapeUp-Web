@@ -1,0 +1,273 @@
+/* DashboardGym.css – Gym Admin Dashboard styles */
+
+/* Make the dashboard a flex column so bottom grid can stretch */
+.gym-flex-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.gym-dashboard-header {
+    margin-bottom: 2rem;
+}
+
+/* ── Metrics ─────────────────────────────────────── */
+.gym-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.gym-metric-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem !important;
+}
+
+.gym-metric-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.gym-metric-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.gym-metric-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.gym-metric-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.2;
+}
+
+.gym-metric-trend {
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.gym-metric-trend.positive { color: var(--success); }
+.gym-metric-trend.negative { color: var(--error); }
+.gym-metric-trend.neutral  { color: var(--text-muted); }
+
+/* ── Bottom two-col ───────────────────────────────── */
+.gym-bottom-grid {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* Stretch the bottom grid to fill remaining height */
+.gym-bottom-stretch {
+    flex: 1;
+    align-items: stretch;
+}
+
+.gym-bottom-stretch > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.gym-bottom-stretch .gym-recent-card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.gym-bottom-stretch .gym-recent-card .gym-recent-table-wrap {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* ── Quick Access ─────────────────────────────────── */
+.gym-section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.gym-quicklinks-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.gym-quicklink-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem !important;
+    cursor: pointer;
+    transition: transform var(--transition-fast), border-color var(--transition-fast);
+}
+
+.gym-quicklink-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary) !important;
+}
+
+.gym-quicklink-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background-color: var(--bg-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.gym-quicklink-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.gym-quicklink-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.gym-quicklink-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.gym-quicklink-arrow {
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.gym-quicklink-card:hover .gym-quicklink-arrow {
+    color: var(--primary);
+    transform: translateX(3px);
+}
+
+/* ── Recent Activity Table ────────────────────────── */
+.gym-recent-card {
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.gym-recent-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.gym-recent-table th {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-main);
+    text-align: left;
+}
+
+.gym-recent-table td {
+    padding: 0.9rem 1.25rem;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.gym-recent-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.gym-recent-table tbody tr:hover {
+    background-color: var(--bg-main);
+}
+
+.gym-recent-user {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 500;
+}
+
+.gym-recent-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: rgba(59, 130, 246, 0.12);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.gym-recent-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+}
+
+.gym-recent-status.allowed {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+}
+
+.gym-recent-status.blocked {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+
+.gym-recent-viewall {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0.85rem 1.25rem;
+    border: none;
+    background: var(--bg-main);
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-top: 1px solid var(--border-color);
+    transition: background-color var(--transition-fast);
+    font-family: inherit;
+}
+
+.gym-recent-viewall:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+@media (max-width: 768px) {
+    .gym-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+}

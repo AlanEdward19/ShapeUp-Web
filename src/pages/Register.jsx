@@ -154,6 +154,13 @@ const Register = () => {
                                 >
                                     {t('header.role.independent')}
                                 </button>
+                                <button
+                                    type="button"
+                                    className={`role-opt ${selectedRole === 'gym' ? 'active' : ''}`}
+                                    onClick={() => setSelectedRole('gym')}
+                                >
+                                    {t('header.role.gym')}
+                                </button>
                             </div>
                         </div>
 

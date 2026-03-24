@@ -5,12 +5,12 @@ import { useNotifications } from '../utils/notifications';
 import { useLanguage } from '../contexts/LanguageContext';
 import './Header.css';
 
-const Header = ({ isProfessional, isIndependent, profile, sessionTitle }) => {
+const Header = ({ isProfessional, isIndependent, isGym, profile, sessionTitle }) => {
     const [showNotifications, setShowNotifications] = useState(false);
 
     // Provide 'pro' or the client's ID dynamically based on auth
     const storedClientId = String(localStorage.getItem('shapeup_client_id') || '1');
-    const targetUserId = isProfessional ? 'pro' : storedClientId;
+    const targetUserId = isProfessional ? 'pro' : (isGym ? 'gym' : storedClientId);
 
     const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications(targetUserId);
     const { t } = useLanguage();
@@ -64,9 +64,9 @@ const Header = ({ isProfessional, isIndependent, profile, sessionTitle }) => {
                         )}
                     </div>
                     <div className="su-profile-info">
-                        <span className="su-profile-name">{profile?.name || (isProfessional ? 'Coach Alex' : 'Jane Doe')}</span>
+                        <span className="su-profile-name">{profile?.name || (isProfessional ? 'Coach Alex' : (isGym ? 'Gym Admin' : 'Jane Doe'))}</span>
                         <span className="su-profile-role">
-                            {isProfessional ? t('header.role.pro') : (isIndependent ? t('header.role.independent') : t('header.role.client'))}
+                            {isProfessional ? t('header.role.pro') : (isGym ? t('header.role.gym') : (isIndependent ? t('header.role.independent') : t('header.role.client')))}
                         </span>
                     </div>
                 </div>
