@@ -8,6 +8,7 @@ import Input from '../../components/Input';
 import CreditCardUI from '../../components/CreditCardUI';
 import { useTheme } from '../../ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
 import './Settings.css';
 
 const Settings = () => {
@@ -21,8 +22,66 @@ const Settings = () => {
     } = useOutletContext();
     const { theme, toggleTheme } = useTheme();
     const { language, setLanguage, t, unitSystem, setUnitSystem } = useLanguage();
+    const { updateUserPassword } = useAuth();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [activeTab, setActiveTab] = useState('profile');
+
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [needsCurrentPassword, setNeedsCurrentPassword] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    const [passwordSuccess, setPasswordSuccess] = useState(false);
+
+    const handleOpenPasswordModal = () => {
+        setNewPassword('');
+        setConfirmPassword('');
+        setCurrentPassword('');
+        setNeedsCurrentPassword(false);
+        setPasswordError('');
+        setPasswordSuccess(false);
+        setIsPasswordModalOpen(true);
+    };
+
+    const handlePasswordSubmit = async () => {
+        if (needsCurrentPassword && !currentPassword) {
+            setPasswordError('Por favor, insira sua senha atual.');
+            return;
+        }
+        if (!newPassword || newPassword.length < 6) {
+            setPasswordError('A senha deve ter pelo menos 6 caracteres.');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setPasswordError('As senhas não coincidem.');
+            return;
+        }
+        setPasswordError('');
+        setPasswordLoading(true);
+        try {
+            await updateUserPassword(newPassword, currentPassword);
+            setPasswordSuccess(true);
+            setTimeout(() => {
+                setIsPasswordModalOpen(false);
+            }, 2000);
+        } catch (error) {
+            if (error.message === 'auth/requires-recent-login-password') {
+                setNeedsCurrentPassword(true);
+                setPasswordError('Sessão expirada. Digite sua senha atual para continuar.');
+            } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
+                setNeedsCurrentPassword(true);
+                setPasswordError('Senha atual incorreta.');
+            } else if (error.code === 'auth/requires-recent-login' || error.message?.includes('CREDENTIAL_TOO_OLD_LOGIN_AGAIN')) {
+                setPasswordError('Ocorreu um erro ao reautenticar. Tente fazer logout e login novamente.');
+            } else {
+                setPasswordError(error.message || 'Falha ao atualizar a senha.');
+            }
+        } finally {
+            setPasswordLoading(false);
+        }
+    };
 
     useEffect(() => {
         const hasSeenProfileTour = localStorage.getItem('shapeup_settings_tour_profile');
@@ -351,6 +410,17 @@ const Settings = () => {
                                         />
                                     </div>
                                 )}
+                                <div className="su-form-group su-col-span-2">
+                                    <label>Segurança</label>
+                                    <div>
+                                        <Button type="button" variant="outline" onClick={handleOpenPasswordModal}>
+                                            Redefinir Senha
+                                        </Button>
+                                    </div>
+                                    <p className="su-text-muted su-text-sm su-mt-2">
+                                        Se você acessou via Google, defina uma senha aqui para vincular esta conta e permitir login com e-mail e senha no futuro.
+                                    </p>
+                                </div>
                             </div>
                         </Card>
                     )}
@@ -656,6 +726,63 @@ const Settings = () => {
                                 Delete Plan
                             </Button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Password Reset Modal */}
+            {isPasswordModalOpen && (
+                <div className="su-modal-overlay" onClick={() => !passwordLoading && setIsPasswordModalOpen(false)}>
+                    <div className="su-modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+                        <h3 className="su-page-title su-mb-4" style={{ fontSize: '1.25rem' }}>Redefinir Senha</h3>
+                        
+                        {passwordSuccess ? (
+                            <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+                                <Shield size={48} style={{ color: 'var(--primary)', margin: '0 auto 1rem' }} />
+                                <h4>Senha atualizada com sucesso!</h4>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {needsCurrentPassword && (
+                                    <Input 
+                                        type="password" 
+                                        label="Senha Atual" 
+                                        placeholder="••••••••" 
+                                        value={currentPassword}
+                                        onChange={(e) => setCurrentPassword(e.target.value)}
+                                    />
+                                )}
+                                <Input 
+                                    type="password" 
+                                    label="Nova Senha" 
+                                    placeholder="••••••••" 
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                />
+                                <Input 
+                                    type="password" 
+                                    label="Confirmar Nova Senha" 
+                                    placeholder="••••••••" 
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                />
+                                
+                                {passwordError && (
+                                    <p style={{ color: 'var(--danger)', fontSize: '0.875rem', margin: 0 }}>
+                                        {passwordError}
+                                    </p>
+                                )}
+                                
+                                <div className="su-confirm-actions su-mt-2">
+                                    <Button variant="outline" onClick={() => setIsPasswordModalOpen(false)} disabled={passwordLoading}>
+                                        Cancelar
+                                    </Button>
+                                    <Button onClick={handlePasswordSubmit} disabled={passwordLoading}>
+                                        {passwordLoading ? 'Atualizando...' : 'Confirmar'}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

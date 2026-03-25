@@ -1,75 +1,74 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Logo from '../components/Logo/Logo';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 import './Login.css';
 
-const Login = ({ onLogin }) => {
+const Login = () => {
     const { t } = useLanguage();
-    const [selectedRole, setSelectedRole] = useState(null); // null means auto-detect by email if possible, or force select
+    const { signIn, signInWithGoogle } = useAuth();
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const [selectedRole, setSelectedRole] = useState(null);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!selectedRole) return;
 
         const email = e.target.email.value.trim().toLowerCase();
+        const password = e.target.password.value;
 
-        // If user explicitly selected a role, use it. Otherwise, fallback to old logic.
-        let role = selectedRole;
-        if (!role) {
-            role = email === 'treinador@outlook.com' ? 'professional' : 'client';
+        setError('');
+        setLoading(true);
+        try {
+            await signIn(email, password, selectedRole);
+            navigate('/dashboard');
+        } catch (err) {
+            setError(getErrorMessage(err.code, t));
+        } finally {
+            setLoading(false);
         }
-        localStorage.setItem('shapeup_role', role);
+    };
 
-        if (role === 'professional') {
-            localStorage.setItem('shapeup_user_name', 'Coach Alan');
-        } else if (role === 'gym') {
-            localStorage.setItem('shapeup_user_name', 'Gym Admin');
-        } else if (role === 'independent') {
-            localStorage.setItem('shapeup_client_id', 'independent');
-            localStorage.setItem('shapeup_user_name', email.split('@')[0]);
-        } else {
-            const storedClients = localStorage.getItem('shapeup_clients');
-            let matchedId = 1;
-            let userName = 'Client';
-
-            if (storedClients) {
-                const clients = JSON.parse(storedClients);
-                // Exact match by email (normalized)
-                const match = clients.find(c => c.email?.toLowerCase() === email);
-
-                if (match) {
-                    matchedId = match.id;
-                    userName = match.name;
-                }
-            }
-            localStorage.setItem('shapeup_client_id', matchedId);
-            localStorage.setItem('shapeup_user_name', userName);
+    const handleGoogleSignIn = async () => {
+        if (!selectedRole) {
+            setError(t('login.error.role_required'));
+            return;
         }
-        localStorage.setItem('shapeup_user_email', email);
-
-        if (onLogin) onLogin();
+        setError('');
+        setLoading(true);
+        try {
+            await signInWithGoogle(selectedRole);
+            navigate('/dashboard');
+        } catch (err) {
+            setError(getErrorMessage(err.code, t));
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className="login-container">
-            {/* Optional decorative background shapes could go here */}
             <div className="login-bg-shape login-bg-shape-1"></div>
             <div className="login-bg-shape login-bg-shape-2"></div>
 
             <div className="login-content">
                 <Link to="/" className="su-back-to-home" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', textDecoration: 'none', marginBottom: '2rem', fontSize: '0.9rem', fontWeight: 500 }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                    Voltar para o Início
+                    {t('login.back')}
                 </Link>
                 <div className="login-header">
                     <div className="login-logo">
                         <Logo className="login-logo-img" />
                         <span className="login-logo-text">ShapeUp</span>
                     </div>
-                    <h1 className="login-tagline">Train with intelligence.</h1>
+                    <h1 className="login-tagline">{t('login.tagline')}</h1>
                 </div>
 
                 <Card className="login-card">
@@ -77,8 +76,8 @@ const Login = ({ onLogin }) => {
                         <Input
                             id="email"
                             type="email"
-                            label="Email address"
-                            placeholder="you@example.com"
+                            label={t('login.email')}
+                            placeholder={t('login.email.placeholder')}
                             required
                         />
 
@@ -86,55 +85,45 @@ const Login = ({ onLogin }) => {
                             <Input
                                 id="password"
                                 type="password"
-                                label="Password"
-                                placeholder="••••••••"
+                                label={t('login.password')}
+                                placeholder={t('login.password.placeholder')}
                                 required
                             />
                             <div className="forgot-password-link">
-                                <a href="#">Forgot password?</a>
+                                <Link to="/forgot-password">{t('login.forgot')}</Link>
                             </div>
                         </div>
 
                         <div className="role-selection-group">
                             <label className="su-input-label">{t('login.role.label')}</label>
                             <div className="role-options">
-                                <button
-                                    type="button"
-                                    className={`role-opt ${selectedRole === 'professional' ? 'active' : ''}`}
-                                    onClick={() => setSelectedRole('professional')}
-                                >
+                                <button type="button" className={`role-opt ${selectedRole === 'professional' ? 'active' : ''}`} onClick={() => setSelectedRole('professional')}>
                                     {t('header.role.pro')}
                                 </button>
-                                <button
-                                    type="button"
-                                    className={`role-opt ${selectedRole === 'client' ? 'active' : ''}`}
-                                    onClick={() => setSelectedRole('client')}
-                                >
+                                <button type="button" className={`role-opt ${selectedRole === 'client' ? 'active' : ''}`} onClick={() => setSelectedRole('client')}>
                                     {t('header.role.client')}
                                 </button>
-                                <button
-                                    type="button"
-                                    className={`role-opt ${selectedRole === 'independent' ? 'active' : ''}`}
-                                    onClick={() => setSelectedRole('independent')}
-                                >
+                                <button type="button" className={`role-opt ${selectedRole === 'independent' ? 'active' : ''}`} onClick={() => setSelectedRole('independent')}>
                                     {t('header.role.independent')}
                                 </button>
-                                <button
-                                    type="button"
-                                    className={`role-opt ${selectedRole === 'gym' ? 'active' : ''}`}
-                                    onClick={() => setSelectedRole('gym')}
-                                >
+                                <button type="button" className={`role-opt ${selectedRole === 'gym' ? 'active' : ''}`} onClick={() => setSelectedRole('gym')}>
                                     {t('header.role.gym')}
                                 </button>
                             </div>
                         </div>
 
-                        <Button type="submit" fullWidth className="btn-sign-in" disabled={!selectedRole}>
-                            Sign In
+                        {error && (
+                            <p style={{ color: 'var(--danger, #ef4444)', fontSize: '0.875rem', marginTop: '-0.25rem', textAlign: 'center' }}>
+                                {error}
+                            </p>
+                        )}
+
+                        <Button type="submit" fullWidth className="btn-sign-in" disabled={!selectedRole || loading}>
+                            {loading ? t('login.btn.signing') : t('login.btn.signin')}
                         </Button>
 
                         <div className="login-divider">
-                            <span>or</span>
+                            <span>{t('login.divider')}</span>
                         </div>
 
                         <Button
@@ -142,6 +131,8 @@ const Login = ({ onLogin }) => {
                             variant="outline"
                             fullWidth
                             className="btn-google"
+                            disabled={loading}
+                            onClick={handleGoogleSignIn}
                             icon={
                                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -151,17 +142,34 @@ const Login = ({ onLogin }) => {
                                 </svg>
                             }
                         >
-                            Sign in with Google
+                            {t('login.btn.google')}
                         </Button>
                     </form>
                 </Card>
 
                 <p className="login-footer-text">
-                    Don't have an account? <Link to="/register">Create account</Link>
+                    {t('login.no_account')} <Link to="/register">{t('login.create_account')}</Link>
                 </p>
             </div>
         </div>
     );
+};
+
+const getErrorMessage = (code, t) => {
+    switch (code) {
+        case 'auth/invalid-credential':
+        case 'auth/wrong-password':
+        case 'auth/user-not-found':
+            return t('login.error.credentials');
+        case 'auth/too-many-requests':
+            return t('login.error.too_many');
+        case 'auth/user-disabled':
+            return t('login.error.disabled');
+        case 'auth/popup-closed-by-user':
+            return t('login.error.google_cancel');
+        default:
+            return t('login.error.generic');
+    }
 };
 
 export default Login;

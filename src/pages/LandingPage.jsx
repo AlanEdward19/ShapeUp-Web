@@ -145,7 +145,6 @@ const LandingPage = () => {
                     </p>
                     <div className="su-lp-cta-group">
                         <button className="su-lp-btn-primary" onClick={scrollToPricing}>Conhecer Planos</button>
-                        <button className="su-lp-btn-secondary" onClick={() => navigate('/register')}>Criar Conta Grátis</button>
                     </div>
                 </div>
             </section>

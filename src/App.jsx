@@ -1,10 +1,12 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { TourProvider } from '@reactour/tour';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import LandingPage from './pages/LandingPage';
 import Layout from './components/Layout';
+import { useAuth } from './contexts/AuthContext';
 import Dashboard from './pages/Dashboard';
 import TrainingPlans from './pages/TrainingPlans';
 import Clients from './pages/Dashboard/Clients';
@@ -19,10 +21,16 @@ import StaffGym from './pages/Dashboard/StaffGym';
 import TurnstileGym from './pages/Dashboard/TurnstileGym';
 import FinancialGym from './pages/Dashboard/FinancialGym';
 
-// Wrapper for the Login page to handle the redirect properly
+// Wrapper for the Login page
 const LoginWrapper = () => {
-  const navigate = useNavigate();
-  return <Login onLogin={() => navigate('/dashboard')} />;
+  return <Login />;
+};
+
+// Protects routes that require authentication
+const ProtectedRoute = ({ children }) => {
+  const { currentUser } = useAuth();
+  if (!currentUser) return <Navigate to="/login" replace />;
+  return children;
 };
 
 function App() {
@@ -43,7 +51,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginWrapper />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Layout />}>
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="training" element={<TrainingPlans />} />
             <Route path="clients" element={<Clients />} />
