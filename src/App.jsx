@@ -4,6 +4,7 @@ import { TourProvider } from '@reactour/tour';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import LandingPage from './pages/LandingPage';
 import Layout from './components/Layout';
 import { useAuth } from './contexts/AuthContext';
@@ -52,6 +53,8 @@ function App() {
           <Route path="/login" element={<LoginWrapper />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/__/auth/action" element={<ResetPassword />} /> 
           <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="training" element={<TrainingPlans />} />

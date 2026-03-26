@@ -7,6 +7,7 @@ import {
     onAuthStateChanged,
     updatePassword,
     sendPasswordResetEmail,
+    confirmPasswordReset,
     reauthenticateWithPopup,
     EmailAuthProvider,
     reauthenticateWithCredential
@@ -94,6 +95,13 @@ export const AuthProvider = ({ children }) => {
     };
 
     /**
+     * Confirm a password reset using the OOB code from the email link
+     */
+    const confirmReset = (code, newPassword) => {
+        return confirmPasswordReset(auth, code, newPassword);
+    };
+
+    /**
      * Update current user's password with automatic reauthentication if needed
      */
     const updateUserPassword = async (newPassword, currentPassword = null) => {
@@ -156,7 +164,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const value = { currentUser, loading, signIn, signInWithGoogle, register, signOut, updateUserPassword, resetPassword };
+    const value = { currentUser, loading, signIn, signInWithGoogle, register, signOut, updateUserPassword, resetPassword, confirmReset };
 
     return (
         <AuthContext.Provider value={value}>
