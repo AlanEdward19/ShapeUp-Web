@@ -13,6 +13,7 @@ import {
     reauthenticateWithCredential
 } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
+import { logoutUser } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -63,8 +64,21 @@ export const AuthProvider = ({ children }) => {
      * Sign out and clear session data.
      */
     const signOut = async () => {
+        console.log("1. signOut iniciado. currentUser está presente?", !!currentUser);
+        if (currentUser) {
+            try {
+                const token = await currentUser.getIdToken();
+                console.log("2. Token recuperado. Enviando para logoutUser()...");
+                await logoutUser(token);
+                console.log("5. logoutUser() finalizou sem exceptions na promessa.");
+            } catch (error) {
+                console.error("Erro detectado no bloco do signOut:", error);
+            }
+        }
+
+        console.log("6. Chamando firebaseSignOut() local...");
         await firebaseSignOut(auth);
-        
+
         // Remove only user-specific datastore keys
         const userKeys = [
             'shapeup_role',
@@ -75,7 +89,7 @@ export const AuthProvider = ({ children }) => {
             'shapeup_pro_plans',
             'shapeup_pro_bank',
         ];
-        
+
         // Find dynamic keys directly related to the user session
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
@@ -106,13 +120,13 @@ export const AuthProvider = ({ children }) => {
      */
     const updateUserPassword = async (newPassword, currentPassword = null) => {
         if (!currentUser) throw new Error("No user is currently signed in.");
-        
+
         try {
             await updatePassword(currentUser, newPassword);
         } catch (error) {
             if (error.code === 'auth/requires-recent-login' || error.message.includes('CREDENTIAL_TOO_OLD_LOGIN_AGAIN')) {
                 const providerId = currentUser.providerData[0]?.providerId;
-                
+
                 if (providerId === 'google.com') {
                     await reauthenticateWithPopup(currentUser, googleProvider);
                     await updatePassword(currentUser, newPassword);

@@ -17,12 +17,14 @@ import {
 import { NavLink, useNavigate } from 'react-router-dom';
 import ChatDrawer from './ChatDrawer';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 import './Sidebar.css';
 import Logo from './Logo/Logo';
 
 const Sidebar = ({ isProfessional, isIndependent, isGym }) => {
     const [showContactModal, setShowContactModal] = useState(false);
     const navigate = useNavigate();
+    const { signOut } = useAuth();
 
     React.useEffect(() => {
         const handleOpenChat = () => setShowContactModal(true);
@@ -31,6 +33,15 @@ const Sidebar = ({ isProfessional, isIndependent, isGym }) => {
     }, []);
 
     const { t } = useLanguage();
+
+    const handleLogout = async () => {
+        try {
+            await signOut();
+            navigate('/');
+        } catch (error) {
+            console.error("Logout falhou no Sidebar:", error);
+        }
+    };
 
     // Navigation structure switches based on context
     const proNavItems = [
@@ -105,7 +116,7 @@ const Sidebar = ({ isProfessional, isIndependent, isGym }) => {
                 )}
                 <button
                     className="su-logout-btn"
-                    onClick={() => navigate('/')}
+                    onClick={handleLogout}
                 >
                     <LogOut size={18} />
                     <span>{t('sidebar.logout')}</span>

@@ -1002,8 +1002,6 @@ export const LanguageProvider = ({ children }) => {
             'gym.turnstile.table.user': 'Usuário',
             'gym.turnstile.table.type': 'Tipo',
             'gym.turnstile.table.time': 'Horário',
-            'gym.turnstile.table.status': 'Status',
-
             'pro.dashboard.title': 'Visão Geral do Painel',
             'pro.dashboard.subtitle': 'Veja o que está acontecendo com seus clientes hoje.',
             'pro.dashboard.invite': 'Convidar Cliente',
