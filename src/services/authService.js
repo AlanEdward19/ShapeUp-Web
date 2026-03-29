@@ -16,3 +16,13 @@ export const logoutUser = async (token) => {
         throw error;
     }
 };
+
+/**
+ * Syncs the current user's scopes on the backend after login.
+ * Called directly (not via hook) because AuthContext is not a React component.
+ */
+export const syncCurrentUserScopes = async () => {
+    console.log("Sincronizando scopes do usuário após login...");
+    await apiClient('/api/scopes/sync/me', { method: 'POST' });
+    console.log("Scopes sincronizados com sucesso.");
+};

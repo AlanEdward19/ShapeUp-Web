@@ -23,7 +23,7 @@ import '../Dashboard/TrainingPlansProfessional.css';
 import './ClientDetail.css';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
 import { exercisesDB } from '../../data/mockExercises';
-import { apiClient } from '../../services/apiClient';
+import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuth } from '../../contexts/AuthContext';
 
 // ─── Mock Data ─────────────────────────────────────────────
@@ -686,6 +686,7 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
 const ClientDetail = () => {
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { id } = useParams();
+    const { createWorkoutPlan } = useTrainingApi();
     const navigate = useNavigate();
     const location = useLocation();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
@@ -933,25 +934,25 @@ const ClientDetail = () => {
             const urlClientId = id; // from useParams
             const isSolo = urlClientId === 'independent';
             
-            // For now, if we don't have a numeric ID in localStorage, we use 1 as per user template
             const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
             const targetId = isSolo ? loggedInUserId : (parseInt(urlClientId) || 1);
-            const executedId = loggedInUserId;
 
             // Map to Backend Template
+            // Components are responsible for sending int enum values (LoadUnit: 1=Kg, 2=Lbs; SetType: 1=Warmup..6=Backoff)
             const workoutBody = {
                 targetUserId: targetId,
-                executedByUserId: executedId,
-                startedAtUtc: new Date().toISOString(),
+                name: updated.name || "Novo Treino",
+                notes: updated.notes || null,
                 exercises: updated.exercises.map(ex => ({
-                    exerciseId: ex.exerciseId || 1, // Fallback if missing
+                    exerciseId: parseInt(ex.exerciseId) || 1,
                     sets: ex.sets.map(s => ({
                         repetitions: parseInt(s.reps) || 0,
                         load: parseFloat(s.load) || 0,
-                        loadUnit: unitSystem === 'imperial' ? 'lbs' : 'kg',
-                        setType: s.type || 'working',
+                        loadUnit: parseInt(s.loadUnit) || 1,
+                        setType: parseInt(s.setType) || 3,
                         rpe: parseInt(s.rpe) || 0,
-                        restSeconds: parseInt(s.rest) || 0
+                        restSeconds: parseInt(s.rest) || 0,
+                        isExtra: false
                     }))
                 }))
             };
@@ -959,10 +960,7 @@ const ClientDetail = () => {
             console.log("Enviando treino para a API:", workoutBody);
             
             // Call API
-            await apiClient('/api/training/workouts', {
-                method: 'POST',
-                body: JSON.stringify(workoutBody)
-            });
+            await createWorkoutPlan(workoutBody);
 
             // Local State Update (Fallback/Sync)
             setPlans(prev => {

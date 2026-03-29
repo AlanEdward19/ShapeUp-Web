@@ -1,39 +1,42 @@
 import { useState, useEffect, useMemo } from 'react';
-import { apiClient } from '../services/apiClient';
+import { useTrainingApi } from './api/useTrainingApi';
 
 /**
  * Custom hook for managing exercises: fetching, filtering and muscle selection.
+ * Delegates API calls to useTrainingApi (Training domain hook).
  */
 export const useExercises = () => {
+    const { getExercises } = useTrainingApi();
+
     const [exercises, setExercises] = useState([]);
     const [availableMuscles, setAvailableMuscles] = useState([]);
     const [loading, setLoading] = useState(true);
-    
+
     // Filtering states
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMuscles, setSelectedMuscles] = useState([]);
 
-    // Fetch exercises via apiClient
+    // Fetch exercises via useTrainingApi
     useEffect(() => {
         const fetchExercises = async () => {
             try {
-                const responseData = await apiClient('/api/training/exercises');
-                
-                const rawData = Array.isArray(responseData) 
-                    ? responseData 
+                const responseData = await getExercises();
+
+                const rawData = Array.isArray(responseData)
+                    ? responseData
                     : (responseData?.data || responseData?.exercises || responseData?.items || []);
 
                 // Normalize results for the UI
                 const data = rawData.map(ex => ({
                     ...ex,
                     name: ex.namePt || ex.name,
-                    muscles: Array.isArray(ex.muscles) 
-                        ? ex.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName) : m) 
+                    muscles: Array.isArray(ex.muscles)
+                        ? ex.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName) : m)
                         : []
                 }));
 
                 setExercises(data);
-                
+
                 // Dynamically extract unique muscles
                 const muscleSet = new Set();
                 data.forEach(ex => {
@@ -52,7 +55,7 @@ export const useExercises = () => {
         };
 
         fetchExercises();
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Filter logic memoized to avoid unnecessary re-calculations
     const filteredExercises = useMemo(() => {

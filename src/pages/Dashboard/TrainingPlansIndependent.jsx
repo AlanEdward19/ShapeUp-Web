@@ -18,7 +18,7 @@ import {
     SET_TYPES,
     TECHNIQUES
 } from './ClientDetail';
-import { apiClient } from '../../services/apiClient';
+import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuth } from '../../contexts/AuthContext';
 import './TrainingPlansClient.css';
 import './TrainingPlansProfessional.css';
@@ -71,6 +71,7 @@ const TrainingPlansIndependent = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
+    const { createWorkoutPlan } = useTrainingApi();
 
     // ─── STATE MANAGEMENT ──────────────────────────────────────────
 
@@ -183,30 +184,27 @@ const TrainingPlansIndependent = () => {
     const handleSavePlan = async (updated) => {
         try {
             const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
-            
+
             const workoutBody = {
                 targetUserId: loggedInUserId,
-                executedByUserId: loggedInUserId,
-                startedAtUtc: new Date().toISOString(),
+                name: updated.name || "Novo Treino",
+                notes: updated.notes || null,
                 exercises: updated.exercises.map(ex => ({
-                    exerciseId: ex.exerciseId || 1,
+                    exerciseId: parseInt(ex.exerciseId) || 1,
                     sets: ex.sets.map(s => ({
                         repetitions: parseInt(s.reps) || 0,
                         load: parseFloat(s.load) || 0,
-                        loadUnit: unitSystem === 'imperial' ? 'lbs' : 'kg',
-                        setType: s.type || 'working',
+                        loadUnit: parseInt(s.loadUnit) || 1,
+                        setType: parseInt(s.setType) || 3,
                         rpe: parseInt(s.rpe) || 0,
-                        restSeconds: parseInt(s.rest) || 0
+                        restSeconds: parseInt(s.rest) || 0,
+                        isExtra: false
                     }))
                 }))
             };
 
             console.log("Enviando treino (Solo) para a API:", workoutBody);
-            
-            await apiClient('/api/training/workouts', {
-                method: 'POST',
-                body: JSON.stringify(workoutBody)
-            });
+            await createWorkoutPlan(workoutBody);
 
             setPlans(prev => {
                 const exists = prev.some(p => p.id === updated.id);

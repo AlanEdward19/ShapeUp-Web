@@ -13,7 +13,7 @@ import {
     reauthenticateWithCredential
 } from 'firebase/auth';
 import { auth, googleProvider } from '../firebase';
-import { logoutUser } from '../services/authService';
+import { logoutUser, syncCurrentUserScopes } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -39,6 +39,18 @@ export const AuthProvider = ({ children }) => {
     const signIn = async (email, password, role) => {
         const credential = await signInWithEmailAndPassword(auth, email, password);
         _persistSession(credential.user, email, role);
+        
+        // Sync scopes on the backend and force-refresh the Firebase token
+        // so the user immediately gets an up-to-date token with the latest claims.
+        try {
+            await syncCurrentUserScopes();
+            await credential.user.getIdToken(/* forceRefresh= */ true);
+            console.log("Token atualizado após sincronização de scopes.");
+        } catch (err) {
+            // Non-fatal: log but don't block the login flow
+            console.warn("Falha ao sincronizar scopes após login:", err);
+        }
+        
         return credential;
     };
 
@@ -50,6 +62,16 @@ export const AuthProvider = ({ children }) => {
         const credential = await signInWithPopup(auth, googleProvider);
         const email = credential.user.email || '';
         _persistSession(credential.user, email, role || 'independent');
+        
+        // Sync scopes on the backend and force-refresh the Firebase token
+        try {
+            await syncCurrentUserScopes();
+            await credential.user.getIdToken(/* forceRefresh= */ true);
+            console.log("Token atualizado após sincronização de scopes (Google).");
+        } catch (err) {
+            console.warn("Falha ao sincronizar scopes após login Google:", err);
+        }
+        
         return credential;
     };
 
