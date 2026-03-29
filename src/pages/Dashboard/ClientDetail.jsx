@@ -12,7 +12,8 @@ import Input from '../../components/Input';
 import {
     LineChart, Line, AreaChart, Area, XAxis, YAxis,
     CartesianGrid, ResponsiveContainer, Tooltip,
-    RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
+    RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
+    BarChart, Bar
 } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import ExerciseLibraryModal from '../../components/ExerciseLibraryModal';
@@ -22,6 +23,8 @@ import '../Dashboard/TrainingPlansProfessional.css';
 import './ClientDetail.css';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
 import { exercisesDB } from '../../data/mockExercises';
+import { apiClient } from '../../services/apiClient';
+import { useAuth } from '../../contexts/AuthContext';
 
 // ─── Mock Data ─────────────────────────────────────────────
 
@@ -106,8 +109,8 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     const [difficulty, setDiff] = useState(plan.difficulty || 'Intermediate');
     const [weeks, setWeeks] = useState(plan.weeks);
     const [planNotes, setPlanNotes] = useState(plan.notes || '');
-    const [exercises, setExercises] = useState(
-        plan.exercises.map(ex => ({ ...ex, sets: ex.sets.map(s => ({ ...s })) }))
+    const [currentExercises, setCurrentExercises] = useState(
+        (plan.exercises || []).map(ex => ({ ...ex, sets: (ex.sets || []).map(s => ({ ...s })) }))
     );
     const [showExerciseLibrary, setShowExerciseLibrary] = useState(false);
     const [alertModal, setAlertModal] = useState({ visible: false, title: '', message: '' });
@@ -116,7 +119,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
 
     const handleSelectExercise = (ex) => {
         // Prevent duplicates
-        const isDuplicate = exercises.some(e => e.name.toLowerCase() === ex.name.toLowerCase());
+        const isDuplicate = currentExercises.some(e => e.name.toLowerCase() === ex.name.toLowerCase());
         if (isDuplicate) {
             setAlertModal({
                 visible: true,
@@ -126,35 +129,45 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             return;
         }
 
-        setExercises(prev => [...prev, {
-            id: `e${Date.now()}`, name: ex.name, tags: `${ex.type} • ${ex.muscles.join(' • ')}`, notes: '',
+        const tagsParts = [];
+        if (ex.type) tagsParts.push(ex.type);
+        if (Array.isArray(ex.muscles) && ex.muscles.length > 0) {
+            tagsParts.push(ex.muscles.join(' • '));
+        }
+
+        setCurrentExercises(prev => [...prev, {
+            id: `e${Date.now()}`, 
+            exerciseId: ex.id,
+            name: ex.name, 
+            tags: tagsParts.join(' • '), 
+            notes: '',
             sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '75', rpe: '8', rest: '90' }]
         }]);
         setShowExerciseLibrary(false);
     };
 
     const removeExercise = idx =>
-        setExercises(prev => prev.filter((_, i) => i !== idx));
+        setCurrentExercises(prev => prev.filter((_, i) => i !== idx));
 
-    const addSet = exIdx => setExercises(prev => {
+    const addSet = exIdx => setCurrentExercises(prev => {
         const u = [...prev];
         u[exIdx] = { ...u[exIdx], sets: [...u[exIdx].sets, { type: 'working', technique: 'Straight', reps: '8-10', load: '75', rpe: '8', rest: '90' }] };
         return u;
     });
 
-    const removeSet = (exIdx, sIdx) => setExercises(prev => {
+    const removeSet = (exIdx, sIdx) => setCurrentExercises(prev => {
         const u = [...prev];
         u[exIdx] = { ...u[exIdx], sets: u[exIdx].sets.filter((_, i) => i !== sIdx) };
         return u;
     });
 
-    const updateSet = (exIdx, sIdx, field, value) => setExercises(prev => {
+    const updateSet = (exIdx, sIdx, field, value) => setCurrentExercises(prev => {
         const u = [...prev];
         u[exIdx].sets[sIdx] = { ...u[exIdx].sets[sIdx], [field]: value };
         return u;
     });
 
-    const updateEx = (exIdx, field, value) => setExercises(prev => {
+    const updateEx = (exIdx, field, value) => setCurrentExercises(prev => {
         const u = [...prev];
         u[exIdx] = { ...u[exIdx], [field]: value };
         return u;
@@ -191,13 +204,13 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     }, [setIsOpen, setSteps, isIndependent, t]);
 
     // Derived summary values (live computed)
-    const totalSets = exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
+    const totalSets = currentExercises.reduce((acc, ex) => acc + ex.sets.length, 0);
     const avgRpe = (() => {
-        const all = exercises.flatMap(ex => ex.sets.map(s => parseFloat(s.rpe)).filter(r => !isNaN(r)));
+        const all = currentExercises.flatMap(ex => ex.sets.map(s => parseFloat(s.rpe)).filter(r => !isNaN(r)));
         return all.length ? (all.reduce((a, b) => a + b, 0) / all.length).toFixed(1) : '—';
     })();
-    const estMins = exercises.length === 0 ? '—' : (() => {
-        const totalRest = exercises.reduce((acc, ex) =>
+    const estMins = currentExercises.length === 0 ? '—' : (() => {
+        const totalRest = currentExercises.reduce((acc, ex) =>
             acc + ex.sets.reduce((a, s) => a + (parseInt(s.rest) || 90), 0), 0);
         return `${Math.round((totalRest + totalSets * 45) / 60)}–${Math.round((totalRest + totalSets * 75) / 60)} ${t('pro.builder.summary.time.unit')}`;
     })();
@@ -205,7 +218,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     // Intensity distribution (sets grouped by RPE rounded)
     const intensityDist = (() => {
         const map = {};
-        exercises.forEach(ex => ex.sets.forEach(s => {
+        currentExercises.forEach(ex => ex.sets.forEach(s => {
             const r = parseFloat(s.rpe);
             if (!isNaN(r)) {
                 const key = `RPE ${Math.round(r)}`;
@@ -221,7 +234,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     const techniqueUsage = (() => {
         const map = {};
         let total = 0;
-        exercises.forEach(ex => ex.sets.forEach(s => {
+        currentExercises.forEach(ex => ex.sets.forEach(s => {
             const tKey = s.technique || 'Straight';
             map[tKey] = (map[tKey] || 0) + 1;
             total++;
@@ -270,7 +283,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                     </div>
 
                     <div className="su-sortable-list">
-                        {exercises.map((ex, exIdx) => (
+                        {currentExercises.map((ex, exIdx) => (
                             <div key={ex.id} className="su-exercise-builder-card">
                                 <div className="su-drag-handle-vertical"><GripVertical size={20} /></div>
                                 <div className="su-exercise-content">
@@ -372,7 +385,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                     <div className="su-intelligence-metrics">
                         <div className="su-metric-item">
                             <span className="su-metric-label">{t('pro.builder.summary.ex')}</span>
-                            <span className="su-metric-val">{exercises.length}</span>
+                            <span className="su-metric-val">{currentExercises.length}</span>
                         </div>
                         <div className="su-metric-item">
                             <span className="su-metric-label">{t('pro.builder.summary.sets')}</span>
@@ -435,12 +448,14 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                     )}
 
                     <Button fullWidth icon={<Save size={16} />}
-                        onClick={() => onSave({ ...plan, name, phase, difficulty, weeks, notes: planNotes, exercises })}>
+                        onClick={() => {
+                            onSave({ ...plan, name, phase, difficulty, weeks, notes: planNotes, exercises: currentExercises });
+                        }}>
                         {t('pro.builder.btn.save')}
                     </Button>
                     {onAssign && (
                         <Button fullWidth variant="outline" className="su-mt-2" style={{ color: 'var(--text-main)' }}
-                            onClick={() => onAssign({ ...plan, name, phase, difficulty, weeks, notes: planNotes, exercises })}>
+                            onClick={() => onAssign({ ...plan, name, phase, difficulty, weeks, notes: planNotes, exercises: currentExercises })}>
                             {t('pro.builder.btn.assign')}
                         </Button>
                     )}
@@ -909,18 +924,64 @@ const ClientDetail = () => {
         localStorage.setItem('shapeup_client_plans_' + id, JSON.stringify(plans));
     }, [plans, id]);
 
-    const handleSavePlan = (updated) => {
-        setPlans(prev => {
-            const exists = prev.find(p => p.id === updated.id);
-            if (exists) {
-                return prev.map(p => p.id === updated.id ? updated : p);
-            }
-            return [...prev, updated];
-        });
-        setEditingPlan(null);
-        addNotification(id.toString(), 'alert', 'Plan Updated', `Your coach has updated "${updated.name}"`, 'primary', {
-            link: '/dashboard/training'
-        });
+    const { currentUser } = useAuth();
+
+    const handleSavePlan = async (updated) => {
+        console.log("handleSavePlan disparado! Dados recebidos:", updated);
+        try {
+            // Determine IDs
+            const urlClientId = id; // from useParams
+            const isSolo = urlClientId === 'independent';
+            
+            // For now, if we don't have a numeric ID in localStorage, we use 1 as per user template
+            const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
+            const targetId = isSolo ? loggedInUserId : (parseInt(urlClientId) || 1);
+            const executedId = loggedInUserId;
+
+            // Map to Backend Template
+            const workoutBody = {
+                targetUserId: targetId,
+                executedByUserId: executedId,
+                startedAtUtc: new Date().toISOString(),
+                exercises: updated.exercises.map(ex => ({
+                    exerciseId: ex.exerciseId || 1, // Fallback if missing
+                    sets: ex.sets.map(s => ({
+                        repetitions: parseInt(s.reps) || 0,
+                        load: parseFloat(s.load) || 0,
+                        loadUnit: unitSystem === 'imperial' ? 'lbs' : 'kg',
+                        setType: s.type || 'working',
+                        rpe: parseInt(s.rpe) || 0,
+                        restSeconds: parseInt(s.rest) || 0
+                    }))
+                }))
+            };
+
+            console.log("Enviando treino para a API:", workoutBody);
+            
+            // Call API
+            await apiClient('/api/training/workouts', {
+                method: 'POST',
+                body: JSON.stringify(workoutBody)
+            });
+
+            // Local State Update (Fallback/Sync)
+            setPlans(prev => {
+                const exists = prev.find(p => p.id === updated.id);
+                if (exists) {
+                    return prev.map(p => p.id === updated.id ? updated : p);
+                }
+                return [...prev, updated];
+            });
+            
+            setEditingPlan(null);
+            
+            addNotification(id.toString(), 'alert', 'Treino Salvo', `O treino "${updated.name}" foi enviado com sucesso!`, 'primary', {
+                link: '/dashboard/training'
+            });
+        } catch (error) {
+            console.error("Erro ao salvar treino na API:", error);
+            alert("Erro ao salvar o treino. Verifique o console.");
+        }
     };
 
     const handleDeletePlan = (planId) =>

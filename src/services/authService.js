@@ -1,23 +1,16 @@
+import { apiClient } from './apiClient';
 
 export const logoutUser = async (token) => {
     console.log("3. Serviço logoutUser iniciado.");
     try {
         const url = `/api/users/logout`;
-        console.log(`4a. Preparando POST para ${url} (via proxy local)`);
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        console.log(`4b. Resposta da API de logout recebida. Status: ${response.status} ${response.statusText}`);
-
-        if (!response.ok) {
-            throw new Error(`Logout failed with status: ${response.status}`);
-        }
-
+        console.log(`4a. Preparando POST para ${url} (via proxy local e com apiClient)`);
+        
+        // apiClient handle the token automatically, so we don't strictly need to pass it,
+        // but since AuthContext still fetches it we can ignore the argument and let apiClient do its thing.
+        await apiClient(url, { method: 'POST' });
+        
+        console.log(`4b. Resposta da API de logout recebida com Sucesso.`);
     } catch (error) {
         console.error("4c. Erro no serviço de logout (fetch falhou ou rede inacessível):", error);
         throw error;

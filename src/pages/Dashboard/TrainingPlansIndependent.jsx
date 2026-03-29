@@ -18,6 +18,8 @@ import {
     SET_TYPES,
     TECHNIQUES
 } from './ClientDetail';
+import { apiClient } from '../../services/apiClient';
+import { useAuth } from '../../contexts/AuthContext';
 import './TrainingPlansClient.css';
 import './TrainingPlansProfessional.css';
 
@@ -178,15 +180,48 @@ const TrainingPlansIndependent = () => {
         setEditingPlan(newPlan);
     };
 
-    const handleSavePlan = (updated) => {
-        setPlans(prev => {
-            const exists = prev.some(p => p.id === updated.id);
-            if (exists) {
-                return prev.map(p => p.id === updated.id ? updated : p);
-            }
-            return [...prev, updated];
-        });
-        setEditingPlan(null);
+    const handleSavePlan = async (updated) => {
+        try {
+            const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
+            
+            const workoutBody = {
+                targetUserId: loggedInUserId,
+                executedByUserId: loggedInUserId,
+                startedAtUtc: new Date().toISOString(),
+                exercises: updated.exercises.map(ex => ({
+                    exerciseId: ex.exerciseId || 1,
+                    sets: ex.sets.map(s => ({
+                        repetitions: parseInt(s.reps) || 0,
+                        load: parseFloat(s.load) || 0,
+                        loadUnit: unitSystem === 'imperial' ? 'lbs' : 'kg',
+                        setType: s.type || 'working',
+                        rpe: parseInt(s.rpe) || 0,
+                        restSeconds: parseInt(s.rest) || 0
+                    }))
+                }))
+            };
+
+            console.log("Enviando treino (Solo) para a API:", workoutBody);
+            
+            await apiClient('/api/training/workouts', {
+                method: 'POST',
+                body: JSON.stringify(workoutBody)
+            });
+
+            setPlans(prev => {
+                const exists = prev.some(p => p.id === updated.id);
+                if (exists) {
+                    return prev.map(p => p.id === updated.id ? updated : p);
+                }
+                return [...prev, updated];
+            });
+            setEditingPlan(null);
+            
+            addNotification('independent', 'alert', 'Treino Salvo', `Seu treino foi enviado com sucesso!`, 'primary');
+        } catch (error) {
+            console.error("Erro ao salvar treino (Solo) na API:", error);
+            alert("Erro ao salvar o treino. Verifique o console.");
+        }
     };
 
     const handleCopyPlan = (original) => {

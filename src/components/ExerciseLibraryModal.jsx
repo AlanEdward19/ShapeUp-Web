@@ -1,26 +1,21 @@
 import React, { useState } from 'react';
 import { X, Search, Filter, ChevronRight } from 'lucide-react';
-import { exercisesDB, availableMuscles } from '../data/mockExercises';
+import { useExercises } from '../hooks/useExercises';
 import './ExerciseLibraryModal.css';
 
 const ExerciseLibraryModal = ({ onClose, onSelect }) => {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedMuscles, setSelectedMuscles] = useState([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    const toggleMuscle = (muscle) => {
-        if (selectedMuscles.includes(muscle)) {
-            setSelectedMuscles(selectedMuscles.filter(m => m !== muscle));
-        } else {
-            setSelectedMuscles([...selectedMuscles, muscle]);
-        }
-    };
-
-    const filteredExercises = exercisesDB.filter(ex => {
-        const matchesSearch = ex.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesMuscle = selectedMuscles.length === 0 || selectedMuscles.some(m => ex.muscles.includes(m));
-        return matchesSearch && matchesMuscle;
-    });
+    const {
+        filteredExercises,
+        loading,
+        searchTerm,
+        setSearchTerm,
+        selectedMuscles,
+        toggleMuscle,
+        clearFilters,
+        availableMuscles
+    } = useExercises();
 
     return (
         <div className="su-modal-overlay su-elm-overlay" onClick={onClose}>
@@ -87,7 +82,7 @@ const ExerciseLibraryModal = ({ onClose, onSelect }) => {
                                 {/* Footer */}
                                 {selectedMuscles.length > 0 && (
                                     <div className="su-elm-filter-footer">
-                                        <button className="su-elm-clear-btn" onClick={() => setSelectedMuscles([])}>
+                                        <button className="su-elm-clear-btn" onClick={clearFilters}>
                                             Clear all filters
                                         </button>
                                     </div>
@@ -99,23 +94,31 @@ const ExerciseLibraryModal = ({ onClose, onSelect }) => {
 
                 {/* Exercise List */}
                 <div className="su-elm-list">
-                    <div className="su-elm-count">{filteredExercises.length} exercise{filteredExercises.length !== 1 ? 's' : ''}</div>
-                    {filteredExercises.map(ex => (
-                        <div key={ex.id} className="su-elm-item" onClick={() => onSelect(ex)}>
-                            <div className="su-elm-item-info">
-                                <strong>{ex.name}</strong>
-                                <div className="su-elm-item-tags">
-                                    <span className="su-elm-tag type">{ex.type}</span>
-                                    {ex.muscles.slice(0, 3).map(m => <span key={m} className="su-elm-tag muscle">{m}</span>)}
-                                </div>
-                            </div>
-                            <ChevronRight size={18} className="su-elm-item-arrow" />
-                        </div>
-                    ))}
-                    {filteredExercises.length === 0 && (
+                    {loading ? (
                         <div className="su-elm-empty">
-                            <p>No exercises match your filters.</p>
+                            <p>Loading exercises...</p>
                         </div>
+                    ) : (
+                        <>
+                            <div className="su-elm-count">{filteredExercises.length} exercise{filteredExercises.length !== 1 ? 's' : ''}</div>
+                            {filteredExercises.map(ex => (
+                                <div key={ex.id} className="su-elm-item" onClick={() => onSelect(ex)}>
+                                    <div className="su-elm-item-info">
+                                        <strong>{ex.name}</strong>
+                                        <div className="su-elm-item-tags">
+                                            {ex.type && <span className="su-elm-tag type">{ex.type}</span>}
+                                            {ex.muscles.slice(0, 3).map(m => <span key={m} className="su-elm-tag muscle">{m}</span>)}
+                                        </div>
+                                    </div>
+                                    <ChevronRight size={18} className="su-elm-item-arrow" />
+                                </div>
+                            ))}
+                            {filteredExercises.length === 0 && (
+                                <div className="su-elm-empty">
+                                    <p>No exercises match your filters.</p>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
 

@@ -16,8 +16,12 @@ const ExerciseModal = ({ exercise, onClose }) => {
                     <div className="su-modal-title-group">
                         <h2 className="su-modal-title">{exercise.name}</h2>
                         <div className="su-modal-tags">
-                            <span className="su-ex-tag-type">{exercise.type}</span>
-                            <span className="su-ex-tag-equipment">{exercise.equipment}</span>
+                            {exercise.type && <span className="su-ex-tag-type">{exercise.type}</span>}
+                            {(exercise.equipment || (exercise.equipments && exercise.equipments.length > 0)) && (
+                                <span className="su-ex-tag-equipment">
+                                    {exercise.equipment || exercise.equipments[0].equipmentNamePt || exercise.equipments[0].equipmentName}
+                                </span>
+                            )}
                         </div>
                     </div>
                     <button className="su-modal-close" onClick={onClose}>
@@ -54,13 +58,27 @@ const ExerciseModal = ({ exercise, onClose }) => {
                         <div className="su-info-block">
                             <h3>{t('client.exercise_modal.notes.title')}</h3>
                             <p className="su-text-muted">
-                                {t('client.exercise_modal.notes.desc.1')}{exercise.name}{t('client.exercise_modal.notes.desc.2')}{exercise.equipment}{t('client.exercise_modal.notes.desc.3')}
+                                {exercise.description || `${t('client.exercise_modal.notes.desc.1')}${exercise.name}${t('client.exercise_modal.notes.desc.2')} (${exercise.equipment || '-'}) ${t('client.exercise_modal.notes.desc.3')}`}
                             </p>
-                            <ul className="su-execution-list">
-                                <li>{t('client.exercise_modal.notes.bullet1')}</li>
-                                <li>{t('client.exercise_modal.notes.bullet2')}</li>
-                                <li>{t('client.exercise_modal.notes.bullet3')}</li>
-                            </ul>
+                            
+                            {/* Renderizar os passos (steps) reais da API ou o fallback genérico se a lista estiver vazia */}
+                            {exercise.steps && exercise.steps.length > 0 ? (
+                                <ul className="su-execution-list">
+                                    {exercise.steps.map((step, idx) => {
+                                        // O step pode ser uma string direta, ou um objeto { stepDescriptionPt, stepDescription... }
+                                        const stepText = typeof step === 'object' 
+                                            ? (step.stepDescriptionPt || step.stepDescription || step.description || step.name) 
+                                            : step;
+                                        return <li key={idx}>{stepText}</li>;
+                                    })}
+                                </ul>
+                            ) : (
+                                <ul className="su-execution-list">
+                                    <li>{t('client.exercise_modal.notes.bullet1')}</li>
+                                    <li>{t('client.exercise_modal.notes.bullet2')}</li>
+                                    <li>{t('client.exercise_modal.notes.bullet3')}</li>
+                                </ul>
+                            )}
                         </div>
                     </div>
 

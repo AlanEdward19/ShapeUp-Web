@@ -9,16 +9,28 @@ import SuggestExerciseModal from '../../components/SuggestExerciseModal';
 import { useLanguage } from '../../contexts/LanguageContext';
 import './Exercises.css';
 
-import { exercisesDB, availableMuscles } from '../../data/mockExercises';
+import { useExercises } from '../../hooks/useExercises';
 
 const Exercises = () => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedMuscles, setSelectedMuscles] = useState([]);
+    
+    // UI Local States
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [selectedExercise, setSelectedExercise] = useState(null);
     const [showSuggest, setShowSuggest] = useState(false);
+    
+    // Business Logic moved to Custom Hook
+    const {
+        filteredExercises,
+        loading,
+        searchTerm,
+        setSearchTerm,
+        selectedMuscles,
+        toggleMuscle,
+        clearFilters,
+        availableMuscles
+    } = useExercises();
 
     // ─── Exercise Library Tour Trigger ───────────────────────────────
     useEffect(() => {
@@ -46,22 +58,6 @@ setTimeout(() => {
             sessionStorage.setItem('shapeup_exercises_tour_seen', 'true');
         }
     }, [setIsOpen, setSteps]);
-
-    // Toggle muscle filter
-    const toggleMuscle = (muscle) => {
-        if (selectedMuscles.includes(muscle)) {
-            setSelectedMuscles(selectedMuscles.filter(m => m !== muscle));
-        } else {
-            setSelectedMuscles([...selectedMuscles, muscle]);
-        }
-    };
-
-    // Filter logic
-    const filteredExercises = exercisesDB.filter(ex => {
-        const matchesSearch = ex.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesMuscle = selectedMuscles.length === 0 || selectedMuscles.some(m => ex.muscles.includes(m));
-        return matchesSearch && matchesMuscle;
-    });
 
     return (
         <div className="su-exercises-dashboard">
@@ -113,7 +109,7 @@ setTimeout(() => {
                                 </div>
                                 {selectedMuscles.length > 0 && (
                                     <div className="su-filter-actions">
-                                        <button className="su-text-btn" onClick={() => setSelectedMuscles([])}>{t('pro.exercises.filter.clear')}</button>
+                                        <button className="su-text-btn" onClick={clearFilters}>{t('pro.exercises.filter.clear')}</button>
                                     </div>
                                 )}
                             </div>
@@ -123,30 +119,33 @@ setTimeout(() => {
 
                 {/* Directory Grid */}
                 <div className="su-exercises-grid">
-                    {filteredExercises.map((ex, idx) => (
-                        <div
-                            key={ex.id}
-                            className="su-exercise-thumb-card"
-                            onClick={() => setSelectedExercise(ex)}
-                            {...(idx === 0 ? { 'data-tour': 'ex-card' } : {})}
-                        >
-                            <div className="su-ex-thumb-visual">
-                                <PlayCircle size={32} className="su-ex-play-icon" />
-                            </div>
-                            <div className="su-ex-thumb-content">
-                                <h4 className="su-ex-thumb-title">{ex.name}</h4>
-                                <div className="su-ex-thumb-tags">
-                                    <span className="su-ex-tag-type">{ex.type}</span>
-                                    {ex.muscles.slice(0, 2).map(m => (
-                                        <span key={m} className="su-ex-tag-muscle">{m}</span>
-                                    ))}
-                                    {ex.muscles.length > 2 && <span className="su-ex-tag-muscle">+{ex.muscles.length - 2}</span>}
+                    {loading ? (
+                        <div className="su-empty-state" style={{ gridColumn: '1 / -1' }}>Carregando exercícios...</div>
+                    ) : filteredExercises.length === 0 ? (
+                        <div className="su-empty-state">{t('pro.exercises.empty')}</div>
+                    ) : (
+                        filteredExercises.map((ex, idx) => (
+                            <div
+                                key={ex.id}
+                                className="su-exercise-thumb-card"
+                                onClick={() => setSelectedExercise(ex)}
+                                {...(idx === 0 ? { 'data-tour': 'ex-card' } : {})}
+                            >
+                                <div className="su-ex-thumb-visual">
+                                    <PlayCircle size={32} className="su-ex-play-icon" />
+                                </div>
+                                <div className="su-ex-thumb-content">
+                                    <h4 className="su-ex-thumb-title">{ex.name}</h4>
+                                    <div className="su-ex-thumb-tags">
+                                        {ex.type && <span className="su-ex-tag-type">{ex.type}</span>}
+                                        {ex.muscles.slice(0, 2).map(m => (
+                                            <span key={m} className="su-ex-tag-muscle">{m}</span>
+                                        ))}
+                                        {ex.muscles.length > 2 && <span className="su-ex-tag-muscle">+{ex.muscles.length - 2}</span>}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                    {filteredExercises.length === 0 && (
-                        <div className="su-empty-state">{t('pro.exercises.empty')}</div>
+                        ))
                     )}
                 </div>
             </Card>
