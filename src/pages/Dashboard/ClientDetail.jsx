@@ -22,9 +22,10 @@ import '../../components/InviteClientModal.css';
 import '../Dashboard/TrainingPlansProfessional.css';
 import './ClientDetail.css';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
-import { exercisesDB } from '../../data/mockExercises';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuth } from '../../contexts/AuthContext';
+import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
+import { normalizePlan } from '../../utils/trainingNormalization';
 
 // ─── Mock Data ─────────────────────────────────────────────
 
@@ -98,7 +99,8 @@ export const ProSelect = ({ label, value, onChange, options }) => (
 
 // ─── Plan Editor (mirrors TrainingPlansProfessional, no analytics) ──
 
-export const TECHNIQUES = ['Straight', 'Cluster', 'Drop Set', 'Rest Pause', 'Muscle Round'];
+export const TECHNIQUES = ['Straight', 'Drop Set', 'Rest Pause', 'Cluster', 'Muscle Round'];
+export const DIFFICULTIES = ['Easy', 'Intermediate', 'Hard', 'Advanced'];
 export const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
 export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false }) => {
@@ -264,8 +266,9 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                             ]} />
                         <ProSelect label={t('pro.builder.diff')} value={difficulty} onChange={e => setDiff(e.target.value)}
                             options={[
-                                { value: 'Beginner', label: t('pro.builder.diff.beginner') },
+                                { value: 'Easy', label: t('pro.builder.diff.easy') || 'Easy' },
                                 { value: 'Intermediate', label: t('pro.builder.diff.intermediate') },
+                                { value: 'Hard', label: t('pro.builder.diff.hard') || 'Hard' },
                                 { value: 'Advanced', label: t('pro.builder.diff.advanced') },
                             ]} />
                     </div>
@@ -686,19 +689,48 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
 const ClientDetail = () => {
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { id } = useParams();
-    const { createWorkoutPlan } = useTrainingApi();
+    const { createWorkoutPlan, getWorkoutPlansByUser } = useTrainingApi();
     const navigate = useNavigate();
     const location = useLocation();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const client = getClientData(parseInt(id));
 
     const [activeTab, setActiveTab] = useState(location.state?.tab || 'analytics');
-    const [plans, setPlans] = useState(() => {
-        const stored = localStorage.getItem('shapeup_client_plans_' + id);
-        if (stored) return JSON.parse(stored);
-        return client.hasData ? initPlans : [];
-    });
+    const [plans, setPlans] = useState([]);
+    const [loadingPlans, setLoadingPlans] = useState(true);
+
+    // Fetch plans from API on mount
+    useEffect(() => {
+        const numericId = parseInt(id);
+        if (!id || isNaN(numericId)) {
+            setLoadingPlans(false);
+            return;
+        }
+        const fetchPlans = async () => {
+            try {
+                const response = await getWorkoutPlansByUser(numericId);
+                const raw = Array.isArray(response)
+                    ? response
+                    : (response?.data || response?.items || []);
+                
+                // Normalizar planos da API para o formato interno do PlanEditor
+                const data = raw.map(p => normalizePlan(p));
+                setPlans(data);
+            } catch (err) {
+                console.error('Erro ao buscar planos do cliente:', err);
+                // Fallback to localStorage cache
+                const stored = localStorage.getItem('shapeup_client_plans_' + id);
+                if (stored) setPlans(JSON.parse(stored));
+                else setPlans(client.hasData ? initPlans : []);
+            } finally {
+                setLoadingPlans(false);
+            }
+        };
+        fetchPlans();
+    }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+
     const [editingPlan, setEditingPlan] = useState(null);
+
     const [selectedPRComparison, setSelectedPRComparison] = useState(null);
     const [muscleTimeFilter, setMuscleTimeFilter] = useState('30');
     const [muscleCustomRange, setMuscleCustomRange] = useState({ start: '', end: '' });
@@ -937,19 +969,21 @@ const ClientDetail = () => {
             const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
             const targetId = isSolo ? loggedInUserId : (parseInt(urlClientId) || 1);
 
-            // Map to Backend Template
-            // Components are responsible for sending int enum values (LoadUnit: 1=Kg, 2=Lbs; SetType: 1=Warmup..6=Backoff)
             const workoutBody = {
                 targetUserId: targetId,
-                name: updated.name || "Novo Treino",
+                name: updated.name || 'Novo Treino',
                 notes: updated.notes || null,
-                exercises: updated.exercises.map(ex => ({
+                durationInWeeks: parseInt(updated.weeks) || 4,
+                phase: updated.phase || 'Hypertrophy',
+                difficulty: mapDifficulty(updated.difficulty),
+                exercises: (updated.exercises || []).map(ex => ({
                     exerciseId: parseInt(ex.exerciseId) || 1,
-                    sets: ex.sets.map(s => ({
+                    sets: (ex.sets || []).map(s => ({
                         repetitions: parseInt(s.reps) || 0,
                         load: parseFloat(s.load) || 0,
-                        loadUnit: parseInt(s.loadUnit) || 1,
-                        setType: parseInt(s.setType) || 3,
+                        loadUnit: mapLoadUnit(s.loadUnit),
+                        setType: mapSetType(s.type ?? s.setType),
+                        technique: mapTechnique(s.technique),
                         rpe: parseInt(s.rpe) || 0,
                         restSeconds: parseInt(s.rest) || 0,
                         isExtra: false
@@ -962,7 +996,7 @@ const ClientDetail = () => {
             // Call API
             await createWorkoutPlan(workoutBody);
 
-            // Local State Update (Fallback/Sync)
+            // Local State Update
             setPlans(prev => {
                 const exists = prev.find(p => p.id === updated.id);
                 if (exists) {

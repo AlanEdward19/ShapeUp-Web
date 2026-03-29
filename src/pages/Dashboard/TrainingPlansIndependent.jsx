@@ -6,7 +6,6 @@ import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 import ExerciseModal from '../../components/ExerciseModal';
-import { exercisesDB } from '../../data/mockExercises';
 import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
 import {
@@ -20,6 +19,8 @@ import {
 } from './ClientDetail';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuth } from '../../contexts/AuthContext';
+import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
+import { normalizePlan } from '../../utils/trainingNormalization';
 import './TrainingPlansClient.css';
 import './TrainingPlansProfessional.css';
 
@@ -71,16 +72,44 @@ const TrainingPlansIndependent = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { createWorkoutPlan } = useTrainingApi();
+    const { createWorkoutPlan, getWorkoutPlansByUser } = useTrainingApi();
+    const { currentUser } = useAuth();
 
     // ─── STATE MANAGEMENT ──────────────────────────────────────────
 
     // 1. Storage & Navigation
-    const [plans, setPlans] = useState(() => {
-        const stored = localStorage.getItem('shapeup_independent_plans');
-        return stored ? JSON.parse(stored) : [];
-    });
+    const [plans, setPlans] = useState([]);
+    const [loadingPlans, setLoadingPlans] = useState(true);
     const [editingPlan, setEditingPlan] = useState(null);
+
+    // Fetch plans from API on mount
+    useEffect(() => {
+        const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id'));
+        if (!loggedInUserId || isNaN(loggedInUserId)) {
+            setLoadingPlans(false);
+            return;
+        }
+        const fetchPlans = async () => {
+            try {
+                const response = await getWorkoutPlansByUser(loggedInUserId);
+                const raw = Array.isArray(response)
+                    ? response
+                    : (response?.data || response?.items || []);
+
+                // Normalizar planos da API para o formato interno do PlanEditor
+                const data = raw.map(p => normalizePlan(p));
+                setPlans(data);
+            } catch (err) {
+                console.error('Erro ao buscar planos (independente):', err);
+                // Fallback to localStorage cache
+                const stored = localStorage.getItem('shapeup_independent_plans');
+                if (stored) setPlans(JSON.parse(stored));
+            } finally {
+                setLoadingPlans(false);
+            }
+        };
+        fetchPlans();
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // 2. Session Engine State
     const [sessionActive, setSessionActive] = useState(false);
@@ -187,15 +216,19 @@ const TrainingPlansIndependent = () => {
 
             const workoutBody = {
                 targetUserId: loggedInUserId,
-                name: updated.name || "Novo Treino",
+                name: updated.name || 'Novo Treino',
                 notes: updated.notes || null,
-                exercises: updated.exercises.map(ex => ({
+                durationInWeeks: parseInt(updated.weeks) || 4,
+                phase: updated.phase || 'Hypertrophy',
+                difficulty: mapDifficulty(updated.difficulty),
+                exercises: (updated.exercises || []).map(ex => ({
                     exerciseId: parseInt(ex.exerciseId) || 1,
-                    sets: ex.sets.map(s => ({
+                    sets: (ex.sets || []).map(s => ({
                         repetitions: parseInt(s.reps) || 0,
                         load: parseFloat(s.load) || 0,
-                        loadUnit: parseInt(s.loadUnit) || 1,
-                        setType: parseInt(s.setType) || 3,
+                        loadUnit: mapLoadUnit(s.loadUnit),
+                        setType: mapSetType(s.type ?? s.setType),
+                        technique: mapTechnique(s.technique),
                         rpe: parseInt(s.rpe) || 0,
                         restSeconds: parseInt(s.rest) || 0,
                         isExtra: false
@@ -203,7 +236,7 @@ const TrainingPlansIndependent = () => {
                 }))
             };
 
-            console.log("Enviando treino (Solo) para a API:", workoutBody);
+            console.log('Enviando treino (Solo) para a API:', workoutBody);
             await createWorkoutPlan(workoutBody);
 
             setPlans(prev => {
@@ -217,8 +250,8 @@ const TrainingPlansIndependent = () => {
             
             addNotification('independent', 'alert', 'Treino Salvo', `Seu treino foi enviado com sucesso!`, 'primary');
         } catch (error) {
-            console.error("Erro ao salvar treino (Solo) na API:", error);
-            alert("Erro ao salvar o treino. Verifique o console.");
+            console.error('Erro ao salvar treino (Solo) na API:', error);
+            alert('Erro ao salvar o treino. Verifique o console.');
         }
     };
 

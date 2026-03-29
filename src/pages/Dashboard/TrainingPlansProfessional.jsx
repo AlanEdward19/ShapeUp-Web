@@ -1,27 +1,48 @@
 import React, { useState, useEffect } from 'react';
-import { Target, Activity, Tag, Plus, GripVertical, Settings2, Trash2, Copy, BarChart3, Dumbbell, X, CheckCircle2 } from 'lucide-react';
+import { Plus, Trash2, Copy, Dumbbell, X, CheckCircle2 } from 'lucide-react';
 import { useTour } from '@reactour/tour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
-import Input from '../../components/Input';
 import { PlanEditor } from './ClientDetail';
 import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useTrainingApi } from '../../hooks/api/useTrainingApi';
+import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
+import { normalizeTemplate } from '../../utils/trainingNormalization';
 import './TrainingPlansProfessional.css';
+
 
 const TrainingPlansProfessional = () => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const [templates, setTemplates] = useState(() => {
-        const stored = localStorage.getItem('shapeup_plan_templates');
-        if (stored) return JSON.parse(stored);
-        return [];
-    });
+    const { createWorkoutTemplate, getWorkoutTemplates } = useTrainingApi();
 
-    // Save templates to localStorage whenever they change
+    const [templates, setTemplates] = useState([]);
+    const [loadingTemplates, setLoadingTemplates] = useState(true);
+
+    // Fetch templates from API on mount
     useEffect(() => {
-        localStorage.setItem('shapeup_plan_templates', JSON.stringify(templates));
-    }, [templates]);
+        const fetchTemplates = async () => {
+            try {
+                const response = await getWorkoutTemplates();
+                const raw = Array.isArray(response)
+                    ? response
+                    : (response?.data || response?.items || []);
+
+                // Normalize from API shape → PlanEditor internal shape
+                const data = raw.map(tmpl => normalizeTemplate(tmpl));
+                setTemplates(data);
+            } catch (err) {
+                console.error('Erro ao buscar templates:', err);
+                // Fallback to localStorage cache
+                const stored = localStorage.getItem('shapeup_plan_templates');
+                if (stored) setTemplates(JSON.parse(stored));
+            } finally {
+                setLoadingTemplates(false);
+            }
+        };
+        fetchTemplates();
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // ─── Pro Training Plans Tour Trigger ────────────────────────────
     useEffect(() => {
@@ -52,15 +73,15 @@ const TrainingPlansProfessional = () => {
 
             setSteps(tourSteps);
             setCurrentStep(0);
-setTimeout(() => {
+            setTimeout(() => {
                 setIsOpen(true);
             }, 600);
             sessionStorage.setItem('shapeup_pro_training_plans_tour_seen', 'true');
         }
-    }, [setIsOpen, setSteps, templates.length]);
+    }, [setIsOpen, setSteps, templates.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const [activeTemplate, setActiveTemplate] = useState(null); // null means showing library, object means editing
-    const [assigningTemplate, setAssigningTemplate] = useState(null); // For assigning to client
+    const [activeTemplate, setActiveTemplate] = useState(null);
+    const [assigningTemplate, setAssigningTemplate] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const [clients, setClients] = useState(() => {
@@ -89,15 +110,50 @@ setTimeout(() => {
         setTemplates(prev => [{ ...tmpl, id: `tmpl_${Date.now()}`, name: `${tmpl.name} (Copy)` }, ...prev]);
     };
 
-    const handleSaveTemplate = (updatedPlan) => {
-        setTemplates(prev => {
-            const exists = prev.find(t => t.id === updatedPlan.id);
-            if (exists) {
-                return prev.map(t => t.id === updatedPlan.id ? updatedPlan : t);
-            }
-            return [updatedPlan, ...prev];
-        });
-        setActiveTemplate(null);
+    /**
+     * Saves a template — NOT tied to a specific client.
+     * Uses createWorkoutTemplate (POST /api/training/workout-templates).
+     * The command only requires name, notes and exercises (no targetUserId).
+     */
+    const handleSaveTemplate = async (updatedPlan) => {
+        try {
+            const templateBody = {
+                name: updatedPlan.name || 'New Template',
+                notes: updatedPlan.notes || null,
+                durationInWeeks: parseInt(updatedPlan.weeks) || 4,
+                phase: updatedPlan.phase || 'Hypertrophy',
+                difficulty: mapDifficulty(updatedPlan.difficulty),
+                exercises: (updatedPlan.exercises || []).map(ex => ({
+                    exerciseId: parseInt(ex.exerciseId) || 1,
+                    sets: (ex.sets || []).map(s => ({
+                        repetitions: parseInt(s.reps) || 0,
+                        load: parseFloat(s.load) || 0,
+                        loadUnit: mapLoadUnit(s.loadUnit),
+                        setType: mapSetType(s.type ?? s.setType),
+                        technique: mapTechnique(s.technique),
+                        rpe: parseInt(s.rpe) || 0,
+                        restSeconds: parseInt(s.rest) || 0,
+                        isExtra: false
+                    }))
+                }))
+            };
+
+            console.log('Enviando template para a API:', templateBody);
+            await createWorkoutTemplate(templateBody);
+
+            // Update local state / cache
+            setTemplates(prev => {
+                const exists = prev.find(t => t.id === updatedPlan.id);
+                if (exists) {
+                    return prev.map(t => t.id === updatedPlan.id ? updatedPlan : t);
+                }
+                return [updatedPlan, ...prev];
+            });
+            setActiveTemplate(null);
+        } catch (error) {
+            console.error('Erro ao salvar template na API:', error);
+            alert('Erro ao salvar o template. Verifique o console.');
+        }
     };
 
     const handleAssign = (clientId) => {
