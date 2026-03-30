@@ -21,6 +21,10 @@ import ObjectivesClient from './pages/Dashboard/ObjectivesClient';
 import StaffGym from './pages/Dashboard/StaffGym';
 import TurnstileGym from './pages/Dashboard/TurnstileGym';
 import FinancialGym from './pages/Dashboard/FinancialGym';
+import UsersAdmin from './pages/Dashboard/Admin/UsersAdmin';
+import ScopesAdmin from './pages/Dashboard/Admin/ScopesAdmin';
+import GroupsAdmin from './pages/Dashboard/Admin/GroupsAdmin';
+import GlobalExercises from './pages/Dashboard/Admin/GlobalExercises';
 
 // Wrapper for the Login page
 const LoginWrapper = () => {
@@ -69,6 +73,13 @@ function App() {
             <Route path="staff" element={<StaffGym />} />
             <Route path="turnstile" element={<TurnstileGym />} />
             <Route path="financial" element={<FinancialGym />} />
+            
+            {/* Admin Routes */}
+            <Route path="admin/users" element={<UsersAdmin />} />
+            <Route path="admin/scopes" element={<ScopesAdmin />} />
+            <Route path="admin/groups" element={<GroupsAdmin />} />
+            <Route path="admin/exercises" element={<GlobalExercises />} />
+
             {/* Mock nested routes below */}
             <Route path="messages" element={<div style={{ padding: '2rem' }}>Messages Placeholder</div>} />
           </Route>

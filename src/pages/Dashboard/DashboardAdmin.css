@@ -1,0 +1,134 @@
+/* DashboardAdmin.css – System Admin Dashboard styles */
+
+.su-admin-dashboard {
+  animation: fadeIn var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.su-dashboard-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.su-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.su-metric-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.su-metric-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.su-metric-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.su-metric-value {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.su-metric-trend {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.su-metric-trend.positive { color: var(--success); }
+.su-metric-trend.negative { color: var(--error); }
+
+/* Charts & Layout */
+.su-admin-overview-layout {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .su-admin-overview-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.su-chart-container {
+  height: 300px;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.su-recent-activity {
+  flex: 1;
+}
+
+.su-activity-list {
+  list-style: none;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.su-activity-item {
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.su-activity-item:last-child {
+  border-bottom: none;
+}
+
+.su-activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.su-activity-content {
+  flex: 1;
+  font-size: 0.875rem;
+}
+
+.su-activity-title {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.su-activity-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Utils */
+.su-mt-4 { margin-top: 1rem; }
+.su-text-muted { color: var(--text-muted); }
+.su-success-text { color: var(--success); }
+.su-error-text { color: var(--error); }
+.su-accent-text { color: var(--accent); }

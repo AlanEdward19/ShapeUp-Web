@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     LayoutDashboard,
     Users,
@@ -12,7 +12,10 @@ import {
     MessageSquare,
     LogOut,
     Target,
-    DollarSign
+    DollarSign,
+    ShieldCheck,
+    Lock,
+    Globe
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import ChatDrawer from './ChatDrawer';
@@ -21,12 +24,12 @@ import { useAuth } from '../contexts/AuthContext';
 import './Sidebar.css';
 import Logo from './Logo/Logo';
 
-const Sidebar = ({ isProfessional, isIndependent, isGym }) => {
+const Sidebar = ({ isProfessional, isIndependent, isGym, isAdmin }) => {
     const [showContactModal, setShowContactModal] = useState(false);
     const navigate = useNavigate();
     const { signOut } = useAuth();
 
-    React.useEffect(() => {
+    useEffect(() => {
         const handleOpenChat = () => setShowContactModal(true);
         window.addEventListener('open_client_chat', handleOpenChat);
         return () => window.removeEventListener('open_client_chat', handleOpenChat);
@@ -79,7 +82,16 @@ const Sidebar = ({ isProfessional, isIndependent, isGym }) => {
         { name: t('nav.settings'),   icon: <Settings size={20} />,        path: '/dashboard/settings' },
     ];
 
-    const navItems = isGym ? gymNavItems : (isProfessional ? proNavItems : (isIndependent ? independentNavItems : clientNavItems));
+    const adminNavItems = [
+        { name: t('nav.dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard' },
+        { name: t('nav.users'), icon: <Users size={20} />, path: '/dashboard/admin/users' },
+        { name: t('nav.scopes'), icon: <Lock size={20} />, path: '/dashboard/admin/scopes' },
+        { name: t('nav.groups'), icon: <ShieldCheck size={20} />, path: '/dashboard/admin/groups' },
+        { name: t('nav.exercises_global'), icon: <LibrarySquare size={20} />, path: '/dashboard/admin/exercises' },
+        { name: t('nav.settings'), icon: <Settings size={20} />, path: '/dashboard/settings' },
+    ];
+
+    const navItems = isAdmin ? adminNavItems : (isGym ? gymNavItems : (isProfessional ? proNavItems : (isIndependent ? independentNavItems : clientNavItems)));
 
     return (
         <aside className="su-sidebar">

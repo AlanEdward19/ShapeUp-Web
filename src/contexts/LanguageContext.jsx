@@ -70,6 +70,10 @@ export const LanguageProvider = ({ children }) => {
             'nav.settings': 'Settings',
             'nav.objectives': 'Objectives',
             'nav.financial': 'Financial',
+            'nav.users': 'Users',
+            'nav.scopes': 'Scopes',
+            'nav.groups': 'Groups',
+            'nav.exercises_global': 'Exercise Library',
             'sidebar.chat': 'Chat with Coach',
 
             'gym.financial.title': 'Financial Overview',
@@ -870,7 +874,17 @@ export const LanguageProvider = ({ children }) => {
             'tour.settings_client.1': 'Welcome to Settings! You can personalize your app experience here.',
             'tour.settings_client.2': 'Update your profile photo and personal details in this section.',
             'tour.settings_client.3': 'Check your active subscription tier and billing cycle here.',
-            'tour.settings_client.4': 'Customize which alerts you want to receive, like workout reminders or new messages from your coach.'
+            'tour.settings_client.4': 'Customize which alerts you want to receive, like workout reminders or new messages from your coach.',
+            'admin.dashboard.title': 'Admin Console',
+            'admin.dashboard.subtitle': 'Global system overview and management.',
+            'admin.users.title': 'User Management',
+            'admin.users.subtitle': 'Manage all system users, roles, and access permissions.',
+            'admin.scopes.title': 'Security Scopes',
+            'admin.scopes.subtitle': 'Manage system access levels and permission rules.',
+            'admin.groups.title': 'Global Groups',
+            'admin.groups.subtitle': 'Manage system groups, membership types, and visibility rules.',
+            'admin.exercises.title': 'Global Exercise Library',
+            'admin.exercises.subtitle': 'Manage the master list of exercises available to all system users.',
         },
         'pt-BR': {
             'nav.dashboard': 'Painel',
@@ -1691,7 +1705,17 @@ export const LanguageProvider = ({ children }) => {
             'tour.settings_client.1': 'Bem-vindo às Configurações! Você pode personalizar sua experiência no aplicativo por aqui.',
             'tour.settings_client.2': 'Atualize sua foto de perfil e dados pessoais nesta seção.',
             'tour.settings_client.3': 'Verifique seu nível de assinatura ativo e o ciclo de cobrança aqui.',
-            'tour.settings_client.4': 'Personalize quais alertas deseja receber, como lembretes de treino ou novas mensagens do seu treinador.'
+            'tour.settings_client.4': 'Personalize quais alertas deseja receber, como lembretes de treino ou novas mensagens do seu treinador.',
+            'admin.dashboard.title': 'Console Administrativo',
+            'admin.dashboard.subtitle': 'Visão geral e gestão global do sistema.',
+            'admin.users.title': 'Gestão de Usuários',
+            'admin.users.subtitle': 'Gerencie todos os usuários, papéis e permissões de acesso.',
+            'admin.scopes.title': 'Escopos de Segurança',
+            'admin.scopes.subtitle': 'Gerencie níveis de acesso e regras de permissão.',
+            'admin.groups.title': 'Grupos Globais',
+            'admin.groups.subtitle': 'Gerencie grupos do sistema, tipos de membros e visibilidade.',
+            'admin.exercises.title': 'Biblioteca Global de Exercícios',
+            'admin.exercises.subtitle': 'Gerencie a lista mestre de exercícios disponíveis para todos os usuários.',
         }
     };
 
