@@ -15,7 +15,13 @@ import './TrainingPlansProfessional.css';
 const TrainingPlansProfessional = () => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { createWorkoutTemplate, getWorkoutTemplates } = useTrainingApi();
+    const {
+        getWorkoutTemplates,
+        createWorkoutTemplate,
+        updateWorkoutTemplate,
+        deleteWorkoutTemplate,
+        assignWorkoutTemplate
+    } = useTrainingApi();
 
     const [templates, setTemplates] = useState([]);
     const [loadingTemplates, setLoadingTemplates] = useState(true);
@@ -100,14 +106,35 @@ const TrainingPlansProfessional = () => {
         });
     };
 
-    const deleteTemplate = (id) => {
-        if (window.confirm('Delete this template?')) {
-            setTemplates(prev => prev.filter(t => t.id !== id));
-        }
-    };
 
-    const duplicateTemplate = (tmpl) => {
-        setTemplates(prev => [{ ...tmpl, id: `tmpl_${Date.now()}`, name: `${tmpl.name} (Copy)` }, ...prev]);
+    const duplicateTemplate = async (tmpl) => {
+        try {
+            // Se for um template do backend, chamamos o endpoint de cópia
+            if (tmpl._templateId) {
+                const response = await copyWorkoutTemplate(tmpl._templateId, {
+                    name: `${tmpl.name} (Copy)`
+                });
+                
+                // O backend provavelmente retorna o novo objeto ou ID
+                // Se retornar o objeto normalizamos, senão recarregamos
+                if (response && (response.templateId || response.id)) {
+                    const newTmpl = normalizeTemplate(response);
+                    setTemplates(prev => [newTmpl, ...prev]);
+                } else {
+                    // Fallback: recarregar lista
+                    const data = await getWorkoutTemplates();
+                    const raw = Array.isArray(data) ? data : (data?.data || data?.items || []);
+                    setTemplates(raw.map(normalizeTemplate));
+                }
+            } else {
+                // Se for algo local ainda não salvo (raro aqui), apenas clonamos no estado
+                setTemplates(prev => [{ ...tmpl, id: `tmpl_${Date.now()}`, name: `${tmpl.name} (Copy)` }, ...prev]);
+            }
+            addNotification('coach', 'success', t('pro.training.copy.success.title'), t('pro.training.copy.success.message'), 'primary');
+        } catch (error) {
+            console.error('Erro ao duplicar template:', error);
+            alert('Erro ao duplicar o template.');
+        }
     };
 
     /**
@@ -139,7 +166,14 @@ const TrainingPlansProfessional = () => {
             };
 
             console.log('Enviando template para a API:', templateBody);
-            await createWorkoutTemplate(templateBody);
+            
+            if (updatedPlan._templateId) {
+                await updateWorkoutTemplate(updatedPlan._templateId, templateBody);
+                addNotification('coach', 'success', t('pro.training.save.success.title'), t('pro.training.save.success.message'), 'primary');
+            } else {
+                await createWorkoutTemplate(templateBody);
+                addNotification('coach', 'success', t('pro.training.create.success.title'), t('pro.training.create.success.message'), 'primary');
+            }
 
             // Update local state / cache
             setTemplates(prev => {
@@ -153,6 +187,23 @@ const TrainingPlansProfessional = () => {
         } catch (error) {
             console.error('Erro ao salvar template na API:', error);
             alert('Erro ao salvar o template. Verifique o console.');
+        }
+    };
+
+    const deleteTemplate = async (templateId) => {
+        if (!window.confirm(t('pro.training.delete.confirm'))) return;
+        
+        try {
+            // Se for um ID do backend (não temporário)
+            if (typeof templateId === 'string' && !templateId.startsWith('tmpl_')) {
+                await deleteWorkoutTemplate(templateId);
+            }
+            
+            setTemplates(prev => prev.filter(t => t.id !== templateId));
+            addNotification('coach', 'alert', t('pro.training.delete.success.title'), t('pro.training.delete.success.message'), 'error');
+        } catch (error) {
+            console.error('Erro ao excluir template:', error);
+            alert('Erro ao excluir o template.');
         }
     };
 

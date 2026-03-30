@@ -21,6 +21,19 @@ export const useTrainingApi = () => {
         });
     }, []);
 
+    const updateWorkoutTemplate = useCallback(async (templateId, command) => {
+        return await apiClient(`/api/training/workout-templates/${templateId}`, {
+            method: 'PUT',
+            body: JSON.stringify(command)
+        });
+    }, []);
+
+    const deleteWorkoutTemplate = useCallback(async (templateId) => {
+        return await apiClient(`/api/training/workout-templates/${templateId}`, {
+            method: 'DELETE'
+        });
+    }, []);
+
     const copyWorkoutTemplate = useCallback(async (templateId, command) => {
         return await apiClient(`/api/training/workout-templates/${templateId}/copy`, {
             method: 'POST',
@@ -40,6 +53,19 @@ export const useTrainingApi = () => {
         return await apiClient('/api/training/workout-plans', {
             method: 'POST',
             body: JSON.stringify(command)
+        });
+    }, []);
+
+    const updateWorkoutPlan = useCallback(async (planId, command) => {
+        return await apiClient(`/api/training/workout-plans/${planId}`, {
+            method: 'PUT',
+            body: JSON.stringify(command)
+        });
+    }, []);
+
+    const deleteWorkoutPlan = useCallback(async (planId) => {
+        return await apiClient(`/api/training/workout-plans/${planId}`, {
+            method: 'DELETE'
         });
     }, []);
 
@@ -174,9 +200,9 @@ export const useTrainingApi = () => {
 
     return {
         // Workout Templates
-        getWorkoutTemplates, getWorkoutTemplateById, createWorkoutTemplate, copyWorkoutTemplate, assignWorkoutTemplate,
+        getWorkoutTemplates, getWorkoutTemplateById, createWorkoutTemplate, updateWorkoutTemplate, deleteWorkoutTemplate, copyWorkoutTemplate, assignWorkoutTemplate,
         // Workout Plans
-        createWorkoutPlan, getWorkoutPlanById, copyWorkoutPlan, getWorkoutPlansByUser,
+        createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan, getWorkoutPlanById, copyWorkoutPlan, getWorkoutPlansByUser,
         // Workouts
         startWorkout, finishWorkout, updateWorkoutState, getWorkoutById, getWorkoutsByUser,
         // Exercises

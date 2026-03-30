@@ -72,7 +72,13 @@ const TrainingPlansIndependent = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { createWorkoutPlan, getWorkoutPlansByUser } = useTrainingApi();
+    const {
+        getWorkoutPlansByUser,
+        createWorkoutPlan,
+        updateWorkoutPlan,
+        deleteWorkoutPlan,
+        copyWorkoutPlan
+    } = useTrainingApi();
     const { currentUser } = useAuth();
 
     // ─── STATE MANAGEMENT ──────────────────────────────────────────
@@ -237,7 +243,12 @@ const TrainingPlansIndependent = () => {
             };
 
             console.log('Enviando treino (Solo) para a API:', workoutBody);
-            await createWorkoutPlan(workoutBody);
+            
+            if (updated._planId) {
+                await updateWorkoutPlan(updated._planId, workoutBody);
+            } else {
+                await createWorkoutPlan(workoutBody);
+            }
 
             setPlans(prev => {
                 const exists = prev.some(p => p.id === updated.id);
@@ -255,19 +266,54 @@ const TrainingPlansIndependent = () => {
         }
     };
 
-    const handleCopyPlan = (original) => {
-        const copy = {
-            ...original,
-            id: `p${Date.now()}`,
-            name: `${original.name} (Copy)`,
-            history: [],
-            active: false
-        };
-        setPlans(prev => [...prev, copy]);
+    const handleCopyPlan = async (original) => {
+        try {
+            if (original._planId) {
+                const response = await copyWorkoutPlan(original._planId, {
+                    name: `${original.name} (Copy)`
+                });
+                
+                if (response && (response.planId || response.id)) {
+                    const newPlan = normalizePlan(response);
+                    setPlans(prev => [newPlan, ...prev]);
+                } else {
+                    const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id'));
+                    const data = await getWorkoutPlansByUser(loggedInUserId);
+                    const raw = Array.isArray(data) ? data : (data?.data || data?.items || []);
+                    setPlans(raw.map(normalizePlan));
+                }
+            } else {
+                const copy = {
+                    ...original,
+                    id: `p${Date.now()}`,
+                    name: `${original.name} (Copy)`,
+                    history: [],
+                    active: false
+                };
+                setPlans(prev => [...prev, copy]);
+            }
+            addNotification('independent', 'success', 'Treino Copiado', `Cópia criada com sucesso!`, 'primary');
+        } catch (error) {
+            console.error('Erro ao copiar treino (Solo):', error);
+            alert('Erro ao copiar o treino.');
+        }
     };
 
-    const handleDeletePlan = (id) => {
-        setPlans(prev => prev.filter(p => p.id !== id));
+    const handleDeletePlan = async (planId) => {
+        if (!window.confirm(t('independent.builder.delete.confirm') || 'Excluir seu treino?')) return;
+        
+        try {
+            // Se for um ID do backend (não começa com 'p' de temporário)
+            if (typeof planId === 'string' && !planId.startsWith('p')) {
+                await deleteWorkoutPlan(planId);
+            }
+            
+            setPlans(prev => prev.filter(p => p.id !== planId));
+            addNotification('independent', 'alert', 'Treino Removido', 'Seu treino foi excluído com sucesso.', 'error');
+        } catch (error) {
+            console.error('Erro ao excluir treino (Solo):', error);
+            alert('Erro ao excluir o treino.');
+        }
     };
 
     // ─── SESSION ENGINE HANDLERS ──────────────────────────────────
