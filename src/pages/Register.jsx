@@ -151,23 +151,7 @@ const Register = () => {
                             required
                         />
 
-                        <div className="role-selection-group">
-                            <label className="su-input-label">{t('login.role.label')}</label>
-                            <div className="role-options">
-                                <button type="button" className={`role-opt ${selectedRole === 'professional' ? 'active' : ''}`} onClick={() => setSelectedRole('professional')}>
-                                    {t('header.role.pro')}
-                                </button>
-                                <button type="button" className={`role-opt ${selectedRole === 'client' ? 'active' : ''}`} onClick={() => setSelectedRole('client')}>
-                                    {t('header.role.client')}
-                                </button>
-                                <button type="button" className={`role-opt ${selectedRole === 'independent' ? 'active' : ''}`} onClick={() => setSelectedRole('independent')}>
-                                    {t('header.role.independent')}
-                                </button>
-                                <button type="button" className={`role-opt ${selectedRole === 'gym' ? 'active' : ''}`} onClick={() => setSelectedRole('gym')}>
-                                    {t('header.role.gym')}
-                                </button>
-                            </div>
-                        </div>
+                        {/* Role selection removed, defaulting to standard registration */}
 
                         {error && (
                             <p style={{ color: 'var(--danger, #ef4444)', fontSize: '0.875rem', marginTop: '-0.25rem', textAlign: 'center' }}>

@@ -34,11 +34,9 @@ export const AuthProvider = ({ children }) => {
 
     /**
      * Sign in with email + password.
-     * After signing in, persists role info in localStorage.
      */
-    const signIn = async (email, password, role) => {
+    const signIn = async (email, password) => {
         const credential = await signInWithEmailAndPassword(auth, email, password);
-        _persistSession(credential.user, email, role);
         
         // Sync scopes on the backend and force-refresh the Firebase token
         // so the user immediately gets an up-to-date token with the latest claims.
@@ -56,12 +54,11 @@ export const AuthProvider = ({ children }) => {
 
     /**
      * Sign in with Google popup.
-     * Role defaults to what the user had previously selected (passed as arg).
      */
-    const signInWithGoogle = async (role) => {
+    const signInWithGoogle = async () => {
         const credential = await signInWithPopup(auth, googleProvider);
         const email = credential.user.email || '';
-        _persistSession(credential.user, email, role || 'independent');
+
         
         // Sync scopes on the backend and force-refresh the Firebase token
         try {
@@ -170,7 +167,7 @@ export const AuthProvider = ({ children }) => {
 
     // --------------- helpers ---------------
 
-    const _persistSession = (user, email, role) => {
+    const persistSession = (user, email, role) => {
         localStorage.setItem('shapeup_role', role);
         localStorage.setItem('shapeup_user_email', email);
 
@@ -200,7 +197,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const value = { currentUser, loading, signIn, signInWithGoogle, register, signOut, updateUserPassword, resetPassword, confirmReset };
+    const value = { currentUser, loading, signIn, signInWithGoogle, register, signOut, updateUserPassword, resetPassword, confirmReset, persistSession };
 
     return (
         <AuthContext.Provider value={value}>

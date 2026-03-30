@@ -190,6 +190,10 @@ export const useGymManagementApi = () => {
         return await apiClient(`/api/gym-management/user-roles/${userId}`);
     }, []);
 
+    const getMyUserRoles = useCallback(async () => {
+        return await apiClient(`/api/gym-management/user-roles/me`);
+    }, []);
+
     const assignUserRole = useCallback(async (command) => {
         return await apiClient('/api/gym-management/user-roles', {
             method: 'POST',
@@ -213,6 +217,6 @@ export const useGymManagementApi = () => {
         // Platform Tiers
         getPlatformTiers, createPlatformTier, updatePlatformTier, deletePlatformTier,
         // User Roles
-        getUserRoles, assignUserRole
+        getUserRoles, assignUserRole, getMyUserRoles
     };
 };
