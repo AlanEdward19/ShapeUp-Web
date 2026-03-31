@@ -265,18 +265,23 @@ const TrainingPlansIndependent = () => {
 
             console.log('Enviando treino (Solo) para a API:', workoutBody);
             
+            let savedPlan = updated;
+            
             if (updated._planId) {
-                await updateWorkoutPlan(updated._planId, workoutBody);
+                const res = await updateWorkoutPlan(updated._planId, workoutBody);
+                if (res) savedPlan = normalizePlan(res);
             } else {
-                await createWorkoutPlan(workoutBody);
+                const res = await createWorkoutPlan(workoutBody);
+                if (res) savedPlan = normalizePlan(res);
             }
 
             setPlans(prev => {
+                // Se for edição, substitui pelo salvo. Se for novo, adiciona o salvo.
                 const exists = prev.some(p => p.id === updated.id);
                 if (exists) {
-                    return prev.map(p => p.id === updated.id ? updated : p);
+                    return prev.map(p => p.id === updated.id ? savedPlan : p);
                 }
-                return [...prev, updated];
+                return [...prev, savedPlan];
             });
             setEditingPlan(null);
             
@@ -352,14 +357,12 @@ const TrainingPlansIndependent = () => {
     const startSession = async (plan) => {
         // Call API to start workout
         try {
-            const me = await getMe();
             const pid = plan._planId || plan.id;
             
             // Tenta chamar a API se houver um ID que não pareça temporário
             if (pid && !String(pid).startsWith('p') && !String(pid).startsWith('plan_')) {
                 const command = {
                     planId: pid,
-                    targetUserId: me.id || me.userId,
                     startedAtUtc: new Date().toISOString()
                 };
                 await startWorkout(command);
