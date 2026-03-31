@@ -3,8 +3,8 @@ import { unmapSetType, unmapTechnique, unmapDifficulty } from './trainingEnums';
 /**
  * Normalizes a single set from API shape to internal PlanEditor shape.
  */
-export const normalizeSet = (s) => ({
-    id: s.setId ?? s.id ?? `set_${Math.random().toString(36).substr(2, 9)}`,
+export const normalizeSet = (s, idx) => ({
+    id: s.setId ?? s.id ?? `set_${idx}`,
     type: unmapSetType(s.setType ?? s.type ?? 3),
     reps: String(s.repetitions ?? s.reps ?? ''),
     load: String(s.load ?? ''),
@@ -27,9 +27,13 @@ export const normalizeTemplate = (tmpl) => ({
     weeks: tmpl.durationInWeeks ?? tmpl.weeks ?? 4,
     exercises: (tmpl.exercises ?? []).map((ex, idx) => ({
         ...ex,
-        id: ex.exerciseId ?? ex.id ?? `ex_${idx}_${Date.now()}`,
-        name: ex.exerciseName ?? ex.name ?? '',
-        sets: (ex.sets ?? []).map(normalizeSet),
+        id: ex.exerciseId ?? ex.id ?? `ex_${idx}`,
+        exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
+        name: ex.namePt ?? ex.exerciseNamePt ?? ex.name ?? ex.exerciseName ?? ex.exercise?.namePt ?? ex.exercise?.translatedName ?? ex.exercise?.name ?? '',
+        muscles: Array.isArray(ex.muscles) 
+            ? ex.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName || m.namePt || m.name) : m)
+            : (ex.exercise?.muscles ? ex.exercise.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName) : m) : []),
+        sets: (ex.sets ?? []).map((s, sIdx) => normalizeSet(s, sIdx)),
     })),
     _templateId: tmpl.templateId,
 });
@@ -47,9 +51,13 @@ export const normalizePlan = (plan) => ({
     active: plan.active ?? true,
     exercises: (plan.exercises ?? []).map((ex, idx) => ({
         ...ex,
-        id: ex.exerciseId ?? ex.id ?? `ex_${idx}_${Date.now()}`,
-        name: ex.exerciseName ?? ex.name ?? '',
-        sets: (ex.sets ?? []).map(normalizeSet),
+        id: ex.exerciseId ?? ex.id ?? `ex_${idx}`,
+        exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
+        name: ex.namePt ?? ex.exerciseNamePt ?? ex.name ?? ex.exerciseName ?? ex.exercise?.namePt ?? ex.exercise?.translatedName ?? ex.exercise?.name ?? '',
+        muscles: Array.isArray(ex.muscles) 
+            ? ex.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName || m.namePt || m.name) : m)
+            : (ex.exercise?.muscles ? ex.exercise.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName) : m) : []),
+        sets: (ex.sets ?? []).map((s, sIdx) => normalizeSet(s, sIdx)),
     })),
     history: plan.history ?? [],
     _planId: plan.planId,

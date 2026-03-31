@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, CalendarDays, Plus, FastForward, Award, TrendingUp, X, Trash2, Dumbbell as DumbbellIcon, Save, Settings2, Copy, History, ChevronUp, ChevronDown, Activity } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
@@ -80,6 +80,7 @@ const TrainingPlansIndependent = () => {
         deleteWorkoutPlan,
         copyWorkoutPlan,
         startWorkout,
+        updateWorkoutState,
     } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
     const { currentUser } = useAuth();
@@ -144,6 +145,16 @@ const TrainingPlansIndependent = () => {
     const [isResting, setIsResting] = useState(false);
     const [sessionExercises, setSessionExercises] = useState([]);
     const [sessionFeedback, setSessionFeedback] = useState({ rpe: null, comments: '' });
+    const [workoutSessionId, setWorkoutSessionId] = useState(null);
+    const [isFinishingSession, setIsFinishingSession] = useState(false);
+
+    const syncInFlightRef = useRef(false);
+    const hasFirstDoneRef = useRef(false);
+    const lastSyncedHashRef = useRef('');
+    const committedSetsRef = useRef(new Set()); // Tracks sets that have been "sent" at least once as done
+    const doneClickGuardRef = useRef({});
+    const sessionExercisesRef = useRef(sessionExercises);
+    const workoutTimeRef = useRef(workoutTime);
 
     // 3. Modals & Overlays
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -156,6 +167,99 @@ const TrainingPlansIndependent = () => {
     // 4. Pagination
     const [historyPage, setHistoryPage] = useState(1);
     const HISTORY_PER_PAGE = 5;
+
+    useEffect(() => {
+        sessionExercisesRef.current = sessionExercises;
+    }, [sessionExercises]);
+
+    useEffect(() => {
+        workoutTimeRef.current = workoutTime;
+    }, [workoutTime]);
+
+    const buildWorkoutStatePayload = useCallback((sourceExercises, elapsedSeconds) => {
+        // Only sync exercises that have at least one set with progress
+        const exercisesWithProgress = sourceExercises.map(ex => {
+            const setsWithProgress = ex.sets.filter(s => !!s.completed).map(s => ({
+                id: s.id,
+                repetitions: parseInt(s.log?.reps) || 0,
+                load: parseFloat(s.log?.weight) || 0,
+                loadUnit: String(unitSystem === 'imperial' ? 2 : 1),
+                setType: mapSetType(s.type),
+                technique: mapTechnique(s.technique || 'Straight'),
+                rpe: parseFloat(s.log?.rpe) || 0,
+                restSeconds: parseInt(s.prescribedRest) || 90,
+                isExtra: !!s.isExtra,
+                completed: true, // If it's in this list, it's completed
+                failure: !!s.failure
+            }));
+
+            if (setsWithProgress.length === 0) return null;
+
+            return {
+                exerciseId: parseInt(ex.id) || ex.exerciseId || 0,
+                sets: setsWithProgress
+            };
+        }).filter(Boolean);
+
+        return {
+            sessionId: String(workoutSessionId),
+            savedAtUtc: new Date().toISOString(),
+            exercises: exercisesWithProgress
+        };
+    }, [workoutSessionId, unitSystem]);
+    
+    /**
+     * Sincroniza o estado atual do treino com o servidor.
+     * Só envia se houver mudança no payload filtrado desde a última sincronização.
+     */
+    const syncWorkoutStateIfNeeded = useCallback(async ({ sourceExercises, elapsedSeconds }) => {
+        if (!workoutSessionId || syncInFlightRef.current) return;
+
+        // 1. Build payload containing ONLY current completed sets
+        const payload = buildWorkoutStatePayload(sourceExercises ?? sessionExercisesRef.current, elapsedSeconds ?? workoutTimeRef.current);
+        
+        // 2. Compara o hash do payload de séries FINALIZADAS
+        const currentPayloadHash = JSON.stringify(payload.exercises); // Compare only exercises/sets content
+        
+        // 3. Se for igual ao que o servidor já tem como "Estado Finalizado", não faz nada
+        if (currentPayloadHash === lastSyncedHashRef.current) {
+            return;
+        }
+
+        // 4. Se o usuário apenas DESMARCOU uma série, não sincronizamos (deixamos o servidor com a última versão válida)
+        // Só sincronizamos se houver conteúdo novo ou mudança em algo já marcado.
+        // Contamos o total de sets no payload. Se diminuiu, é um "undone" puro, pulamos sem atualizar o hash.
+        const currentDoneCount = payload.exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
+        const lastDoneCount = parseInt(sessionStorage.getItem(`lastDoneCount_${workoutSessionId}`) || '0');
+        
+        if (currentDoneCount < lastDoneCount) {
+             // Just bail, don't update hash. If they re-check, currentPayloadHash will match lastSyncedHashRef and still bail.
+             return;
+        }
+
+        // 5. Inicia a sincronização
+        syncInFlightRef.current = true;
+        const previousHash = lastSyncedHashRef.current;
+        lastSyncedHashRef.current = currentPayloadHash;
+        sessionStorage.setItem(`lastDoneCount_${workoutSessionId}`, currentDoneCount.toString());
+
+        try {
+            console.log('Sincronizando Estado Consolidado (Independent)...', payload);
+            await updateWorkoutState(workoutSessionId, payload);
+        } catch (error) {
+            console.error('Falha na sincronização (Independent):', error);
+            lastSyncedHashRef.current = previousHash;
+        } finally {
+            syncInFlightRef.current = false;
+        }
+    }, [workoutSessionId, updateWorkoutState, buildWorkoutStatePayload]);
+
+    const mutateSessionExercises = useCallback((mutator) => {
+        const next = [...sessionExercisesRef.current];
+        mutator(next);
+        setSessionExercises(next);
+        return next;
+    }, []);
 
     // ─── EFFECTS ───────────────────────────────────────────────────
 
@@ -219,6 +323,20 @@ const TrainingPlansIndependent = () => {
             clearInterval(restInterval);
         };
     }, [sessionActive, isResting, restTimer, showFeedbackModal, showOverviewModal, showCancelModal]);
+
+    // Debounced synchronization: Only sync state when changes occur and have settled (2s)
+    useEffect(() => {
+        if (!sessionActive || !workoutSessionId || !hasFirstDoneRef.current) return;
+        
+        const timerId = setTimeout(() => {
+            syncWorkoutStateIfNeeded({
+                sourceExercises: sessionExercises,
+                elapsedSeconds: workoutTimeRef.current
+            });
+        }, 2000);
+
+        return () => clearTimeout(timerId);
+    }, [sessionExercises, sessionActive, workoutSessionId, syncWorkoutStateIfNeeded]);
 
     // ─── PLAN MANAGEMENT HANDLERS ─────────────────────────────────
 
@@ -355,6 +473,7 @@ const TrainingPlansIndependent = () => {
     // ─── SESSION ENGINE HANDLERS ──────────────────────────────────
 
     const startSession = async (plan) => {
+        setWorkoutSessionId(null);
         // Call API to start workout
         try {
             const pid = plan._planId || plan.id;
@@ -365,16 +484,18 @@ const TrainingPlansIndependent = () => {
                     planId: pid,
                     startedAtUtc: new Date().toISOString()
                 };
-                await startWorkout(command);
+                const startedWorkout = await startWorkout(command);
+                setWorkoutSessionId(startedWorkout?.sessionId || startedWorkout?.id || startedWorkout?.workoutSessionId || null);
             }
         } catch (error) {
             console.error('Failed to start workout via API:', error);
+            setWorkoutSessionId(null);
         }
 
         const runtimeExercises = plan.exercises.map((ex, exIdx) => ({
-            id: ex.id || `ex_${exIdx}`,
-            name: ex.name,
-            target: ex.tags || 'General',
+            id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
+            name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
+            target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
             sets: ex.sets.map((s, sIdx) => ({
                 id: `s_${exIdx}_${sIdx}`,
                 type: s.type,
@@ -387,14 +508,26 @@ const TrainingPlansIndependent = () => {
         }));
 
         setSessionExercises(runtimeExercises);
+        hasFirstDoneRef.current = false;
+        committedSetsRef.current = new Set();
+        lastSyncedHashRef.current = ''; // Reset hash for new session
+        doneClickGuardRef.current = {};
+        setIsFinishingSession(false);
         setActivePlan(plan);
         setSessionActive(true);
+        setWorkoutTime(0);
         setSessionTitle(`${plan.name} · ${plan.phase}`);
     };
 
-    const finishSession = () => {
+    const finishSession = async () => {
+        if (isFinishingSession) return;
+
+        setIsFinishingSession(true);
+        await syncWorkoutStateIfNeeded({ force: true });
+
         setShowFeedbackModal(true);
         setSessionTitle(null);
+        setIsFinishingSession(false);
     };
 
     const submitFeedback = () => {
@@ -456,6 +589,8 @@ const TrainingPlansIndependent = () => {
     const resetSession = () => {
         setSessionActive(false);
         setActivePlan(null);
+        setWorkoutSessionId(null);
+        setIsFinishingSession(false);
         setWorkoutTime(0);
         setIsResting(false);
         setRestTimer(0);
@@ -464,6 +599,9 @@ const TrainingPlansIndependent = () => {
         setShowOverviewModal(false);
         setShowFeedbackModal(false);
         setShowCancelModal(false);
+        hasFirstDoneRef.current = false;
+        lastSyncedHashRef.current = '';
+        doneClickGuardRef.current = {};
         setSessionTitle(null);
     };
 
@@ -528,9 +666,9 @@ const TrainingPlansIndependent = () => {
                                                 const types = ['warmup', 'working', 'topset', 'backoff'];
                                                 const cur = types.indexOf(s.type);
                                                 const next = types[(cur + 1) % types.length];
-                                                const updated = [...sessionExercises];
-                                                updated[exIdx].sets[sIdx].type = next;
-                                                setSessionExercises(updated);
+                                                mutateSessionExercises(updated => {
+                                                    updated[exIdx].sets[sIdx].type = next;
+                                                });
                                             }} style={{ cursor: 'pointer' }}>
                                                 {t(`client.session.set_type.${s.type}`) !== `client.session.set_type.${s.type}` ? t(`client.session.set_type.${s.type}`) : (s.type.charAt(0).toUpperCase() + s.type.slice(1))}
                                             </span>
@@ -545,13 +683,13 @@ const TrainingPlansIndependent = () => {
                                             </div>
                                         </div>
                                         <div className="col-log">
-                                            <input type="number" className="su-exec-input" value={s.log.weight} onChange={e => { const updated = [...sessionExercises]; updated[exIdx].sets[sIdx].log.weight = e.target.value; setSessionExercises(updated); }} placeholder="--" />
+                                            <input type="number" className="su-exec-input" value={s.log.weight} onChange={e => mutateSessionExercises(updated => { updated[exIdx].sets[sIdx].log.weight = e.target.value; })} placeholder="--" disabled={s.completed} />
                                         </div>
                                         <div className="col-log">
-                                            <input type="number" className="su-exec-input" value={s.log.reps} onChange={e => { const updated = [...sessionExercises]; updated[exIdx].sets[sIdx].log.reps = e.target.value; setSessionExercises(updated); }} placeholder="--" />
+                                            <input type="number" className="su-exec-input" value={s.log.reps} onChange={e => mutateSessionExercises(updated => { updated[exIdx].sets[sIdx].log.reps = e.target.value; })} placeholder="--" disabled={s.completed} />
                                         </div>
                                         <div className="col-log">
-                                            <input type="number" className="su-exec-input" value={s.log.rpe} onChange={e => { const updated = [...sessionExercises]; updated[exIdx].sets[sIdx].log.rpe = e.target.value; setSessionExercises(updated); }} placeholder="--" />
+                                            <input type="number" className="su-exec-input" value={s.log.rpe} onChange={e => mutateSessionExercises(updated => { updated[exIdx].sets[sIdx].log.rpe = e.target.value; })} placeholder="--" disabled={s.completed} />
                                         </div>
                                         <div className="col-failure">
                                             <label className={`su-failure-checkbox ${s.failure ? 'checked' : ''}`}>
@@ -560,10 +698,10 @@ const TrainingPlansIndependent = () => {
                                                     className="su-visually-hidden"
                                                     checked={s.failure}
                                                     onChange={e => {
-                                                        const updated = [...sessionExercises];
-                                                        updated[exIdx].sets[sIdx].failure = e.target.checked;
-                                                        if (e.target.checked) updated[exIdx].sets[sIdx].log.rpe = '10';
-                                                        setSessionExercises(updated);
+                                                        mutateSessionExercises(updated => {
+                                                            updated[exIdx].sets[sIdx].failure = e.target.checked;
+                                                            if (e.target.checked) updated[exIdx].sets[sIdx].log.rpe = '10';
+                                                        });
                                                     }}
                                                 />
                                                 <span className="su-failure-icon">🔥</span>
@@ -571,10 +709,24 @@ const TrainingPlansIndependent = () => {
                                         </div>
                                         <div className="col-done">
                                             <button className={`su-check-circle ${s.completed ? 'checked' : ''}`} onClick={() => {
-                                                const updated = [...sessionExercises];
-                                                updated[exIdx].sets[sIdx].completed = !updated[exIdx].sets[sIdx].completed;
-                                                setSessionExercises(updated);
-                                                if (updated[exIdx].sets[sIdx].completed && s.prescribedRest > 0) { setRestTimer(s.prescribedRest); setIsResting(true); }
+                                                const clickKey = `${exIdx}-${sIdx}`;
+                                                const now = Date.now();
+                                                const lastClick = doneClickGuardRef.current[clickKey] || 0;
+                                                if (now - lastClick < 350) return;
+                                                doneClickGuardRef.current[clickKey] = now;
+
+                                                let completedState = false;
+                                                mutateSessionExercises(updated => {
+                                                    updated[exIdx].sets[sIdx].completed = !updated[exIdx].sets[sIdx].completed;
+                                                    completedState = updated[exIdx].sets[sIdx].completed;
+                                                });
+
+                                                if (completedState) {
+                                                    committedSetsRef.current.add(s.id);
+                                                    hasFirstDoneRef.current = true;
+                                                }
+
+                                                if (completedState && s.prescribedRest > 0) { setRestTimer(s.prescribedRest); setIsResting(true); }
                                             }}><CheckCircle size={22} /></button>
                                         </div>
                                     </div>
@@ -583,7 +735,7 @@ const TrainingPlansIndependent = () => {
                         </Card>
                     ))}
                     <div className="su-session-footer su-mt-8 su-mb-12">
-                        <Button size="lg" fullWidth className="su-complete-session-btn" onClick={finishSession}>{t('client.session.btn.finish')}</Button>
+                        <Button size="lg" fullWidth className="su-complete-session-btn" onClick={finishSession} disabled={isFinishingSession}>{t('client.session.btn.finish')}</Button>
                     </div>
                 </div>
 

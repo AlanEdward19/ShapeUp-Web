@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, CalendarDays, Plus, FastForward, Award, TrendingUp, X, Trash2 } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
@@ -13,6 +13,7 @@ import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { useAuth } from '../../contexts/AuthContext';
 import { normalizePlan } from '../../utils/trainingNormalization';
+import { mapSetType, mapTechnique } from '../../utils/trainingEnums';
 import './TrainingPlansClient.css';
 
 const formatTime = (totalSeconds) => {
@@ -29,7 +30,7 @@ const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { startWorkout, getWorkoutPlansByUser } = useTrainingApi();
+    const { startWorkout, updateWorkoutState, getWorkoutPlansByUser } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
     const { currentUser } = useAuth();
 
@@ -57,6 +58,16 @@ const ClientView = () => {
     // We store arrays of sets for each exercise block
     // Dynamic Sets Data Structure
     const [exercises, setExercises] = useState([]);
+    const [workoutSessionId, setWorkoutSessionId] = useState(null);
+    const [isFinishingSession, setIsFinishingSession] = useState(false);
+
+    const syncInFlightRef = useRef(false);
+    const hasFirstDoneRef = useRef(false);
+    const lastSyncedHashRef = useRef('');
+    const committedSetsRef = useRef(new Set()); // Tracks sets that have been "sent" at least once as done
+    const doneClickGuardRef = useRef({});
+    const exercisesRef = useRef(exercises);
+    const workoutTimeRef = useRef(workoutTime);
 
     // Session History Pagination state
     const [historyPage, setHistoryPage] = useState(1);
@@ -64,6 +75,89 @@ const ClientView = () => {
 
     const [showSessionModal, setShowSessionModal] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
+
+    useEffect(() => {
+        exercisesRef.current = exercises;
+    }, [exercises]);
+
+    useEffect(() => {
+        workoutTimeRef.current = workoutTime;
+    }, [workoutTime]);
+
+    const buildWorkoutStatePayload = useCallback((sourceExercises, elapsedSeconds) => {
+        // Only sync exercises that have at least one set with progress
+        const exercisesWithProgress = sourceExercises.map(ex => {
+            const setsWithProgress = ex.sets.filter(s => !!s.completed).map(s => ({
+                id: s.id,
+                repetitions: parseInt(s.log?.reps) || 0,
+                load: parseFloat(s.log?.weight) || 0,
+                loadUnit: String(unitSystem === 'imperial' ? 2 : 1),
+                setType: mapSetType(s.type),
+                technique: mapTechnique(s.technique || 'Straight'),
+                rpe: parseFloat(s.log?.rpe) || 0,
+                restSeconds: parseInt(s.prescribedRest) || 90,
+                isExtra: !!s.isExtra,
+                completed: true, // If it's in this list, it's completed
+                failure: !!s.failure
+            }));
+
+            if (setsWithProgress.length === 0) return null;
+
+            return {
+                exerciseId: parseInt(ex.id) || ex.exerciseId || 0,
+                sets: setsWithProgress
+            };
+        }).filter(Boolean);
+
+        return {
+            sessionId: String(workoutSessionId),
+            savedAtUtc: new Date().toISOString(),
+            exercises: exercisesWithProgress
+        };
+    }, [workoutSessionId, unitSystem]);
+    
+    /**
+     * Sincroniza o estado atual do treino com o servidor.
+     * Só envia se houver mudança no payload filtrado desde a última sincronização.
+     */
+    const syncWorkoutStateIfNeeded = useCallback(async ({ sourceExercises, elapsedSeconds }) => {
+        if (!workoutSessionId || syncInFlightRef.current) return;
+
+        // 1. Build payload containing ONLY current completed sets
+        const payload = buildWorkoutStatePayload(sourceExercises ?? exercisesRef.current, elapsedSeconds ?? workoutTimeRef.current);
+        
+        // 2. Compara o hash do payload de séries FINALIZADAS
+        const currentPayloadHash = JSON.stringify(payload.exercises); // Compare only exercises/sets content
+        
+        // 3. Se for igual ao que o servidor já tem como "Estado Finalizado", não faz nada
+        if (currentPayloadHash === lastSyncedHashRef.current) {
+            return;
+        }
+
+        // 4. Se o usuário apenas DESMARCOU uma série, não sincronizamos
+        const currentDoneCount = payload.exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
+        const lastDoneCount = parseInt(sessionStorage.getItem(`lastDoneCount_client_${workoutSessionId}`) || '0');
+        
+        if (currentDoneCount < lastDoneCount) {
+             return;
+        }
+
+        // 5. Inicia a sincronização
+        syncInFlightRef.current = true;
+        const previousHash = lastSyncedHashRef.current;
+        lastSyncedHashRef.current = currentPayloadHash;
+        sessionStorage.setItem(`lastDoneCount_client_${workoutSessionId}`, currentDoneCount.toString());
+
+        try {
+            console.log('Sincronizando Estado Consolidado (Client)...', payload);
+            await updateWorkoutState(workoutSessionId, payload);
+        } catch (error) {
+            console.error('Falha na sincronização (Client):', error);
+            lastSyncedHashRef.current = previousHash;
+        } finally {
+            syncInFlightRef.current = false;
+        }
+    }, [workoutSessionId, updateWorkoutState, buildWorkoutStatePayload]);
 
     // -- Fetch Plans from API & LocalStorage --
     useEffect(() => {
@@ -163,6 +257,20 @@ const ClientView = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionActive, setIsOpen, setSteps, setCurrentStep, t]);
 
+    // Debounced synchronization: Only sync state when changes occur and have settled (2s)
+    useEffect(() => {
+        if (!sessionActive || !workoutSessionId || !hasFirstDoneRef.current) return;
+        
+        const timerId = setTimeout(() => {
+            syncWorkoutStateIfNeeded({
+                sourceExercises: exercises,
+                elapsedSeconds: workoutTimeRef.current
+            });
+        }, 2000);
+
+        return () => clearTimeout(timerId);
+    }, [exercises, sessionActive, workoutSessionId, syncWorkoutStateIfNeeded]);
+
     // -- Start A Specific Session --
     const startSessionForPlan = async (plan) => {
         // Call API to start workout
@@ -173,17 +281,19 @@ const ClientView = () => {
                 workoutPlanId: plan._planId || plan.id,
                 targetUserId: me.id || me.userId
             };
-            await startWorkout(command);
+            const startedWorkout = await startWorkout(command);
+            setWorkoutSessionId(startedWorkout?.sessionId || startedWorkout?.id || startedWorkout?.workoutSessionId || null);
         } catch (error) {
             console.error('Failed to start workout via API:', error);
+            setWorkoutSessionId(null);
         }
 
         // Map the plan's exercises into the runtime session engine format
         const runtimeExercises = plan.exercises.map((ex, exIdx) => {
             return {
-                id: ex.id || `ex_${exIdx}`,
-                name: ex.name,
-                target: ex.tags || 'General',
+                id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
+                name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
+                target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
                 sets: ex.sets.map((s, sIdx) => ({
                     id: `s_${exIdx}_${sIdx}`,
                     type: s.type,
@@ -197,8 +307,14 @@ const ClientView = () => {
         });
 
         setExercises(runtimeExercises);
+        hasFirstDoneRef.current = false;
+        committedSetsRef.current = new Set();
+        lastSyncedHashRef.current = buildWorkoutStateComparisonHash(runtimeExercises);
+        doneClickGuardRef.current = {};
+        setIsFinishingSession(false);
         setActivePlan(plan);
         setSessionActive(true);
+        setWorkoutTime(0);
         setSessionTitle(`${plan.name} · ${plan.phase}`);
     };
 
@@ -245,11 +361,23 @@ const ClientView = () => {
     };
 
     const toggleSetComplete = (exerciseIndex, setIndex, defaultRest) => {
+        const clickKey = `${exerciseIndex}-${setIndex}`;
+        const now = Date.now();
+        const lastClick = doneClickGuardRef.current[clickKey] || 0;
+        if (now - lastClick < 350) return;
+        doneClickGuardRef.current[clickKey] = now;
+
         const newExercises = [...exercises];
         const isNowComplete = !newExercises[exerciseIndex].sets[setIndex].completed;
 
         newExercises[exerciseIndex].sets[setIndex].completed = isNowComplete;
         setExercises(newExercises);
+
+        if (isNowComplete) {
+            const targetSet = newExercises[exerciseIndex].sets[setIndex];
+            committedSetsRef.current.add(targetSet.id);
+            hasFirstDoneRef.current = true;
+        }
 
         if (isNowComplete && defaultRest > 0) {
             startRest(defaultRest);
@@ -303,10 +431,19 @@ const ClientView = () => {
         setExercises(newExercises);
     };
 
-    const finishSession = () => {
+    const finishSession = async () => {
+        setIsFinishingSession(true);
+
+        // Force a final sync before proceeding to feedback/overview to ensure no pending changes are lost
+        await syncWorkoutStateIfNeeded({
+            sourceExercises: exercises,
+            elapsedSeconds: workoutTime
+        });
+
         // Instead of directly ending, trigger feedback flow
         setShowFeedbackModal(true);
         setSessionTitle(null);
+        setIsFinishingSession(false);
     };
 
     const submitFeedback = () => {
@@ -413,10 +550,15 @@ const ClientView = () => {
         setSessionFeedback({ rpe: null, comments: '' });
         setSessionActive(false);
         setActivePlan(null);
+        setWorkoutSessionId(null);
+        setIsFinishingSession(false);
         setWorkoutTime(0);
         setIsResting(false);
         setRestTimer(0);
         setExercises([]);
+        hasFirstDoneRef.current = false;
+        lastSyncedHashRef.current = '';
+        doneClickGuardRef.current = {};
         setViewingExerciseDef(null);
     };
 
@@ -425,10 +567,15 @@ const ClientView = () => {
         setSessionFeedback({ rpe: null, comments: '' });
         setSessionActive(false);
         setActivePlan(null);
+        setWorkoutSessionId(null);
+        setIsFinishingSession(false);
         setWorkoutTime(0);
         setIsResting(false);
         setRestTimer(0);
         setExercises([]);
+        hasFirstDoneRef.current = false;
+        lastSyncedHashRef.current = '';
+        doneClickGuardRef.current = {};
         setViewingExerciseDef(null);
     };
 
@@ -869,6 +1016,7 @@ const ClientView = () => {
                                             value={set.log.weight}
                                             onChange={(e) => updateSetLog(exIndex, setIndex, 'weight', e.target.value)}
                                             placeholder="--"
+                                            disabled={set.completed}
                                         />
                                     </div>
                                     <div className="col-log">
@@ -878,6 +1026,7 @@ const ClientView = () => {
                                             value={set.log.reps}
                                             onChange={(e) => updateSetLog(exIndex, setIndex, 'reps', e.target.value)}
                                             placeholder="--"
+                                            disabled={set.completed}
                                         />
                                     </div>
                                     <div className="col-log">
@@ -887,7 +1036,7 @@ const ClientView = () => {
                                             value={set.log.rpe}
                                             onChange={(e) => updateSetLog(exIndex, setIndex, 'rpe', e.target.value)}
                                             placeholder="--"
-                                            disabled={set.failure}
+                                            disabled={set.completed || set.failure}
                                             title={set.failure ? "RPE is locked to 10 when reaching failure" : ""}
                                         />
                                     </div>
@@ -936,7 +1085,7 @@ const ClientView = () => {
                 ))}
 
                 <div className="su-finish-run-container">
-                    <Button size="lg" fullWidth className="su-complete-session-btn" onClick={finishSession}>
+                    <Button size="lg" fullWidth className="su-complete-session-btn" onClick={finishSession} disabled={isFinishingSession}>
                         {t('client.session.btn.finish')}
                     </Button>
                 </div>
