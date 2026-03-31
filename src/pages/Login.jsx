@@ -27,6 +27,8 @@ const Login = () => {
     const [tempUser, setTempUser] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [selectedRoleIndex, setSelectedRoleIndex] = useState(null);
+    const [isTransitioning, setIsTransitioning] = useState(false);
 
     const processRoles = async (credential) => {
         try {
@@ -81,14 +83,89 @@ const Login = () => {
         }
     };
 
-    const handlePersonaSelect = (roleObj) => {
+    const handlePersonaSelect = (roleObj, index) => {
+        if (isTransitioning) return;
+        
+        setSelectedRoleIndex(index);
+        setIsTransitioning(true);
+
         const mappedRole = roleMapping[roleObj.role] || 'client';
         persistSession(tempUser, tempUser.email, mappedRole);
-        navigate('/dashboard');
+
+        // Wait for the animation to play before navigating
+        setTimeout(() => {
+            navigate('/dashboard');
+        }, 800);
     };
 
     return (
-        <div className="login-container">
+        <div className={`login-container ${availableRoles.length > 0 ? 'is-selecting-persona' : ''}`}>
+            {availableRoles.length > 0 && (
+                <div className={`persona-selection-wrapper ${isTransitioning ? 'transition-active' : ''}`}>
+                    <h2 className={`persona-title-main ${isTransitioning ? 'faded' : ''}`}>
+                        Quem está treinando hoje?
+                    </h2>
+                    <div className="persona-grid">
+                        {availableRoles.map((roleObj, index) => {
+                            let label = roleObj.role;
+                            let icon = null;
+
+                            // Map specific roles to tailored labels and icons
+                            if (roleObj.role === 'Trainer') {
+                                label = 'Profissional';
+                                icon = (
+                                    <svg viewBox="0 0 24 24" width="60" height="60" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="persona-icon-svg">
+                                        <path d="M18 10h3v4h-3M3 10h3v4H3M6 8h4v8H6M14 8h4v8h-4M10 12h4"/>
+                                    </svg>
+                                );
+                            } else if (roleObj.role === 'GymOwner') {
+                                label = 'Academia';
+                                icon = (
+                                    <svg viewBox="0 0 24 24" width="60" height="60" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="persona-icon-svg">
+                                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
+                                        <path d="M9 22v-4h6v4" />
+                                        <path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01" />
+                                    </svg>
+                                );
+                            } else {
+                                label = roleObj.role === 'IndependentClient' ? 'Aluno Independente' : 'Aluno';
+                                icon = (
+                                    <svg viewBox="0 0 24 24" width="60" height="60" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="persona-icon-svg">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                        <circle cx="12" cy="7" r="4" />
+                                    </svg>
+                                );
+                            }
+
+                            return (
+                                <div 
+                                    className={`persona-card ${isTransitioning && selectedRoleIndex === index ? 'selected' : ''} ${isTransitioning && selectedRoleIndex !== index ? 'faded' : ''}`}
+                                    key={index} 
+                                    onClick={() => handlePersonaSelect(roleObj, index)}
+                                >
+                                    <div className="persona-avatar">
+                                        {icon}
+                                    </div>
+                                    <span className="persona-name">{label}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    
+                    <button 
+                        className={`persona-cancel-btn ${isTransitioning ? 'faded' : ''}`}
+                        onClick={() => {
+                            setAvailableRoles([]);
+                            setTempUser(null);
+                            // Ensure firebase sign out is called if the user changes mind at this stage
+                            // Not strictly required for UI state navigation, but optional.
+                        }}
+                    >
+                        Voltar ao Login
+                    </button>
+                </div>
+            )}
+
             <div className="login-bg-shape login-bg-shape-1"></div>
             <div className="login-bg-shape login-bg-shape-2"></div>
 
@@ -106,47 +183,6 @@ const Login = () => {
                 </div>
 
                 <Card className="login-card">
-                    {availableRoles.length > 0 ? (
-                        <div className="persona-selection">
-                            <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', textAlign: 'center', color: 'var(--text-primary)' }}>
-                                Quem está acessando hoje?
-                            </h2>
-                            <div className="role-options" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                {availableRoles.map((roleObj, index) => {
-                                    // Make sure we have a user-friendly label
-                                    let label = roleObj.role;
-                                    if (roleObj.role === 'Trainer') label = 'Profissional / Treinador';
-                                    if (roleObj.role === 'GymOwner') label = 'Administrador da Academia';
-                                    if (roleObj.role === 'Client' || roleObj.role === 'GymClient') label = 'Aluno / Cliente';
-                                    if (roleObj.role === 'IndependentClient') label = 'Aluno Independente';
-
-                                    return (
-                                        <button 
-                                            key={index}
-                                            type="button" 
-                                            className="role-opt" 
-                                            onClick={() => handlePersonaSelect(roleObj)}
-                                            style={{ padding: '1rem', width: '100%', justifyContent: 'center' }}
-                                        >
-                                            {label}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                            <Button 
-                                variant="outline" 
-                                fullWidth 
-                                style={{ marginTop: '2rem' }}
-                                onClick={() => {
-                                    setAvailableRoles([]);
-                                    setTempUser(null);
-                                    navigate('/login');
-                                }}
-                            >
-                                {t('login.back')}
-                            </Button>
-                        </div>
-                    ) : (
                         <form className="login-form" onSubmit={handleSubmit}>
                             <Input
                                 id="email"
@@ -202,7 +238,6 @@ const Login = () => {
                                 {t('login.btn.google')}
                             </Button>
                         </form>
-                    )}
                 </Card>
 
                 <p className="login-footer-text">
