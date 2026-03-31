@@ -28,6 +28,7 @@ export const normalizeTemplate = (tmpl) => ({
     exercises: (tmpl.exercises ?? []).map((ex, idx) => ({
         ...ex,
         id: ex.exerciseId ?? ex.id ?? `ex_${idx}_${Date.now()}`,
+        name: ex.exerciseName ?? ex.name ?? '',
         sets: (ex.sets ?? []).map(normalizeSet),
     })),
     _templateId: tmpl.templateId,
@@ -47,6 +48,7 @@ export const normalizePlan = (plan) => ({
     exercises: (plan.exercises ?? []).map((ex, idx) => ({
         ...ex,
         id: ex.exerciseId ?? ex.id ?? `ex_${idx}_${Date.now()}`,
+        name: ex.exerciseName ?? ex.name ?? '',
         sets: (ex.sets ?? []).map(normalizeSet),
     })),
     history: plan.history ?? [],
