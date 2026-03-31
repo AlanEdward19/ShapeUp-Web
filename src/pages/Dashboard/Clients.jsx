@@ -344,11 +344,7 @@ const Clients = () => {
                         <p className="su-page-subtitle">{t('clients.subtitle')}</p>
                     </div>
                     <div style={{ display: 'flex', gap: '0.75rem' }}>
-                        {isProfessional && (
-                            <Button variant="outline" onClick={() => setShowGymClients(true)}>
-                                {t('gym.clients.btn.view_all') || 'Rede da Academia'}
-                            </Button>
-                        )}
+
                         <Button onClick={() => setShowInvite(true)} data-tour="clients-invite-btn">{t('clients.invite')}</Button>
                     </div>
                 </div>
