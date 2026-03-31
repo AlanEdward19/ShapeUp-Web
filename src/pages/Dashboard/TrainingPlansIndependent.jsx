@@ -79,6 +79,7 @@ const TrainingPlansIndependent = () => {
         updateWorkoutPlan,
         deleteWorkoutPlan,
         copyWorkoutPlan,
+        startWorkout,
     } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
     const { currentUser } = useAuth();
@@ -351,13 +352,18 @@ const TrainingPlansIndependent = () => {
     const startSession = async (plan) => {
         // Call API to start workout
         try {
-            console.log('Starting workout via API for plan:', plan.id);
             const me = await getMe();
-            const command = {
-                workoutPlanId: plan._planId || plan.id,
-                targetUserId: me.id || me.userId
-            };
-            await startWorkout(command);
+            const pid = plan._planId || plan.id;
+            
+            // Tenta chamar a API se houver um ID que não pareça temporário
+            if (pid && !String(pid).startsWith('p') && !String(pid).startsWith('plan_')) {
+                const command = {
+                    planId: pid,
+                    targetUserId: me.id || me.userId,
+                    startedAtUtc: new Date().toISOString()
+                };
+                await startWorkout(command);
+            }
         } catch (error) {
             console.error('Failed to start workout via API:', error);
         }
