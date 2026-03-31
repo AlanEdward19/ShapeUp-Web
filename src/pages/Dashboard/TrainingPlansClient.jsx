@@ -9,6 +9,10 @@ import ExerciseModal from '../../components/ExerciseModal';
 import { exercisesDB } from '../../data/mockExercises';
 import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useTrainingApi } from '../../hooks/api/useTrainingApi';
+import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
+import { useAuth } from '../../contexts/AuthContext';
+import { normalizePlan } from '../../utils/trainingNormalization';
 import './TrainingPlansClient.css';
 
 const formatTime = (totalSeconds) => {
@@ -25,6 +29,9 @@ const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
+    const { startWorkout, getWorkoutPlansByUser } = useTrainingApi();
+    const { getMe } = useAuthorizationApi();
+    const { currentUser } = useAuth();
 
     // Session State
     const [sessionActive, setSessionActive] = useState(false);
@@ -58,14 +65,41 @@ const ClientView = () => {
     const [showSessionModal, setShowSessionModal] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
 
-    // -- Fetch Plans from LocalStorage --
+    // -- Fetch Plans from API & LocalStorage --
     useEffect(() => {
-        const clientId = localStorage.getItem('shapeup_client_id') || 1;
-        const storedPlans = localStorage.getItem(`shapeup_client_plans_${clientId}`);
-        if (storedPlans) {
-            setAssignedPlans(JSON.parse(storedPlans));
-        }
-    }, []);
+        const fetchPlans = async () => {
+            try {
+                console.log('TrainingPlansClient: Calling getMe()...');
+                const me = await getMe();
+                const userId = me.id || me.userId;
+                
+                if (!userId) {
+                    console.warn('TrainingPlansClient: No valid user ID returned from getMe.');
+                    return;
+                }
+                
+                console.log('TrainingPlansClient: Fetching training plans for user:', userId);
+                const response = await getWorkoutPlansByUser(userId);
+                const raw = Array.isArray(response) 
+                    ? response 
+                    : (response?.data || response?.items || []);
+                
+                const data = raw.map(p => normalizePlan(p));
+                setAssignedPlans(data);
+                
+                // Update local storage cache
+                localStorage.setItem(`shapeup_client_plans_${userId}`, JSON.stringify(data));
+            } catch (err) {
+                console.error('Error fetching plans from API:', err);
+                const storedPlans = localStorage.getItem(`shapeup_client_plans_${localStorage.getItem('shapeup_client_id')}`);
+                if (storedPlans) {
+                    setAssignedPlans(JSON.parse(storedPlans));
+                }
+            }
+        };
+
+        fetchPlans();
+    }, [getMe, getWorkoutPlansByUser]);
 
     // -- Training Plans Tour Trigger --
     useEffect(() => {
@@ -130,7 +164,20 @@ const ClientView = () => {
     }, [sessionActive, setIsOpen, setSteps, setCurrentStep, t]);
 
     // -- Start A Specific Session --
-    const startSessionForPlan = (plan) => {
+    const startSessionForPlan = async (plan) => {
+        // Call API to start workout
+        try {
+            console.log('Starting workout via API for plan:', plan.id);
+            const me = await getMe();
+            const command = {
+                workoutPlanId: plan._planId || plan.id,
+                targetUserId: me.id || me.userId
+            };
+            await startWorkout(command);
+        } catch (error) {
+            console.error('Failed to start workout via API:', error);
+        }
+
         // Map the plan's exercises into the runtime session engine format
         const runtimeExercises = plan.exercises.map((ex, exIdx) => {
             return {

@@ -540,6 +540,7 @@
 .su-alert-modal-box .su-modal-actions {
     display: flex;
     gap: 1rem;
+    justify-content: center;
 }
 
 @keyframes modalFadeIn {
@@ -557,3 +558,53 @@
 .su-alert-modal-box {
     animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* Delete Specific Modal Styles */
+.su-delete-confirm-content {
+    max-width: 420px !important;
+    padding: 2.5rem !important;
+    text-align: center;
+}
+
+.su-delete-icon-ring, 
+.su-alert-icon-ring {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--error);
+}
+
+.su-delete-icon-ring::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    border-radius: 50%;
+    border: 2px solid rgba(239, 68, 68, 0.05);
+}
+
+.su-delete-confirm-content h2,
+.su-delete-confirm-content h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--text-main);
+}
+
+.su-confirm-delete-btn:hover {
+    background-color: #dc2626 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.su-cancel-btn:hover {
+    background-color: var(--bg-main) !important;
+}
