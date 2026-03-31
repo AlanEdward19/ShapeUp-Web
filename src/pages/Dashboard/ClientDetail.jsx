@@ -649,24 +649,30 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
 
             {/* Delete confirmation modal */}
             {confirmDelete && (
-                <div className="su-modal-overlay" onClick={() => setConfirmDelete(false)}>
-                    <div className="su-modal-box su-confirm-modal" onClick={e => e.stopPropagation()}>
-                        <div className="su-confirm-icon">
-                            <Trash2 size={28} />
+                <div className="su-modal-overlay su-delete-confirm-overlay" onClick={() => setConfirmDelete(false)}>
+                    <div className="su-modal-box su-delete-confirm-content su-alert-modal-box" onClick={e => e.stopPropagation()}>
+                        <div className="su-alert-icon-ring" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)' }}>
+                            <Trash2 size={32} />
                         </div>
-                        <h3 className="su-confirm-title">{t('pro.client.plan.delete.title')}</h3>
-                        <p className="su-confirm-body">
-                            <strong>"{plan.name}"</strong> {t('pro.client.plan.delete.desc')}
+                        <h3 className="su-modal-title">{t('pro.client.plan.delete.title')}</h3>
+                        <p className="su-modal-subtitle">
+                            {t('pro.client.plan.delete.desc') || 'Tem certeza que deseja excluir o plano'} 
+                            <strong> {plan.name}</strong>? 
+                            <br/>{t('pro.client.plan.delete.warning') || 'Essa ação não pode ser desfeita.'}
                         </p>
-                        <div className="su-confirm-actions">
-                            <Button variant="outline" onClick={() => setConfirmDelete(false)}>
-                                {t('pro.client.plan.delete.cancel')}
-                            </Button>
-                            <Button
-                                style={{ background: '#ef4444', borderColor: '#ef4444' }}
-                                onClick={() => { onDelete(plan.id); setConfirmDelete(false); }}
+                        <div className="su-modal-actions" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <Button 
+                                variant="outline" 
+                                onClick={() => setConfirmDelete(false)}
+                                style={{ minWidth: '120px' }}
                             >
-                                {t('pro.client.plan.delete.confirm')}
+                                {t('common.cancel') || 'Cancelar'}
+                            </Button>
+                            <Button 
+                                onClick={() => { onDelete(plan.id); setConfirmDelete(false); }}
+                                style={{ minWidth: '120px', backgroundColor: 'var(--error)', color: 'white' }}
+                            >
+                                {t('common.delete') || 'Excluir'}
                             </Button>
                         </div>
                     </div>
@@ -1027,11 +1033,9 @@ const ClientDetail = () => {
     };
 
     const handleDeletePlan = async (planId) => {
-        if (!window.confirm(t('pro.training.delete.confirm') || 'Excluir plano?')) return;
-        
         try {
-            // Se for um ID do backend (não temporário)
-            if (typeof planId === 'string' && !planId.startsWith('p')) {
+            // Se for um ID do backend (não temporário, mesmo se for Number)
+            if (planId && !String(planId).startsWith('p')) {
                 await deleteWorkoutPlan(planId);
             }
             

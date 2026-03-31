@@ -89,6 +89,8 @@ const TrainingPlansProfessional = () => {
     const [activeTemplate, setActiveTemplate] = useState(null);
     const [assigningTemplate, setAssigningTemplate] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [templateToDelete, setTemplateToDelete] = useState(null);
 
     const [clients, setClients] = useState(() => {
         const stored = localStorage.getItem('shapeup_clients');
@@ -190,20 +192,30 @@ const TrainingPlansProfessional = () => {
         }
     };
 
-    const deleteTemplate = async (templateId) => {
-        if (!window.confirm(t('pro.training.delete.confirm'))) return;
-        
+    const deleteTemplate = (tmpl) => {
+        setTemplateToDelete(tmpl);
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!templateToDelete) return;
+
         try {
-            // Se for um ID do backend (não temporário)
-            if (typeof templateId === 'string' && !templateId.startsWith('tmpl_')) {
-                await deleteWorkoutTemplate(templateId);
-            }
+            const tid = templateToDelete._templateId || templateToDelete.id;
             
-            setTemplates(prev => prev.filter(t => t.id !== templateId));
+            // Só chama a API se for um ID real (não temporário que começa com tmpl_)
+            if (tid && !String(tid).startsWith('tmpl_')) {
+                await deleteWorkoutTemplate(tid);
+            }
+
+            setTemplates(prev => prev.filter(t => t.id !== (templateToDelete._templateId || templateToDelete.id)));
             addNotification('coach', 'alert', t('pro.training.delete.success.title'), t('pro.training.delete.success.message'), 'error');
         } catch (error) {
             console.error('Erro ao excluir template:', error);
             alert('Erro ao excluir o template.');
+        } finally {
+            setShowDeleteConfirm(false);
+            setTemplateToDelete(null);
         }
     };
 
@@ -271,7 +283,7 @@ const TrainingPlansProfessional = () => {
                                                 <h3 className="su-template-title-clean" style={{ marginBottom: 0, paddingRight: '1rem' }}>{tmpl.name}</h3>
                                                 <div className="su-template-top-actions">
                                                     <button className="su-icon-btn su-text-muted" title="Duplicate" onClick={() => duplicateTemplate(tmpl)}><Copy size={16} /></button>
-                                                    <button className="su-icon-btn su-error-text" title="Delete" onClick={() => deleteTemplate(tmpl.id)}><Trash2 size={16} /></button>
+                                                    <button className="su-icon-btn su-error-text" title="Delete" onClick={() => deleteTemplate(tmpl)}><Trash2 size={16} /></button>
                                                 </div>
                                             </div>
                                             <div className="su-template-subtitle-clean" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -349,6 +361,38 @@ const TrainingPlansProfessional = () => {
                         <div className="su-modal-actions">
                             <Button fullWidth onClick={() => setShowSuccessModal(false)}>
                                 {t('pro.training.assign.success.btn')}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div className="su-modal-overlay su-delete-confirm-overlay" onClick={() => setShowDeleteConfirm(false)}>
+                    <div className="su-modal-box su-delete-confirm-content su-alert-modal-box" onClick={e => e.stopPropagation()}>
+                        <div className="su-alert-icon-wrap" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)' }}>
+                            <Trash2 size={32} />
+                        </div>
+                        <h2 className="su-modal-title">{t('pro.training.delete.confirm.title') || 'Excluir Template?'}</h2>
+                        <p className="su-modal-subtitle">
+                            {t('pro.training.delete.confirm.desc') || 'Tem certeza que deseja excluir o template'} 
+                            <strong> {templateToDelete?.name}</strong>? 
+                            <br/>{t('pro.training.delete.confirm.warning') || 'Essa ação não pode ser desfeita.'}
+                        </p>
+                        <div className="su-modal-actions" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <Button 
+                                variant="outline" 
+                                onClick={() => { setShowDeleteConfirm(false); setTemplateToDelete(null); }}
+                                style={{ minWidth: '120px' }}
+                            >
+                                {t('common.cancel') || 'Cancelar'}
+                            </Button>
+                            <Button 
+                                onClick={confirmDelete}
+                                style={{ minWidth: '120px', backgroundColor: 'var(--error)', color: 'white' }}
+                            >
+                                {t('common.delete') || 'Excluir'}
                             </Button>
                         </div>
                     </div>

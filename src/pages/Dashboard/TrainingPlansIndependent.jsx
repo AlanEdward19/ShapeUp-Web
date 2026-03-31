@@ -18,6 +18,7 @@ import {
     TECHNIQUES
 } from './ClientDetail';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
+import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { useAuth } from '../../contexts/AuthContext';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
 import { normalizePlan } from '../../utils/trainingNormalization';
@@ -60,7 +61,7 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart }) => {
                     <div className="su-plan-tiny-actions">
                         <button onClick={() => onEdit(plan)} title={t('pro.client.plan.btn.edit')}><Settings2 size={16} /></button>
                         <button onClick={() => onCopy(plan)} title={t('pro.client.plan.btn.copy')}><Copy size={16} /></button>
-                        <button onClick={onDelete} title={t('independent.builder.btn.delete')} className="delete"><Trash2 size={16} /></button>
+                        <button onClick={() => onDelete(plan)} title={t('independent.builder.btn.delete')} className="delete"><Trash2 size={16} /></button>
                     </div>
                 </div>
             </div>
@@ -77,8 +78,9 @@ const TrainingPlansIndependent = () => {
         createWorkoutPlan,
         updateWorkoutPlan,
         deleteWorkoutPlan,
-        copyWorkoutPlan
+        copyWorkoutPlan,
     } = useTrainingApi();
+    const { getMe } = useAuthorizationApi();
     const { currentUser } = useAuth();
 
     // ─── STATE MANAGEMENT ──────────────────────────────────────────
@@ -87,35 +89,51 @@ const TrainingPlansIndependent = () => {
     const [plans, setPlans] = useState([]);
     const [loadingPlans, setLoadingPlans] = useState(true);
     const [editingPlan, setEditingPlan] = useState(null);
-
+    
     // Fetch plans from API on mount
     useEffect(() => {
-        const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id'));
-        if (!loggedInUserId || isNaN(loggedInUserId)) {
-            setLoadingPlans(false);
-            return;
-        }
         const fetchPlans = async () => {
             try {
-                const response = await getWorkoutPlansByUser(loggedInUserId);
+                setLoadingPlans(true);
+                
+                // 1. Get real User ID from getMe
+                console.log('TrainingPlansIndependent: Calling getMe()...');
+                const me = await getMe();
+                const userId = me.id || me.userId;
+                
+                if (!userId) {
+                    console.warn('TrainingPlansIndependent: No valid user ID returned from getMe.');
+                    setLoadingPlans(false);
+                    return;
+                }
+                
+                console.log('TrainingPlansIndependent: Fetching plans for user:', userId);
+                const response = await getWorkoutPlansByUser(userId);
+                console.log('TrainingPlansIndependent: API Response:', response);
+
                 const raw = Array.isArray(response)
                     ? response
                     : (response?.data || response?.items || []);
-
+                
                 // Normalizar planos da API para o formato interno do PlanEditor
                 const data = raw.map(p => normalizePlan(p));
+                
+                console.log('TrainingPlansIndependent: Final plans data:', data);
                 setPlans(data);
+                
+                // Backup cache
+                localStorage.setItem('shapeup_independent_plans', JSON.stringify(data));
             } catch (err) {
-                console.error('Erro ao buscar planos (independente):', err);
-                // Fallback to localStorage cache
+                console.error('TrainingPlansIndependent: Error fetching plans from API:', err);
                 const stored = localStorage.getItem('shapeup_independent_plans');
                 if (stored) setPlans(JSON.parse(stored));
             } finally {
                 setLoadingPlans(false);
             }
         };
+
         fetchPlans();
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [getMe, getWorkoutPlansByUser]);
 
     // 2. Session Engine State
     const [sessionActive, setSessionActive] = useState(false);
@@ -131,6 +149,8 @@ const TrainingPlansIndependent = () => {
     const [showOverviewModal, setShowOverviewModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [showSessionDetail, setShowSessionDetail] = useState(null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [planToDelete, setPlanToDelete] = useState(null);
 
     // 4. Pagination
     const [historyPage, setHistoryPage] = useState(1);
@@ -299,26 +319,49 @@ const TrainingPlansIndependent = () => {
         }
     };
 
-    const handleDeletePlan = async (planId) => {
-        if (!window.confirm(t('independent.builder.delete.confirm') || 'Excluir seu treino?')) return;
-        
+    const handleDeletePlan = (plan) => {
+        setPlanToDelete(plan);
+        setShowDeleteConfirm(true);
+    };
+
+    const confirmDeletePlan = async () => {
+        if (!planToDelete) return;
+
         try {
-            // Se for um ID do backend (não começa com 'p' de temporário)
-            if (typeof planId === 'string' && !planId.startsWith('p')) {
-                await deleteWorkoutPlan(planId);
-            }
+            const pid = planToDelete._planId || planToDelete.id;
             
-            setPlans(prev => prev.filter(p => p.id !== planId));
+            // Só chama a API se for um ID real do backend (não temporário p... ou plan_...)
+            if (pid && !String(pid).startsWith('p') && !String(pid).startsWith('plan_')) {
+                await deleteWorkoutPlan(pid);
+            }
+
+            setPlans(prev => prev.filter(p => p.id !== (planToDelete._planId || planToDelete.id)));
             addNotification('independent', 'alert', 'Treino Removido', 'Seu treino foi excluído com sucesso.', 'error');
         } catch (error) {
             console.error('Erro ao excluir treino (Solo):', error);
             alert('Erro ao excluir o treino.');
+        } finally {
+            setShowDeleteConfirm(false);
+            setPlanToDelete(null);
         }
     };
 
     // ─── SESSION ENGINE HANDLERS ──────────────────────────────────
 
-    const startSession = (plan) => {
+    const startSession = async (plan) => {
+        // Call API to start workout
+        try {
+            console.log('Starting workout via API for plan:', plan.id);
+            const me = await getMe();
+            const command = {
+                workoutPlanId: plan._planId || plan.id,
+                targetUserId: me.id || me.userId
+            };
+            await startWorkout(command);
+        } catch (error) {
+            console.error('Failed to start workout via API:', error);
+        }
+
         const runtimeExercises = plan.exercises.map((ex, exIdx) => ({
             id: ex.id || `ex_${exIdx}`,
             name: ex.name,
@@ -659,7 +702,7 @@ const TrainingPlansIndependent = () => {
                             plan={plan}
                             onEdit={setEditingPlan}
                             onCopy={handleCopyPlan}
-                            onDelete={() => handleDeletePlan(plan.id)}
+                            onDelete={() => handleDeletePlan(plan)}
                             onStart={startSession}
                         />
                     ))
@@ -702,6 +745,43 @@ const TrainingPlansIndependent = () => {
                     planName={showSessionDetail.planName}
                     onClose={() => setShowSessionDetail(null)}
                 />
+            )}
+            {/* Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div className="su-modal-overlay su-delete-confirm-overlay" onClick={() => { setShowDeleteConfirm(false); setPlanToDelete(null); }}>
+                    <div className="su-modal-box su-delete-confirm-content su-alert-modal-box" onClick={e => e.stopPropagation()}>
+                        <div className="su-delete-icon-ring">
+                            <Trash2 size={32} />
+                        </div>
+                        <h2>{t('independent.builder.delete.title') || 'Excluir Treino?'}</h2>
+                        <p className="su-text-muted">
+                            {t('independent.builder.delete.desc') || 'Tem certeza que deseja excluir o treino'} 
+                            <strong> {planToDelete?.name}</strong>? 
+                            <br/>{t('independent.builder.delete.warning') || 'Essa ação não pode ser desfeita.'}
+                        </p>
+                        <div className="su-modal-actions" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <Button 
+                                variant="outline" 
+                                className="su-cancel-btn"
+                                onClick={() => { setShowDeleteConfirm(false); setPlanToDelete(null); }}
+                                style={{ minWidth: '120px' }}
+                            >
+                                {t('common.cancel') || 'Cancelar'}
+                            </Button>
+                            <Button 
+                                className="su-confirm-delete-btn"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    confirmDeletePlan();
+                                }}
+                                style={{ minWidth: '120px', backgroundColor: 'var(--error)', color: 'white' }}
+                            >
+                                {t('common.delete') || 'Excluir'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );
