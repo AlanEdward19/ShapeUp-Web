@@ -1,20 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useGymManagementApi } from '../hooks/api/useGymManagementApi';
 import './Login.css';
 
 const Register = () => {
     const { t } = useLanguage();
     const { register, signInWithGoogle } = useAuth();
     const navigate = useNavigate();
+    const { acceptTrainerClientInvite } = useGymManagementApi();
 
     const [selectedRole, setSelectedRole] = useState('independent');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [inviteToken, setInviteToken] = useState(null);
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(window.location.search);
+        const payloadStr = searchParams.get("payload");
+
+        if (payloadStr) {
+            setInviteToken(payloadStr);
+            setSelectedRole('client');
+
+            // Clean the URL visually
+            const url = new URL(window.location);
+            url.searchParams.delete("payload");
+            window.history.replaceState({}, document.title, url.toString());
+        }
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,7 +48,16 @@ const Register = () => {
         try {
             await register(email, password);
 
-            if (selectedRole === 'client') {
+            if (inviteToken) {
+                try {
+                    // O backend faz toda a validação pelo payload
+                    await acceptTrainerClientInvite({
+                        payload: inviteToken
+                    });
+                } catch (acceptErr) {
+                    console.error("Erro ao aceitar convite no backend:", acceptErr);
+                }
+            } else if (selectedRole === 'client') {
                 const stored = localStorage.getItem('shapeup_clients');
                 let clients = stored ? JSON.parse(stored) : [];
 

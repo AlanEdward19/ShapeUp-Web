@@ -7,6 +7,7 @@ import Logo from '../components/Logo/Logo';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useGymManagementApi } from '../hooks/api/useGymManagementApi';
+import { useUserManagementApi } from '../hooks/api/useUserManagementApi';
 import './Login.css';
 
 const roleMapping = {
@@ -21,6 +22,7 @@ const Login = () => {
     const { t } = useLanguage();
     const { signIn, signInWithGoogle, persistSession } = useAuth();
     const { getMyUserRoles } = useGymManagementApi();
+    const { getMe } = useUserManagementApi();
     const navigate = useNavigate();
 
     const [availableRoles, setAvailableRoles] = useState([]);
@@ -32,7 +34,18 @@ const Login = () => {
 
     const processRoles = async (credential) => {
         try {
-            const roles = await getMyUserRoles();
+            const [roles, userData] = await Promise.all([
+                getMyUserRoles(),
+                getMe().catch(err => {
+                    console.warn("Muted error during /api/users/me:", err);
+                    return null;
+                })
+            ]);
+
+            if (userData && userData.id) {
+                localStorage.setItem('shapeup_user_id', userData.id);
+            }
+
             if (!roles || roles.length === 0) {
                 setError(t('login.error.no_roles') || "Nenhum perfil encontrado para este usuário.");
                 setLoading(false);

@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { X, Mail, CheckCircle, Send } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
+import { useGymManagementApi } from '../hooks/api/useGymManagementApi';
 import './InviteClientModal.css';
 
 const InviteClientModal = ({ onClose, onInvite }) => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps } = useTour();
+    const { generateTrainerClientInvite } = useGymManagementApi();
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
     const [error, setError] = useState('');
@@ -37,7 +39,7 @@ const InviteClientModal = ({ onClose, onInvite }) => {
 
     const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (!email.trim()) {
             setError(t('clients.invite.error.empty'));
             return;
@@ -47,9 +49,25 @@ const InviteClientModal = ({ onClose, onInvite }) => {
             return;
         }
         setError('');
-        setSent(true);
-        if (onInvite) {
-            onInvite(email);
+
+        try {
+            const trainerId = localStorage.getItem('shapeup_user_id');
+            if (!trainerId) {
+                throw new Error(t('clients.invite.error.no_trainer_id') || "ID do Treinador não encontrado na sessão.");
+            }
+
+            await generateTrainerClientInvite(trainerId, email, {
+                trainerPlanId: null,
+                expiresInHours: 48
+            });
+
+            setSent(true);
+            if (onInvite) {
+                onInvite(email);
+            }
+        } catch (err) {
+            console.error("Invite client API error:", err);
+            setError(t('clients.invite.error.api') || "Erro ao gerar convite. Tente novamente.");
         }
     };
 

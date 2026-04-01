@@ -157,6 +157,20 @@ export const useGymManagementApi = () => {
         });
     }, []);
 
+    const generateTrainerClientInvite = useCallback(async (trainerId, clientEmail, command) => {
+        return await apiClient(`/api/gym-management/trainers/${trainerId}/clients/invites/${clientEmail}`, {
+            method: 'POST',
+            body: JSON.stringify(command)
+        });
+    }, []);
+
+    const acceptTrainerClientInvite = useCallback(async (command) => {
+        return await apiClient('/api/gym-management/trainer-client-invites/accept', {
+            method: 'POST',
+            body: JSON.stringify(command)
+        });
+    }, []);
+
     // --- PLATFORM TIERS ---
     const getPlatformTiers = useCallback(async (cursor, pageSize) => {
         const query = new URLSearchParams();
@@ -213,7 +227,7 @@ export const useGymManagementApi = () => {
         // Trainer Plans
         getTrainerPlans, createTrainerPlan, updateTrainerPlan, deleteTrainerPlan,
         // Trainer Clients
-        getTrainerClients, addTrainerClient, transferTrainerClient,
+        getTrainerClients, addTrainerClient, transferTrainerClient, generateTrainerClientInvite, acceptTrainerClientInvite,
         // Platform Tiers
         getPlatformTiers, createPlatformTier, updatePlatformTier, deletePlatformTier,
         // User Roles

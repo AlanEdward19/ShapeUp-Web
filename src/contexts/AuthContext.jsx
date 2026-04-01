@@ -100,6 +100,7 @@ export const AuthProvider = ({ children }) => {
 
         // Remove only user-specific datastore keys
         const userKeys = [
+            'shapeup_user_id',
             'shapeup_role',
             'shapeup_user_name',
             'shapeup_user_email',
