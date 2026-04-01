@@ -109,6 +109,12 @@ export const useTrainingApi = () => {
         });
     }, []);
 
+    const cancelWorkout = useCallback(async (sessionId) => {
+        return await apiClient(`/api/training/workouts/${sessionId}/cancel`, {
+            method: 'POST'
+        });
+    }, []);
+
     const getWorkoutById = useCallback(async (sessionId) => {
         return await apiClient(`/api/training/workouts/${sessionId}`);
     }, []);
@@ -118,6 +124,10 @@ export const useTrainingApi = () => {
         if (cursor) query.append('cursor', cursor);
         if (pageSize) query.append('pageSize', pageSize);
         return await apiClient(`/api/training/workouts/user/${targetUserId}?${query.toString()}`);
+    }, []);
+
+    const getActiveWorkout = useCallback(async () => {
+        return await apiClient('/api/training/workouts/me/active');
     }, []);
 
     // --- EXERCISES ---
@@ -204,7 +214,7 @@ export const useTrainingApi = () => {
         // Workout Plans
         createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan, getWorkoutPlanById, copyWorkoutPlan, getWorkoutPlansByUser,
         // Workouts
-        startWorkout, finishWorkout, updateWorkoutState, getWorkoutById, getWorkoutsByUser,
+        startWorkout, finishWorkout, updateWorkoutState, cancelWorkout, getWorkoutById, getWorkoutsByUser, getActiveWorkout,
         // Exercises
         getExercises, getExerciseById, createExercise, updateExercise, deleteExercise, suggestExercises,
         // Equipments
