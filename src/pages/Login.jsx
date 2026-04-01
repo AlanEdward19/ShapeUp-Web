@@ -42,8 +42,20 @@ const Login = () => {
                 })
             ]);
 
-            if (userData && userData.id) {
-                localStorage.setItem('shapeup_user_id', userData.id);
+            if (userData) {
+                let uid = userData.id || userData.userId || userData.uid || (typeof userData === 'number' ? userData : null);
+                if (!uid && roles && roles.length > 0) {
+                    uid = roles[0].userId;
+                }
+                
+                if (uid) {
+                    localStorage.setItem('shapeup_user_id', String(uid));
+                } else {
+                    console.warn("Could not find id string/number in /api/users/me payload:", userData);
+                }
+            } else if (roles && roles.length > 0 && roles[0].userId) {
+                // Fallback to roles if getMe failed or returned empty
+                localStorage.setItem('shapeup_user_id', String(roles[0].userId));
             }
 
             if (!roles || roles.length === 0) {
