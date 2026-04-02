@@ -30,7 +30,7 @@ const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { startWorkout, updateWorkoutState, getWorkoutPlansByUser } = useTrainingApi();
+    const { startWorkout, updateWorkoutState, getWorkoutPlansByUser, cancelWorkout } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
     const { currentUser } = useAuth();
 
@@ -562,7 +562,14 @@ const ClientView = () => {
         setViewingExerciseDef(null);
     };
 
-    const handleCancelSessionConfirm = () => {
+    const handleCancelSessionConfirm = async () => {
+        if (workoutSessionId) {
+            try {
+                await cancelWorkout(workoutSessionId);
+            } catch (error) {
+                console.error('Failed to cancel workout via API:', error);
+            }
+        }
         setShowCancelModal(false);
         setSessionFeedback({ rpe: null, comments: '' });
         setSessionActive(false);

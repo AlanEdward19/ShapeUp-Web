@@ -81,6 +81,7 @@ const TrainingPlansIndependent = () => {
         copyWorkoutPlan,
         startWorkout,
         updateWorkoutState,
+        cancelWorkout,
     } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
     const { currentUser } = useAuth();
@@ -583,10 +584,17 @@ const TrainingPlansIndependent = () => {
             return p;
         }));
 
-        resetSession();
+        resetSession({ skipCancel: true });
     };
 
-    const resetSession = () => {
+    const resetSession = async ({ skipCancel = false } = {}) => {
+        if (!skipCancel && workoutSessionId) {
+            try {
+                await cancelWorkout(workoutSessionId);
+            } catch (error) {
+                console.error('Failed to cancel workout via API:', error);
+            }
+        }
         setSessionActive(false);
         setActivePlan(null);
         setWorkoutSessionId(null);
