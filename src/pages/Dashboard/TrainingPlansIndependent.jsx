@@ -82,6 +82,8 @@ const TrainingPlansIndependent = () => {
         startWorkout,
         updateWorkoutState,
         cancelWorkout,
+        getActiveWorkout,
+        getWorkoutPlanById,
     } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
     const { currentUser } = useAuth();
@@ -148,6 +150,9 @@ const TrainingPlansIndependent = () => {
     const [sessionFeedback, setSessionFeedback] = useState({ rpe: null, comments: '' });
     const [workoutSessionId, setWorkoutSessionId] = useState(null);
     const [isFinishingSession, setIsFinishingSession] = useState(false);
+    const [pendingActiveWorkout, setPendingActiveWorkout] = useState(null);
+    const [isResumingWorkout, setIsResumingWorkout] = useState(false);
+    const [isCancellingActive, setIsCancellingActive] = useState(false);
 
     const syncInFlightRef = useRef(false);
     const hasFirstDoneRef = useRef(false);
@@ -265,6 +270,97 @@ const TrainingPlansIndependent = () => {
     // ─── EFFECTS ───────────────────────────────────────────────────
 
     // Initial Load handled in useState to prevent race conditions with Sync
+
+    // -- Check for active workout on mount --
+    useEffect(() => {
+        const checkActiveWorkout = async () => {
+            try {
+                const response = await getActiveWorkout();
+                if (response && response.hasActiveWorkout && response.session) {
+                    console.log('Active workout found (Independent):', response.session);
+                    setPendingActiveWorkout(response.session);
+                }
+            } catch (error) {
+                console.log('No active workout found (expected).');
+            }
+        };
+
+        if (!sessionActive) {
+            checkActiveWorkout();
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const handleResumeActiveWorkout = async () => {
+        if (!pendingActiveWorkout) return;
+        setIsResumingWorkout(true);
+        try {
+            const activeSessionId = pendingActiveWorkout.sessionId || pendingActiveWorkout.id;
+            const planId = pendingActiveWorkout.workoutPlanId || pendingActiveWorkout.planId;
+
+            setWorkoutSessionId(activeSessionId);
+
+            // Try to find the plan from local plans first
+            let plan = plans.find(p => (p._planId || p.id) === planId);
+
+            // If not found locally, try fetching from API
+            if (!plan && planId) {
+                try {
+                    const fetchedPlan = await getWorkoutPlanById(planId);
+                    if (fetchedPlan) plan = normalizePlan(fetchedPlan);
+                } catch (err) {
+                    console.error('Failed to fetch plan for resume:', err);
+                }
+            }
+
+            if (plan) {
+                const runtimeExercises = plan.exercises.map((ex, exIdx) => ({
+                    id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
+                    name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
+                    target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
+                    sets: ex.sets.map((s, sIdx) => ({
+                        id: `s_${exIdx}_${sIdx}`,
+                        type: s.type,
+                        target: `${s.reps} reps @ ${s.load}% | RPE ${s.rpe}`,
+                        completed: false,
+                        failure: false,
+                        prescribedRest: s.rest || 90,
+                        log: { weight: '', reps: '', rpe: '' }
+                    }))
+                }));
+
+                setSessionExercises(runtimeExercises);
+                hasFirstDoneRef.current = false;
+                committedSetsRef.current = new Set();
+                lastSyncedHashRef.current = '';
+                doneClickGuardRef.current = {};
+                setIsFinishingSession(false);
+                setActivePlan(plan);
+                setSessionActive(true);
+                setWorkoutTime(0);
+                setSessionTitle(`${plan.name} \u00b7 ${plan.phase}`);
+            }
+
+            setPendingActiveWorkout(null);
+        } catch (error) {
+            console.error('Failed to resume workout:', error);
+        } finally {
+            setIsResumingWorkout(false);
+        }
+    };
+
+    const handleCancelActiveWorkout = async () => {
+        if (!pendingActiveWorkout) return;
+        setIsCancellingActive(true);
+        try {
+            const activeSessionId = pendingActiveWorkout.sessionId || pendingActiveWorkout.id;
+            await cancelWorkout(activeSessionId);
+            setPendingActiveWorkout(null);
+        } catch (error) {
+            console.error('Failed to cancel active workout:', error);
+        } finally {
+            setIsCancellingActive(false);
+        }
+    };
 
     // -- Independent Training Plans Tour Trigger --
     useEffect(() => {
@@ -849,6 +945,36 @@ const TrainingPlansIndependent = () => {
 
     return (
         <div className="su-client-dashboard">
+            {/* Active Workout Recovery Modal (Blocking) */}
+            {pendingActiveWorkout && (
+                <div className="su-rest-modal-overlay" style={{ zIndex: 12000 }}>
+                    <div className="su-feedback-modal-content" style={{ textAlign: 'center' }}>
+                        <h3 style={{ marginBottom: '1rem' }}>{t('client.session.modal.active.title')}</h3>
+                        <p className="su-text-muted su-mb-6">
+                            {t('client.session.modal.active.desc')}
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem' }}>
+                            <Button
+                                fullWidth
+                                onClick={handleResumeActiveWorkout}
+                                disabled={isResumingWorkout || isCancellingActive}
+                            >
+                                {isResumingWorkout ? '...' : t('client.session.modal.active.resume')}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                fullWidth
+                                onClick={handleCancelActiveWorkout}
+                                disabled={isResumingWorkout || isCancellingActive}
+                                style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}
+                            >
+                                {isCancellingActive ? '...' : t('client.session.modal.active.cancel')}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="su-dashboard-header" data-tour="idep-tp-header">
                 <div>
                     <h1 className="su-page-title">{t('client.training.title')}</h1>
