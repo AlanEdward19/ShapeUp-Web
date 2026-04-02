@@ -20,7 +20,7 @@ const roleMapping = {
 
 const Login = () => {
     const { t } = useLanguage();
-    const { signIn, signInWithGoogle, persistSession } = useAuth();
+    const { signIn, signInWithGoogle, persistSession, signOut } = useAuth();
     const { getMyUserRoles } = useGymManagementApi();
     const { getMe } = useUserManagementApi();
     const navigate = useNavigate();
@@ -124,7 +124,15 @@ const Login = () => {
     };
 
     return (
-        <div className={`login-container ${availableRoles.length > 0 ? 'is-selecting-persona' : ''}`}>
+        <div className={`login-container ${availableRoles.length > 0 ? 'is-selecting-persona' : ''} ${loading ? 'is-loading' : ''}`}>
+            {loading && (
+                <div className="login-loading-overlay">
+                    <svg className="su-spinner overlay-spinner" viewBox="0 0 50 50">
+                        <circle className="path" cx="25" cy="25" r="20" fill="none" strokeWidth="4"></circle>
+                    </svg>
+                </div>
+            )}
+
             {availableRoles.length > 0 && (
                 <div className={`persona-selection-wrapper ${isTransitioning ? 'transition-active' : ''}`}>
                     <h2 className={`persona-title-main ${isTransitioning ? 'faded' : ''}`}>
@@ -179,11 +187,10 @@ const Login = () => {
                     
                     <button 
                         className={`persona-cancel-btn ${isTransitioning ? 'faded' : ''}`}
-                        onClick={() => {
+                        onClick={async () => {
                             setAvailableRoles([]);
                             setTempUser(null);
-                            // Ensure firebase sign out is called if the user changes mind at this stage
-                            // Not strictly required for UI state navigation, but optional.
+                            await signOut();
                         }}
                     >
                         Voltar ao Login

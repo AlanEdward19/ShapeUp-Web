@@ -11,6 +11,8 @@ import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useOutletContext } from 'react-router-dom';
 import ClientsGym from './ClientsGym';
+import { useGymManagementApi } from '../../hooks/api/useGymManagementApi';
+import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import './Clients.css';
 
 // Initial state is empty
@@ -31,8 +33,39 @@ const Clients = () => {
     const { isGym, isProfessional } = useOutletContext() || {};
     const [showGymClients, setShowGymClients] = useState(false);
 
+    const { getTrainerClients } = useGymManagementApi();
+    const { getMe } = useAuthorizationApi();
+
     useEffect(() => {
-        const fetchAndComputeClients = () => {
+        const fetchAndComputeClients = async () => {
+            try {
+                if (isProfessional || !isGym) {
+                    const me = await getMe();
+                    const userId = me.id || me.userId;
+                    if (userId) {
+                        const response = await getTrainerClients(userId);
+                        const data = response && response.items ? response.items : (Array.isArray(response) ? response : []);
+                        
+                        const updatedList = data.map(item => ({
+                            id: item.clientId || item.id,
+                            name: item.clientName,
+                            email: item.clientName,
+                            activePlan: item.planName || '-',
+                            compliance: item.adherencePercentage || 0,
+                            lastCheckin: item.enrolledAt ? new Date(item.enrolledAt).toLocaleDateString() : '-',
+                            status: item.status ? item.status.charAt(0).toUpperCase() + item.status.slice(1) : 'Active',
+                            relationshipId: item.id
+                        }));
+                        
+                        setClients(updatedList);
+                        setClientsLoaded(true);
+                        return; // Successfully fetched from API
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch trainer clients:", error);
+            }
+
             let storedClients = localStorage.getItem('shapeup_clients');
             let clientsList = storedClients ? JSON.parse(storedClients) : [];
 
@@ -85,7 +118,7 @@ const Clients = () => {
         window.addEventListener('shapeup_clients_updated', handleClientsUpdated);
 
         return () => window.removeEventListener('shapeup_clients_updated', handleClientsUpdated);
-    }, []);
+    }, [getTrainerClients, getMe, isProfessional, isGym]);
 
     // ─── Tour Trigger ─────────────────────────────────────────────────
     useEffect(() => {
