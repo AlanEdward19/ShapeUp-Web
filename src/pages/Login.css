@@ -446,4 +446,61 @@
         opacity: 0;
     }
 }
+
+/* Loading Overlay for the Login Form */
+.login-loading-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(5px);
+    z-index: 50; /* Above background and card, but behind persona selection */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    animation: fadeInContainer 0.3s ease forwards;
+}
+
+[data-theme='light'] .login-loading-overlay {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.overlay-spinner {
+    width: 60px;
+    height: 60px;
+    color: var(--primary);
+}
+
+/* Spinner Styles */
+.su-spinner {
+    animation: rotate 2s linear infinite;
+    display: inline-block;
+}
+
+.su-spinner .path {
+    stroke: currentColor;
+    stroke-linecap: round;
+    animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes dash {
+    0% {
+        stroke-dasharray: 1, 150;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: -35;
+    }
+    100% {
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: -124;
+    }
+}
 
