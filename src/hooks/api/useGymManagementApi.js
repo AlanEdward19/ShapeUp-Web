@@ -157,6 +157,19 @@ export const useGymManagementApi = () => {
         });
     }, []);
 
+    const removeTrainerClient = useCallback(async (trainerId, clientId) => {
+        return await apiClient(`/api/gym-management/trainers/${trainerId}/clients/${clientId}`, {
+            method: 'DELETE'
+        });
+    }, []);
+
+    const deactivateTrainerClientPlan = useCallback(async (trainerId, clientId, command) => {
+        return await apiClient(`/api/gym-management/trainers/${trainerId}/clients/${clientId}/plan/status`, {
+            method: 'PATCH',
+            body: JSON.stringify(command)
+        });
+    }, []);
+
     const generateTrainerClientInvite = useCallback(async (trainerId, clientEmail, command) => {
         return await apiClient(`/api/gym-management/trainers/${trainerId}/clients/invites/${clientEmail}`, {
             method: 'POST',
@@ -227,7 +240,7 @@ export const useGymManagementApi = () => {
         // Trainer Plans
         getTrainerPlans, createTrainerPlan, updateTrainerPlan, deleteTrainerPlan,
         // Trainer Clients
-        getTrainerClients, addTrainerClient, transferTrainerClient, generateTrainerClientInvite, acceptTrainerClientInvite,
+        getTrainerClients, addTrainerClient, transferTrainerClient, removeTrainerClient, deactivateTrainerClientPlan, generateTrainerClientInvite, acceptTrainerClientInvite,
         // Platform Tiers
         getPlatformTiers, createPlatformTier, updatePlatformTier, deletePlatformTier,
         // User Roles

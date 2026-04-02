@@ -26,7 +26,7 @@ export const useAuthorizationApi = () => {
 
     // --- SCOPES ---
     const getScopes = useCallback(async (cursor, pageSize) => {
-        const query = newSearchParams();
+        const query = new URLSearchParams();
         if (cursor) query.append('cursor', cursor);
         if (pageSize) query.append('pageSize', pageSize);
         return await apiClient(`/api/scopes?${query.toString()}`);

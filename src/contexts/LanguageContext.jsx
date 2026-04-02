@@ -183,10 +183,7 @@ export const LanguageProvider = ({ children }) => {
             'gym.turnstile.search': 'Search user...',
             'gym.turnstile.metric.today': 'Entries Today',
             'gym.turnstile.metric.blocked': 'Blocked',
-            'gym.turnstile.table.user': 'User',
-            'gym.turnstile.table.type': 'Type',
-            'gym.turnstile.table.time': 'Time',
-            'gym.turnstile.table.status': 'Status',
+
             'gym.turnstile.status.allowed': 'Allowed',
             'gym.turnstile.status.blocked': 'Blocked',
 
@@ -1013,9 +1010,7 @@ export const LanguageProvider = ({ children }) => {
             'gym.turnstile.search': 'Buscar usuário...',
             'gym.turnstile.metric.today': 'Acessos Hoje',
             'gym.turnstile.metric.blocked': 'Bloqueados',
-            'gym.turnstile.table.user': 'Usuário',
-            'gym.turnstile.table.type': 'Tipo',
-            'gym.turnstile.table.time': 'Horário',
+
             'pro.dashboard.title': 'Visão Geral do Painel',
             'pro.dashboard.subtitle': 'Veja o que está acontecendo com seus clientes hoje.',
             'pro.dashboard.invite': 'Convidar Cliente',
