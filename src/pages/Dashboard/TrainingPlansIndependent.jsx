@@ -84,6 +84,7 @@ const TrainingPlansIndependent = () => {
         cancelWorkout,
         getActiveWorkout,
         getWorkoutPlanById,
+        finishWorkout,
     } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
     const { currentUser } = useAuth();
@@ -627,7 +628,20 @@ const TrainingPlansIndependent = () => {
         setIsFinishingSession(false);
     };
 
-    const submitFeedback = () => {
+    const submitFeedback = async () => {
+        if (workoutSessionId) {
+            try {
+                const payload = buildWorkoutStatePayload(sessionExercises, workoutTime);
+                await finishWorkout(workoutSessionId, {
+                    sessionId: String(workoutSessionId),
+                    endedAtUtc: new Date().toISOString(),
+                    perceivedExertion: parseFloat(sessionFeedback.rpe) || 5,
+                    exercises: payload.exercises || []
+                });
+            } catch (error) {
+                console.error('Failed to finish workout via API:', error);
+            }
+        }
         setShowFeedbackModal(false);
         setShowOverviewModal(true);
     };

@@ -30,7 +30,7 @@ const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { startWorkout, updateWorkoutState, getWorkoutPlansByUser, cancelWorkout, getActiveWorkout, getWorkoutPlanById } = useTrainingApi();
+    const { startWorkout, updateWorkoutState, getWorkoutPlansByUser, cancelWorkout, getActiveWorkout, getWorkoutPlanById, finishWorkout } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
     const { currentUser } = useAuth();
 
@@ -542,7 +542,20 @@ const ClientView = () => {
         setIsFinishingSession(false);
     };
 
-    const submitFeedback = () => {
+    const submitFeedback = async () => {
+        if (workoutSessionId) {
+            try {
+                const payload = buildWorkoutStatePayload(exercises, workoutTime);
+                await finishWorkout(workoutSessionId, {
+                    sessionId: String(workoutSessionId),
+                    endedAtUtc: new Date().toISOString(),
+                    perceivedExertion: parseFloat(sessionFeedback.rpe) || 5,
+                    exercises: payload.exercises || []
+                });
+            } catch (error) {
+                console.error('Failed to finish workout via API:', error);
+            }
+        }
         setShowFeedbackModal(false);
         setShowOverviewModal(true);
     };
