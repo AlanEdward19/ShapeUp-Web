@@ -620,6 +620,10 @@ export const LanguageProvider = ({ children }) => {
             'client.objectives.chart.empty': 'Log at least 2 weight entries to see your trend chart.',
             'client.objectives.chart.series.weight': 'Weight (kg)',
             'client.objectives.chart.series.goal': 'Goal Weight',
+            'client.objectives.period.current': 'Last 30 Days',
+            'client.objectives.period.last_week': 'Last Week',
+            'client.objectives.period.last_month': 'Last Calendar Month',
+            'client.objectives.period.custom': 'Custom Range',
 
             'client.settings.notifications.title': 'Notification Preferences',
             'client.settings.notifications.chat.title': 'Chat Messages',
@@ -1448,6 +1452,10 @@ export const LanguageProvider = ({ children }) => {
             'client.objectives.chart.empty': 'Registre pelo menos 2 pesos para ver seu gráfico de tendência.',
             'client.objectives.chart.series.weight': 'Peso (kg)',
             'client.objectives.chart.series.goal': 'Peso Meta',
+            'client.objectives.period.current': 'Últimos 30 Dias (Atual)',
+            'client.objectives.period.last_week': 'Semana Passada',
+            'client.objectives.period.last_month': 'Mês Anterior',
+            'client.objectives.period.custom': 'Período Personalizado',
 
             'client.settings.notifications.title': 'Preferências de Notificações',
             'client.settings.notifications.chat.title': 'Mensagens de Chat',

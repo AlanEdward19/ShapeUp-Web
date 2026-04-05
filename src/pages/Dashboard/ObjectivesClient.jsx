@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -6,11 +6,13 @@ import { Target, Scale, Trash2, TrendingUp, Check } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
+import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import './DashboardClient.css';
 
 const ObjectivesClient = () => {
     const { t, unitSystem, convertWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
+    const { upsertTargetWeight, upsertDailyWeightRegister, getWeightRegisters } = useTrainingApi();
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
 
     // --- Objectives State ---
@@ -28,6 +30,86 @@ const ObjectivesClient = () => {
     const [tempGoalWeight, setTempGoalWeight] = useState(objectives.goalWeight ? convertWeight(objectives.goalWeight, objectives.goalUnit || 'metric') : '');
     const [newWeightEntry, setNewWeightEntry] = useState('');
     const [showSaveSuccess, setShowSaveSuccess] = useState(false);
+    
+    // Period States
+    const [period, setPeriod] = useState('current');
+    const [customDates, setCustomDates] = useState({ start: '', end: '' });
+
+    // Date Logic
+    const getPeriodDates = useCallback(() => {
+        const now = new Date();
+        let startDate, endDate;
+
+        switch (period) {
+            case 'current':
+                startDate = new Date(now);
+                startDate.setDate(startDate.getDate() - 30);
+                endDate = now;
+                break;
+            case 'last_week':
+                startDate = new Date(now);
+                startDate.setDate(startDate.getDate() - 7);
+                endDate = now;
+                break;
+            case 'last_month':
+                startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                endDate = new Date(now.getFullYear(), now.getMonth(), 0);
+                endDate.setHours(23, 59, 59, 999);
+                break;
+            case 'custom':
+                if (customDates.start && customDates.end) {
+                    startDate = new Date(customDates.start);
+                    endDate = new Date(customDates.end);
+                    endDate.setHours(23, 59, 59, 999);
+                }
+                break;
+            default:
+                startDate = new Date(now);
+                startDate.setDate(startDate.getDate() - 30);
+                endDate = now;
+        }
+
+        return {
+            startDateUtc: startDate ? startDate.toISOString() : null,
+            endDateUtc: endDate ? endDate.toISOString() : null
+        };
+    }, [period, customDates]);
+
+    const loadWeightData = useCallback(async () => {
+        if (period === 'custom' && (!customDates.start || !customDates.end)) return;
+        
+        const { startDateUtc, endDateUtc } = getPeriodDates();
+        if (!startDateUtc || !endDateUtc) return;
+        
+        try {
+            const data = await getWeightRegisters(startDateUtc, endDateUtc);
+            if (!data) return;
+
+            const mappedHistory = data.map(entry => {
+                const dateObj = new Date(entry.dateUtc);
+                return {
+                    id: entry.id || dateObj.getTime(),
+                    date: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    originalDateObj: dateObj,
+                    weight: entry.weight,
+                    unit: 'metric'
+                };
+            });
+            
+            mappedHistory.sort((a, b) => b.originalDateObj - a.originalDateObj);
+
+            setObjectives(prev => ({
+                ...prev,
+                history: mappedHistory
+            }));
+        } catch (err) {
+            console.error("Failed to fetch weight logs", err);
+        }
+    }, [period, customDates, getPeriodDates, getWeightRegisters]);
+
+    useEffect(() => {
+        loadWeightData();
+    }, [loadWeightData]);
 
     // Persistence Effect
     useEffect(() => {
@@ -66,34 +148,42 @@ const ObjectivesClient = () => {
     }, [setIsOpen, setSteps, setCurrentStep, t]);
 
     // Handlers
-    const handleSaveGoal = () => {
-        setObjectives(prev => ({
-            ...prev,
-            goalWeight: tempGoalWeight,
-            goalUnit: unitSystem
-        }));
-        setShowSaveSuccess(true);
-        setTimeout(() => setShowSaveSuccess(false), 3000);
+    const handleSaveGoal = async () => {
+        try {
+            await upsertTargetWeight({
+                targetWeight: parseFloat(tempGoalWeight),
+                unit: unitSystem
+            });
+            setObjectives(prev => ({
+                ...prev,
+                goalWeight: tempGoalWeight,
+                goalUnit: unitSystem
+            }));
+            setShowSaveSuccess(true);
+            setTimeout(() => setShowSaveSuccess(false), 3000);
+        } catch (error) {
+            console.error("Failed to save target weight:", error);
+            // Optionally handle error notification here
+        }
     };
 
-    const handleLogWeight = () => {
+    const handleLogWeight = async () => {
         if (!newWeightEntry) return;
         // Don't log if the input is obviously invalid
         const parsedWeight = parseFloat(newWeightEntry);
         if (isNaN(parsedWeight) || parsedWeight <= 0) return;
 
-        const newEntry = {
-            id: Date.now(),
-            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            weight: parsedWeight,
-            unit: unitSystem
-        };
-        // Insert at beginning for chronological descending in list, but chart needs ascending
-        setObjectives(prev => ({
-            ...prev,
-            history: [newEntry, ...prev.history]
-        }));
-        setNewWeightEntry('');
+        try {
+            await upsertDailyWeightRegister({
+                weight: parsedWeight,
+                dateUtc: new Date().toISOString()
+            });
+
+            await loadWeightData();
+            setNewWeightEntry('');
+        } catch (error) {
+            console.error("Failed to log weight:", error);
+        }
     };
 
     const handleDeleteWeight = (id) => {
@@ -104,7 +194,7 @@ const ObjectivesClient = () => {
     }
 
     // Chart Data (Ascending dates)
-    const chartData = [...objectives.history].sort((a, b) => a.id - b.id).map((h, i) => ({
+    const chartData = [...objectives.history].sort((a, b) => (a.originalDateObj || a.id) - (b.originalDateObj || b.id)).map((h, i) => ({
         session: `Entry ${i + 1}`,
         weight: parseFloat(convertWeight(h.weight, h.unit || 'metric').toFixed(1)), // Fix precision
         date: h.date
@@ -194,10 +284,31 @@ const ObjectivesClient = () => {
                 {/* Right Column: Chart */}
                 <div className="su-overview-sidebar" data-tour="obj-chart">
                     <Card className="su-metric-card-large" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
-                        <div className="su-card-header-icon">
-                            <TrendingUp size={20} className="su-text-muted" />
-                            <h3 className="su-section-title">{t('client.objectives.chart.title')}</h3>
+                        <div className="su-card-header-icon" style={{ justifyContent: 'space-between', display: 'flex', width: '100%', marginBottom: period === 'custom' ? '0.5rem' : '0' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <TrendingUp size={20} className="su-text-muted" />
+                                <h3 className="su-section-title" style={{ margin: 0 }}>{t('client.objectives.chart.title')}</h3>
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <select 
+                                    className="su-input" 
+                                    style={{ padding: '0.25rem 0.5rem', width: 'auto', minWidth: '130px', margin: 0, fontSize: '0.875rem' }}
+                                    value={period}
+                                    onChange={(e) => setPeriod(e.target.value)}
+                                >
+                                    <option value="current">{t('client.objectives.period.current')}</option>
+                                    <option value="last_week">{t('client.objectives.period.last_week')}</option>
+                                    <option value="last_month">{t('client.objectives.period.last_month')}</option>
+                                    <option value="custom">{t('client.objectives.period.custom')}</option>
+                                </select>
+                            </div>
                         </div>
+                        {period === 'custom' && (
+                            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', justifyContent: 'flex-end' }}>
+                                <input type="date" className="su-input" style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }} value={customDates.start} onChange={e => setCustomDates(prev => ({...prev, start: e.target.value}))} />
+                                <input type="date" className="su-input" style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }} value={customDates.end} onChange={e => setCustomDates(prev => ({...prev, end: e.target.value}))} />
+                            </div>
+                        )}
                         <div style={{ flex: 1, minHeight: 0, marginTop: '1rem' }}>
                             {chartData.length >= 2 ? (
                                 <ResponsiveContainer width="100%" height="100%">
