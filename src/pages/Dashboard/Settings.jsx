@@ -134,7 +134,7 @@ const Settings = () => {
             }, 500);
             localStorage.setItem(storageKey, 'true');
         }
-    }, [activeTab, setIsOpen, setSteps, setCurrentStep, t]);
+    }, [activeTab, setIsOpen, setSteps, setCurrentStep, t, isProfessional]);
 
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
     const userEmail = localStorage.getItem('shapeup_user_email') || '';
@@ -265,7 +265,7 @@ const Settings = () => {
     });
     const [isCardFlipped, setIsCardFlipped] = useState(false);
 
-    const [clientAssignedPlan, setClientAssignedPlan] = useState(() => {
+    const [clientAssignedPlan] = useState(() => {
         const stored = localStorage.getItem('shapeup_clients');
         if (stored) {
             const list = JSON.parse(stored);

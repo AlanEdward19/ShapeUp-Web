@@ -35,7 +35,7 @@ export const calculateMuscleSetsTotal = (sessions, exercisesDB) => {
 };
 
 // Returns chronological array of data points for stacked bar or similar charts
-export const calculateMuscleSetsOverTime = (sessions, exercisesDB, groupBy = 'week') => {
+export const calculateMuscleSetsOverTime = (sessions, exercisesDB, _groupBy = 'week') => {
     // 1. group sessions by date string key (Week or Month)
     const getWeekKey = (date) => {
         const d = new Date(date);

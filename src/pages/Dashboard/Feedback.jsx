@@ -188,6 +188,7 @@ setTimeout(() => {
     const handleReply = () => {
         if (!replyText.trim() && !attachedFile) return;
         const newMsg = {
+            // eslint-disable-next-line react-hooks/purity -- runs inside handleReply (click handler), not during render
             id: Date.now(),
             clientId: activeThread.clientId,
             clientName: activeThread.clientName,

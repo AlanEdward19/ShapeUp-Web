@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, CalendarDays, Plus, FastForward, Award, TrendingUp, X, Trash2, Dumbbell as DumbbellIcon, Save, Settings2, Copy, History, ChevronUp, ChevronDown, Activity } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
@@ -19,7 +19,6 @@ import {
 } from './ClientDetail';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
-import { useAuth } from '../../contexts/AuthContext';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
 import { normalizePlan } from '../../utils/trainingNormalization';
 import './TrainingPlansClient.css';
@@ -71,7 +70,7 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart }) => {
 
 const TrainingPlansIndependent = () => {
     const { setSessionTitle } = useOutletContext();
-    const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
+    const { t, unitSystem, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const {
         getWorkoutPlansByUser,
@@ -87,13 +86,12 @@ const TrainingPlansIndependent = () => {
         finishWorkout,
     } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
-    const { currentUser } = useAuth();
 
     // ─── STATE MANAGEMENT ──────────────────────────────────────────
 
     // 1. Storage & Navigation
     const [plans, setPlans] = useState([]);
-    const [loadingPlans, setLoadingPlans] = useState(true);
+    const [, setLoadingPlans] = useState(true);
     const [editingPlan, setEditingPlan] = useState(null);
     
     // Fetch plans from API on mount
@@ -172,7 +170,7 @@ const TrainingPlansIndependent = () => {
     const [planToDelete, setPlanToDelete] = useState(null);
 
     // 4. Pagination
-    const [historyPage, setHistoryPage] = useState(1);
+    const [historyPage] = useState(1);
     const HISTORY_PER_PAGE = 5;
 
     useEffect(() => {
@@ -183,7 +181,7 @@ const TrainingPlansIndependent = () => {
         workoutTimeRef.current = workoutTime;
     }, [workoutTime]);
 
-    const buildWorkoutStatePayload = useCallback((sourceExercises, elapsedSeconds) => {
+    const buildWorkoutStatePayload = useCallback((sourceExercises, _elapsedSeconds) => {
         // Only sync exercises that have at least one set with progress
         const exercisesWithProgress = sourceExercises.map(ex => {
             const setsWithProgress = ex.sets.filter(s => !!s.completed).map(s => ({
@@ -281,7 +279,7 @@ const TrainingPlansIndependent = () => {
                     console.log('Active workout found (Independent):', response.session);
                     setPendingActiveWorkout(response.session);
                 }
-            } catch (error) {
+            } catch (_error) {
                 console.log('No active workout found (expected).');
             }
         };
@@ -734,7 +732,6 @@ const TrainingPlansIndependent = () => {
     ).sort((a, b) => b.id.localeCompare(a.id));
 
     const paginatedHistory = allHistory.slice((historyPage - 1) * HISTORY_PER_PAGE, historyPage * HISTORY_PER_PAGE);
-    const totalPages = Math.ceil(allHistory.length / HISTORY_PER_PAGE);
 
     // ─── RENDER ────────────────────────────────────────────────────
 

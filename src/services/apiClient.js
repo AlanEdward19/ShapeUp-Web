@@ -39,8 +39,8 @@ export const apiClient = async (endpoint, options = {}) => {
     
     try {
         return await response.json();
-    } catch (e) {
+    } catch (_e) {
         // Fallback p/ rotas que não voltam JSON, mas dão sucesso
-        return null; 
+        return null;
     }
 };

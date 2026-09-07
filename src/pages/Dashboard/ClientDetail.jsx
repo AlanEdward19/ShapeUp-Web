@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
 import {
@@ -22,8 +22,8 @@ import '../../components/InviteClientModal.css';
 import '../Dashboard/TrainingPlansProfessional.css';
 import './ClientDetail.css';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
+import { exercisesDB } from '../../data/mockExercises';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
-import { useAuth } from '../../contexts/AuthContext';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
 import { normalizePlan } from '../../utils/trainingNormalization';
 
@@ -76,6 +76,7 @@ const initPlans = [];
 
 // ─── Helpers ────────────────────────────────────────────────
 
+// eslint-disable-next-line react-refresh/only-export-components -- shared constant co-located with the components that use it
 export const SET_TYPE_COLORS = { warmup: '#94a3b8', feeder: '#a78bfa', working: '#60a5fa', topset: '#f59e0b', backoff: '#34d399' };
 export const SetTypeBadge = ({ type }) => {
     const { t } = useLanguage();
@@ -99,8 +100,11 @@ export const ProSelect = ({ label, value, onChange, options }) => (
 
 // ─── Plan Editor (mirrors TrainingPlansProfessional, no analytics) ──
 
+// eslint-disable-next-line react-refresh/only-export-components -- shared constant co-located with the components that use it
 export const TECHNIQUES = ['Straight', 'Drop Set', 'Rest Pause', 'Cluster', 'Muscle Round'];
+// eslint-disable-next-line react-refresh/only-export-components -- shared constant co-located with the components that use it
 export const DIFFICULTIES = ['Easy', 'Intermediate', 'Hard', 'Advanced'];
+// eslint-disable-next-line react-refresh/only-export-components -- shared constant co-located with the components that use it
 export const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
 export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false }) => {
@@ -693,7 +697,7 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
 
 // ─── MAIN COMPONENT ─────────────────────────────────────────
 const ClientDetail = () => {
-    const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
+    const { t, unitSystem, convertWeight } = useLanguage();
     const { id } = useParams();
     const {
         getWorkoutPlansByUser,
@@ -709,7 +713,7 @@ const ClientDetail = () => {
 
     const [activeTab, setActiveTab] = useState(location.state?.tab || 'analytics');
     const [plans, setPlans] = useState([]);
-    const [loadingPlans, setLoadingPlans] = useState(true);
+    const [, setLoadingPlans] = useState(true);
 
     // Fetch plans from API on mount
     useEffect(() => {
@@ -748,7 +752,7 @@ const ClientDetail = () => {
     const [muscleCustomRange, setMuscleCustomRange] = useState({ start: '', end: '' });
 
     // --- Objectives State ---
-    const [objectives, setObjectives] = useState(() => {
+    const [objectives] = useState(() => {
         const stored = localStorage.getItem(`shapeup_client_objectives_${id}`);
         if (stored) return JSON.parse(stored);
         return { goalWeight: '', history: [] };
@@ -922,7 +926,7 @@ const ClientDetail = () => {
                     toSession: imp.toSession
                 };
             });
-    }, [allHistory]);
+    }, [allHistory, convertWeight, unitSystem]);
 
     const adherenceStats = { completed: 0, skipped: 0, partial: 0 };
     if (hasRealData) {
@@ -968,8 +972,6 @@ const ClientDetail = () => {
     React.useEffect(() => {
         localStorage.setItem('shapeup_client_plans_' + id, JSON.stringify(plans));
     }, [plans, id]);
-
-    const { currentUser } = useAuth();
 
     const handleSavePlan = async (updated) => {
         console.log("handleSavePlan disparado! Dados recebidos:", updated);

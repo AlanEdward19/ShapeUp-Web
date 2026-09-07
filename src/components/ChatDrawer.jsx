@@ -134,6 +134,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
         }
 
         const newMsg = {
+            // eslint-disable-next-line react-hooks/purity -- runs inside handleSend (click handler), not during render
             id: Date.now(),
             clientId: clientId,
             clientName: clientName,

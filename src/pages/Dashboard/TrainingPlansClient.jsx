@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, CalendarDays, Plus, FastForward, Award, TrendingUp, X, Trash2 } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
@@ -11,7 +11,6 @@ import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
-import { useAuth } from '../../contexts/AuthContext';
 import { normalizePlan } from '../../utils/trainingNormalization';
 import { mapSetType, mapTechnique } from '../../utils/trainingEnums';
 import './TrainingPlansClient.css';
@@ -32,7 +31,6 @@ const ClientView = () => {
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const { startWorkout, updateWorkoutState, getWorkoutPlansByUser, cancelWorkout, getActiveWorkout, getWorkoutPlanById, finishWorkout } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
-    const { currentUser } = useAuth();
 
     // Session State
     const [sessionActive, setSessionActive] = useState(false);
@@ -87,7 +85,7 @@ const ClientView = () => {
         workoutTimeRef.current = workoutTime;
     }, [workoutTime]);
 
-    const buildWorkoutStatePayload = useCallback((sourceExercises, elapsedSeconds) => {
+    const buildWorkoutStatePayload = useCallback((sourceExercises, _elapsedSeconds) => {
         // Only sync exercises that have at least one set with progress
         const exercisesWithProgress = sourceExercises.map(ex => {
             const setsWithProgress = ex.sets.filter(s => !!s.completed).map(s => ({
@@ -207,7 +205,7 @@ const ClientView = () => {
                     console.log('Active workout found:', response.session);
                     setPendingActiveWorkout(response.session);
                 }
-            } catch (error) {
+            } catch (_error) {
                 // 404 or no active workout is expected, just ignore
                 console.log('No active workout found (expected).');
             }
@@ -350,7 +348,6 @@ const ClientView = () => {
                 localStorage.setItem('shapeup_session_engine_tour_seen', 'true');
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sessionActive, setIsOpen, setSteps, setCurrentStep, t]);
 
     // Debounced synchronization: Only sync state when changes occur and have settled (2s)
@@ -405,7 +402,7 @@ const ClientView = () => {
         setExercises(runtimeExercises);
         hasFirstDoneRef.current = false;
         committedSetsRef.current = new Set();
-        lastSyncedHashRef.current = buildWorkoutStateComparisonHash(runtimeExercises);
+        lastSyncedHashRef.current = JSON.stringify(buildWorkoutStatePayload(runtimeExercises, 0).exercises);
         doneClickGuardRef.current = {};
         setIsFinishingSession(false);
         setActivePlan(plan);
@@ -1274,7 +1271,7 @@ const SetTypeBadge = ({ type }) => {
 };
 
 const SessionDetailModal = ({ session, planName, onClose }) => {
-    const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
+    const { t, unitSystem, convertWeight } = useLanguage();
 
     // We infer the original scale from the session's totalVol
     const originUnit = (session.totalVol || '').includes('lbs') ? 'imperial' : 'metric';

@@ -34,7 +34,6 @@ const InviteClientModal = ({ onClose, onInvite }) => {
 
             sessionStorage.setItem('shapeup_invite_client_tour_seen', 'true');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [t, setIsOpen, setSteps]);
 
     const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);

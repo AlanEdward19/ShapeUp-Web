@@ -17,6 +17,7 @@ import { logoutUser, syncCurrentUserScopes } from '../services/authService';
 
 const AuthContext = createContext(null);
 
+// eslint-disable-next-line react-refresh/only-export-components -- context hook co-located with its Provider, standard pattern
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
@@ -57,9 +58,7 @@ export const AuthProvider = ({ children }) => {
      */
     const signInWithGoogle = async () => {
         const credential = await signInWithPopup(auth, googleProvider);
-        const email = credential.user.email || '';
 
-        
         // Sync scopes on the backend and force-refresh the Firebase token
         try {
             await syncCurrentUserScopes();

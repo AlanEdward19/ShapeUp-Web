@@ -91,7 +91,7 @@ const DashboardProfessional = () => {
             setSteps(tourSteps);
             setCurrentStep(0);
             
-            const tId = setTimeout(() => {
+            setTimeout(() => {
                 setIsOpen(true);
             }, 600);
             
@@ -196,42 +196,6 @@ const DashboardProfessional = () => {
         if (days === 1) return 'Yesterday';
         if (days < 7) return `${days} days ago`;
         return d.toLocaleDateString();
-    };
-
-    const handleInvite = (emailAddress) => {
-        const normalizedEmail = emailAddress.trim().toLowerCase();
-        const newClient = {
-            id: Date.now(),
-            name: normalizedEmail, // Will be updated on registration
-            email: normalizedEmail, // Used to match during registration
-            activePlan: '-',
-            compliance: 0,
-            lastCheckin: '-',
-            status: 'Invited'
-        };
-        const updated = [...clients, newClient];
-        setClients(updated);
-        
-        const currentStorage = JSON.parse(localStorage.getItem('shapeup_clients') || '[]');
-        const updatedStorage = [...currentStorage, newClient];
-        localStorage.setItem('shapeup_clients', JSON.stringify(updatedStorage));
-        window.dispatchEvent(new Event('shapeup_clients_updated'));
-
-        // Trigger post-invite tour or logic
-        setJustInvitedClient(true);
-
-        setTimeout(() => {
-            addNotification('pro', 'system', 'New Client Registered', `${normalizedEmail} has accepted your invite and joined your roster.`, 'primary', {
-                clientId: newClient.id,
-                link: `/dashboard/clients/${newClient.id}`
-            });
-
-            const refreshed = JSON.parse(localStorage.getItem('shapeup_clients') || '[]');
-            const finalized = refreshed.map(c => c.id === newClient.id ? { ...c, status: 'Active' } : c);
-            localStorage.setItem('shapeup_clients', JSON.stringify(finalized));
-
-            setClients(prev => prev.map(c => c.id === newClient.id ? { ...c, status: 'Active' } : c));
-        }, 3000);
     };
 
     // ─── Unified Feed Logic ───────────────────────────────────────────

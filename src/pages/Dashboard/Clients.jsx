@@ -15,9 +15,6 @@ import { useGymManagementApi } from '../../hooks/api/useGymManagementApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import './Clients.css';
 
-// Initial state is empty
-const initialClientsList = [];
-
 const Clients = () => {
     const navigate = useNavigate();
     const { t } = useLanguage();
@@ -235,7 +232,7 @@ const Clients = () => {
 
         // Simulate client registration
         setTimeout(() => {
-            addNotification('pro', 'system', 'New Client Registered', `${email} has accepted your invite and joined your roster.`, 'primary', {
+            addNotification('pro', 'system', 'New Client Registered', `${normalizedEmail} has accepted your invite and joined your roster.`, 'primary', {
                 clientId: newClient.id,
                 link: `/dashboard/clients/${newClient.id}`
             });

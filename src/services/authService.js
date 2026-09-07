@@ -1,6 +1,6 @@
 import { apiClient } from './apiClient';
 
-export const logoutUser = async (token) => {
+export const logoutUser = async (_token) => {
     console.log("3. Serviço logoutUser iniciado.");
     try {
         const url = `/api/users/logout`;

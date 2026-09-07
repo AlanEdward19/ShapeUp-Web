@@ -108,6 +108,9 @@ const ObjectivesClient = () => {
     }, [period, customDates, getPeriodDates, getWeightRegisters]);
 
     useEffect(() => {
+        // loadWeightData is async; its setObjectives call happens after the awaited
+        // fetch resolves, not synchronously within this effect.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadWeightData();
     }, [loadWeightData]);
 
@@ -144,7 +147,6 @@ const ObjectivesClient = () => {
             
             localStorage.setItem('shapeup_objectives_client_tour_seen', 'true');
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setIsOpen, setSteps, setCurrentStep, t]);
 
     // Handlers

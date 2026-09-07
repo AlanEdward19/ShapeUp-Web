@@ -16,7 +16,7 @@ const TurnstileGym = () => {
         { id: 't2', name: 'Catraca Musculação', status: 'inactive', hasError: false }
     ]);
 
-    const mockAccesses = Array.from({ length: 45 }).map((_, i) => {
+    const [mockAccesses] = useState(() => Array.from({ length: 45 }).map((_, i) => {
         const h = String(Math.floor(Math.random() * 12) + 6).padStart(2, '0');
         const m = String(Math.floor(Math.random() * 60)).padStart(2, '0');
         const isTrainer = i % 5 === 0;
@@ -29,7 +29,7 @@ const TurnstileGym = () => {
             type: isTrainer ? 'Trainer' : 'Client',
             reason: isBlocked ? 'Pagamento Atrasado' : undefined
         };
-    });
+    }));
 
     const filteredAccess = mockAccesses.filter(access => 
         access.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -52,7 +52,7 @@ const TurnstileGym = () => {
         addNotification('gym', 'system', t('gym.turnstile.notification.new') || 'Nova catraca registrada no sistema. Por favor, configure os IPs de rede.', '/dashboard/turnstile');
     };
 
-    const handleUnlock = (id) => {
+    const handleUnlock = (_id) => {
         // Mock unlock pulse
         alert(`BIP! Catraca liberada remotamente.`);
     };

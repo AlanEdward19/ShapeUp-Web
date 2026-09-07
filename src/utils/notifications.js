@@ -81,10 +81,15 @@ import { useState, useEffect } from 'react';
 export const useNotifications = (targetUserId) => {
     const [notifications, setNotifications] = useState(() => getNotifications(targetUserId));
 
-    useEffect(() => {
-        // Immediate fetch when targetUserId changes
+    // Re-sync when targetUserId changes, following React's documented pattern for
+    // adjusting state during render instead of in an effect (avoids an extra render pass).
+    const [prevTargetUserId, setPrevTargetUserId] = useState(targetUserId);
+    if (targetUserId !== prevTargetUserId) {
+        setPrevTargetUserId(targetUserId);
         setNotifications(getNotifications(targetUserId));
+    }
 
+    useEffect(() => {
         const handleUpdate = () => {
             setNotifications(getNotifications(targetUserId));
         };

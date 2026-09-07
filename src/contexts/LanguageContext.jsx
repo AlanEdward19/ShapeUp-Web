@@ -1,22 +1,20 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
 const LanguageContext = createContext();
 
-export const LanguageProvider = ({ children }) => {
-    const [language, setLanguageState] = useState('en');
+// Auto detect language on first load if not set
+const getInitialLanguage = () => {
+    const storedLang = localStorage.getItem('shapeup_language');
+    if (storedLang) return storedLang;
 
-    useEffect(() => {
-        // Auto detect language on first load if not set
-        const storedLang = localStorage.getItem('shapeup_language');
-        if (storedLang) {
-            setLanguageState(storedLang);
-        } else {
-            const browserLang = navigator.language || navigator.userLanguage;
-            const defaultLang = browserLang.toLowerCase().includes('pt') ? 'pt-BR' : 'en';
-            setLanguageState(defaultLang);
-            localStorage.setItem('shapeup_language', defaultLang);
-        }
-    }, []);
+    const browserLang = navigator.language || navigator.userLanguage;
+    const defaultLang = browserLang.toLowerCase().includes('pt') ? 'pt-BR' : 'en';
+    localStorage.setItem('shapeup_language', defaultLang);
+    return defaultLang;
+};
+
+export const LanguageProvider = ({ children }) => {
+    const [language, setLanguageState] = useState(getInitialLanguage);
 
     const setLanguage = (lang) => {
         setLanguageState(lang);
@@ -1875,4 +1873,5 @@ export const LanguageProvider = ({ children }) => {
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components -- context hook co-located with its Provider, standard pattern
 export const useLanguage = () => useContext(LanguageContext);

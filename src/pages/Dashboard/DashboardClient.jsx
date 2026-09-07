@@ -18,9 +18,6 @@ const toLocalDateKey = (dateStr) => {
     return `${year}-${month}-${day}`;
 };
 
-// ─── Helper: YYYY-MM-DD for today in local time ───────────────────────
-const getTodayKey = () => toLocalDateKey(new Date());
-
 // ─── Helper: ISO week key ─────────────────────────────────────────────
 const getWeekKey = (date) => {
     const d = new Date(date);
@@ -39,13 +36,11 @@ const DashboardClient = () => {
     const firstName = storedName.split(' ')[0];
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
 
-    // ─── Re-read localStorage on every mount ─────────────────────────
-    const [allHistory, setAllHistory] = useState([]);
-    const [plansData, setPlansData] = useState({ plansWithSessions: 0, totalPlans: 0 });
-    const [objectives, setObjectives] = useState({ goalWeight: '', history: [] });
-
-    useEffect(() => {
+    // ─── Read localStorage once, on mount (clientId is fixed for this component's lifetime) ───
+    const [initialClientState] = useState(() => {
         const storedPlans = localStorage.getItem(`shapeup_client_plans_${clientId}`);
+        let allHistory = [];
+        let plansData = { plansWithSessions: 0, totalPlans: 0 };
         if (storedPlans) {
             const plans = JSON.parse(storedPlans);
             const getTimestamp = (id) => {
@@ -53,22 +48,23 @@ const DashboardClient = () => {
                 if (typeof id === 'string') return parseInt(id.replace(/[^0-9]/g, '')) || 0;
                 return 0;
             };
-            const history = plans
+            allHistory = plans
                 .flatMap(p => (p.history || []).map(h => ({ ...h, planName: p.name })))
                 .sort((a, b) => getTimestamp(a.id) - getTimestamp(b.id));
-
-            setAllHistory(history);
-            setPlansData({
+            plansData = {
                 plansWithSessions: plans.filter(p => (p.history || []).length > 0).length,
                 totalPlans: plans.length
-            });
+            };
         }
 
         const storedObjs = localStorage.getItem(`shapeup_client_objectives_${clientId}`);
-        if (storedObjs) {
-            setObjectives(JSON.parse(storedObjs));
-        }
-    }, [clientId]);
+        const objectives = storedObjs ? JSON.parse(storedObjs) : { goalWeight: '', history: [] };
+
+        return { allHistory, plansData, objectives };
+    });
+
+    const [allHistory] = useState(initialClientState.allHistory);
+    const [plansData] = useState(initialClientState.plansData);
 
     // ─── Tour Trigger ─────────────────────────────────────────────────
     useEffect(() => {
@@ -98,14 +94,13 @@ const DashboardClient = () => {
 
             localStorage.setItem('shapeup_client_dashboard_tour_seen', 'true');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setIsOpen, setSteps, setCurrentStep, t]);
 
     const currentWeekKey = getWeekKey(new Date());
 
     // ─── Weekly Volume ────────────────────────────────────────────────
     const { weeklyVolumeFormatted, weeklyDiff } = useMemo(() => {
-        const lastWeekKey = getWeekKey(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+        const lastWeekKey = getWeekKey(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000));
         const sumVol = sessions => sessions.reduce((acc, h) => {
             const rawStr = h.totalVol || '0';
             const v = parseFloat(rawStr.toString().replace(/[^0-9.]/g, ''));
@@ -118,7 +113,7 @@ const DashboardClient = () => {
         const pct = lastVol === 0 ? null : Math.round(((thisVol - lastVol) / lastVol) * 100);
         const formatted = thisVol >= 1000 ? `${(thisVol / 1000).toFixed(1)}k` : thisVol.toFixed(0);
         return { weeklyVolumeFormatted: formatted, weeklyDiff: pct, hasVolume: thisVol > 0 };
-    }, [allHistory, currentWeekKey]);
+    }, [allHistory, currentWeekKey, convertWeight]);
 
     // ─── Current Streak (consecutive days, LOCAL timezone) ───────────
     const streakDays = useMemo(() => {
@@ -147,7 +142,7 @@ const DashboardClient = () => {
             const converted = isNaN(v) ? 0 : convertWeight(v, originUnit);
             return { session: `S${i + 1}`, volume: converted, date: h.date };
         });
-    }, [allHistory]);
+    }, [allHistory, convertWeight]);
 
     // ─── Muscle Activation ───────────────────────────────────────────
     const [muscleTimeFilter, setMuscleTimeFilter] = useState('30');
@@ -251,7 +246,7 @@ const DashboardClient = () => {
                     to: `${toFormatted} × ${imp.to.reps}`
                 };
             });
-    }, [allHistory]);
+    }, [allHistory, convertWeight]);
 
     const hasData = allHistory.length > 0;
     const { plansWithSessions, totalPlans } = plansData;

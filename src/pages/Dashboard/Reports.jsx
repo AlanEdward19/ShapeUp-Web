@@ -10,16 +10,8 @@ import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
 import { exercisesDB } from '../../data/mockExercises';
 import './Reports.css';
 
-// Mock History
-const reportHistory = [
-    { id: 1, name: 'Q3 Financial Summary', type: 'Billing', date: 'Oct 01, 2025', status: 'Completed', size: '2.4 MB' },
-    { id: 2, name: 'September Roster Adherence', type: 'Performance', date: 'Oct 01, 2025', status: 'Completed', size: '1.1 MB' },
-    { id: 3, name: 'Mike K. Prog. Block A', type: 'Client Data', date: 'Sep 28, 2025', status: 'Completed', size: '0.8 MB' },
-    { id: 4, name: 'Active Clients List', type: 'Directory', date: 'Sep 15, 2025', status: 'Completed', size: '0.3 MB' },
-];
-
 const Reports = () => {
-    const { t, unitSystem } = useLanguage();
+    const { t, unitSystem, convertWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [reportType, setReportType] = useState('performance');
     const [targetScope, setTargetScope] = useState('all');

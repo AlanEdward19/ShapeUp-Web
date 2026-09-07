@@ -31,28 +31,30 @@ const DashboardIndependent = () => {
     const storedName = localStorage.getItem('shapeup_user_name') || 'Athlete';
     const firstName = storedName.split(' ')[0];
 
-    const [allHistory, setAllHistory] = useState([]);
-    const [plansData, setPlansData] = useState({ plansWithSessions: 0, totalPlans: 0 });
-
-    useEffect(() => {
+    const [initialIndependentState] = useState(() => {
         const storedPlans = localStorage.getItem('shapeup_independent_plans');
-        if (storedPlans) {
-            const plans = JSON.parse(storedPlans);
-            const history = plans
-                .flatMap(p => (p.history || []).map(h => ({ ...h, planName: p.name })))
-                .sort((a, b) => {
-                    const idA = a.id?.replace('h', '') || 0;
-                    const idB = b.id?.replace('h', '') || 0;
-                    return parseInt(idA) - parseInt(idB);
-                });
-
-            setAllHistory(history);
-            setPlansData({
-                plansWithSessions: plans.filter(p => (p.history || []).length > 0).length,
-                totalPlans: plans.length
-            });
+        if (!storedPlans) {
+            return { allHistory: [], plansData: { plansWithSessions: 0, totalPlans: 0 } };
         }
-    }, []);
+
+        const plans = JSON.parse(storedPlans);
+        const allHistory = plans
+            .flatMap(p => (p.history || []).map(h => ({ ...h, planName: p.name })))
+            .sort((a, b) => {
+                const idA = a.id?.replace('h', '') || 0;
+                const idB = b.id?.replace('h', '') || 0;
+                return parseInt(idA) - parseInt(idB);
+            });
+        const plansData = {
+            plansWithSessions: plans.filter(p => (p.history || []).length > 0).length,
+            totalPlans: plans.length
+        };
+
+        return { allHistory, plansData };
+    });
+
+    const [allHistory] = useState(initialIndependentState.allHistory);
+    const [plansData] = useState(initialIndependentState.plansData);
 
     // ─── Tour Trigger ─────────────────────────────────────────────────
     useEffect(() => {
@@ -87,7 +89,7 @@ const DashboardIndependent = () => {
     const currentWeekKey = getWeekKey(new Date());
 
     const { weeklyVolumeFormatted, weeklyDiff } = useMemo(() => {
-        const lastWeekKey = getWeekKey(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000));
+        const lastWeekKey = getWeekKey(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000));
         const sumVol = sessions => sessions.reduce((acc, h) => {
             const rawStr = h.totalVol || '0';
             const v = parseFloat(rawStr.toString().replace(/[^0-9.]/g, ''));

@@ -20,11 +20,11 @@ const TrainingPlansProfessional = () => {
         createWorkoutTemplate,
         updateWorkoutTemplate,
         deleteWorkoutTemplate,
-        assignWorkoutTemplate
+        copyWorkoutTemplate
     } = useTrainingApi();
 
     const [templates, setTemplates] = useState([]);
-    const [loadingTemplates, setLoadingTemplates] = useState(true);
+    const [, setLoadingTemplates] = useState(true);
 
     // Fetch templates from API on mount
     useEffect(() => {
@@ -92,7 +92,7 @@ const TrainingPlansProfessional = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [templateToDelete, setTemplateToDelete] = useState(null);
 
-    const [clients, setClients] = useState(() => {
+    const [clients] = useState(() => {
         const stored = localStorage.getItem('shapeup_clients');
         return stored ? JSON.parse(stored) : [];
     });
