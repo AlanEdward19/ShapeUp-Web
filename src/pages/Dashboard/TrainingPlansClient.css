@@ -266,7 +266,7 @@
 }
 
 .su-execute-btn-large:hover {
-    background-color: var(--primary-dark, #1d4ed8);
+    background-color: var(--primary-hover);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
@@ -706,7 +706,7 @@
 
 .su-btn-icon-danger:hover {
     opacity: 1;
-    color: #ef4444 !important;
+    color: var(--error) !important;
     transform: scale(1.1);
 }
 

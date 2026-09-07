@@ -227,7 +227,7 @@
 .su-elm-clear-btn {
     background: none;
     border: 1px solid rgba(239, 68, 68, 0.4);
-    color: #ef4444;
+    color: var(--error);
     cursor: pointer;
     font-size: 0.8125rem;
     font-weight: 600;
@@ -238,7 +238,7 @@
 
 .su-elm-clear-btn:hover {
     background: rgba(239, 68, 68, 0.08);
-    border-color: #ef4444;
+    border-color: var(--error);
 }
 
 /* ─── BODY: 2-column layout ───────────────────────────────── */

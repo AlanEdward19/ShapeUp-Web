@@ -286,8 +286,8 @@
 }
 
 .su-cp-action-btn.execute:hover {
-    background-color: var(--primary-dark, #1d4ed8);
-    border-color: var(--primary-dark, #1d4ed8);
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
@@ -339,8 +339,8 @@
 }
 
 .su-cp-action-btn.delete:hover {
-    color: #ef4444;
-    border-color: #ef4444;
+    color: var(--error);
+    border-color: var(--error);
     background: rgba(239, 68, 68, 0.06);
 }
 
@@ -710,7 +710,7 @@
 /* Status badges reused in ClientDetail header */
 .su-status-badge.warning {
     background-color: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
+    color: var(--warning);
     border-color: rgba(245, 158, 11, 0.2);
 }
 
@@ -805,7 +805,7 @@
     font-size: 0.7rem;
     font-weight: 600;
     background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
+    color: var(--warning);
     border: 1px solid rgba(245, 158, 11, 0.25);
     white-space: nowrap;
     letter-spacing: 0.02em;
@@ -827,7 +827,7 @@
     height: 56px;
     border-radius: 50%;
     background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
+    color: var(--error);
     margin: 0 auto 1.25rem;
 }
 

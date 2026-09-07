@@ -30,7 +30,7 @@
 
 /* Primary Variant — gradient + glow */
 .su-btn-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
     color: #ffffff;
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
 }
@@ -65,7 +65,7 @@
 
 /* Danger Variant */
 .su-btn-danger {
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    background: linear-gradient(135deg, var(--error) 0%, #dc2626 100%);
     color: #ffffff;
     box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
 }

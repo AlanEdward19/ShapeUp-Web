@@ -74,8 +74,8 @@
 
 .su-logout-btn:hover {
     background-color: rgba(239, 68, 68, 0.08);
-    border-color: #ef4444;
-    color: #ef4444;
+    border-color: var(--error);
+    color: var(--error);
 }
 
 .su-contact-coach-btn {

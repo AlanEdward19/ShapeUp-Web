@@ -17,11 +17,11 @@
     align-items: center;
     justify-content: space-between;
     padding: 0 5%;
-    background: rgba(15, 17, 21, 0.75);
+    background: color-mix(in srgb, var(--bg-main) 75%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     z-index: 100;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .su-lp-logo {
@@ -31,7 +31,7 @@
     font-size: clamp(2rem, 1.5vw, 2.5rem);
     font-weight: 800;
     letter-spacing: -0.5px;
-    background: linear-gradient(135deg, var(--primary, #3b82f6) 0%, #10b981 100%);
+    background: linear-gradient(135deg, var(--primary, #3b82f6) 0%, var(--success, #10b981) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -92,8 +92,8 @@
 .su-lp-badge {
     display: inline-block;
     padding: 0.25rem 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 999px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -151,19 +151,19 @@
 }
 
 .su-lp-btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--bg-card);
     color: var(--text-main);
     padding: 1rem 2rem;
     border-radius: 999px;
     font-weight: 700;
     font-size: 1.1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .su-lp-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-input);
 }
 
 /* Features */
@@ -203,8 +203,17 @@
 
 .su-lp-feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-md);
     border-color: var(--primary, #3b82f6);
+}
+
+.su-lp-feature-card--muted {
+    opacity: 0.7;
+}
+
+.su-lp-icon-wrap--muted {
+    background: var(--bg-input);
+    color: var(--text-muted);
 }
 
 .su-lp-icon-wrap {
@@ -243,7 +252,7 @@
 .su-lp-coming-soon {
     display: inline-block;
     padding: 0.15rem 0.5rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-input);
     font-size: 0.7rem;
     border-radius: 4px;
     margin-left: 0.5rem;
@@ -263,7 +272,7 @@
     justify-content: center;
     gap: 0.5rem;
     margin-bottom: 3rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--bg-card);
     padding: 0.5rem;
     border-radius: 999px;
     max-width: fit-content;
@@ -406,9 +415,9 @@
 }
 
 .su-lp-price-card:not(.featured) .su-lp-card-btn {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--bg-input);
     color: var(--text-main);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
 }
 
 .su-lp-card-btn:hover {
@@ -423,6 +432,12 @@
     text-align: center;
     color: var(--text-muted);
     font-size: 0.875rem;
+}
+
+.su-lp-footer-tagline {
+    margin-top: 0.5rem;
+    opacity: 0.5;
+    font-size: 0.8rem;
 }
 
 /* Currency Toggle */

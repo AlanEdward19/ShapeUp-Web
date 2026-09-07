@@ -288,24 +288,24 @@
     display: flex;
     gap: 1rem;
     padding: 1rem;
-    background-color: #fffbeb;
-    border: 1px solid #fef3c7;
+    background-color: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.25);
     border-radius: var(--radius-md);
-    color: #92400e;
+    color: var(--text-main);
     font-size: 0.875rem;
     align-items: flex-start;
 }
 
 .su-warning-alert svg {
     flex-shrink: 0;
-    color: #f59e0b;
+    color: var(--warning);
     margin-top: 0.1rem;
 }
 
 .su-warning-alert strong {
     display: block;
     margin-bottom: 0.25rem;
-    color: #78350f;
+    color: var(--warning);
 }
 
 .su-warning-alert p {

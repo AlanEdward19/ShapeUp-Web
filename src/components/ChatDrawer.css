@@ -268,17 +268,17 @@
 }
 
 .su-chat-tag.rpe-report {
-    background-color: #ef4444;
+    background-color: var(--error);
     color: white;
 }
 
 .su-chat-tag.question {
-    background-color: #f59e0b;
+    background-color: var(--warning);
     color: white;
 }
 
 .su-chat-tag.check-in {
-    background-color: #10b981;
+    background-color: var(--success);
     color: white;
 }
 
