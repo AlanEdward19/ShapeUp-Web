@@ -1,20 +1,36 @@
 import React, { useState } from 'react';
-import { WifiOff, RefreshCw, AlertTriangle, X } from 'lucide-react';
+import { WifiOff, RefreshCw, AlertTriangle, Clock, X } from 'lucide-react';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
 import { useMutationQueue } from '../hooks/useMutationQueue';
 import { useLanguage } from '../contexts/LanguageContext';
 import './OfflineQueueIndicator.css';
 
+// Best-effort human label for a queued mutation. Falls back to the raw endpoint/method for
+// anything not explicitly recognized here -- add a case whenever a new flow starts using
+// enqueueMutation with a dedupeKey worth describing.
+const describeMutation = (item, t) => {
+    const workoutStateMatch = item.endpoint.match(/\/api\/training\/workouts\/[^/]+\/state$/);
+    if (workoutStateMatch) return t('offline.item.workout_state') || 'Workout progress';
+    return `${item.method} ${item.endpoint}`;
+};
+
+const STATUS_META = {
+    pending: { icon: Clock, className: 'pending' },
+    syncing: { icon: RefreshCw, className: 'pending', spin: true },
+    failed: { icon: AlertTriangle, className: 'attention' },
+    conflict: { icon: AlertTriangle, className: 'attention' },
+};
+
 const OfflineQueueIndicator = () => {
     const { t } = useLanguage();
     const isOnline = useOnlineStatus();
-    const { queue, pendingCount, failedCount, conflictCount, retryMutation, discardMutation } = useMutationQueue();
+    const { queue, failedCount, conflictCount, retryMutation, discardMutation } = useMutationQueue();
     const [expanded, setExpanded] = useState(false);
 
     const attentionCount = failedCount + conflictCount;
     if (isOnline && queue.length === 0) return null;
 
-    const issues = queue.filter(m => m.status === 'failed' || m.status === 'conflict');
+    const sorted = [...queue].sort((a, b) => a.createdAt - b.createdAt);
 
     return (
         <div className="su-offline-indicator">
@@ -32,29 +48,42 @@ const OfflineQueueIndicator = () => {
                         ? t('offline.status.offline') || 'Offline'
                         : attentionCount > 0
                             ? `${attentionCount} ${t('offline.status.issues') || 'sync issue(s)'}`
-                            : `${pendingCount} ${t('offline.status.syncing') || 'syncing...'}`}
+                            : `${queue.length} ${t('offline.status.syncing') || 'syncing...'}`}
                 </span>
             </button>
 
-            {expanded && issues.length > 0 && (
+            {expanded && sorted.length > 0 && (
                 <div className="su-offline-panel">
-                    <div className="su-offline-panel-header">{t('offline.panel.title') || 'Sync issues'}</div>
-                    {issues.map(item => (
-                        <div key={item.id} className="su-offline-panel-item">
-                            <div className="su-offline-panel-item-info">
-                                <span className="su-offline-panel-item-endpoint">{item.endpoint}</span>
-                                <span className="su-offline-panel-item-status">{item.status}</span>
+                    <div className="su-offline-panel-header">{t('offline.panel.title_queue') || 'Pending changes'}</div>
+                    {sorted.map(item => {
+                        const meta = STATUS_META[item.status] || STATUS_META.pending;
+                        const Icon = meta.icon;
+                        return (
+                            <div key={item.id} className="su-offline-panel-item">
+                                <Icon size={14} className={`su-offline-panel-item-icon ${meta.className} ${meta.spin ? 'su-offline-spin' : ''}`} />
+                                <div className="su-offline-panel-item-info">
+                                    <span className="su-offline-panel-item-endpoint">{describeMutation(item, t)}</span>
+                                    <span className={`su-offline-panel-item-status ${meta.className}`}>
+                                        {t(`offline.item.status.${item.status}`) || item.status}
+                                        {item.status === 'conflict' && ` -- ${t('offline.item.conflict_hint') || 'someone else changed this first'}`}
+                                        {item.status === 'failed' && item.httpStatus === 403 && ` -- ${t('offline.item.no_permission') || "you don't have permission for this anymore"}`}
+                                    </span>
+                                </div>
+                                <div className="su-offline-panel-item-actions">
+                                    {(item.status === 'failed' || item.status === 'conflict') && (
+                                        <button onClick={() => retryMutation(item.id)} title={t('offline.panel.retry') || 'Retry'}>
+                                            <RefreshCw size={14} />
+                                        </button>
+                                    )}
+                                    {item.status !== 'syncing' && (
+                                        <button onClick={() => discardMutation(item.id)} title={t('offline.panel.discard') || 'Cancel'}>
+                                            <X size={14} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                            <div className="su-offline-panel-item-actions">
-                                <button onClick={() => retryMutation(item.id)} title={t('offline.panel.retry') || 'Retry'}>
-                                    <RefreshCw size={14} />
-                                </button>
-                                <button onClick={() => discardMutation(item.id)} title={t('offline.panel.discard') || 'Discard'}>
-                                    <X size={14} />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>

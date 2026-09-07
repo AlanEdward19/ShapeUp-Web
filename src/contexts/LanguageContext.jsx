@@ -958,8 +958,16 @@ export const LanguageProvider = ({ children }) => {
             'offline.status.issues': 'sync issue(s)',
             'offline.status.syncing': 'syncing...',
             'offline.panel.title': 'Sync issues',
+            'offline.panel.title_queue': 'Pending changes',
             'offline.panel.retry': 'Retry',
-            'offline.panel.discard': 'Discard'
+            'offline.panel.discard': 'Cancel',
+            'offline.item.workout_state': 'Workout progress',
+            'offline.item.status.pending': 'Waiting to sync',
+            'offline.item.status.syncing': 'Syncing...',
+            'offline.item.status.failed': 'Failed',
+            'offline.item.status.conflict': 'Conflict',
+            'offline.item.conflict_hint': 'someone else changed this first',
+            'offline.item.no_permission': "you don't have permission for this anymore"
         },
         'pt-BR': {
             'nav.dashboard': 'Painel',
@@ -1871,8 +1879,16 @@ export const LanguageProvider = ({ children }) => {
             'offline.status.issues': 'problema(s) de sincronização',
             'offline.status.syncing': 'sincronizando...',
             'offline.panel.title': 'Problemas de sincronização',
+            'offline.panel.title_queue': 'Alterações pendentes',
             'offline.panel.retry': 'Tentar novamente',
-            'offline.panel.discard': 'Descartar'
+            'offline.panel.discard': 'Cancelar',
+            'offline.item.workout_state': 'Progresso do treino',
+            'offline.item.status.pending': 'Aguardando sincronizar',
+            'offline.item.status.syncing': 'Sincronizando...',
+            'offline.item.status.failed': 'Falhou',
+            'offline.item.status.conflict': 'Conflito',
+            'offline.item.conflict_hint': 'outra pessoa alterou isso primeiro',
+            'offline.item.no_permission': 'você não tem mais permissão para isso'
         }
     };
 

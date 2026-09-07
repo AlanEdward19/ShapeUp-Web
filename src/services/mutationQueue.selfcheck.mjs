@@ -102,6 +102,29 @@ await wait(10);
 item = getMutationQueue().find(m => m.id === idFailed);
 assert.equal(item.status, 'failed');
 console.log('6. 4xx (non-409) -> failed status: OK');
+store.clear();
+
+// 6b. 403 -> failed immediately (permission genuinely denied, retrying can't fix it)
+const idForbidden = enqueueMutation({ endpoint: '/api/no-permission', method: 'POST', body: {} });
+responses = [{ status: 403 }];
+await wait(10);
+item = getMutationQueue().find(m => m.id === idForbidden);
+assert.equal(item.status, 'failed');
+assert.equal(item.httpStatus, 403);
+console.log('6b. 403 -> failed immediately: OK');
+store.clear();
+
+// 6c. 401 -> retried (transient: apiClient fetches a fresh token every attempt), not failed
+const idUnauthorized = enqueueMutation({ endpoint: '/api/stale-token', method: 'POST', body: {} });
+responses = [{ status: 401 }];
+await wait(10);
+item = getMutationQueue().find(m => m.id === idUnauthorized);
+assert.equal(item.status, 'pending', '401 must be retried, not failed immediately');
+assert.equal(item.attempts, 1);
+assert.equal(item.httpStatus, 401);
+console.log('6c. 401 -> scheduled for retry, not failed: OK');
+discardMutation(idUnauthorized);
+store.clear();
 
 // 7. retryMutation resets a failed item back to pending and re-attempts
 responses = [{ status: 200 }];

@@ -39,8 +39,8 @@
 }
 
 .su-offline-panel {
-    width: 280px;
-    max-height: 240px;
+    width: 320px;
+    max-height: 320px;
     overflow-y: auto;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -85,10 +85,23 @@
     text-overflow: ellipsis;
 }
 
+.su-offline-panel-item-icon {
+    flex-shrink: 0;
+    color: var(--text-muted);
+}
+
+.su-offline-panel-item-icon.attention {
+    color: var(--error);
+}
+
 .su-offline-panel-item-status {
     font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: normal;
+}
+
+.su-offline-panel-item-status.attention {
     color: var(--error);
-    text-transform: uppercase;
 }
 
 .su-offline-panel-item-actions {

@@ -6,7 +6,14 @@
 //   syncing:  request currently in flight
 //   synced:   delivered successfully -- removed from the queue right after
 //   conflict: server returned 409 -- needs a human/app decision, never auto-retried
-//   failed:   non-retryable 4xx, or exhausted MAX_ATTEMPTS retries
+//   failed:   non-retryable 4xx (permission denied, bad request, not found -- retrying the
+//             same request won't change the outcome), or exhausted MAX_ATTEMPTS retries
+//
+// 401 is deliberately NOT treated as permanent: apiClient fetches a fresh Firebase token on
+// every attempt, so a 401 today (stale cached token) can legitimately succeed on the next
+// attempt once the token refreshes -- it's retried with backoff like a network failure, not
+// failed immediately. 403 (the token is fine, the user genuinely lost the permission) still
+// fails immediately -- retrying can't fix a capability the user no longer has.
 //
 // Persisted to localStorage so queued writes survive reloads, app crashes, and being offline
 // across sessions -- the whole point of a gym-floor "log now, sync later" workflow.
@@ -78,7 +85,7 @@ export const enqueueMutation = ({ endpoint, method = 'POST', body, dedupeKey = n
     if (existingIndex >= 0) {
         id = queue[existingIndex].id;
         nextQueue = queue.map((m, i) => i === existingIndex
-            ? { ...m, endpoint, method, body, status: 'pending', updatedAt: now, nextAttemptAt: now }
+            ? { ...m, endpoint, method, body, status: 'pending', error: null, httpStatus: null, updatedAt: now, nextAttemptAt: now }
             : m);
     } else {
         id = `${now}-${Math.random().toString(36).slice(2, 9)}`;
@@ -87,6 +94,7 @@ export const enqueueMutation = ({ endpoint, method = 'POST', body, dedupeKey = n
             status: 'pending',
             attempts: 0,
             error: null,
+            httpStatus: null,
             createdAt: now,
             updatedAt: now,
             nextAttemptAt: now,
@@ -102,7 +110,7 @@ export const enqueueMutation = ({ endpoint, method = 'POST', body, dedupeKey = n
 export const retryMutation = (id) => {
     const now = Date.now();
     persist(queue.map(m => m.id === id
-        ? { ...m, status: 'pending', attempts: 0, error: null, nextAttemptAt: now }
+        ? { ...m, status: 'pending', attempts: 0, error: null, httpStatus: null, nextAttemptAt: now }
         : m));
     processQueue();
 };
@@ -137,23 +145,24 @@ export const processQueue = async () => {
                 persist(queue.filter(m => m.id !== id));
             } catch (err) {
                 const attempts = item.attempts + 1;
+                const isPermanent4xx = err.status && err.status >= 400 && err.status < 500
+                    && err.status !== 409 && err.status !== 401;
+
                 let status;
                 let nextAttemptAt = now;
                 if (err.status === 409) {
                     status = 'conflict';
-                } else if (err.status && err.status >= 400 && err.status < 500) {
-                    status = 'failed';
-                } else if (attempts >= MAX_ATTEMPTS) {
+                } else if (isPermanent4xx || attempts >= MAX_ATTEMPTS) {
                     status = 'failed';
                 } else {
                     status = 'pending';
                     nextAttemptAt = now + RETRY_BASE_DELAY_MS * (2 ** (attempts - 1));
                 }
                 if (status !== 'pending') {
-                    logError('mutation_sync_failed', err, { endpoint: item.endpoint, status, attempts, queueDelayMs: Date.now() - item.createdAt });
+                    logError('mutation_sync_failed', err, { endpoint: item.endpoint, status, attempts, httpStatus: err.status, queueDelayMs: Date.now() - item.createdAt });
                 }
                 persist(queue.map(m => m.id === id
-                    ? { ...m, status, attempts, error: err.message || 'Unknown error', updatedAt: Date.now(), nextAttemptAt }
+                    ? { ...m, status, attempts, error: err.message || 'Unknown error', httpStatus: err.status ?? null, updatedAt: Date.now(), nextAttemptAt }
                     : m));
             }
         }
