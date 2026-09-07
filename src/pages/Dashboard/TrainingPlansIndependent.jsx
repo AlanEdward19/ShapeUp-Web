@@ -19,6 +19,7 @@ import {
 } from './ClientDetail';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
+import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
 import { normalizePlan } from '../../utils/trainingNormalization';
 import './TrainingPlansClient.css';
@@ -79,7 +80,6 @@ const TrainingPlansIndependent = () => {
         deleteWorkoutPlan,
         copyWorkoutPlan,
         startWorkout,
-        updateWorkoutState,
         cancelWorkout,
         getActiveWorkout,
         getWorkoutPlanById,
@@ -153,7 +153,6 @@ const TrainingPlansIndependent = () => {
     const [isResumingWorkout, setIsResumingWorkout] = useState(false);
     const [isCancellingActive, setIsCancellingActive] = useState(false);
 
-    const syncInFlightRef = useRef(false);
     const hasFirstDoneRef = useRef(false);
     const lastSyncedHashRef = useRef('');
     const committedSetsRef = useRef(new Set()); // Tracks sets that have been "sent" at least once as done
@@ -216,17 +215,20 @@ const TrainingPlansIndependent = () => {
     /**
      * Sincroniza o estado atual do treino com o servidor.
      * Só envia se houver mudança no payload filtrado desde a última sincronização.
+     * Enfileira via mutationQueue (offline foundation) em vez de chamar a API direto: a
+     * escrita fica durável (sobrevive offline/reload) e ganha retry/backoff automáticos.
+     * dedupeKey garante que só a versão mais recente do payload desta sessão fica pendente.
      */
-    const syncWorkoutStateIfNeeded = useCallback(async ({ sourceExercises, elapsedSeconds }) => {
-        if (!workoutSessionId || syncInFlightRef.current) return;
+    const syncWorkoutStateIfNeeded = useCallback(({ sourceExercises, elapsedSeconds }) => {
+        if (!workoutSessionId) return;
 
         // 1. Build payload containing ONLY current completed sets
         const payload = buildWorkoutStatePayload(sourceExercises ?? sessionExercisesRef.current, elapsedSeconds ?? workoutTimeRef.current);
-        
+
         // 2. Compara o hash do payload de séries FINALIZADAS
         const currentPayloadHash = JSON.stringify(payload.exercises); // Compare only exercises/sets content
-        
-        // 3. Se for igual ao que o servidor já tem como "Estado Finalizado", não faz nada
+
+        // 3. Se for igual ao que já está enfileirado/sincronizado, não faz nada
         if (currentPayloadHash === lastSyncedHashRef.current) {
             return;
         }
@@ -236,28 +238,23 @@ const TrainingPlansIndependent = () => {
         // Contamos o total de sets no payload. Se diminuiu, é um "undone" puro, pulamos sem atualizar o hash.
         const currentDoneCount = payload.exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
         const lastDoneCount = parseInt(sessionStorage.getItem(`lastDoneCount_${workoutSessionId}`) || '0');
-        
+
         if (currentDoneCount < lastDoneCount) {
              // Just bail, don't update hash. If they re-check, currentPayloadHash will match lastSyncedHashRef and still bail.
              return;
         }
 
-        // 5. Inicia a sincronização
-        syncInFlightRef.current = true;
-        const previousHash = lastSyncedHashRef.current;
+        // 5. Enfileira a sincronização
         lastSyncedHashRef.current = currentPayloadHash;
         sessionStorage.setItem(`lastDoneCount_${workoutSessionId}`, currentDoneCount.toString());
 
-        try {
-            console.log('Sincronizando Estado Consolidado (Independent)...', payload);
-            await updateWorkoutState(workoutSessionId, payload);
-        } catch (error) {
-            console.error('Falha na sincronização (Independent):', error);
-            lastSyncedHashRef.current = previousHash;
-        } finally {
-            syncInFlightRef.current = false;
-        }
-    }, [workoutSessionId, updateWorkoutState, buildWorkoutStatePayload]);
+        enqueueMutation({
+            endpoint: `/api/training/workouts/${workoutSessionId}/state`,
+            method: 'PUT',
+            body: payload,
+            dedupeKey: `workout-state-${workoutSessionId}`,
+        });
+    }, [workoutSessionId, buildWorkoutStatePayload]);
 
     const mutateSessionExercises = useCallback((mutator) => {
         const next = [...sessionExercisesRef.current];

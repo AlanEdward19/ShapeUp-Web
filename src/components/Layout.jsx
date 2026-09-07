@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import OfflineQueueIndicator from './OfflineQueueIndicator';
 import './Layout.css';
 
 const Layout = () => {
@@ -44,6 +45,7 @@ const Layout = () => {
                     }} />
                 </main>
             </div>
+            <OfflineQueueIndicator />
         </div>
     );
 };

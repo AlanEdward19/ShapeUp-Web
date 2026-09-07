@@ -952,7 +952,14 @@ export const LanguageProvider = ({ children }) => {
             'landing.pricing.gyms.enterprise.feature.2': 'Custom BI reports',
             'landing.pricing.gyms.enterprise.feature.3': '24/7 priority support and VIP onboarding',
             'landing.footer.rights': 'All rights reserved.',
-            'landing.footer.tagline': 'Transforming fitness through technology and intelligence.'
+            'landing.footer.tagline': 'Transforming fitness through technology and intelligence.',
+
+            'offline.status.offline': 'Offline',
+            'offline.status.issues': 'sync issue(s)',
+            'offline.status.syncing': 'syncing...',
+            'offline.panel.title': 'Sync issues',
+            'offline.panel.retry': 'Retry',
+            'offline.panel.discard': 'Discard'
         },
         'pt-BR': {
             'nav.dashboard': 'Painel',
@@ -1858,7 +1865,14 @@ export const LanguageProvider = ({ children }) => {
             'landing.pricing.gyms.enterprise.feature.2': 'Relatórios customizados de BI',
             'landing.pricing.gyms.enterprise.feature.3': 'Suporte prioritário 24/7 e Onboarding VIP',
             'landing.footer.rights': 'Todos os direitos reservados.',
-            'landing.footer.tagline': 'Transformando o fitness através da tecnologia e inteligência.'
+            'landing.footer.tagline': 'Transformando o fitness através da tecnologia e inteligência.',
+
+            'offline.status.offline': 'Offline',
+            'offline.status.issues': 'problema(s) de sincronização',
+            'offline.status.syncing': 'sincronizando...',
+            'offline.panel.title': 'Problemas de sincronização',
+            'offline.panel.retry': 'Tentar novamente',
+            'offline.panel.discard': 'Descartar'
         }
     };
 

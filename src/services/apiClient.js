@@ -31,7 +31,9 @@ export const apiClient = async (endpoint, options = {}) => {
     });
 
     if (!response.ok) {
-        throw new Error(`API Request to ${url} failed with status: ${response.status}`);
+        const error = new Error(`API Request to ${url} failed with status: ${response.status}`);
+        error.status = response.status;
+        throw error;
     }
 
     // Se a resposta for 204 No Content, apenas não dá erro e não faz parse de JSON
