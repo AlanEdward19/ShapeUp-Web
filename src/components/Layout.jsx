@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import OfflineQueueIndicator from './OfflineQueueIndicator';
+import ErrorBoundary from './ErrorBoundary';
 import './Layout.css';
 
 const Layout = () => {
@@ -34,15 +35,17 @@ const Layout = () => {
                     sessionTitle={sessionTitle}
                 />
                 <main className="su-layout-content">
-                    <Outlet context={{
-                        isProfessional,
-                        isIndependent,
-                        isGym,
-                        coachProfile, setCoachProfile,
-                        clientProfile, setClientProfile,
-                        gymProfile, setGymProfile,
-                        setSessionTitle
-                    }} />
+                    <ErrorBoundary source="dashboard-page">
+                        <Outlet context={{
+                            isProfessional,
+                            isIndependent,
+                            isGym,
+                            coachProfile, setCoachProfile,
+                            clientProfile, setClientProfile,
+                            gymProfile, setGymProfile,
+                            setSessionTitle
+                        }} />
+                    </ErrorBoundary>
                 </main>
             </div>
             <OfflineQueueIndicator />

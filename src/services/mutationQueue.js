@@ -10,6 +10,11 @@
 //
 // Persisted to localStorage so queued writes survive reloads, app crashes, and being offline
 // across sessions -- the whole point of a gym-floor "log now, sync later" workflow.
+//
+// Emits telemetry events for two of the roadmap's day-one SLIs that only make sense measured
+// here: "sync success" (did a queued write eventually land?) and "queue delay" (createdAt ->
+// synced/failed, i.e. how long the user's data sat unsynced).
+import { logEvent, logError } from '../utils/telemetry.js';
 // apiClient is loaded lazily (dynamic import) rather than statically -- it pulls in
 // Firebase, which the state machine itself has no need for. This also lets the state
 // machine be exercised without ever touching Firebase (see mutationQueue.selfcheck.mjs).
@@ -128,6 +133,7 @@ export const processQueue = async () => {
                     body: item.body !== undefined ? JSON.stringify(item.body) : undefined,
                 });
                 // Delivered -- drop it, nothing left to show or retry.
+                logEvent('mutation_sync_success', { endpoint: item.endpoint, queueDelayMs: Date.now() - item.createdAt });
                 persist(queue.filter(m => m.id !== id));
             } catch (err) {
                 const attempts = item.attempts + 1;
@@ -142,6 +148,9 @@ export const processQueue = async () => {
                 } else {
                     status = 'pending';
                     nextAttemptAt = now + RETRY_BASE_DELAY_MS * (2 ** (attempts - 1));
+                }
+                if (status !== 'pending') {
+                    logError('mutation_sync_failed', err, { endpoint: item.endpoint, status, attempts, queueDelayMs: Date.now() - item.createdAt });
                 }
                 persist(queue.map(m => m.id === id
                     ? { ...m, status, attempts, error: err.message || 'Unknown error', updatedAt: Date.now(), nextAttemptAt }
