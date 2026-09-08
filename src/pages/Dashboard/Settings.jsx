@@ -520,6 +520,7 @@ const Settings = () => {
                                     >
                                         <option value="en">English (US)</option>
                                         <option value="pt-BR">Português (BR)</option>
+                                        <option value="es">Español</option>
                                     </select>
                                 </div>
                                 <div className="su-settings-list-item">
