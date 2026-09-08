@@ -20,10 +20,36 @@ import {
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
+import { generateObjectId } from '../../utils/objectId';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
 import { normalizePlan } from '../../utils/trainingNormalization';
 import './TrainingPlansClient.css';
 import './TrainingPlansProfessional.css';
+
+// Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
+// from a plan object shaped like normalizePlan()'s output (PlanEditor's internal shape) and
+// need the same API request body built from it.
+const buildWorkoutPlanBody = (plan, targetUserId) => ({
+    targetUserId,
+    name: plan.name || 'Novo Treino',
+    notes: plan.notes || null,
+    durationInWeeks: parseInt(plan.weeks) || 4,
+    phase: plan.phase || 'Hypertrophy',
+    difficulty: mapDifficulty(plan.difficulty),
+    exercises: (plan.exercises || []).map(ex => ({
+        exerciseId: parseInt(ex.exerciseId) || 1,
+        sets: (ex.sets || []).map(s => ({
+            repetitions: parseInt(s.reps) || 0,
+            load: parseFloat(s.load) || 0,
+            loadUnit: mapLoadUnit(s.loadUnit),
+            setType: mapSetType(s.type ?? s.setType),
+            technique: mapTechnique(s.technique),
+            rpe: parseInt(s.rpe) || 0,
+            restSeconds: parseInt(s.rest) || 0,
+            isExtra: false
+        }))
+    }))
+});
 
 const formatTime = (totalSeconds) => {
     const hours = Math.floor(totalSeconds / 3600);
@@ -77,8 +103,6 @@ const TrainingPlansIndependent = () => {
         getWorkoutPlansByUser,
         createWorkoutPlan,
         updateWorkoutPlan,
-        copyWorkoutPlan,
-        startWorkout,
         getActiveWorkout,
         getWorkoutPlanById,
     } = useTrainingApi();
@@ -449,28 +473,7 @@ const TrainingPlansIndependent = () => {
     const handleSavePlan = async (updated) => {
         try {
             const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
-
-            const workoutBody = {
-                targetUserId: loggedInUserId,
-                name: updated.name || 'Novo Treino',
-                notes: updated.notes || null,
-                durationInWeeks: parseInt(updated.weeks) || 4,
-                phase: updated.phase || 'Hypertrophy',
-                difficulty: mapDifficulty(updated.difficulty),
-                exercises: (updated.exercises || []).map(ex => ({
-                    exerciseId: parseInt(ex.exerciseId) || 1,
-                    sets: (ex.sets || []).map(s => ({
-                        repetitions: parseInt(s.reps) || 0,
-                        load: parseFloat(s.load) || 0,
-                        loadUnit: mapLoadUnit(s.loadUnit),
-                        setType: mapSetType(s.type ?? s.setType),
-                        technique: mapTechnique(s.technique),
-                        rpe: parseInt(s.rpe) || 0,
-                        restSeconds: parseInt(s.rest) || 0,
-                        isExtra: false
-                    }))
-                }))
-            };
+            const workoutBody = buildWorkoutPlanBody(updated, loggedInUserId);
 
             console.log('Enviando treino (Solo) para a API:', workoutBody);
             
@@ -501,37 +504,31 @@ const TrainingPlansIndependent = () => {
         }
     };
 
-    const handleCopyPlan = async (original) => {
-        try {
-            if (original._planId) {
-                const response = await copyWorkoutPlan(original._planId, {
-                    name: `${original.name} (Copy)`
-                });
-                
-                if (response && (response.planId || response.id)) {
-                    const newPlan = normalizePlan(response);
-                    setPlans(prev => [newPlan, ...prev]);
-                } else {
-                    const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id'));
-                    const data = await getWorkoutPlansByUser(loggedInUserId);
-                    const raw = Array.isArray(data) ? data : (data?.data || data?.items || []);
-                    setPlans(raw.map(normalizePlan));
-                }
-            } else {
-                const copy = {
-                    ...original,
-                    id: `p${Date.now()}`,
-                    name: `${original.name} (Copy)`,
-                    history: [],
-                    active: false
-                };
-                setPlans(prev => [...prev, copy]);
-            }
-            addNotification('independent', 'success', 'Treino Copiado', `Cópia criada com sucesso!`, 'primary');
-        } catch (error) {
-            console.error('Erro ao copiar treino (Solo):', error);
-            alert('Erro ao copiar o treino.');
-        }
+    // Offline-safe by construction: `original` already has the full local copy of the plan
+    // (from the last successful fetch, or from a not-yet-synced local edit) -- no need to ask
+    // the server to copy-by-reference and wait for a new id back. We build the duplicate
+    // entirely client-side and enqueue it as a plain CREATE (same body-builder as
+    // handleSavePlan), which is response-ignored/optimistic-local already.
+    const handleCopyPlan = (original) => {
+        const copy = {
+            ...original,
+            id: `p${Date.now()}`,
+            _planId: undefined,
+            name: `${original.name} (Copy)`,
+            history: [],
+            active: false
+        };
+
+        const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
+        enqueueMutation({
+            endpoint: '/api/training/workout-plans',
+            method: 'POST',
+            body: buildWorkoutPlanBody(copy, loggedInUserId),
+            dedupeKey: `workout-plan-${copy.id}`,
+        });
+
+        setPlans(prev => [...prev, copy]);
+        addNotification('independent', 'success', 'Treino Copiado', `Cópia criada com sucesso!`, 'primary');
     };
 
     const handleDeletePlan = (plan) => {
@@ -562,23 +559,24 @@ const TrainingPlansIndependent = () => {
 
     // ─── SESSION ENGINE HANDLERS ──────────────────────────────────
 
-    const startSession = async (plan) => {
-        setWorkoutSessionId(null);
-        // Call API to start workout
-        try {
-            const pid = plan._planId || plan.id;
-            
-            // Tenta chamar a API se houver um ID que não pareça temporário
-            if (pid && !String(pid).startsWith('p') && !String(pid).startsWith('plan_')) {
-                const command = {
-                    planId: pid,
-                    startedAtUtc: new Date().toISOString()
-                };
-                const startedWorkout = await startWorkout(command);
-                setWorkoutSessionId(startedWorkout?.sessionId || startedWorkout?.id || startedWorkout?.workoutSessionId || null);
-            }
-        } catch (error) {
-            console.error('Failed to start workout via API:', error);
+    // Enqueued (offline foundation): a client-generated session id (see objectId.js) is used
+    // as the real session id from the start -- state sync/finish/cancel run against this same
+    // id whether online or offline, no reconciliation needed (backend accepts a pre-set id,
+    // see StartWorkoutExecutionCommand.Id).
+    const startSession = (plan) => {
+        const pid = plan._planId || plan.id;
+
+        // Só dá pra iniciar no servidor se o plano em si já tiver um ID real (não temporário
+        // p.../plan_...) -- um plano ainda não sincronizado não existe lá pra referenciar.
+        if (pid && !String(pid).startsWith('p') && !String(pid).startsWith('plan_')) {
+            const sessionId = generateObjectId();
+            setWorkoutSessionId(sessionId);
+            enqueueMutation({
+                endpoint: '/api/training/workouts/start',
+                method: 'POST',
+                body: { id: sessionId, planId: pid, startedAtUtc: new Date().toISOString() },
+            });
+        } else {
             setWorkoutSessionId(null);
         }
 

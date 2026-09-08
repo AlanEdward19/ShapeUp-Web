@@ -28,6 +28,31 @@ import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
 import { normalizePlan } from '../../utils/trainingNormalization';
 
+// Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
+// from a plan object shaped like normalizePlan()'s output (PlanEditor's internal shape) and
+// need the same API request body built from it.
+const buildWorkoutPlanBody = (plan, targetUserId) => ({
+    targetUserId,
+    name: plan.name || 'Novo Treino',
+    notes: plan.notes || null,
+    durationInWeeks: parseInt(plan.weeks) || 4,
+    phase: plan.phase || 'Hypertrophy',
+    difficulty: mapDifficulty(plan.difficulty),
+    exercises: (plan.exercises || []).map(ex => ({
+        exerciseId: parseInt(ex.exerciseId) || 1,
+        sets: (ex.sets || []).map(s => ({
+            repetitions: parseInt(s.reps) || 0,
+            load: parseFloat(s.load) || 0,
+            loadUnit: mapLoadUnit(s.loadUnit),
+            setType: mapSetType(s.type ?? s.setType),
+            technique: mapTechnique(s.technique),
+            rpe: parseInt(s.rpe) || 0,
+            restSeconds: parseInt(s.rest) || 0,
+            isExtra: false
+        }))
+    }))
+});
+
 // ─── Mock Data ─────────────────────────────────────────────
 
 const clientsDB = {};
@@ -700,10 +725,7 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
 const ClientDetail = () => {
     const { t, unitSystem, convertWeight } = useLanguage();
     const { id } = useParams();
-    const {
-        getWorkoutPlansByUser,
-        copyWorkoutPlan
-    } = useTrainingApi();
+    const { getWorkoutPlansByUser } = useTrainingApi();
     const navigate = useNavigate();
     const location = useLocation();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
@@ -984,27 +1006,7 @@ const ClientDetail = () => {
         const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
         const targetId = isSolo ? loggedInUserId : (parseInt(urlClientId) || 1);
 
-        const workoutBody = {
-            targetUserId: targetId,
-            name: updated.name || 'Novo Treino',
-            notes: updated.notes || null,
-            durationInWeeks: parseInt(updated.weeks) || 4,
-            phase: updated.phase || 'Hypertrophy',
-            difficulty: mapDifficulty(updated.difficulty),
-            exercises: (updated.exercises || []).map(ex => ({
-                exerciseId: parseInt(ex.exerciseId) || 1,
-                sets: (ex.sets || []).map(s => ({
-                    repetitions: parseInt(s.reps) || 0,
-                    load: parseFloat(s.load) || 0,
-                    loadUnit: mapLoadUnit(s.loadUnit),
-                    setType: mapSetType(s.type ?? s.setType),
-                    technique: mapTechnique(s.technique),
-                    rpe: parseInt(s.rpe) || 0,
-                    restSeconds: parseInt(s.rest) || 0,
-                    isExtra: false
-                }))
-            }))
-        };
+        const workoutBody = buildWorkoutPlanBody(updated, targetId);
 
         console.log("Enviando treino para a API:", workoutBody);
 
@@ -1055,42 +1057,39 @@ const ClientDetail = () => {
         setEditingPlan(newPlan);
     };
 
-    const handleCopyPlan = async (plan) => {
-        try {
-            if (plan._planId) {
-                const response = await copyWorkoutPlan(plan._planId, {
-                    name: `${plan.name} (Copy)`
-                });
-                
-                if (response && (response.planId || response.id)) {
-                    const newPlan = normalizePlan(response);
-                    setPlans(prev => [newPlan, ...prev]);
-                } else {
-                    // Fallback: recarregar
-                    const data = await getWorkoutPlansByUser(id);
-                    const raw = Array.isArray(data) ? data : (data?.data || data?.items || []);
-                    setPlans(raw.map(normalizePlan));
-                }
-            } else {
-                // Local copy
-                const copy = {
-                    ...plan,
-                    id: `p${Date.now()}`,
-                    name: `${plan.name} (Copy)`,
-                    active: false,
-                    history: [],
-                    exercises: plan.exercises.map(ex => ({
-                        ...ex, id: `e${Date.now() + Math.random()}`,
-                        sets: ex.sets.map(s => ({ ...s }))
-                    }))
-                };
-                setPlans(prev => [copy, ...prev]);
-            }
-            addNotification(id.toString(), 'success', 'Plano Copiado', 'Cópia criada com sucesso.', 'primary');
-        } catch (error) {
-            console.error('Erro ao copiar plano:', error);
-            alert('Erro ao copiar o plano.');
-        }
+    // Offline-safe by construction: `plan` already has the full local copy (from the last
+    // successful fetch, or from a not-yet-synced local edit) -- no need to ask the server to
+    // copy-by-reference and wait for a new id back. We build the duplicate entirely
+    // client-side and enqueue it as a plain CREATE (same body-builder as handleSavePlan),
+    // which is response-ignored/optimistic-local already.
+    const handleCopyPlan = (plan) => {
+        const copy = {
+            ...plan,
+            id: `p${Date.now()}`,
+            _planId: undefined,
+            name: `${plan.name} (Copy)`,
+            active: false,
+            history: [],
+            exercises: plan.exercises.map(ex => ({
+                ...ex, id: `e${Date.now() + Math.random()}`,
+                sets: ex.sets.map(s => ({ ...s }))
+            }))
+        };
+
+        const urlClientId = id; // from useParams
+        const isSolo = urlClientId === 'independent';
+        const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
+        const targetId = isSolo ? loggedInUserId : (parseInt(urlClientId) || 1);
+
+        enqueueMutation({
+            endpoint: '/api/training/workout-plans',
+            method: 'POST',
+            body: buildWorkoutPlanBody(copy, targetId),
+            dedupeKey: `workout-plan-${copy.id}`,
+        });
+
+        setPlans(prev => [copy, ...prev]);
+        addNotification(id.toString(), 'success', 'Plano Copiado', 'Cópia criada com sucesso.', 'primary');
     };
 
     const tabs = [

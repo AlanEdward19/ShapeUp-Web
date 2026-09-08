@@ -12,14 +12,35 @@ import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../util
 import { normalizeTemplate } from '../../utils/trainingNormalization';
 import './TrainingPlansProfessional.css';
 
+// Shared by handleSaveTemplate and the offline-safe path of duplicateTemplate below --
+// both start from a template object shaped like normalizeTemplate()'s output (PlanEditor's
+// internal shape) and need the same API request body built from it.
+const buildTemplateBody = (plan) => ({
+    name: plan.name || 'New Template',
+    notes: plan.notes || null,
+    durationInWeeks: parseInt(plan.weeks) || 4,
+    phase: plan.phase || 'Hypertrophy',
+    difficulty: mapDifficulty(plan.difficulty),
+    exercises: (plan.exercises || []).map(ex => ({
+        exerciseId: parseInt(ex.exerciseId) || 1,
+        sets: (ex.sets || []).map(s => ({
+            repetitions: parseInt(s.reps) || 0,
+            load: parseFloat(s.load) || 0,
+            loadUnit: mapLoadUnit(s.loadUnit),
+            setType: mapSetType(s.type ?? s.setType),
+            technique: mapTechnique(s.technique),
+            rpe: parseInt(s.rpe) || 0,
+            restSeconds: parseInt(s.rest) || 0,
+            isExtra: false
+        }))
+    }))
+});
+
 
 const TrainingPlansProfessional = () => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const {
-        getWorkoutTemplates,
-        copyWorkoutTemplate
-    } = useTrainingApi();
+    const { getWorkoutTemplates } = useTrainingApi();
 
     const [templates, setTemplates] = useState([]);
     const [, setLoadingTemplates] = useState(true);
@@ -107,34 +128,23 @@ const TrainingPlansProfessional = () => {
     };
 
 
-    const duplicateTemplate = async (tmpl) => {
-        try {
-            // Se for um template do backend, chamamos o endpoint de cópia
-            if (tmpl._templateId) {
-                const response = await copyWorkoutTemplate(tmpl._templateId, {
-                    name: `${tmpl.name} (Copy)`
-                });
-                
-                // O backend provavelmente retorna o novo objeto ou ID
-                // Se retornar o objeto normalizamos, senão recarregamos
-                if (response && (response.templateId || response.id)) {
-                    const newTmpl = normalizeTemplate(response);
-                    setTemplates(prev => [newTmpl, ...prev]);
-                } else {
-                    // Fallback: recarregar lista
-                    const data = await getWorkoutTemplates();
-                    const raw = Array.isArray(data) ? data : (data?.data || data?.items || []);
-                    setTemplates(raw.map(normalizeTemplate));
-                }
-            } else {
-                // Se for algo local ainda não salvo (raro aqui), apenas clonamos no estado
-                setTemplates(prev => [{ ...tmpl, id: `tmpl_${Date.now()}`, name: `${tmpl.name} (Copy)` }, ...prev]);
-            }
-            addNotification('coach', 'success', t('pro.training.copy.success.title'), t('pro.training.copy.success.message'), 'primary');
-        } catch (error) {
-            console.error('Erro ao duplicar template:', error);
-            alert('Erro ao duplicar o template.');
-        }
+    // Offline-safe by construction: `tmpl` already has the full local copy of the template
+    // (from the last successful fetch, or from a not-yet-synced local edit) -- no need to ask
+    // the server to copy-by-reference and wait for a new id back. We build the duplicate
+    // entirely client-side and enqueue it as a plain CREATE (same body-builder as
+    // handleSaveTemplate), which is response-ignored/optimistic-local already.
+    const duplicateTemplate = (tmpl) => {
+        const copy = { ...tmpl, id: `tmpl_${Date.now()}`, _templateId: undefined, name: `${tmpl.name} (Copy)` };
+
+        enqueueMutation({
+            endpoint: '/api/training/workout-templates',
+            method: 'POST',
+            body: buildTemplateBody(copy),
+            dedupeKey: `workout-template-${copy.id}`,
+        });
+
+        setTemplates(prev => [copy, ...prev]);
+        addNotification('coach', 'success', t('pro.training.copy.success.title'), t('pro.training.copy.success.message'), 'primary');
     };
 
     /**
@@ -147,26 +157,7 @@ const TrainingPlansProfessional = () => {
     // never from the server response. Safe to defer: never throws, works offline, shows up in
     // OfflineQueueIndicator if it later fails (e.g. lost edit permission by the time it syncs).
     const handleSaveTemplate = (updatedPlan) => {
-        const templateBody = {
-            name: updatedPlan.name || 'New Template',
-            notes: updatedPlan.notes || null,
-            durationInWeeks: parseInt(updatedPlan.weeks) || 4,
-            phase: updatedPlan.phase || 'Hypertrophy',
-            difficulty: mapDifficulty(updatedPlan.difficulty),
-            exercises: (updatedPlan.exercises || []).map(ex => ({
-                exerciseId: parseInt(ex.exerciseId) || 1,
-                sets: (ex.sets || []).map(s => ({
-                    repetitions: parseInt(s.reps) || 0,
-                    load: parseFloat(s.load) || 0,
-                    loadUnit: mapLoadUnit(s.loadUnit),
-                    setType: mapSetType(s.type ?? s.setType),
-                    technique: mapTechnique(s.technique),
-                    rpe: parseInt(s.rpe) || 0,
-                    restSeconds: parseInt(s.rest) || 0,
-                    isExtra: false
-                }))
-            }))
-        };
+        const templateBody = buildTemplateBody(updatedPlan);
 
         const dedupeKey = `workout-template-${updatedPlan._templateId || updatedPlan.id}`;
         if (updatedPlan._templateId) {

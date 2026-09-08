@@ -12,6 +12,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
+import { generateObjectId } from '../../utils/objectId';
 import { normalizePlan } from '../../utils/trainingNormalization';
 import { mapSetType, mapTechnique } from '../../utils/trainingEnums';
 import './TrainingPlansClient.css';
@@ -30,7 +31,7 @@ const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { startWorkout, getWorkoutPlansByUser, getActiveWorkout, getWorkoutPlanById } = useTrainingApi();
+    const { getWorkoutPlansByUser, getActiveWorkout, getWorkoutPlanById } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
 
     // Session State
@@ -363,20 +364,30 @@ const ClientView = () => {
     }, [exercises, sessionActive, workoutSessionId, syncWorkoutStateIfNeeded]);
 
     // -- Start A Specific Session --
+    // Enqueued (offline foundation): a client-generated session id (see objectId.js) is used
+    // as the real session id from the start -- the whole session (state sync, finish, cancel)
+    // runs against this same id whether online or offline, no reconciliation needed. The
+    // backend accepts it as-is (StartWorkoutExecutionCommand.Id) instead of always generating
+    // its own. NOTE: field names below (planId/executedByUserId) previously didn't match the
+    // backend's StartWorkoutExecutionCommand at all (workoutPlanId/targetUserId) -- fixed here.
     const startSessionForPlan = async (plan) => {
-        // Call API to start workout
+        const sessionId = generateObjectId();
+        setWorkoutSessionId(sessionId);
+
         try {
-            console.log('Starting workout via API for plan:', plan.id);
             const me = await getMe();
-            const command = {
-                workoutPlanId: plan._planId || plan.id,
-                targetUserId: me.id || me.userId
-            };
-            const startedWorkout = await startWorkout(command);
-            setWorkoutSessionId(startedWorkout?.sessionId || startedWorkout?.id || startedWorkout?.workoutSessionId || null);
+            enqueueMutation({
+                endpoint: '/api/training/workouts/start',
+                method: 'POST',
+                body: {
+                    id: sessionId,
+                    planId: plan._planId || plan.id,
+                    startedAtUtc: new Date().toISOString(),
+                    executedByUserId: me.id || me.userId,
+                },
+            });
         } catch (error) {
-            console.error('Failed to start workout via API:', error);
-            setWorkoutSessionId(null);
+            console.error('Failed to resolve current user for starting workout:', error);
         }
 
         // Map the plan's exercises into the runtime session engine format
