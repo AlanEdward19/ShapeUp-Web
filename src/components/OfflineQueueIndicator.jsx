@@ -7,10 +7,22 @@ import './OfflineQueueIndicator.css';
 
 // Best-effort human label for a queued mutation. Falls back to the raw endpoint/method for
 // anything not explicitly recognized here -- add a case whenever a new flow starts using
-// enqueueMutation with a dedupeKey worth describing.
+// enqueueMutation with something worth describing.
+const DESCRIPTORS = [
+    [/\/api\/training\/workouts\/[^/]+\/state$/, 'offline.item.workout_state', 'Workout progress'],
+    [/\/api\/training\/workouts\/[^/]+\/finish$/, 'offline.item.workout_finish', 'Workout completion'],
+    [/\/api\/training\/workouts\/[^/]+\/cancel$/, 'offline.item.workout_cancel', 'Workout cancellation'],
+    [/\/api\/training\/workout-plans/, 'offline.item.workout_plan', 'Training plan'],
+    [/\/api\/training\/workout-templates/, 'offline.item.workout_template', 'Training template'],
+    [/\/api\/training\/weight\/target$/, 'offline.item.weight_target', 'Weight goal'],
+    [/\/api\/training\/weight\/registers$/, 'offline.item.weight_register', 'Weight log'],
+    [/\/api\/gym-management\/trainers\/[^/]+\/clients\/invites\//, 'offline.item.client_invite', 'Client invite'],
+    [/\/api\/gym-management\/trainer-client-invites\/accept$/, 'offline.item.invite_accept', 'Invite acceptance'],
+];
+
 const describeMutation = (item, t) => {
-    const workoutStateMatch = item.endpoint.match(/\/api\/training\/workouts\/[^/]+\/state$/);
-    if (workoutStateMatch) return t('offline.item.workout_state') || 'Workout progress';
+    const match = DESCRIPTORS.find(([re]) => re.test(item.endpoint));
+    if (match) return t(match[1]) || match[2];
     return `${item.method} ${item.endpoint}`;
 };
 

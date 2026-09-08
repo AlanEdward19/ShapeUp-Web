@@ -30,7 +30,7 @@ const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { startWorkout, getWorkoutPlansByUser, cancelWorkout, getActiveWorkout, getWorkoutPlanById, finishWorkout } = useTrainingApi();
+    const { startWorkout, getWorkoutPlansByUser, getActiveWorkout, getWorkoutPlanById } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
 
     // Session State
@@ -273,18 +273,18 @@ const ClientView = () => {
         }
     };
 
-    const handleCancelActiveWorkout = async () => {
+    const handleCancelActiveWorkout = () => {
         if (!pendingActiveWorkout) return;
         setIsCancellingActive(true);
-        try {
-            const activeSessionId = pendingActiveWorkout.sessionId || pendingActiveWorkout.id;
-            await cancelWorkout(activeSessionId);
-            setPendingActiveWorkout(null);
-        } catch (error) {
-            console.error('Failed to cancel active workout:', error);
-        } finally {
-            setIsCancellingActive(false);
-        }
+        const activeSessionId = pendingActiveWorkout.sessionId || pendingActiveWorkout.id;
+        // Enqueued (offline foundation): local state is reset unconditionally right after.
+        enqueueMutation({
+            endpoint: `/api/training/workouts/${activeSessionId}/cancel`,
+            method: 'POST',
+            dedupeKey: `workout-cancel-${activeSessionId}`,
+        });
+        setPendingActiveWorkout(null);
+        setIsCancellingActive(false);
     };
 
     // -- Training Plans Tour Trigger --
@@ -537,19 +537,22 @@ const ClientView = () => {
         setIsFinishingSession(false);
     };
 
-    const submitFeedback = async () => {
+    const submitFeedback = () => {
         if (workoutSessionId) {
-            try {
-                const payload = buildWorkoutStatePayload(exercises, workoutTime);
-                await finishWorkout(workoutSessionId, {
+            // Enqueued (offline foundation): the session summary shown next is built entirely
+            // from local exercises/workoutTime, not from this response.
+            const payload = buildWorkoutStatePayload(exercises, workoutTime);
+            enqueueMutation({
+                endpoint: `/api/training/workouts/${workoutSessionId}/finish`,
+                method: 'POST',
+                body: {
                     sessionId: String(workoutSessionId),
                     endedAtUtc: new Date().toISOString(),
                     perceivedExertion: parseFloat(sessionFeedback.rpe) || 5,
                     exercises: payload.exercises || []
-                });
-            } catch (error) {
-                console.error('Failed to finish workout via API:', error);
-            }
+                },
+                dedupeKey: `workout-finish-${workoutSessionId}`,
+            });
         }
         setShowFeedbackModal(false);
         setShowOverviewModal(true);
@@ -666,13 +669,14 @@ const ClientView = () => {
         setViewingExerciseDef(null);
     };
 
-    const handleCancelSessionConfirm = async () => {
+    const handleCancelSessionConfirm = () => {
         if (workoutSessionId) {
-            try {
-                await cancelWorkout(workoutSessionId);
-            } catch (error) {
-                console.error('Failed to cancel workout via API:', error);
-            }
+            // Enqueued (offline foundation): local state is reset unconditionally right after.
+            enqueueMutation({
+                endpoint: `/api/training/workouts/${workoutSessionId}/cancel`,
+                method: 'POST',
+                dedupeKey: `workout-cancel-${workoutSessionId}`,
+            });
         }
         setShowCancelModal(false);
         setSessionFeedback({ rpe: null, comments: '' });

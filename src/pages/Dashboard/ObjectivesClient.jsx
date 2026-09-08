@@ -7,12 +7,13 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
+import { enqueueMutation } from '../../services/mutationQueue';
 import './DashboardClient.css';
 
 const ObjectivesClient = () => {
     const { t, unitSystem, convertWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { upsertTargetWeight, upsertDailyWeightRegister, getWeightRegisters } = useTrainingApi();
+    const { getWeightRegisters } = useTrainingApi();
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
 
     // --- Objectives State ---
@@ -150,42 +151,59 @@ const ObjectivesClient = () => {
     }, [setIsOpen, setSteps, setCurrentStep, t]);
 
     // Handlers
-    const handleSaveGoal = async () => {
-        try {
-            await upsertTargetWeight({
-                targetWeight: parseFloat(tempGoalWeight),
-                unit: unitSystem
-            });
-            setObjectives(prev => ({
-                ...prev,
-                goalWeight: tempGoalWeight,
-                goalUnit: unitSystem
-            }));
-            setShowSaveSuccess(true);
-            setTimeout(() => setShowSaveSuccess(false), 3000);
-        } catch (error) {
-            console.error("Failed to save target weight:", error);
-            // Optionally handle error notification here
-        }
+    // Enqueued (offline foundation): the response was already ignored before this change --
+    // local `objectives` state is driven from the value the user just typed, not from the
+    // server. dedupeKey collapses repeated saves before the first one syncs.
+    const handleSaveGoal = () => {
+        enqueueMutation({
+            endpoint: '/api/training/weight/target',
+            method: 'PUT',
+            body: { targetWeight: parseFloat(tempGoalWeight), unit: unitSystem },
+            dedupeKey: `weight-target-${clientId}`,
+        });
+        setObjectives(prev => ({
+            ...prev,
+            goalWeight: tempGoalWeight,
+            goalUnit: unitSystem
+        }));
+        setShowSaveSuccess(true);
+        setTimeout(() => setShowSaveSuccess(false), 3000);
     };
 
-    const handleLogWeight = async () => {
+    const handleLogWeight = () => {
         if (!newWeightEntry) return;
         // Don't log if the input is obviously invalid
         const parsedWeight = parseFloat(newWeightEntry);
         if (isNaN(parsedWeight) || parsedWeight <= 0) return;
 
-        try {
-            await upsertDailyWeightRegister({
-                weight: parsedWeight,
-                dateUtc: new Date().toISOString()
-            });
+        const dateUtc = new Date().toISOString();
 
-            await loadWeightData();
-            setNewWeightEntry('');
-        } catch (error) {
-            console.error("Failed to log weight:", error);
-        }
+        // Enqueued (offline foundation). Each register is a distinct day's entry, not an
+        // update -- no dedupeKey, every log is its own queued write. We add an optimistic
+        // local entry instead of the old await-then-refetch: a refetch right now would just
+        // overwrite `history` with server data that doesn't have this entry yet (it hasn't
+        // synced), making the just-logged weight flicker in and back out.
+        enqueueMutation({
+            endpoint: '/api/training/weight/registers',
+            method: 'POST',
+            body: { weight: parsedWeight, dateUtc },
+        });
+
+        const dateObj = new Date(dateUtc);
+        setObjectives(prev => ({
+            ...prev,
+            history: [
+                {
+                    id: `local-${Date.now()}`,
+                    date: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                    originalDateObj: dateObj,
+                    weight: parsedWeight,
+                    unit: unitSystem
+                },
+                ...prev.history
+            ]
+        }));
+        setNewWeightEntry('');
     };
 
     const handleDeleteWeight = (id) => {

@@ -5,14 +5,13 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
-import { useGymManagementApi } from '../hooks/api/useGymManagementApi';
+import { enqueueMutation } from '../services/mutationQueue';
 import './Login.css';
 
 const Register = () => {
     const { t } = useLanguage();
     const { register, signInWithGoogle } = useAuth();
     const navigate = useNavigate();
-    const { acceptTrainerClientInvite } = useGymManagementApi();
 
     const [selectedRole, setSelectedRole] = useState('independent');
     const [error, setError] = useState('');
@@ -49,14 +48,14 @@ const Register = () => {
             await register(email, password);
 
             if (inviteToken) {
-                try {
-                    // O backend faz toda a validação pelo payload
-                    await acceptTrainerClientInvite({
-                        payload: inviteToken
-                    });
-                } catch (acceptErr) {
-                    console.error("Erro ao aceitar convite no backend:", acceptErr);
-                }
+                // Enqueued (offline foundation): O backend faz toda a validação pelo payload.
+                // Fire-and-forget -- a navegação segue de qualquer forma; se falhar depois de
+                // reconectar (payload expirado, etc.), aparece no OfflineQueueIndicator.
+                enqueueMutation({
+                    endpoint: '/api/gym-management/trainer-client-invites/accept',
+                    method: 'POST',
+                    body: { payload: inviteToken },
+                });
             } else if (selectedRole === 'client') {
                 const stored = localStorage.getItem('shapeup_clients');
                 let clients = stored ? JSON.parse(stored) : [];

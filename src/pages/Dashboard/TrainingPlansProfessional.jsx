@@ -7,6 +7,7 @@ import { PlanEditor } from './ClientDetail';
 import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
+import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
 import { normalizeTemplate } from '../../utils/trainingNormalization';
 import './TrainingPlansProfessional.css';
@@ -17,9 +18,6 @@ const TrainingPlansProfessional = () => {
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const {
         getWorkoutTemplates,
-        createWorkoutTemplate,
-        updateWorkoutTemplate,
-        deleteWorkoutTemplate,
         copyWorkoutTemplate
     } = useTrainingApi();
 
@@ -144,52 +142,60 @@ const TrainingPlansProfessional = () => {
      * Uses createWorkoutTemplate (POST /api/training/workout-templates).
      * The command only requires name, notes and exercises (no targetUserId).
      */
-    const handleSaveTemplate = async (updatedPlan) => {
-        try {
-            const templateBody = {
-                name: updatedPlan.name || 'New Template',
-                notes: updatedPlan.notes || null,
-                durationInWeeks: parseInt(updatedPlan.weeks) || 4,
-                phase: updatedPlan.phase || 'Hypertrophy',
-                difficulty: mapDifficulty(updatedPlan.difficulty),
-                exercises: (updatedPlan.exercises || []).map(ex => ({
-                    exerciseId: parseInt(ex.exerciseId) || 1,
-                    sets: (ex.sets || []).map(s => ({
-                        repetitions: parseInt(s.reps) || 0,
-                        load: parseFloat(s.load) || 0,
-                        loadUnit: mapLoadUnit(s.loadUnit),
-                        setType: mapSetType(s.type ?? s.setType),
-                        technique: mapTechnique(s.technique),
-                        rpe: parseInt(s.rpe) || 0,
-                        restSeconds: parseInt(s.rest) || 0,
-                        isExtra: false
-                    }))
+    // Enqueued (offline foundation): the response was already ignored before this change --
+    // local `templates` state is always driven from the locally-built `updatedPlan`/filter,
+    // never from the server response. Safe to defer: never throws, works offline, shows up in
+    // OfflineQueueIndicator if it later fails (e.g. lost edit permission by the time it syncs).
+    const handleSaveTemplate = (updatedPlan) => {
+        const templateBody = {
+            name: updatedPlan.name || 'New Template',
+            notes: updatedPlan.notes || null,
+            durationInWeeks: parseInt(updatedPlan.weeks) || 4,
+            phase: updatedPlan.phase || 'Hypertrophy',
+            difficulty: mapDifficulty(updatedPlan.difficulty),
+            exercises: (updatedPlan.exercises || []).map(ex => ({
+                exerciseId: parseInt(ex.exerciseId) || 1,
+                sets: (ex.sets || []).map(s => ({
+                    repetitions: parseInt(s.reps) || 0,
+                    load: parseFloat(s.load) || 0,
+                    loadUnit: mapLoadUnit(s.loadUnit),
+                    setType: mapSetType(s.type ?? s.setType),
+                    technique: mapTechnique(s.technique),
+                    rpe: parseInt(s.rpe) || 0,
+                    restSeconds: parseInt(s.rest) || 0,
+                    isExtra: false
                 }))
-            };
+            }))
+        };
 
-            console.log('Enviando template para a API:', templateBody);
-            
-            if (updatedPlan._templateId) {
-                await updateWorkoutTemplate(updatedPlan._templateId, templateBody);
-                addNotification('coach', 'success', t('pro.training.save.success.title'), t('pro.training.save.success.message'), 'primary');
-            } else {
-                await createWorkoutTemplate(templateBody);
-                addNotification('coach', 'success', t('pro.training.create.success.title'), t('pro.training.create.success.message'), 'primary');
-            }
-
-            // Update local state / cache
-            setTemplates(prev => {
-                const exists = prev.find(t => t.id === updatedPlan.id);
-                if (exists) {
-                    return prev.map(t => t.id === updatedPlan.id ? updatedPlan : t);
-                }
-                return [updatedPlan, ...prev];
+        const dedupeKey = `workout-template-${updatedPlan._templateId || updatedPlan.id}`;
+        if (updatedPlan._templateId) {
+            enqueueMutation({
+                endpoint: `/api/training/workout-templates/${updatedPlan._templateId}`,
+                method: 'PUT',
+                body: templateBody,
+                dedupeKey,
             });
-            setActiveTemplate(null);
-        } catch (error) {
-            console.error('Erro ao salvar template na API:', error);
-            alert('Erro ao salvar o template. Verifique o console.');
+            addNotification('coach', 'success', t('pro.training.save.success.title'), t('pro.training.save.success.message'), 'primary');
+        } else {
+            enqueueMutation({
+                endpoint: '/api/training/workout-templates',
+                method: 'POST',
+                body: templateBody,
+                dedupeKey,
+            });
+            addNotification('coach', 'success', t('pro.training.create.success.title'), t('pro.training.create.success.message'), 'primary');
         }
+
+        // Update local state / cache
+        setTemplates(prev => {
+            const exists = prev.find(t => t.id === updatedPlan.id);
+            if (exists) {
+                return prev.map(t => t.id === updatedPlan.id ? updatedPlan : t);
+            }
+            return [updatedPlan, ...prev];
+        });
+        setActiveTemplate(null);
     };
 
     const deleteTemplate = (tmpl) => {
@@ -197,26 +203,25 @@ const TrainingPlansProfessional = () => {
         setShowDeleteConfirm(true);
     };
 
-    const confirmDelete = async () => {
+    const confirmDelete = () => {
         if (!templateToDelete) return;
 
-        try {
-            const tid = templateToDelete._templateId || templateToDelete.id;
-            
-            // Só chama a API se for um ID real (não temporário que começa com tmpl_)
-            if (tid && !String(tid).startsWith('tmpl_')) {
-                await deleteWorkoutTemplate(tid);
-            }
+        const tid = templateToDelete._templateId || templateToDelete.id;
 
-            setTemplates(prev => prev.filter(t => t.id !== (templateToDelete._templateId || templateToDelete.id)));
-            addNotification('coach', 'alert', t('pro.training.delete.success.title'), t('pro.training.delete.success.message'), 'error');
-        } catch (error) {
-            console.error('Erro ao excluir template:', error);
-            alert('Erro ao excluir o template.');
-        } finally {
-            setShowDeleteConfirm(false);
-            setTemplateToDelete(null);
+        // Só enfileira a chamada se for um ID real (não temporário que começa com tmpl_ --
+        // um template ainda não sincronizado com o servidor não tem o que deletar lá).
+        if (tid && !String(tid).startsWith('tmpl_')) {
+            enqueueMutation({
+                endpoint: `/api/training/workout-templates/${tid}`,
+                method: 'DELETE',
+                dedupeKey: `workout-template-${tid}`,
+            });
         }
+
+        setTemplates(prev => prev.filter(t => t.id !== (templateToDelete._templateId || templateToDelete.id)));
+        addNotification('coach', 'alert', t('pro.training.delete.success.title'), t('pro.training.delete.success.message'), 'error');
+        setShowDeleteConfirm(false);
+        setTemplateToDelete(null);
     };
 
     const handleAssign = (clientId) => {

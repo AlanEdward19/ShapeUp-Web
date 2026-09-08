@@ -24,6 +24,7 @@ import './ClientDetail.css';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
 import { exercisesDB } from '../../data/mockExercises';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
+import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
 import { normalizePlan } from '../../utils/trainingNormalization';
 
@@ -701,9 +702,6 @@ const ClientDetail = () => {
     const { id } = useParams();
     const {
         getWorkoutPlansByUser,
-        createWorkoutPlan,
-        updateWorkoutPlan,
-        deleteWorkoutPlan,
         copyWorkoutPlan
     } = useTrainingApi();
     const navigate = useNavigate();
@@ -973,80 +971,79 @@ const ClientDetail = () => {
         localStorage.setItem('shapeup_client_plans_' + id, JSON.stringify(plans));
     }, [plans, id]);
 
-    const handleSavePlan = async (updated) => {
+    // Enqueued (offline foundation): the response was already ignored before this change --
+    // local `plans` state is always driven from the locally-built `updated` object, never from
+    // the server response. Safe to defer: never throws, works offline.
+    const handleSavePlan = (updated) => {
         console.log("handleSavePlan disparado! Dados recebidos:", updated);
-        try {
-            // Determine IDs
-            const urlClientId = id; // from useParams
-            const isSolo = urlClientId === 'independent';
-            
-            const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
-            const targetId = isSolo ? loggedInUserId : (parseInt(urlClientId) || 1);
 
-            const workoutBody = {
-                targetUserId: targetId,
-                name: updated.name || 'Novo Treino',
-                notes: updated.notes || null,
-                durationInWeeks: parseInt(updated.weeks) || 4,
-                phase: updated.phase || 'Hypertrophy',
-                difficulty: mapDifficulty(updated.difficulty),
-                exercises: (updated.exercises || []).map(ex => ({
-                    exerciseId: parseInt(ex.exerciseId) || 1,
-                    sets: (ex.sets || []).map(s => ({
-                        repetitions: parseInt(s.reps) || 0,
-                        load: parseFloat(s.load) || 0,
-                        loadUnit: mapLoadUnit(s.loadUnit),
-                        setType: mapSetType(s.type ?? s.setType),
-                        technique: mapTechnique(s.technique),
-                        rpe: parseInt(s.rpe) || 0,
-                        restSeconds: parseInt(s.rest) || 0,
-                        isExtra: false
-                    }))
+        // Determine IDs
+        const urlClientId = id; // from useParams
+        const isSolo = urlClientId === 'independent';
+
+        const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
+        const targetId = isSolo ? loggedInUserId : (parseInt(urlClientId) || 1);
+
+        const workoutBody = {
+            targetUserId: targetId,
+            name: updated.name || 'Novo Treino',
+            notes: updated.notes || null,
+            durationInWeeks: parseInt(updated.weeks) || 4,
+            phase: updated.phase || 'Hypertrophy',
+            difficulty: mapDifficulty(updated.difficulty),
+            exercises: (updated.exercises || []).map(ex => ({
+                exerciseId: parseInt(ex.exerciseId) || 1,
+                sets: (ex.sets || []).map(s => ({
+                    repetitions: parseInt(s.reps) || 0,
+                    load: parseFloat(s.load) || 0,
+                    loadUnit: mapLoadUnit(s.loadUnit),
+                    setType: mapSetType(s.type ?? s.setType),
+                    technique: mapTechnique(s.technique),
+                    rpe: parseInt(s.rpe) || 0,
+                    restSeconds: parseInt(s.rest) || 0,
+                    isExtra: false
                 }))
-            };
+            }))
+        };
 
-            console.log("Enviando treino para a API:", workoutBody);
-            
-            // Call API
-            if (updated._planId) {
-                await updateWorkoutPlan(updated._planId, workoutBody);
-            } else {
-                await createWorkoutPlan(workoutBody);
-            }
+        console.log("Enviando treino para a API:", workoutBody);
 
-            // Local State Update
-            setPlans(prev => {
-                const exists = prev.find(p => p.id === updated.id);
-                if (exists) {
-                    return prev.map(p => p.id === updated.id ? updated : p);
-                }
-                return [...prev, updated];
-            });
-            
-            setEditingPlan(null);
-            
-            addNotification(id.toString(), 'alert', 'Treino Salvo', `O treino "${updated.name}" foi enviado com sucesso!`, 'primary', {
-                link: '/dashboard/training'
-            });
-        } catch (error) {
-            console.error("Erro ao salvar treino na API:", error);
-            alert("Erro ao salvar o treino. Verifique o console.");
+        const dedupeKey = `workout-plan-${updated._planId || updated.id}`;
+        if (updated._planId) {
+            enqueueMutation({ endpoint: `/api/training/workout-plans/${updated._planId}`, method: 'PUT', body: workoutBody, dedupeKey });
+        } else {
+            enqueueMutation({ endpoint: '/api/training/workout-plans', method: 'POST', body: workoutBody, dedupeKey });
         }
+
+        // Local State Update
+        setPlans(prev => {
+            const exists = prev.find(p => p.id === updated.id);
+            if (exists) {
+                return prev.map(p => p.id === updated.id ? updated : p);
+            }
+            return [...prev, updated];
+        });
+
+        setEditingPlan(null);
+
+        addNotification(id.toString(), 'alert', 'Treino Salvo', `O treino "${updated.name}" foi enviado com sucesso!`, 'primary', {
+            link: '/dashboard/training'
+        });
     };
 
-    const handleDeletePlan = async (planId) => {
-        try {
-            // Se for um ID do backend (não temporário, mesmo se for Number)
-            if (planId && !String(planId).startsWith('p')) {
-                await deleteWorkoutPlan(planId);
-            }
-            
-            setPlans(prev => prev.filter(p => p.id !== planId));
-            addNotification(id.toString(), 'alert', 'Plano Removido', 'O plano foi excluído com sucesso.', 'error');
-        } catch (error) {
-            console.error('Erro ao excluir plano:', error);
-            alert('Erro ao excluir o plano.');
+    const handleDeletePlan = (planId) => {
+        // Se for um ID do backend (não temporário, mesmo se for Number) -- um plano ainda não
+        // sincronizado com o servidor não tem o que deletar lá.
+        if (planId && !String(planId).startsWith('p')) {
+            enqueueMutation({
+                endpoint: `/api/training/workout-plans/${planId}`,
+                method: 'DELETE',
+                dedupeKey: `workout-plan-${planId}`,
+            });
         }
+
+        setPlans(prev => prev.filter(p => p.id !== planId));
+        addNotification(id.toString(), 'alert', 'Plano Removido', 'O plano foi excluído com sucesso.', 'error');
     };
 
     const handleAddPlan = () => {

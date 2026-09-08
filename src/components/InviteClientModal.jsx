@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { X, Mail, CheckCircle, Send } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
-import { useGymManagementApi } from '../hooks/api/useGymManagementApi';
+import { enqueueMutation } from '../services/mutationQueue';
 import './InviteClientModal.css';
 
 const InviteClientModal = ({ onClose, onInvite }) => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps } = useTour();
-    const { generateTrainerClientInvite } = useGymManagementApi();
     const [email, setEmail] = useState('');
     const [sent, setSent] = useState(false);
     const [error, setError] = useState('');
@@ -38,7 +37,7 @@ const InviteClientModal = ({ onClose, onInvite }) => {
 
     const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
-    const handleSend = async () => {
+    const handleSend = () => {
         if (!email.trim()) {
             setError(t('clients.invite.error.empty'));
             return;
@@ -49,24 +48,26 @@ const InviteClientModal = ({ onClose, onInvite }) => {
         }
         setError('');
 
-        try {
-            const trainerId = localStorage.getItem('shapeup_user_id');
-            if (!trainerId) {
-                throw new Error(t('clients.invite.error.no_trainer_id') || "ID do Treinador não encontrado na sessão.");
-            }
+        const trainerId = localStorage.getItem('shapeup_user_id');
+        if (!trainerId) {
+            setError(t('clients.invite.error.no_trainer_id') || "ID do Treinador não encontrado na sessão.");
+            return;
+        }
 
-            await generateTrainerClientInvite(trainerId, email, {
-                trainerPlanId: null,
-                expiresInHours: 48
-            });
+        // Enqueued (offline foundation): the invite email itself is a fire-and-forget backend
+        // side-effect -- the caller (Clients.jsx) already writes its own local "Invited" client
+        // record independent of this response, so there's nothing to wait for here. Goes
+        // through even offline; if it later fails (e.g. lost the permission to invite by the
+        // time connectivity returns), it shows up in OfflineQueueIndicator like any other issue.
+        enqueueMutation({
+            endpoint: `/api/gym-management/trainers/${trainerId}/clients/invites/${email}`,
+            method: 'POST',
+            body: { trainerPlanId: null, expiresInHours: 48 },
+        });
 
-            setSent(true);
-            if (onInvite) {
-                onInvite(email);
-            }
-        } catch (err) {
-            console.error("Invite client API error:", err);
-            setError(t('clients.invite.error.api') || "Erro ao gerar convite. Tente novamente.");
+        setSent(true);
+        if (onInvite) {
+            onInvite(email);
         }
     };
 

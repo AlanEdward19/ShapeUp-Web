@@ -77,13 +77,10 @@ const TrainingPlansIndependent = () => {
         getWorkoutPlansByUser,
         createWorkoutPlan,
         updateWorkoutPlan,
-        deleteWorkoutPlan,
         copyWorkoutPlan,
         startWorkout,
-        cancelWorkout,
         getActiveWorkout,
         getWorkoutPlanById,
-        finishWorkout,
     } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
 
@@ -344,18 +341,19 @@ const TrainingPlansIndependent = () => {
         }
     };
 
-    const handleCancelActiveWorkout = async () => {
+    const handleCancelActiveWorkout = () => {
         if (!pendingActiveWorkout) return;
         setIsCancellingActive(true);
-        try {
-            const activeSessionId = pendingActiveWorkout.sessionId || pendingActiveWorkout.id;
-            await cancelWorkout(activeSessionId);
-            setPendingActiveWorkout(null);
-        } catch (error) {
-            console.error('Failed to cancel active workout:', error);
-        } finally {
-            setIsCancellingActive(false);
-        }
+        const activeSessionId = pendingActiveWorkout.sessionId || pendingActiveWorkout.id;
+        // Enqueued (offline foundation): local session state is reset unconditionally right
+        // after regardless of the response, so there's nothing to await here.
+        enqueueMutation({
+            endpoint: `/api/training/workouts/${activeSessionId}/cancel`,
+            method: 'POST',
+            dedupeKey: `workout-cancel-${activeSessionId}`,
+        });
+        setPendingActiveWorkout(null);
+        setIsCancellingActive(false);
     };
 
     // -- Independent Training Plans Tour Trigger --
@@ -541,26 +539,25 @@ const TrainingPlansIndependent = () => {
         setShowDeleteConfirm(true);
     };
 
-    const confirmDeletePlan = async () => {
+    const confirmDeletePlan = () => {
         if (!planToDelete) return;
 
-        try {
-            const pid = planToDelete._planId || planToDelete.id;
-            
-            // Só chama a API se for um ID real do backend (não temporário p... ou plan_...)
-            if (pid && !String(pid).startsWith('p') && !String(pid).startsWith('plan_')) {
-                await deleteWorkoutPlan(pid);
-            }
+        const pid = planToDelete._planId || planToDelete.id;
 
-            setPlans(prev => prev.filter(p => p.id !== (planToDelete._planId || planToDelete.id)));
-            addNotification('independent', 'alert', 'Treino Removido', 'Seu treino foi excluído com sucesso.', 'error');
-        } catch (error) {
-            console.error('Erro ao excluir treino (Solo):', error);
-            alert('Erro ao excluir o treino.');
-        } finally {
-            setShowDeleteConfirm(false);
-            setPlanToDelete(null);
+        // Só enfileira a chamada se for um ID real do backend (não temporário p... ou plan_...
+        // -- um plano ainda não sincronizado com o servidor não tem o que deletar lá).
+        if (pid && !String(pid).startsWith('p') && !String(pid).startsWith('plan_')) {
+            enqueueMutation({
+                endpoint: `/api/training/workout-plans/${pid}`,
+                method: 'DELETE',
+                dedupeKey: `workout-plan-${pid}`,
+            });
         }
+
+        setPlans(prev => prev.filter(p => p.id !== (planToDelete._planId || planToDelete.id)));
+        addNotification('independent', 'alert', 'Treino Removido', 'Seu treino foi excluído com sucesso.', 'error');
+        setShowDeleteConfirm(false);
+        setPlanToDelete(null);
     };
 
     // ─── SESSION ENGINE HANDLERS ──────────────────────────────────
@@ -623,19 +620,22 @@ const TrainingPlansIndependent = () => {
         setIsFinishingSession(false);
     };
 
-    const submitFeedback = async () => {
+    const submitFeedback = () => {
         if (workoutSessionId) {
-            try {
-                const payload = buildWorkoutStatePayload(sessionExercises, workoutTime);
-                await finishWorkout(workoutSessionId, {
+            // Enqueued (offline foundation): the session summary shown next (handleSessionCompleted)
+            // is built entirely from local sessionExercises/workoutTime, not from this response.
+            const payload = buildWorkoutStatePayload(sessionExercises, workoutTime);
+            enqueueMutation({
+                endpoint: `/api/training/workouts/${workoutSessionId}/finish`,
+                method: 'POST',
+                body: {
                     sessionId: String(workoutSessionId),
                     endedAtUtc: new Date().toISOString(),
                     perceivedExertion: parseFloat(sessionFeedback.rpe) || 5,
                     exercises: payload.exercises || []
-                });
-            } catch (error) {
-                console.error('Failed to finish workout via API:', error);
-            }
+                },
+                dedupeKey: `workout-finish-${workoutSessionId}`,
+            });
         }
         setShowFeedbackModal(false);
         setShowOverviewModal(true);
@@ -692,13 +692,15 @@ const TrainingPlansIndependent = () => {
         resetSession({ skipCancel: true });
     };
 
-    const resetSession = async ({ skipCancel = false } = {}) => {
+    const resetSession = ({ skipCancel = false } = {}) => {
         if (!skipCancel && workoutSessionId) {
-            try {
-                await cancelWorkout(workoutSessionId);
-            } catch (error) {
-                console.error('Failed to cancel workout via API:', error);
-            }
+            // Enqueued (offline foundation): local session state is reset unconditionally
+            // right below regardless of the response.
+            enqueueMutation({
+                endpoint: `/api/training/workouts/${workoutSessionId}/cancel`,
+                method: 'POST',
+                dedupeKey: `workout-cancel-${workoutSessionId}`,
+            });
         }
         setSessionActive(false);
         setActivePlan(null);
