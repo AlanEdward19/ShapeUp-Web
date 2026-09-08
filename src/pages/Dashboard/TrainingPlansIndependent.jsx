@@ -101,8 +101,6 @@ const TrainingPlansIndependent = () => {
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const {
         getWorkoutPlansByUser,
-        createWorkoutPlan,
-        updateWorkoutPlan,
         getActiveWorkout,
         getWorkoutPlanById,
     } = useTrainingApi();
@@ -470,38 +468,49 @@ const TrainingPlansIndependent = () => {
         setEditingPlan(newPlan);
     };
 
-    const handleSavePlan = async (updated) => {
-        try {
-            const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
-            const workoutBody = buildWorkoutPlanBody(updated, loggedInUserId);
+    // Enqueued (offline foundation). Update already knows its target id (`_planId`) up front --
+    // no different from the other Bucket A flows, safe to fire-and-forget. Create is the part
+    // that used to need the server's response: a brand-new plan's real id, used right after
+    // for any edit/delete/copy/start on it. Same fix as startWorkout -- generate the id
+    // client-side (objectId.js) and send it along; the backend uses it as-is
+    // (CreateWorkoutPlanCommand.Id) instead of always generating one.
+    const handleSavePlan = (updated) => {
+        const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
+        const workoutBody = buildWorkoutPlanBody(updated, loggedInUserId);
 
-            console.log('Enviando treino (Solo) para a API:', workoutBody);
-            
-            let savedPlan = updated;
-            
-            if (updated._planId) {
-                const res = await updateWorkoutPlan(updated._planId, workoutBody);
-                if (res) savedPlan = normalizePlan(res);
-            } else {
-                const res = await createWorkoutPlan(workoutBody);
-                if (res) savedPlan = normalizePlan(res);
-            }
+        console.log('Enviando treino (Solo) para a API:', workoutBody);
 
-            setPlans(prev => {
-                // Se for edição, substitui pelo salvo. Se for novo, adiciona o salvo.
-                const exists = prev.some(p => p.id === updated.id);
-                if (exists) {
-                    return prev.map(p => p.id === updated.id ? savedPlan : p);
-                }
-                return [...prev, savedPlan];
+        let savedPlan = updated;
+
+        if (updated._planId) {
+            enqueueMutation({
+                endpoint: `/api/training/workout-plans/${updated._planId}`,
+                method: 'PUT',
+                body: workoutBody,
+                dedupeKey: `workout-plan-${updated._planId}`,
             });
-            setEditingPlan(null);
-            
-            addNotification('independent', 'alert', 'Treino Salvo', `Seu treino foi enviado com sucesso!`, 'primary');
-        } catch (error) {
-            console.error('Erro ao salvar treino (Solo) na API:', error);
-            alert('Erro ao salvar o treino. Verifique o console.');
+        } else {
+            const planId = generateObjectId();
+            savedPlan = { ...updated, _planId: planId };
+            enqueueMutation({
+                endpoint: '/api/training/workout-plans',
+                method: 'POST',
+                body: { ...workoutBody, id: planId },
+                dedupeKey: `workout-plan-${planId}`,
+            });
         }
+
+        setPlans(prev => {
+            // Se for edição, substitui pelo salvo. Se for novo, adiciona o salvo.
+            const exists = prev.some(p => p.id === updated.id);
+            if (exists) {
+                return prev.map(p => p.id === updated.id ? savedPlan : p);
+            }
+            return [...prev, savedPlan];
+        });
+        setEditingPlan(null);
+
+        addNotification('independent', 'alert', 'Treino Salvo', `Seu treino foi enviado com sucesso!`, 'primary');
     };
 
     // Offline-safe by construction: `original` already has the full local copy of the plan
