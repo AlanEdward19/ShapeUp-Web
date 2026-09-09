@@ -8,8 +8,8 @@ import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { enqueueMutation } from '../../services/mutationQueue';
-import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
-import { normalizeTemplate } from '../../utils/trainingNormalization';
+import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
+import { normalizeTemplate, flattenBlockExercises, countBlockSets } from '../../utils/trainingNormalization';
 import './TrainingPlansProfessional.css';
 
 // Shared by handleSaveTemplate and the offline-safe path of duplicateTemplate below --
@@ -21,17 +21,26 @@ const buildTemplateBody = (plan) => ({
     durationInWeeks: parseInt(plan.weeks) || 4,
     phase: plan.phase || 'Hypertrophy',
     difficulty: mapDifficulty(plan.difficulty),
-    exercises: (plan.exercises || []).map(ex => ({
-        exerciseId: parseInt(ex.exerciseId) || 1,
-        sets: (ex.sets || []).map(s => ({
-            repetitions: parseInt(s.reps) || 0,
-            load: parseFloat(s.load) || 0,
-            loadUnit: mapLoadUnit(s.loadUnit),
-            setType: mapSetType(s.type ?? s.setType),
-            technique: mapTechnique(s.technique),
-            rpe: parseInt(s.rpe) || 0,
-            restSeconds: parseInt(s.rest) || 0,
-            isExtra: false
+    blocks: (plan.blocks || []).map(block => ({
+        type: mapBlockType(block.type),
+        timeCapSeconds: block.timeCapSeconds === '' || block.timeCapSeconds == null ? null : parseInt(block.timeCapSeconds),
+        intervalSeconds: block.intervalSeconds === '' || block.intervalSeconds == null ? null : parseInt(block.intervalSeconds),
+        totalRounds: block.totalRounds === '' || block.totalRounds == null ? null : parseInt(block.totalRounds),
+        restAfterSeconds: block.restAfterSeconds === '' || block.restAfterSeconds == null ? null : parseInt(block.restAfterSeconds),
+        exercises: (block.exercises || []).map(ex => ({
+            exerciseId: parseInt(ex.exerciseId) || 1,
+            sets: (ex.sets || []).map(s => ({
+                repetitions: s.reps === '' || s.reps == null ? null : parseInt(s.reps),
+                load: parseFloat(s.load) || 0,
+                loadUnit: mapLoadUnit(s.loadUnit),
+                setType: mapSetType(s.type ?? s.setType),
+                technique: mapTechnique(s.technique),
+                intensity: s.intensityType && s.intensityValue !== ''
+                    ? { type: mapIntensityType(s.intensityType), value: parseInt(s.intensityValue) }
+                    : null,
+                restSeconds: s.rest === '' || s.rest == null ? null : parseInt(s.rest),
+                isExtra: false
+            }))
         }))
     }))
 });
@@ -123,7 +132,7 @@ const TrainingPlansProfessional = () => {
             phase: 'Hypertrophy',
             difficulty: 'Intermediate',
             weeks: 4,
-            exercises: []
+            blocks: []
         });
     };
 
@@ -267,10 +276,11 @@ const TrainingPlansProfessional = () => {
                     ) : (
                         <div className="su-grid-cards">
                             {templates.map(tmpl => {
-                                const totalSets = tmpl.exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
-                                const totalRest = tmpl.exercises.reduce((acc, ex) =>
+                                const tmplExercises = flattenBlockExercises(tmpl.blocks);
+                                const totalSets = countBlockSets(tmpl.blocks);
+                                const totalRest = tmplExercises.reduce((acc, ex) =>
                                     acc + ex.sets.reduce((a, s) => a + (parseInt(s.rest) || 90), 0), 0);
-                                const estMins = tmpl.exercises.length === 0 ? 0 : Math.round((totalRest + totalSets * 60) / 60);
+                                const estMins = tmplExercises.length === 0 ? 0 : Math.round((totalRest + totalSets * 60) / 60);
 
                                 return (
                                     <Card key={tmpl.id} className="su-template-card su-clean-card" data-tour="tpp-card">
@@ -289,7 +299,7 @@ const TrainingPlansProfessional = () => {
 
                                             <div className="su-template-metrics-clean">
                                                 <div className="su-metric-clean">
-                                                    <span className="su-metric-clean-val">{tmpl.exercises.length}</span>
+                                                    <span className="su-metric-clean-val">{tmplExercises.length}</span>
                                                     <span className="su-metric-clean-lbl">{t('pro.training.card.exercises')}</span>
                                                 </div>
                                                 <div className="su-metric-divider"></div>
