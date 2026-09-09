@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Card from '../../components/Card';
+import RankingList from '../../components/gamification/RankingList';
 import { TrendingUp, Flame, CalendarDays, Award, Target } from 'lucide-react';
+import { useGamificationApi } from '../../hooks/api/useGamificationApi';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
@@ -31,10 +33,47 @@ const getWeekKey = (date) => {
 const DashboardClient = () => {
     const { t, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
+    const { getRanking } = useGamificationApi();
 
     const storedName = localStorage.getItem('shapeup_user_name') || 'Athlete';
     const firstName = storedName.split(' ')[0];
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
+    const currentUserId = parseInt(localStorage.getItem('shapeup_client_id'), 10) || 1;
+
+    const [rankingEntries, setRankingEntries] = useState([]);
+    const [rankingCursor, setRankingCursor] = useState(null);
+    const [rankingLoading, setRankingLoading] = useState(true);
+    const [rankingLoadingMore, setRankingLoadingMore] = useState(false);
+
+    const fetchRanking = useCallback(async (cursor = null, append = false) => {
+        if (append) {
+            setRankingLoadingMore(true);
+        } else {
+            setRankingLoading(true);
+        }
+
+        try {
+            const response = await getRanking(cursor, 10);
+            const items = response?.items ?? [];
+            const nextCursor = response?.nextCursor ?? null;
+
+            setRankingEntries((prev) => (append ? [...prev, ...items] : items));
+            setRankingCursor(nextCursor);
+        } catch (error) {
+            console.error('Failed to fetch ranking:', error);
+            if (!append) {
+                setRankingEntries([]);
+                setRankingCursor(null);
+            }
+        } finally {
+            setRankingLoading(false);
+            setRankingLoadingMore(false);
+        }
+    }, [getRanking]);
+
+    useEffect(() => {
+        fetchRanking();
+    }, [fetchRanking]);
 
     // ─── Read localStorage once, on mount (clientId is fixed for this component's lifetime) ───
     const [initialClientState] = useState(() => {
@@ -426,6 +465,17 @@ const DashboardClient = () => {
                     </Card>
                 </div>
 
+            </div>
+
+            <div className="su-mt-4">
+                <RankingList
+                    entries={rankingEntries}
+                    currentUserId={currentUserId}
+                    nextCursor={rankingCursor}
+                    onLoadMore={() => rankingCursor && fetchRanking(rankingCursor, true)}
+                    isLoading={rankingLoading}
+                    isLoadingMore={rankingLoadingMore}
+                />
             </div>
 
         </div>
