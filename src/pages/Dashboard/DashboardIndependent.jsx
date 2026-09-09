@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Card from '../../components/Card';
 import RankingList from '../../components/gamification/RankingList';
+import GamificationProgressCard from '../../components/gamification/GamificationProgressCard';
 import { TrendingUp, Flame, CalendarDays, Award } from 'lucide-react';
 import { useGamificationApi } from '../../hooks/api/useGamificationApi';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
@@ -30,11 +31,12 @@ const getWeekKey = (date) => {
 const DashboardIndependent = () => {
     const { t, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { getRanking } = useGamificationApi();
+    const { getGamificationProfile, getRanking } = useGamificationApi();
     const storedName = localStorage.getItem('shapeup_user_name') || 'Athlete';
     const firstName = storedName.split(' ')[0];
     const currentUserId = parseInt(localStorage.getItem('shapeup_client_id'), 10) || 1;
 
+    const [gamificationProfile, setGamificationProfile] = useState(null);
     const [rankingEntries, setRankingEntries] = useState([]);
     const [rankingCursor, setRankingCursor] = useState(null);
     const [rankingLoading, setRankingLoading] = useState(true);
@@ -66,9 +68,26 @@ const DashboardIndependent = () => {
         }
     }, [getRanking]);
 
+    const fetchGamificationProfile = useCallback(async () => {
+        try {
+            const profile = await getGamificationProfile();
+            setGamificationProfile(profile);
+        } catch (error) {
+            console.error('Failed to fetch gamification profile:', error);
+            setGamificationProfile({
+                totalXp: 0,
+                currentStreak: 0,
+                shapeCoins: 0,
+                shapeScore: 0,
+                level: 1,
+            });
+        }
+    }, [getGamificationProfile]);
+
     useEffect(() => {
+        fetchGamificationProfile();
         fetchRanking();
-    }, [fetchRanking]);
+    }, [fetchGamificationProfile, fetchRanking]);
 
     const [initialIndependentState] = useState(() => {
         const storedPlans = localStorage.getItem('shapeup_independent_plans');
@@ -271,6 +290,8 @@ const DashboardIndependent = () => {
                     </div>
                     <span className="su-metric-trend">{plansData.totalPlans === 0 ? t('client.dashboard.trend.sessions.noplans') : t('client.dashboard.trend.sessions.plans')}</span>
                 </Card>
+
+                <GamificationProgressCard profile={gamificationProfile} />
             </div>
 
             <div className="su-overview-layout">
