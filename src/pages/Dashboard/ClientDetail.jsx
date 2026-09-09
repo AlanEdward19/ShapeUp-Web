@@ -4,7 +4,7 @@ import { useTour } from '@reactour/tour';
 import {
     ArrowLeft, TrendingUp, Activity, Scale, CheckCircle2,
     Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp, AlertTriangle,
-    GripVertical, X, Save, Settings2, BarChart2, Dumbbell, ClipboardList, History, Play
+    X, Save, Settings2, BarChart2, Dumbbell, ClipboardList, History, Play
 } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -17,6 +17,7 @@ import {
 } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import ExerciseLibraryModal from '../../components/ExerciseLibraryModal';
+import BlockCard from '../../components/training/BlockCard';
 import { addNotification } from '../../utils/notifications';
 import '../../components/InviteClientModal.css';
 import '../Dashboard/TrainingPlansProfessional.css';
@@ -25,8 +26,8 @@ import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
 import { exercisesDB } from '../../data/mockExercises';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { enqueueMutation } from '../../services/mutationQueue';
-import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
-import { normalizePlan } from '../../utils/trainingNormalization';
+import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
+import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
 
 // Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
 // from a plan object shaped like normalizePlan()'s output (PlanEditor's internal shape) and
@@ -38,17 +39,26 @@ const buildWorkoutPlanBody = (plan, targetUserId) => ({
     durationInWeeks: parseInt(plan.weeks) || 4,
     phase: plan.phase || 'Hypertrophy',
     difficulty: mapDifficulty(plan.difficulty),
-    exercises: (plan.exercises || []).map(ex => ({
-        exerciseId: parseInt(ex.exerciseId) || 1,
-        sets: (ex.sets || []).map(s => ({
-            repetitions: parseInt(s.reps) || 0,
-            load: parseFloat(s.load) || 0,
-            loadUnit: mapLoadUnit(s.loadUnit),
-            setType: mapSetType(s.type ?? s.setType),
-            technique: mapTechnique(s.technique),
-            rpe: parseInt(s.rpe) || 0,
-            restSeconds: parseInt(s.rest) || 0,
-            isExtra: false
+    blocks: (plan.blocks || []).map(block => ({
+        type: mapBlockType(block.type),
+        timeCapSeconds: block.timeCapSeconds === '' || block.timeCapSeconds == null ? null : parseInt(block.timeCapSeconds),
+        intervalSeconds: block.intervalSeconds === '' || block.intervalSeconds == null ? null : parseInt(block.intervalSeconds),
+        totalRounds: block.totalRounds === '' || block.totalRounds == null ? null : parseInt(block.totalRounds),
+        restAfterSeconds: block.restAfterSeconds === '' || block.restAfterSeconds == null ? null : parseInt(block.restAfterSeconds),
+        exercises: (block.exercises || []).map(ex => ({
+            exerciseId: parseInt(ex.exerciseId) || 1,
+            sets: (ex.sets || []).map(s => ({
+                repetitions: s.reps === '' || s.reps == null ? null : parseInt(s.reps),
+                load: parseFloat(s.load) || 0,
+                loadUnit: mapLoadUnit(s.loadUnit),
+                setType: mapSetType(s.type ?? s.setType),
+                technique: mapTechnique(s.technique),
+                intensity: s.intensityType && s.intensityValue !== ''
+                    ? { type: mapIntensityType(s.intensityType), value: parseInt(s.intensityValue) }
+                    : null,
+                restSeconds: s.rest === '' || s.rest == null ? null : parseInt(s.rest),
+                isExtra: false
+            }))
         }))
     }))
 });
@@ -141,17 +151,26 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     const [difficulty, setDiff] = useState(plan.difficulty || 'Intermediate');
     const [weeks, setWeeks] = useState(plan.weeks);
     const [planNotes, setPlanNotes] = useState(plan.notes || '');
-    const [currentExercises, setCurrentExercises] = useState(
-        (plan.exercises || []).map(ex => ({ ...ex, sets: (ex.sets || []).map(s => ({ ...s })) }))
+    const [currentBlocks, setCurrentBlocks] = useState(
+        (plan.blocks || []).map(block => ({
+            ...block,
+            exercises: (block.exercises || []).map(ex => ({ ...ex, sets: (ex.sets || []).map(s => ({ ...s })) }))
+        }))
     );
     const [showExerciseLibrary, setShowExerciseLibrary] = useState(false);
+    // null = the library selection creates a new Straight block; a number = it's added to that
+    // existing block instead (needed to ever build a Superset/Emom with 2+ exercises).
+    const [addingToBlockIndex, setAddingToBlockIndex] = useState(null);
     const [alertModal, setAlertModal] = useState({ visible: false, title: '', message: '' });
 
-    const addExercise = () => setShowExerciseLibrary(true);
+    const allExercises = currentBlocks.flatMap(b => b.exercises);
+
+    const addExercise = () => { setAddingToBlockIndex(null); setShowExerciseLibrary(true); };
+    const addExerciseToBlock = (blockIdx) => { setAddingToBlockIndex(blockIdx); setShowExerciseLibrary(true); };
 
     const handleSelectExercise = (ex) => {
         // Prevent duplicates
-        const isDuplicate = currentExercises.some(e => e.name.toLowerCase() === ex.name.toLowerCase());
+        const isDuplicate = allExercises.some(e => e.name.toLowerCase() === ex.name.toLowerCase());
         if (isDuplicate) {
             setAlertModal({
                 visible: true,
@@ -167,43 +186,39 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             tagsParts.push(ex.muscles.join(' • '));
         }
 
-        setCurrentExercises(prev => [...prev, {
-            id: `e${Date.now()}`, 
+        const newExercise = {
+            id: `e${Date.now()}`,
             exerciseId: ex.id,
-            name: ex.name, 
-            tags: tagsParts.join(' • '), 
+            name: ex.name,
+            tags: tagsParts.join(' • '),
             notes: '',
-            sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '75', rpe: '8', rest: '90' }]
-        }]);
+            sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '75', intensityType: 'rpe', intensityValue: '8', rest: '90' }]
+        };
+
+        if (addingToBlockIndex === null) {
+            setCurrentBlocks(prev => [...prev, {
+                id: `b${Date.now()}`,
+                type: 'straight',
+                timeCapSeconds: '', intervalSeconds: '', totalRounds: '', restAfterSeconds: '',
+                exercises: [newExercise]
+            }]);
+        } else {
+            setCurrentBlocks(prev => {
+                const u = [...prev];
+                u[addingToBlockIndex] = { ...u[addingToBlockIndex], exercises: [...u[addingToBlockIndex].exercises, newExercise] };
+                return u;
+            });
+        }
         setShowExerciseLibrary(false);
     };
 
-    const removeExercise = idx =>
-        setCurrentExercises(prev => prev.filter((_, i) => i !== idx));
-
-    const addSet = exIdx => setCurrentExercises(prev => {
+    const updateBlock = (blockIdx, field, value) => setCurrentBlocks(prev => {
         const u = [...prev];
-        u[exIdx] = { ...u[exIdx], sets: [...u[exIdx].sets, { type: 'working', technique: 'Straight', reps: '8-10', load: '75', rpe: '8', rest: '90' }] };
+        u[blockIdx] = { ...u[blockIdx], [field]: value };
         return u;
     });
 
-    const removeSet = (exIdx, sIdx) => setCurrentExercises(prev => {
-        const u = [...prev];
-        u[exIdx] = { ...u[exIdx], sets: u[exIdx].sets.filter((_, i) => i !== sIdx) };
-        return u;
-    });
-
-    const updateSet = (exIdx, sIdx, field, value) => setCurrentExercises(prev => {
-        const u = [...prev];
-        u[exIdx].sets[sIdx] = { ...u[exIdx].sets[sIdx], [field]: value };
-        return u;
-    });
-
-    const updateEx = (exIdx, field, value) => setCurrentExercises(prev => {
-        const u = [...prev];
-        u[exIdx] = { ...u[exIdx], [field]: value };
-        return u;
-    });
+    const removeBlock = (blockIdx) => setCurrentBlocks(prev => prev.filter((_, i) => i !== blockIdx));
 
     // ─── Plan Editor Tour Trigger ────────────────────────────────────
     React.useEffect(() => {
@@ -236,22 +251,27 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     }, [setIsOpen, setSteps, isIndependent, t]);
 
     // Derived summary values (live computed)
-    const totalSets = currentExercises.reduce((acc, ex) => acc + ex.sets.length, 0);
+    const totalSets = allExercises.reduce((acc, ex) => acc + ex.sets.length, 0);
+    // Only RPE-scored sets enter this average -- RIR is a different scale, not converted.
     const avgRpe = (() => {
-        const all = currentExercises.flatMap(ex => ex.sets.map(s => parseFloat(s.rpe)).filter(r => !isNaN(r)));
+        const all = allExercises.flatMap(ex => ex.sets
+            .filter(s => s.intensityType === 'rpe')
+            .map(s => parseFloat(s.intensityValue))
+            .filter(r => !isNaN(r)));
         return all.length ? (all.reduce((a, b) => a + b, 0) / all.length).toFixed(1) : '—';
     })();
-    const estMins = currentExercises.length === 0 ? '—' : (() => {
-        const totalRest = currentExercises.reduce((acc, ex) =>
+    const estMins = allExercises.length === 0 ? '—' : (() => {
+        const totalRest = allExercises.reduce((acc, ex) =>
             acc + ex.sets.reduce((a, s) => a + (parseInt(s.rest) || 90), 0), 0);
         return `${Math.round((totalRest + totalSets * 45) / 60)}–${Math.round((totalRest + totalSets * 75) / 60)} ${t('pro.builder.summary.time.unit')}`;
     })();
 
-    // Intensity distribution (sets grouped by RPE rounded)
+    // Intensity distribution (RPE-scored sets grouped by value rounded)
     const intensityDist = (() => {
         const map = {};
-        currentExercises.forEach(ex => ex.sets.forEach(s => {
-            const r = parseFloat(s.rpe);
+        allExercises.forEach(ex => ex.sets.forEach(s => {
+            if (s.intensityType !== 'rpe') return;
+            const r = parseFloat(s.intensityValue);
             if (!isNaN(r)) {
                 const key = `RPE ${Math.round(r)}`;
                 map[key] = (map[key] || 0) + 1;
@@ -266,7 +286,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     const techniqueUsage = (() => {
         const map = {};
         let total = 0;
-        currentExercises.forEach(ex => ex.sets.forEach(s => {
+        allExercises.forEach(ex => ex.sets.forEach(s => {
             const tKey = s.technique || 'Straight';
             map[tKey] = (map[tKey] || 0) + 1;
             total++;
@@ -316,86 +336,14 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                     </div>
 
                     <div className="su-sortable-list">
-                        {currentExercises.map((ex, exIdx) => (
-                            <div key={ex.id} className="su-exercise-builder-card">
-                                <div className="su-drag-handle-vertical"><GripVertical size={20} /></div>
-                                <div className="su-exercise-content">
-                                    <div className="su-ex-header">
-                                        <div className="su-ex-title-row">
-                                            <input
-                                                className="su-pe-ex-name-input"
-                                                value={ex.name}
-                                                onChange={e => updateEx(exIdx, 'name', e.target.value)}
-                                                placeholder={t('pro.builder.ex.name.ph')}
-                                            />
-                                            <input
-                                                className="su-pe-ex-tags-input"
-                                                value={ex.tags}
-                                                onChange={e => updateEx(exIdx, 'tags', e.target.value)}
-                                                placeholder={t('pro.builder.ex.tags.ph')}
-                                            />
-                                        </div>
-                                        <div className="su-ex-toggles">
-                                            <button className="su-icon-btn su-error-text" onClick={() => removeExercise(exIdx)}>
-                                                <Trash2 size={18} />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="su-ex-notes">
-                                        <Input
-                                            value={ex.notes}
-                                            onChange={e => updateEx(exIdx, 'notes', e.target.value)}
-                                            placeholder={t('pro.builder.ex.notes.ph')}
-                                        />
-                                    </div>
-
-                                    <div className="su-sets-builder">
-                                        <div className="su-sets-header-labels">
-                                            <span></span>
-                                            <span>{t('pro.builder.set.type')}</span>
-                                            <span>{t('pro.builder.set.tech')}</span>
-                                            <span>{t('pro.builder.set.reps')}</span>
-                                            <span>{t('pro.builder.set.load')}</span>
-                                            <span>{t('pro.builder.set.rpe')}</span>
-                                            <span>{t('pro.builder.set.rest')}</span>
-                                            <span></span>
-                                        </div>
-
-                                        {ex.sets.map((s, sIdx) => (
-                                            <div key={sIdx} className="su-set-row">
-                                                <div className="su-set-base-grid">
-                                                    <div className="su-set-index">{sIdx + 1}</div>
-                                                    <div className="su-input-group">
-                                                        <select className="su-select" value={s.type}
-                                                            onChange={e => updateSet(exIdx, sIdx, 'type', e.target.value)}>
-                                                            {SET_TYPES.map(type => <option key={type} value={type}>{t(`client.session.set_type.${type}`)}</option>)}
-                                                        </select>
-                                                    </div>
-                                                    <div className="su-input-group">
-                                                        <select className="su-select" value={s.technique}
-                                                            onChange={e => updateSet(exIdx, sIdx, 'technique', e.target.value)}>
-                                                            {TECHNIQUES.map(tech => <option key={tech} value={tech}>{t(`pro.builder.tech.${tech.toLowerCase().replace(' ', '')}`) || tech}</option>)}
-                                                        </select>
-                                                    </div>
-                                                    <Input value={s.reps} onChange={e => updateSet(exIdx, sIdx, 'reps', e.target.value)} placeholder="8-10" />
-                                                    <Input value={s.load} onChange={e => updateSet(exIdx, sIdx, 'load', e.target.value)} placeholder="75" />
-                                                    <Input value={s.rpe} onChange={e => updateSet(exIdx, sIdx, 'rpe', e.target.value)} placeholder="8" />
-                                                    <Input value={s.rest} onChange={e => updateSet(exIdx, sIdx, 'rest', e.target.value)} placeholder="90" />
-                                                    <div className="su-set-actions">
-                                                        <button className="su-icon-btn su-error-text" onClick={() => removeSet(exIdx, sIdx)}>
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-
-                                        <Button variant="outline" icon={<Plus size={16} />} className="su-mt-2"
-                                            onClick={() => addSet(exIdx)}>{t('pro.builder.add.set')}</Button>
-                                    </div>
-                                </div>
-                            </div>
+                        {currentBlocks.map((block, blockIdx) => (
+                            <BlockCard
+                                key={block.id ?? blockIdx}
+                                block={block}
+                                onChange={(field, value) => updateBlock(blockIdx, field, value)}
+                                onRemove={() => removeBlock(blockIdx)}
+                                onAddExercise={() => addExerciseToBlock(blockIdx)}
+                            />
                         ))}
                     </div>
 
@@ -418,7 +366,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                     <div className="su-intelligence-metrics">
                         <div className="su-metric-item">
                             <span className="su-metric-label">{t('pro.builder.summary.ex')}</span>
-                            <span className="su-metric-val">{currentExercises.length}</span>
+                            <span className="su-metric-val">{allExercises.length}</span>
                         </div>
                         <div className="su-metric-item">
                             <span className="su-metric-label">{t('pro.builder.summary.sets')}</span>
@@ -482,13 +430,13 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
 
                     <Button fullWidth icon={<Save size={16} />}
                         onClick={() => {
-                            onSave({ ...plan, name, phase, difficulty, weeks, notes: planNotes, exercises: currentExercises });
+                            onSave({ ...plan, name, phase, difficulty, weeks, notes: planNotes, blocks: currentBlocks });
                         }}>
                         {t('pro.builder.btn.save')}
                     </Button>
                     {onAssign && (
                         <Button fullWidth variant="outline" className="su-mt-2" style={{ color: 'var(--text-main)' }}
-                            onClick={() => onAssign({ ...plan, name, phase, difficulty, weeks, notes: planNotes, exercises: currentExercises })}>
+                            onClick={() => onAssign({ ...plan, name, phase, difficulty, weeks, notes: planNotes, blocks: currentBlocks })}>
                             {t('pro.builder.btn.assign')}
                         </Button>
                     )}
@@ -601,7 +549,7 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
                         {plan.active && <span className="su-active-plan-badge">{t('pro.client.plan.active')}</span>}
                         <h3 className="su-cp-plan-name">{plan.name}</h3>
                         <p className="su-cp-plan-meta">
-                            {t(`pro.builder.phase.${plan.phase?.toLowerCase().split(' ')[0]}`) || plan.phase} · {t(`pro.builder.diff.${plan.difficulty?.toLowerCase()}`) || plan.difficulty} · {plan.weeks} {t('pro.client.plan.weeks')} · {plan.exercises.length} {t('pro.client.plan.exercises')}
+                            {t(`pro.builder.phase.${plan.phase?.toLowerCase().split(' ')[0]}`) || plan.phase} · {t(`pro.builder.diff.${plan.difficulty?.toLowerCase()}`) || plan.difficulty} · {plan.weeks} {t('pro.client.plan.weeks')} · {flattenBlockExercises(plan.blocks).length} {t('pro.client.plan.exercises')}
                         </p>
                     </div>
                     <div className="su-cp-plan-actions">
@@ -624,10 +572,10 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
 
                 {/* Exercise chips */}
                 <div className="su-cp-plan-exercises">
-                    {plan.exercises.map(ex => (
+                    {flattenBlockExercises(plan.blocks).map(ex => (
                         <span key={ex.id} className="su-cp-ex-chip">{ex.name}</span>
                     ))}
-                    {plan.exercises.length === 0 && (
+                    {flattenBlockExercises(plan.blocks).length === 0 && (
                         <span className="su-cp-ex-empty">{t('pro.client.plan.empty.ex')}</span>
                     )}
                 </div>
@@ -1052,7 +1000,7 @@ const ClientDetail = () => {
         const newPlan = {
             id: `p${Date.now()}`, name: 'New Training Plan',
             phase: 'Hypertrophy', difficulty: 'Intermediate',
-            weeks: 6, active: false, notes: '', exercises: [], history: []
+            weeks: 6, active: false, notes: '', blocks: [], history: []
         };
         setEditingPlan(newPlan);
     };
@@ -1070,9 +1018,13 @@ const ClientDetail = () => {
             name: `${plan.name} (Copy)`,
             active: false,
             history: [],
-            exercises: plan.exercises.map(ex => ({
-                ...ex, id: `e${Date.now() + Math.random()}`,
-                sets: ex.sets.map(s => ({ ...s }))
+            blocks: plan.blocks.map(block => ({
+                ...block,
+                id: `b${Date.now() + Math.random()}`,
+                exercises: block.exercises.map(ex => ({
+                    ...ex, id: `e${Date.now() + Math.random()}`,
+                    sets: ex.sets.map(s => ({ ...s }))
+                }))
             }))
         };
 
