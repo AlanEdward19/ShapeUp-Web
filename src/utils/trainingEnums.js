@@ -70,6 +70,45 @@ export const unmapTechnique = (value) => {
     return INT_TO_TECHNIQUE[parseInt(value)] ?? 'Straight';
 };
 
+// ─── BLOCK TYPE ──────────────────────────────────────────────────────────────
+// BlockType: 1=Straight, 2=Superset, 3=Amrap, 4=Emom
+export const BLOCK_TYPES = ['straight', 'superset', 'amrap', 'emom'];
+export const BLOCK_TYPE_TO_INT = {
+    straight: 1,
+    superset: 2,
+    amrap: 3,
+    emom: 4,
+};
+export const INT_TO_BLOCK_TYPE = Object.fromEntries(
+    Object.entries(BLOCK_TYPE_TO_INT).map(([k, v]) => [v, k])
+);
+export const mapBlockType = (value) => {
+    if (typeof value === 'number') return value;
+    return BLOCK_TYPE_TO_INT[String(value).toLowerCase()] ?? 1;
+};
+export const unmapBlockType = (value) => {
+    if (typeof value === 'string' && isNaN(value)) return value.toLowerCase();
+    return INT_TO_BLOCK_TYPE[parseInt(value)] ?? 'straight';
+};
+
+// ─── INTENSITY TYPE ──────────────────────────────────────────────────────────
+// IntensityType: 1=Rpe, 2=Rir
+export const INTENSITY_TYPE_TO_INT = {
+    rpe: 1,
+    rir: 2,
+};
+export const INT_TO_INTENSITY_TYPE = Object.fromEntries(
+    Object.entries(INTENSITY_TYPE_TO_INT).map(([k, v]) => [v, k])
+);
+export const mapIntensityType = (value) => {
+    if (typeof value === 'number') return value;
+    return INTENSITY_TYPE_TO_INT[String(value).toLowerCase()] ?? 1;
+};
+export const unmapIntensityType = (value) => {
+    if (typeof value === 'string' && isNaN(value)) return value.toLowerCase();
+    return INT_TO_INTENSITY_TYPE[parseInt(value)] ?? 'rpe';
+};
+
 // ─── DIFFICULTY ──────────────────────────────────────────────────────────────
 // Difficulty: 1=Easy, 2=Intermediate, 3=Hard, 4=Advanced
 export const DIFFICULTY_TO_INT = {
