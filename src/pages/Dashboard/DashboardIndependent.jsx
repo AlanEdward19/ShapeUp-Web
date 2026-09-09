@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Card from '../../components/Card';
+import RankingList from '../../components/gamification/RankingList';
 import { TrendingUp, Flame, CalendarDays, Award } from 'lucide-react';
+import { useGamificationApi } from '../../hooks/api/useGamificationApi';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
@@ -28,8 +30,45 @@ const getWeekKey = (date) => {
 const DashboardIndependent = () => {
     const { t, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
+    const { getRanking } = useGamificationApi();
     const storedName = localStorage.getItem('shapeup_user_name') || 'Athlete';
     const firstName = storedName.split(' ')[0];
+    const currentUserId = parseInt(localStorage.getItem('shapeup_client_id'), 10) || 1;
+
+    const [rankingEntries, setRankingEntries] = useState([]);
+    const [rankingCursor, setRankingCursor] = useState(null);
+    const [rankingLoading, setRankingLoading] = useState(true);
+    const [rankingLoadingMore, setRankingLoadingMore] = useState(false);
+
+    const fetchRanking = useCallback(async (cursor = null, append = false) => {
+        if (append) {
+            setRankingLoadingMore(true);
+        } else {
+            setRankingLoading(true);
+        }
+
+        try {
+            const response = await getRanking(cursor, 10);
+            const items = response?.items ?? [];
+            const nextCursor = response?.nextCursor ?? null;
+
+            setRankingEntries((prev) => (append ? [...prev, ...items] : items));
+            setRankingCursor(nextCursor);
+        } catch (error) {
+            console.error('Failed to fetch ranking:', error);
+            if (!append) {
+                setRankingEntries([]);
+                setRankingCursor(null);
+            }
+        } finally {
+            setRankingLoading(false);
+            setRankingLoadingMore(false);
+        }
+    }, [getRanking]);
+
+    useEffect(() => {
+        fetchRanking();
+    }, [fetchRanking]);
 
     const [initialIndependentState] = useState(() => {
         const storedPlans = localStorage.getItem('shapeup_independent_plans');
@@ -291,6 +330,17 @@ const DashboardIndependent = () => {
                         </div>
                     </Card>
                 </div>
+            </div>
+
+            <div className="su-mt-4">
+                <RankingList
+                    entries={rankingEntries}
+                    currentUserId={currentUserId}
+                    nextCursor={rankingCursor}
+                    onLoadMore={() => rankingCursor && fetchRanking(rankingCursor, true)}
+                    isLoading={rankingLoading}
+                    isLoadingMore={rankingLoadingMore}
+                />
             </div>
         </div>
     );
