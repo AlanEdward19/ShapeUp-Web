@@ -21,8 +21,8 @@ import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
-import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty } from '../../utils/trainingEnums';
-import { normalizePlan } from '../../utils/trainingNormalization';
+import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
+import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
 import './TrainingPlansClient.css';
 import './TrainingPlansProfessional.css';
 
@@ -36,17 +36,26 @@ const buildWorkoutPlanBody = (plan, targetUserId) => ({
     durationInWeeks: parseInt(plan.weeks) || 4,
     phase: plan.phase || 'Hypertrophy',
     difficulty: mapDifficulty(plan.difficulty),
-    exercises: (plan.exercises || []).map(ex => ({
-        exerciseId: parseInt(ex.exerciseId) || 1,
-        sets: (ex.sets || []).map(s => ({
-            repetitions: parseInt(s.reps) || 0,
-            load: parseFloat(s.load) || 0,
-            loadUnit: mapLoadUnit(s.loadUnit),
-            setType: mapSetType(s.type ?? s.setType),
-            technique: mapTechnique(s.technique),
-            rpe: parseInt(s.rpe) || 0,
-            restSeconds: parseInt(s.rest) || 0,
-            isExtra: false
+    blocks: (plan.blocks || []).map(block => ({
+        type: mapBlockType(block.type),
+        timeCapSeconds: block.timeCapSeconds === '' || block.timeCapSeconds == null ? null : parseInt(block.timeCapSeconds),
+        intervalSeconds: block.intervalSeconds === '' || block.intervalSeconds == null ? null : parseInt(block.intervalSeconds),
+        totalRounds: block.totalRounds === '' || block.totalRounds == null ? null : parseInt(block.totalRounds),
+        restAfterSeconds: block.restAfterSeconds === '' || block.restAfterSeconds == null ? null : parseInt(block.restAfterSeconds),
+        exercises: (block.exercises || []).map(ex => ({
+            exerciseId: parseInt(ex.exerciseId) || 1,
+            sets: (ex.sets || []).map(s => ({
+                repetitions: s.reps === '' || s.reps == null ? null : parseInt(s.reps),
+                load: parseFloat(s.load) || 0,
+                loadUnit: mapLoadUnit(s.loadUnit),
+                setType: mapSetType(s.type ?? s.setType),
+                technique: mapTechnique(s.technique),
+                intensity: s.intensityType && s.intensityValue !== ''
+                    ? { type: mapIntensityType(s.intensityType), value: parseInt(s.intensityValue) }
+                    : null,
+                restSeconds: s.rest === '' || s.rest == null ? null : parseInt(s.rest),
+                isExtra: false
+            }))
         }))
     }))
 });
@@ -76,7 +85,7 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart }) => {
                     </p>
                     <div className="su-ex-count-badge">
                         <Activity size={14} />
-                        <span>{plan.exercises?.length || 0} {t('pro.client.plan.exercises')}</span>
+                        <span>{flattenBlockExercises(plan.blocks).length} {t('pro.client.plan.exercises')}</span>
                     </div>
                 </div>
                 <div className="su-plan-card-side">
@@ -328,14 +337,14 @@ const TrainingPlansIndependent = () => {
             }
 
             if (plan) {
-                const runtimeExercises = plan.exercises.map((ex, exIdx) => ({
+                const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => ({
                     id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
                     name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
                     target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
                     sets: ex.sets.map((s, sIdx) => ({
                         id: `s_${exIdx}_${sIdx}`,
                         type: s.type,
-                        target: `${s.reps} reps @ ${s.load}% | RPE ${s.rpe}`,
+                        target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
                         completed: false,
                         failure: false,
                         prescribedRest: s.rest || 90,
@@ -462,7 +471,7 @@ const TrainingPlansIndependent = () => {
             weeks: 6,
             active: false,
             notes: '',
-            exercises: [],
+            blocks: [],
             history: []
         };
         setEditingPlan(newPlan);
@@ -589,14 +598,14 @@ const TrainingPlansIndependent = () => {
             setWorkoutSessionId(null);
         }
 
-        const runtimeExercises = plan.exercises.map((ex, exIdx) => ({
+        const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => ({
             id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
             name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
             target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
             sets: ex.sets.map((s, sIdx) => ({
                 id: `s_${exIdx}_${sIdx}`,
                 type: s.type,
-                target: `${s.reps} reps @ ${s.load}% | RPE ${s.rpe}`,
+                target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
                 completed: false,
                 failure: false,
                 prescribedRest: s.rest || 90,
