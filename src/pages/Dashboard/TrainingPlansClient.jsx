@@ -13,7 +13,7 @@ import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
-import { normalizePlan } from '../../utils/trainingNormalization';
+import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
 import { mapSetType, mapTechnique } from '../../utils/trainingEnums';
 import './TrainingPlansClient.css';
 
@@ -239,14 +239,14 @@ const ClientView = () => {
 
             if (plan) {
                 // Map exercises to runtime format
-                const runtimeExercises = plan.exercises.map((ex, exIdx) => ({
+                const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => ({
                     id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
                     name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
                     target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
                     sets: ex.sets.map((s, sIdx) => ({
                         id: `s_${exIdx}_${sIdx}`,
                         type: s.type,
-                        target: `${s.reps} reps @ ${s.load}% | RPE ${s.rpe}`,
+                        target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
                         completed: false,
                         failure: false,
                         prescribedRest: s.rest || 90,
@@ -391,7 +391,7 @@ const ClientView = () => {
         }
 
         // Map the plan's exercises into the runtime session engine format
-        const runtimeExercises = plan.exercises.map((ex, exIdx) => {
+        const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => {
             return {
                 id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
                 name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
@@ -399,7 +399,7 @@ const ClientView = () => {
                 sets: ex.sets.map((s, sIdx) => ({
                     id: `s_${exIdx}_${sIdx}`,
                     type: s.type,
-                    target: `${s.reps} reps @ ${s.load}% | RPE ${s.rpe}`,
+                    target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
                     completed: false,
                     failure: false,
                     prescribedRest: s.rest || 90,
@@ -784,7 +784,7 @@ const ClientView = () => {
 
                                         <div className="su-plan-meta-row">
                                             <div className="su-meta-pill">
-                                                <DumbbellIcon size={16} /> {plan.exercises.length} {t('client.training.card.exercises')}
+                                                <DumbbellIcon size={16} /> {flattenBlockExercises(plan.blocks).length} {t('client.training.card.exercises')}
                                             </div>
                                         </div>
                                     </div>
