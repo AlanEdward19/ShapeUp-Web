@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Zap, Coins, Target, Award } from 'lucide-react';
+import { Trophy, Zap, Coins, Target, Award, UtensilsCrossed } from 'lucide-react';
 import Card from '../Card';
 import './GamificationProgressCard.css';
 
@@ -25,6 +25,7 @@ const GamificationProgressCard = ({ profile }) => {
     const totalXp = profile?.totalXp ?? 0;
     const level = profile?.level ?? 1;
     const currentStreak = profile?.currentStreak ?? 0;
+    const nutritionStreak = profile?.nutritionCurrentStreak ?? 0;
     const shapeCoins = profile?.shapeCoins ?? 0;
     const shapeScore = profile?.shapeScore ?? 0;
 
@@ -73,12 +74,20 @@ const GamificationProgressCard = ({ profile }) => {
                     </div>
 
                     <div className="su-gamification-stats-grid">
-                        <div className="su-gamification-stat">
+                        <div className="su-gamification-stat" data-testid="workout-streak-stat">
                             <div className="su-gamification-stat-header">
-                                <span className="su-metric-label">Streak</span>
+                                <span className="su-metric-label">Streak treino</span>
                                 <Award size={16} className="su-warning-text" aria-hidden="true" />
                             </div>
                             <div className="su-gamification-stat-value">{currentStreak}</div>
+                        </div>
+
+                        <div className="su-gamification-stat" data-testid="nutrition-streak-stat">
+                            <div className="su-gamification-stat-header">
+                                <span className="su-metric-label">Streak nutrição</span>
+                                <UtensilsCrossed size={16} className="su-success-text" aria-hidden="true" />
+                            </div>
+                            <div className="su-gamification-stat-value" data-testid="nutrition-streak-value">{nutritionStreak}</div>
                         </div>
 
                         <div className="su-gamification-stat">

@@ -12,7 +12,9 @@ import {
     MessageSquare,
     LogOut,
     Target,
-    DollarSign
+    DollarSign,
+    UtensilsCrossed,
+    Shield
 } from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import ChatDrawer from './ChatDrawer';
@@ -58,6 +60,7 @@ const Sidebar = ({ isProfessional, isIndependent, isGym }) => {
     const clientNavItems = [
         { name: t('nav.dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard' },
         { name: t('nav.my_training'), icon: <Activity size={20} />, path: '/dashboard/training' },
+        { name: t('nav.nutrition') || 'Nutrição', icon: <UtensilsCrossed size={20} />, path: '/dashboard/nutrition/diary' },
         { name: t('nav.objectives'), icon: <Target size={20} />, path: '/dashboard/objectives' },
         { name: t('nav.settings'), icon: <Settings size={20} />, path: '/dashboard/settings' },
     ];
@@ -66,8 +69,14 @@ const Sidebar = ({ isProfessional, isIndependent, isGym }) => {
         { name: t('nav.dashboard'), icon: <LayoutDashboard size={20} />, path: '/dashboard' },
         { name: t('nav.training_plans'), icon: <Dumbbell size={20} />, path: '/dashboard/training' },
         { name: t('nav.exercises_library'), icon: <LibrarySquare size={20} />, path: '/dashboard/exercises' },
+        { name: t('nav.nutrition') || 'Nutrição', icon: <UtensilsCrossed size={20} />, path: '/dashboard/nutrition/diary' },
         { name: t('nav.objectives'), icon: <Target size={20} />, path: '/dashboard/objectives' },
         { name: t('nav.settings'), icon: <Settings size={20} />, path: '/dashboard/settings' },
+    ];
+
+    const adminNavItems = [
+        { name: t('nav.food_moderation') || 'Triagem alimentos', icon: <Shield size={20} />, path: '/dashboard/admin/food-moderation' },
+        { name: t('nav.feature_flags') || 'Feature flags', icon: <Settings size={20} />, path: '/dashboard/admin/feature-flags' },
     ];
 
     const gymNavItems = [
@@ -79,7 +88,9 @@ const Sidebar = ({ isProfessional, isIndependent, isGym }) => {
         { name: t('nav.settings'),   icon: <Settings size={20} />,        path: '/dashboard/settings' },
     ];
 
-    const navItems = isGym ? gymNavItems : (isProfessional ? proNavItems : (isIndependent ? independentNavItems : clientNavItems));
+    const isPlatformAdmin = localStorage.getItem('shapeup_platform_admin') === 'true';
+    const baseNavItems = isGym ? gymNavItems : (isProfessional ? proNavItems : (isIndependent ? independentNavItems : clientNavItems));
+    const navItems = isPlatformAdmin ? [...baseNavItems, ...adminNavItems] : baseNavItems;
 
     return (
         <aside className="su-sidebar">

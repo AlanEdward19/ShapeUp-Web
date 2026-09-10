@@ -21,6 +21,12 @@ import ObjectivesClient from './pages/Dashboard/ObjectivesClient';
 import StaffGym from './pages/Dashboard/StaffGym';
 import TurnstileGym from './pages/Dashboard/TurnstileGym';
 import FinancialGym from './pages/Dashboard/FinancialGym';
+import DiaryDay from './pages/Dashboard/Nutrition/DiaryDay';
+import FoodSearch from './pages/Dashboard/Nutrition/FoodSearch';
+import MealPlanManager from './pages/Dashboard/Nutrition/MealPlanManager';
+import GoalOnboarding from './pages/Dashboard/Nutrition/GoalOnboarding';
+import FoodModerationQueue from './pages/Admin/FoodModerationQueue';
+import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
 
 // Wrapper for the Login page
 const LoginWrapper = () => {
@@ -66,6 +72,12 @@ function App() {
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
             <Route path="objectives" element={<ObjectivesClient />} />
+            <Route path="nutrition/diary" element={<DiaryDay />} />
+            <Route path="nutrition/foods" element={<FoodSearch />} />
+            <Route path="nutrition/meal-plans" element={<MealPlanManager />} />
+            <Route path="nutrition/goal" element={<GoalOnboarding />} />
+            <Route path="admin/food-moderation" element={<FoodModerationQueue />} />
+            <Route path="admin/feature-flags" element={<FeatureFlagsPanel />} />
             <Route path="staff" element={<StaffGym />} />
             <Route path="turnstile" element={<TurnstileGym />} />
             <Route path="financial" element={<FinancialGym />} />
