@@ -1,7 +1,8 @@
 import { render, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import DiaryDay, { isMacroGoalMet } from '../DiaryDay';
+import DiaryDay from '../DiaryDay';
+import { isMacroGoalMet } from '../nutritionUtils';
 
 const mockGetDiaryDay = vi.fn();
 const mockGetNutritionProfile = vi.fn();

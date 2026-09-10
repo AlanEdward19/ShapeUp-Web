@@ -2,7 +2,8 @@ import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter } from 'react-router-dom';
-import FoodSearch, { supportsBarcodeDetector } from '../FoodSearch';
+import FoodSearch from '../FoodSearch';
+import { supportsBarcodeDetector } from '../nutritionUtils';
 
 const mockSearchFoods = vi.fn();
 const mockGetFoodByBarcode = vi.fn();

@@ -4,6 +4,7 @@ import Card from '../../../components/Card';
 import NutritionNav from './NutritionNav';
 import SubstituteItemModal from './SubstituteItemModal';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
+import { isMacroGoalMet } from './nutritionUtils';
 
 const MEAL_SLOT_LABELS = {
     Breakfast: 'Café da manhã',
@@ -24,17 +25,6 @@ const toDateKey = (date = new Date()) => {
     const m = String(date.getMonth() + 1).padStart(2, '0');
     const d = String(date.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
-};
-
-export const isMacroGoalMet = (totals, goal) => {
-    if (!goal || !totals) return false;
-    const tolerance = 0.1;
-    return ['proteinG', 'carbG', 'fatG'].every((macro) => {
-        const target = goal[macro];
-        const consumed = totals[macro] ?? 0;
-        if (!target || target <= 0) return false;
-        return Math.abs(consumed - target) / target <= tolerance;
-    });
 };
 
 const MacroProgressBar = ({ label, consumed, goal, color, informational }) => {

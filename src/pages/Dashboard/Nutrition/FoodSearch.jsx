@@ -6,9 +6,7 @@ import Button from '../../../components/Button';
 import FoodForm from './FoodForm';
 import NutritionNav from './NutritionNav';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
-
-export const supportsBarcodeDetector = () =>
-    typeof window !== 'undefined' && 'BarcodeDetector' in window;
+import { supportsBarcodeDetector } from './nutritionUtils';
 
 const FoodSearch = () => {
     const { searchFoods, getFoodByBarcode } = useNutritionApi();
