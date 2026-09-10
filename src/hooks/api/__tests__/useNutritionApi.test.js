@@ -160,6 +160,20 @@ describe('useNutritionApi', () => {
             expect(() => result.current.addDiaryEntry(command)).toThrow('queue failed');
             expect(apiClient).not.toHaveBeenCalled();
         });
+
+        it('enqueues past client date for cross-day offline sync', () => {
+            const pastDateCommand = { ...command, date: '2026-05-08' };
+            const { result } = renderHook(() => useNutritionApi());
+            act(() => {
+                result.current.addDiaryEntry(pastDateCommand);
+            });
+            expect(enqueueMutation).toHaveBeenCalledWith({
+                endpoint: '/api/nutrition/diary/entries',
+                method: 'POST',
+                body: { ...pastDateCommand, id: 'generated-entry-id' },
+            });
+            expect(apiClient).not.toHaveBeenCalled();
+        });
     });
 
     describe('removeDiaryEntry', () => {

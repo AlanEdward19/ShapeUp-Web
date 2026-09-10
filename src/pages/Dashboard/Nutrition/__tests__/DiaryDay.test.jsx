@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import DiaryDay from '../DiaryDay';
@@ -7,12 +7,16 @@ import { isMacroGoalMet } from '../nutritionUtils';
 const mockGetDiaryDay = vi.fn();
 const mockGetNutritionProfile = vi.fn();
 const mockRemoveDiaryEntry = vi.fn();
+const mockSuggestSubstitutes = vi.fn();
 
 vi.mock('../../../../hooks/api/useNutritionApi', () => ({
     useNutritionApi: () => ({
         getDiaryDay: mockGetDiaryDay,
         getNutritionProfile: mockGetNutritionProfile,
         removeDiaryEntry: mockRemoveDiaryEntry,
+        suggestSubstitutes: mockSuggestSubstitutes,
+        substituteDiaryItem: vi.fn(),
+        searchFoods: vi.fn(),
     }),
 }));
 
@@ -48,6 +52,7 @@ describe('DiaryDay', () => {
             activeGoal: { kcal: 2000, proteinG: 150, carbG: 200, fatG: 65 },
         });
         mockRemoveDiaryEntry.mockResolvedValue(null);
+        mockSuggestSubstitutes.mockResolvedValue({ suggestions: [] });
     });
 
     it('renders meals and macro progress with data', async () => {
@@ -73,6 +78,22 @@ describe('DiaryDay', () => {
 
         await waitFor(() => {
             expect(getByTestId('empty-day')).toHaveTextContent('Nenhuma refeição registrada');
+        });
+    });
+
+    it('opens substitute modal when substitute button is clicked', async () => {
+        mockGetDiaryDay.mockResolvedValue(sampleDiary);
+
+        const { getByTestId } = renderDiaryDay();
+
+        await waitFor(() => {
+            expect(getByTestId('substitute-btn-entry-1')).toBeInTheDocument();
+        });
+
+        fireEvent.click(getByTestId('substitute-btn-entry-1'));
+
+        await waitFor(() => {
+            expect(getByTestId('substitute-modal')).toBeInTheDocument();
         });
     });
 
