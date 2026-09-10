@@ -6,14 +6,14 @@ import { Target, Scale, Trash2, TrendingUp, Check } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
-import { useTrainingApi } from '../../hooks/api/useTrainingApi';
+import { useNutritionApi } from '../../hooks/api/useNutritionApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import './DashboardClient.css';
 
 const ObjectivesClient = () => {
     const { t, unitSystem, convertWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { getWeightRegisters } = useTrainingApi();
+    const { getWeightRegisters } = useNutritionApi();
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
 
     // --- Objectives State ---
@@ -156,7 +156,7 @@ const ObjectivesClient = () => {
     // server. dedupeKey collapses repeated saves before the first one syncs.
     const handleSaveGoal = () => {
         enqueueMutation({
-            endpoint: '/api/training/weight/target',
+            endpoint: '/api/nutrition/weight/target',
             method: 'PUT',
             body: { targetWeight: parseFloat(tempGoalWeight), unit: unitSystem },
             dedupeKey: `weight-target-${clientId}`,
@@ -184,7 +184,7 @@ const ObjectivesClient = () => {
         // overwrite `history` with server data that doesn't have this entry yet (it hasn't
         // synced), making the just-logged weight flicker in and back out.
         enqueueMutation({
-            endpoint: '/api/training/weight/registers',
+            endpoint: '/api/nutrition/weight/registers',
             method: 'POST',
             body: { weight: parsedWeight, dateUtc },
         });
