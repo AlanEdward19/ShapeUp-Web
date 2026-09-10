@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { PartyPopper } from 'lucide-react';
 import Card from '../../../components/Card';
 import NutritionNav from './NutritionNav';
+import SubstituteItemModal from './SubstituteItemModal';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
 
 const MEAL_SLOT_LABELS = {
@@ -63,6 +64,8 @@ const DiaryDay = () => {
     const [diary, setDiary] = useState(null);
     const [goal, setGoal] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [substituteEntry, setSubstituteEntry] = useState(null);
+
     const loadData = useCallback(async () => {
         setLoading(true);
         try {
@@ -175,14 +178,25 @@ const DiaryDay = () => {
                                                 {item.computedMacros?.kcal} kcal · P {item.computedMacros?.proteinG}g
                                             </div>
                                         </div>
-                                        <button
-                                            type="button"
-                                            className="su-btn su-btn-secondary"
-                                            style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}
-                                            onClick={() => handleRemove(item.id)}
-                                        >
-                                            Remover
-                                        </button>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <button
+                                                type="button"
+                                                className="su-btn su-btn-secondary"
+                                                style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}
+                                                onClick={() => setSubstituteEntry(item)}
+                                                data-testid={`substitute-btn-${item.id}`}
+                                            >
+                                                Substituir
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className="su-btn su-btn-secondary"
+                                                style={{ fontSize: '0.8rem', padding: '0.25rem 0.5rem' }}
+                                                onClick={() => handleRemove(item.id)}
+                                            >
+                                                Remover
+                                            </button>
+                                        </div>
                                     </li>
                                 ))}
                             </ul>
@@ -191,6 +205,17 @@ const DiaryDay = () => {
                 ))
             )}
 
+            {substituteEntry && (
+                <SubstituteItemModal
+                    entry={substituteEntry}
+                    date={date}
+                    onClose={() => setSubstituteEntry(null)}
+                    onSubstituted={() => {
+                        setSubstituteEntry(null);
+                        loadData();
+                    }}
+                />
+            )}
         </div>
     );
 };
