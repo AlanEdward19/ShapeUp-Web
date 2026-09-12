@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X, Lightbulb, CheckCircle } from 'lucide-react';
 import './InviteClientModal.css';
 import './SuggestExerciseModal.css';
 
@@ -45,15 +44,10 @@ const SuggestExerciseModal = ({ onClose }) => {
     return (
         <div className="su-modal-overlay" onClick={onClose}>
             <div className="su-modal-box su-suggest-modal" onClick={e => e.stopPropagation()}>
-                <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
+                <button className="su-modal-close" onClick={onClose} aria-label="Close">×</button>
 
                 {!sent ? (
                     <>
-                        <div className="su-modal-icon-header">
-                            <div className="su-modal-icon-circle" style={{ background: 'linear-gradient(135deg, #7c3aed, #5b21b6)' }}>
-                                <Lightbulb size={24} />
-                            </div>
-                        </div>
                         <h2 className="su-modal-title">Suggest New Exercise</h2>
                         <p className="su-modal-subtitle">
                             Can't find an exercise you need? Suggest it to our admins and we'll review it for the library.
@@ -138,18 +132,13 @@ const SuggestExerciseModal = ({ onClose }) => {
 
                         <div className="su-modal-actions">
                             <button className="su-modal-btn-cancel" onClick={onClose}>Cancel</button>
-                            <button className="su-modal-btn-primary" onClick={handleSubmit}
-                                style={{ background: 'linear-gradient(135deg, #7c3aed, #5b21b6)', boxShadow: '0 4px 14px rgba(124,58,237,0.35)' }}
-                            >
-                                <Lightbulb size={16} /> Send Suggestion
+                            <button className="su-modal-btn-primary" onClick={handleSubmit}>
+                                Send Suggestion
                             </button>
                         </div>
                     </>
                 ) : (
                     <div className="su-modal-success">
-                        <div className="su-modal-success-icon">
-                            <CheckCircle size={52} />
-                        </div>
                         <h2 className="su-modal-title">Suggestion Sent!</h2>
                         <p className="su-modal-subtitle">
                             Your suggestion for <strong>"{form.name}"</strong> has been submitted to our administrators for review.<br />

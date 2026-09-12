@@ -6,6 +6,12 @@ import { ThemeProvider } from './ThemeContext.jsx';
 import { LanguageProvider } from './contexts/LanguageContext.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
 import './index.css';
+import './styles/workspace.css';
+import { redirectToHttpsIfNeeded } from './utils/forceHttps';
+import { startAnalyticsIfAllowed } from './utils/analytics';
+
+redirectToHttpsIfNeeded();
+startAnalyticsIfAllowed();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

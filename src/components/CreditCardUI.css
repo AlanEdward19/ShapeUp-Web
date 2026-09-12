@@ -1,16 +1,15 @@
-/* CreditCardUI.css */
 .su-cc-scene {
-    width: 340px;
-    height: 215px;
+    width: min(21.25rem, 100%);
+    height: 13.4rem;
     perspective: 1000px;
-    margin: 0 auto 2rem auto;
+    margin: 0 auto 2rem;
 }
 
 .su-cc-card {
     width: 100%;
     height: 100%;
     position: relative;
-    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     transform-style: preserve-3d;
 }
 
@@ -23,83 +22,50 @@
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    border-radius: 16px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    color: white;
+    border-radius: 0;
+    box-shadow: var(--shadow-md);
+    color: var(--text-inverse);
     overflow: hidden;
-    /* Gradient Background */
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background: oklch(28% 0.04 50);
+    border: 1px solid oklch(38% 0.05 45);
 }
 
-.su-cc-face::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.1) 0%, transparent 40%);
-    pointer-events: none;
-}
-
-/* Front Face */
 .su-cc-front {
-    padding: 1.5rem;
+    padding: 1.25rem 1.35rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
 .su-cc-chip {
-    width: 45px;
-    height: 35px;
-    background: linear-gradient(to bottom right, #d4af37, #aa8529);
-    border-radius: 6px;
-    position: relative;
-    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
-}
-
-.su-cc-chip::after {
-    content: '';
-    position: absolute;
-    top: 10%;
-    left: 10%;
-    right: 10%;
-    bottom: 10%;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
+    width: 2.6rem;
+    height: 1.85rem;
+    background: color-mix(in oklch, var(--primary) 70%, oklch(72% 0.1 85));
+    border: 1px solid color-mix(in oklch, var(--primary) 40%, white);
 }
 
 .su-cc-type {
     position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    font-style: italic;
+    top: 1.2rem;
+    right: 1.35rem;
+    font-family: var(--font-display);
     font-weight: 800;
-    font-size: 1.5rem;
-    opacity: 0.8;
-}
-
-.su-cc-logo-visa {
-    color: #fff;
-}
-
-.su-cc-logo-mc {
-    color: #ff5f00;
+    font-size: 1.35rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }
 
 .su-cc-number {
-    font-size: 1.5rem;
-    font-family: 'Courier New', Courier, monospace;
-    letter-spacing: 2px;
-    margin-top: 1rem;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin-top: 0.75rem;
 }
 
 .su-cc-details {
     display: flex;
     justify-content: space-between;
-    margin-top: 1rem;
 }
 
 .su-cc-col {
@@ -112,64 +78,64 @@
 }
 
 .su-cc-label {
-    font-size: 0.65rem;
+    font-family: var(--font-display);
+    font-size: 0.62rem;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 0.25rem;
-    letter-spacing: 1px;
+    letter-spacing: 0.14em;
+    color: color-mix(in oklch, var(--text-inverse) 65%, transparent);
+    margin-bottom: 0.2rem;
 }
 
 .su-cc-val {
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.08em;
 }
 
-/* Back Face */
 .su-cc-back {
     transform: rotateY(180deg);
 }
 
 .su-cc-magstripe {
     width: 100%;
-    height: 45px;
-    background-color: #000;
-    margin-top: 25px;
+    height: 2.6rem;
+    background-color: oklch(12% 0.02 50);
+    margin-top: 1.5rem;
 }
 
 .su-cc-cvv-strip {
-    margin: 20px 20px 0 20px;
+    margin: 1.15rem 1.25rem 0;
 }
 
 .su-cc-cvv-label {
     display: block;
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 4px;
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: color-mix(in oklch, var(--text-inverse) 65%, transparent);
+    margin-bottom: 0.25rem;
     text-align: right;
-    padding-right: 5px;
 }
 
 .su-cc-cvv-box {
     width: 100%;
-    height: 35px;
-    background-color: #fff;
-    border-radius: 4px;
+    height: 2rem;
+    background: var(--bg-input);
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 0 10px;
-    color: #000;
-    font-size: 0.9rem;
-    font-weight: bold;
-    font-family: 'Courier New', Courier, monospace;
-    letter-spacing: 2px;
+    padding: 0 0.7rem;
+    color: var(--text-main);
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: 0.16em;
 }
 
 .su-cc-back-desc {
-    margin: 20px;
+    margin: 1rem 1.25rem;
     font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.4);
-    text-align: center;
+    color: color-mix(in oklch, var(--text-inverse) 45%, transparent);
+    text-align: left;
 }

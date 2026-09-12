@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { Search, Plus, UserPlus, FileEdit, Filter } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import './Clients.css';
@@ -131,7 +131,7 @@ const ClientsGym = () => {
                                                 onClick={() => handleStealClient(client.name)}
                                                 title={t('gym.clients.btn.steal') || 'Vincular a mim para editar treinos'}
                                             >
-                                                <UserPlus size={16} /> {t('gym.clients.btn.steal_short') || 'Link to me'}
+                                                {t('gym.clients.btn.steal_short') || 'Link to me'}
                                             </Button>
                                         ) : (
                                             <Button 
@@ -140,7 +140,7 @@ const ClientsGym = () => {
                                                 onClick={() => handleAssignTrainer(client.name)}
                                                 title={t('gym.clients.btn.assign') || 'Alterar Professor'}
                                             >
-                                                <FileEdit size={16} /> {t('gym.clients.btn.assign_short') || 'Change Trainer'}
+                                                {t('gym.clients.btn.assign_short') || 'Change Trainer'}
                                             </Button>
                                         )}
                                     </div>

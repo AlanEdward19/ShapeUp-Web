@@ -1,5 +1,4 @@
 import React from 'react';
-import { Trophy, Flame, Coins, Zap } from 'lucide-react';
 import Card from '../Card';
 import Button from '../Button';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -23,10 +22,7 @@ const RankingList = ({
 
     return (
         <Card className="su-ranking-card">
-            <h3 className="su-section-title">
-                <Trophy size={20} style={{ verticalAlign: 'text-bottom', marginRight: '8px', color: 'var(--warning)' }} />
-                {title}
-            </h3>
+            <h3 className="su-section-title">{title}</h3>
 
             {isLoading && entries.length === 0 ? (
                 <div className="su-ranking-empty">{t('common.loading') || 'Loading...'}</div>
@@ -49,18 +45,15 @@ const RankingList = ({
                                     </span>
                                     <div className="su-ranking-stats">
                                         <span className="su-ranking-stat" title={t('gamification.ranking.level') || 'Level'}>
-                                            <Zap size={14} />
                                             Lv {entry.level ?? 0}
                                         </span>
                                         <span className="su-ranking-stat" title={t('gamification.ranking.xp') || 'XP'}>
                                             {entry.totalXp ?? 0} XP
                                         </span>
                                         <span className="su-ranking-stat" title={t('gamification.ranking.streak') || 'Streak'}>
-                                            <Flame size={14} />
                                             {entry.currentStreak ?? 0}
                                         </span>
                                         <span className="su-ranking-stat" title={t('gamification.ranking.coins') || 'ShapeCoins'}>
-                                            <Coins size={14} />
                                             {entry.shapeCoins ?? 0}
                                         </span>
                                     </div>

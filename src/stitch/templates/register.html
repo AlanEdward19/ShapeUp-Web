@@ -1,0 +1,150 @@
+
+<!-- Main Container -->
+<main class="w-full max-w-[560px] mx-auto flex flex-col my-auto">
+<!-- Top System Header -->
+<header class="flex items-center justify-between pb-6 border-b border-brand-border">
+<!-- ShapeUp Tech Brand -->
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-[6px] bg-brand-card border border-brand-border flex items-center justify-center text-brand-terracotta">
+<svg class="w-4 h-4" fill="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<path d="M50 8L86 28V72L50 92L14 72V28L50 8Z" stroke="#E06C43" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"></path>
+<rect fill="#E06C43" height="10" rx="3" width="50" x="25" y="45"></rect>
+<path d="M32 66L45 42L55 54L68 28" stroke="#B8AAA2" stroke-linecap="round" stroke-linejoin="round" stroke-width="7"></path>
+</svg>
+</div>
+<span class="font-headline tracking-tight text-xl font-bold text-brand-text">Shape<span class="text-brand-terracotta">Up</span></span>
+</div>
+<!-- Environment / Status Tag -->
+<div class="flex items-center gap-1.5 text-xs text-brand-muted font-mono bg-brand-card border border-brand-border px-2.5 py-1 rounded-[6px]">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-terracotta inline-block animate-pulse"></span>
+<span>Setup de Ambiente</span>
+</div>
+</header>
+<!-- Discrete Technical Stepper Indicator -->
+<div class="py-5">
+<div class="flex items-center justify-between text-xs mb-2">
+<span class="font-medium text-brand-text">
+<span class="text-brand-terracotta font-semibold">Passo 1 de 3:</span> Identificação &amp; Perfil de Uso
+        </span>
+<span class="text-brand-muted font-mono">Etapa 01/03</span>
+</div>
+<!-- Step bars -->
+<div class="grid grid-cols-3 gap-2">
+<div class="h-1 bg-brand-terracotta rounded-full"></div>
+<div class="h-1 bg-brand-border rounded-full"></div>
+<div class="h-1 bg-brand-border rounded-full"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] text-brand-muted mt-1.5 font-mono">
+<span class="text-brand-text">1. Perfil &amp; Identificação</span>
+<span>2. Credenciais</span>
+<span>3. Parâmetros</span>
+</div>
+</div>
+<!-- Configuration Form -->
+<form class="flex flex-col gap-6" id="setup-form" data-source-onsubmit="event.preventDefault();">
+<!-- Configuration Target Header -->
+<div class="flex flex-col gap-1">
+<h1 class="font-headline text-2xl font-bold tracking-tight text-brand-text">
+          Como você pretende usar o ShapeUp?
+        </h1>
+<p class="text-sm text-brand-muted leading-relaxed">
+          Configure seu ambiente de trabalho de acordo com seu papel de atuação.
+        </p>
+</div>
+<!-- Technical Role Selection (Configuration Radios) -->
+<fieldset class="flex flex-col gap-2.5" role="radiogroup">
+<legend class="sr-only">Selecione seu perfil de configuração</legend>
+<!-- Option 1: Personal Trainer / Coach (Selected by default) -->
+<label class="role-option group relative flex items-start gap-3.5 p-3.5 rounded-[8px] bg-brand-card border border-brand-border hover:bg-brand-card-hover hover:border-brand-border transition-colors cursor-pointer" data-role="coach">
+<input checked="" class="sr-only" name="system_role" type="radio" value="coach">
+<div class="role-radio mt-0.5 w-4 h-4 rounded-full border border-brand-border flex items-center justify-center flex-shrink-0 group-hover:border-brand-muted transition-colors">
+<div class="role-dot w-2 h-2 rounded-full bg-brand-terracotta hidden"></div>
+</div>
+<div class="flex flex-col gap-0.5 min-w-0 pr-2">
+<span class="text-sm font-semibold text-brand-text group-hover:text-white transition-colors">
+              Personal Trainer / Coach
+            </span>
+<span class="text-xs text-brand-muted leading-normal">
+              Prescrição de treinos, periodização técnica, gestão de alunos e acompanhamento de cargas.
+            </span>
+</div>
+</label>
+<!-- Option 2: Atleta / Aluno -->
+<label class="role-option group relative flex items-start gap-3.5 p-3.5 rounded-[8px] bg-brand-card border border-brand-border hover:bg-brand-card-hover hover:border-brand-border transition-colors cursor-pointer" data-role="athlete">
+<input class="sr-only" name="system_role" type="radio" value="athlete">
+<div class="role-radio mt-0.5 w-4 h-4 rounded-full border border-brand-border flex items-center justify-center flex-shrink-0 group-hover:border-brand-muted transition-colors">
+<div class="role-dot w-2 h-2 rounded-full bg-brand-terracotta hidden"></div>
+</div>
+<div class="flex flex-col gap-0.5 min-w-0 pr-2">
+<span class="text-sm font-semibold text-brand-text group-hover:text-white transition-colors">
+              Atleta / Aluno
+            </span>
+<span class="text-xs text-brand-muted leading-normal">
+              Acesso ao plano prescrito, registro de cargas em tempo real, diário de nutrição e métricas corporais.
+            </span>
+</div>
+</label>
+<!-- Option 3: Gestor de Academia ou Studio -->
+<label class="role-option group relative flex items-start gap-3.5 p-3.5 rounded-[8px] bg-brand-card border border-brand-border hover:bg-brand-card-hover hover:border-brand-border transition-colors cursor-pointer" data-role="manager">
+<input class="sr-only" name="system_role" type="radio" value="manager">
+<div class="role-radio mt-0.5 w-4 h-4 rounded-full border border-brand-border flex items-center justify-center flex-shrink-0 group-hover:border-brand-muted transition-colors">
+<div class="role-dot w-2 h-2 rounded-full bg-brand-terracotta hidden"></div>
+</div>
+<div class="flex flex-col gap-0.5 min-w-0 pr-2">
+<span class="text-sm font-semibold text-brand-text group-hover:text-white transition-colors">
+              Gestor de Academia ou Studio
+            </span>
+<span class="text-xs text-brand-muted leading-normal">
+              Controle de catracas e acessos em tempo real, fluxo de caixa, gestão de equipe e relatórios operacionais.
+            </span>
+</div>
+</label>
+</fieldset>
+<!-- Identification Fields -->
+<div class="flex flex-col gap-3.5 pt-2 border-t border-brand-border">
+<h2 class="text-xs font-semibold uppercase tracking-wider text-brand-muted font-mono">
+          Dados de Identificação
+        </h2>
+<!-- Nome Completo -->
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-medium text-brand-text" for="fullname">
+            Nome completo
+          </label>
+<input class="w-full bg-brand-input border border-brand-border rounded-[6px] px-3 py-2 text-sm text-brand-text placeholder:text-brand-muted/50 focus:outline-none focus:border-brand-terracotta focus:ring-1 focus:ring-brand-terracotta transition-colors" id="fullname" name="fullname" placeholder="Seu nome completo" required="" type="text">
+</div>
+<!-- E-mail Profissional -->
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-medium text-brand-text" for="email">
+            E-mail profissional
+          </label>
+<input class="w-full bg-brand-input border border-brand-border rounded-[6px] px-3 py-2 text-sm text-brand-text placeholder:text-brand-muted/50 focus:outline-none focus:border-brand-terracotta focus:ring-1 focus:ring-brand-terracotta transition-colors" id="email" name="email" placeholder="nome@dominio.com.br" required="" type="email">
+</div>
+<!-- Telefone / WhatsApp com DDD -->
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-medium text-brand-text" for="phone">
+            Telefone / WhatsApp com DDD
+          </label>
+<input class="w-full bg-brand-input border border-brand-border rounded-[6px] px-3 py-2 text-sm text-brand-text placeholder:text-brand-muted/50 focus:outline-none focus:border-brand-terracotta focus:ring-1 focus:ring-brand-terracotta transition-colors" id="phone" name="phone" placeholder="(11) 98765-4321" required="" type="tel">
+</div>
+</div>
+<!-- Action Button -->
+<div class="flex flex-col gap-3 pt-2">
+<button class="w-full h-11 bg-[#E06C43] hover:bg-[#cc5c35] text-white font-medium text-sm rounded-[6px] flex items-center justify-center gap-2 transition-colors active:scale-[0.99]" type="submit">
+<span>Continuar configuração</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</form>
+<!-- Minimalist Technical Footer -->
+<footer class="mt-8 pt-5 border-t border-brand-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-brand-muted">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-brand-muted">lock</span>
+<span>Segurança de dados e conformidade integral com LGPD.</span>
+</div>
+<div class="flex items-center gap-1">
+<span>Já possui uma conta?</span>
+<a class="text-brand-terracotta hover:underline font-medium ml-0.5" href="#">Entrar</a>
+</div>
+</footer>
+</main>
+

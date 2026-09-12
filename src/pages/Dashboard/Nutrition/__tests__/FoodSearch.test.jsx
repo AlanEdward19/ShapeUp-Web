@@ -2,6 +2,7 @@ import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter } from 'react-router-dom';
+import { withLang } from '../../../../test/withLang';
 import FoodSearch from '../FoodSearch';
 import { supportsBarcodeDetector } from '../nutritionUtils';
 
@@ -19,11 +20,13 @@ vi.mock('../../../../hooks/api/useNutritionApi', () => ({
 }));
 
 const renderFoodSearch = () =>
-    render(
-        <MemoryRouter>
-            <FoodSearch />
-        </MemoryRouter>
-    );
+        render(
+            withLang(
+            <MemoryRouter>
+                <FoodSearch />
+            </MemoryRouter>
+            )
+        );
 
 describe('FoodSearch', () => {
     beforeEach(() => {
@@ -65,7 +68,7 @@ describe('FoodSearch', () => {
         fireEvent.click(getByTestId('food-search-btn'));
 
         await waitFor(() => {
-            expect(getByTestId('empty-state')).toHaveTextContent('Nenhum alimento encontrado');
+            expect(getByTestId('empty-state')).toHaveTextContent('No foods found');
         });
     });
 

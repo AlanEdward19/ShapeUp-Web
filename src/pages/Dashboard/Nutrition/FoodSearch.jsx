@@ -1,14 +1,15 @@
 import React, { useState, useCallback } from 'react';
-import { Search, ScanBarcode } from 'lucide-react';
-import Card from '../../../components/Card';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import FoodForm from './FoodForm';
 import NutritionNav from './NutritionNav';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { supportsBarcodeDetector } from './nutritionUtils';
+import './Nutrition.css';
 
 const FoodSearch = () => {
+    const { t } = useLanguage();
     const { searchFoods, getFoodByBarcode } = useNutritionApi();
     const [query, setQuery] = useState('');
     const [barcodeInput, setBarcodeInput] = useState('');
@@ -32,13 +33,13 @@ const FoodSearch = () => {
             setResults(Array.isArray(items) ? items : []);
             setSearched(true);
         } catch (err) {
-            setError(err.message || 'Falha na busca');
+            setError(err.message || t('nutrition.foods.error.search'));
             setResults([]);
             setSearched(true);
         } finally {
             setLoading(false);
         }
-    }, [query, searchFoods]);
+    }, [query, searchFoods, t]);
 
     const handleBarcodeLookup = useCallback(async (code) => {
         const trimmed = code?.trim();
@@ -58,12 +59,12 @@ const FoodSearch = () => {
                 setCreateBarcode(trimmed);
                 setShowCreateForm(true);
             } else {
-                setError(err.message || 'Falha na busca por código de barras');
+                setError(err.message || t('nutrition.foods.error.barcode'));
             }
         } finally {
             setLoading(false);
         }
-    }, [getFoodByBarcode]);
+    }, [getFoodByBarcode, t]);
 
     const handleScanBarcode = async () => {
         if (!supportsBarcodeDetector()) return;
@@ -81,10 +82,10 @@ const FoodSearch = () => {
             if (codes.length > 0) {
                 await handleBarcodeLookup(codes[0].rawValue);
             } else {
-                setError('Nenhum código detectado. Tente digitar manualmente.');
+                setError(t('nutrition.foods.error.none'));
             }
         } catch (err) {
-            setError(err.message || 'Falha ao ler código de barras');
+            setError(err.message || t('nutrition.foods.error.scan'));
         }
     };
 
@@ -98,13 +99,18 @@ const FoodSearch = () => {
     return (
         <div className="su-nutrition-page">
             <NutritionNav />
-            <h1 className="su-page-title su-mb-6">Buscar alimentos</h1>
+            <header className="su-nutrition-masthead">
+                <div>
+                    <span className="su-nutrition-kicker">{t('nutrition.foods.kicker')}</span>
+                    <h1 className="su-page-title">{t('nutrition.foods.title')}</h1>
+                </div>
+            </header>
 
-            <Card className="su-mb-4">
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end' }}>
-                    <div style={{ flex: 1 }}>
+            <section className="su-journal-sheet">
+                <div className="su-search-row">
+                    <div>
                         <Input
-                            label="Buscar por nome"
+                            label={t('nutrition.foods.search_label')}
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -112,12 +118,11 @@ const FoodSearch = () => {
                         />
                     </div>
                     <Button onClick={handleSearch} disabled={loading || !query.trim()} data-testid="food-search-btn">
-                        <Search size={16} />
-                        Buscar
+                        {t('nutrition.foods.search')}
                     </Button>
                 </div>
 
-                <div style={{ marginTop: '1rem' }} data-testid="barcode-section">
+                <div className="su-barcode-row" style={{ marginTop: '1rem' }} data-testid="barcode-section">
                     {supportsBarcodeDetector() ? (
                         <Button
                             variant="secondary"
@@ -125,14 +130,13 @@ const FoodSearch = () => {
                             disabled={loading}
                             data-testid="barcode-scan-btn"
                         >
-                            <ScanBarcode size={16} />
-                            Ler código de barras
+                            {t('nutrition.foods.scan')}
                         </Button>
                     ) : (
-                        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-end' }}>
-                            <div style={{ flex: 1 }}>
+                        <>
+                            <div>
                                 <Input
-                                    label="Código de barras (digitação manual)"
+                                    label={t('nutrition.foods.barcode_label')}
                                     value={barcodeInput}
                                     onChange={(e) => setBarcodeInput(e.target.value)}
                                     data-testid="barcode-manual-input"
@@ -144,14 +148,14 @@ const FoodSearch = () => {
                                 disabled={loading || !barcodeInput.trim()}
                                 data-testid="barcode-manual-btn"
                             >
-                                Buscar código
+                                {t('nutrition.foods.barcode_btn')}
                             </Button>
-                        </div>
+                        </>
                     )}
                 </div>
 
                 {error && <p className="su-input-error-text su-mt-4" role="alert">{error}</p>}
-            </Card>
+            </section>
 
             {showCreateForm && (
                 <FoodForm
@@ -170,39 +174,38 @@ const FoodSearch = () => {
             )}
 
             {!selectedFood && !showCreateForm && searched && (
-                <Card data-testid="search-results">
+                <section className="su-journal-sheet" data-testid="search-results">
                     {loading ? (
-                        <p className="su-text-muted">Buscando...</p>
+                        <p className="su-text-muted">{t('nutrition.foods.searching')}</p>
                     ) : results.length === 0 ? (
-                        <p className="su-text-muted" data-testid="empty-state">
-                            Nenhum alimento encontrado. Tente outro termo ou cadastre um novo.
+                        <p className="su-text-muted su-empty-ledger" data-testid="empty-state">
+                            {t('nutrition.foods.empty')}
                         </p>
                     ) : (
-                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                        <ul className="su-food-index">
                             {results.map((food) => (
-                                <li key={food.id} style={{ marginBottom: '0.5rem' }}>
+                                <li key={food.id} className="su-food-index-item">
                                     <button
                                         type="button"
-                                        className="su-nav-link"
-                                        style={{ width: '100%', textAlign: 'left', padding: '0.75rem', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'transparent', cursor: 'pointer' }}
+                                        className="su-food-index-btn"
                                         onClick={() => setSelectedFood(food)}
                                         data-testid={`food-result-${food.id}`}
                                     >
                                         <strong>{food.name}</strong>
                                         {food.isPersonalOverride && (
                                             <span className="su-warning-text" style={{ marginLeft: '0.5rem', fontSize: '0.8rem' }}>
-                                                (sua versão)
+                                                ({t('nutrition.diary.override')})
                                             </span>
                                         )}
-                                        <span className="su-text-muted" style={{ display: 'block', fontSize: '0.85rem' }}>
-                                            {food.macrosPer100?.kcal} kcal / 100g
+                                        <span className="su-text-muted su-food-kcal">
+                                            {t('nutrition.foods.kcal100', { n: food.macrosPer100?.kcal })}
                                         </span>
                                     </button>
                                 </li>
                             ))}
                         </ul>
                     )}
-                </Card>
+                </section>
             )}
         </div>
     );

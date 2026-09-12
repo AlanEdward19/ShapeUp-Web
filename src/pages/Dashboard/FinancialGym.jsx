@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Card from '../../components/Card';
-import {
-    DollarSign, TrendingUp, TrendingDown, Users, CreditCard,
-    ChevronDown, Download, CheckCircle, XCircle, Clock
-} from 'lucide-react';
+import { Download } from 'lucide-react';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid,
-    Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, Legend
+    Tooltip as RechartsTooltip, ResponsiveContainer
 } from 'recharts';
 import './FinancialGym.css';
 
@@ -47,62 +44,45 @@ const fmt = (n) => `R$ ${n.toLocaleString('pt-BR', { minimumFractionDigits: 2 })
 const FinancialGym = () => {
     const { t } = useLanguage();
     const [period, setPeriod] = useState('month');
+    const [view, setView] = useState('transactions');
+    const [filter, setFilter] = useState('all');
+    const [query, setQuery] = useState('');
+    const filteredTransactions = recentTransactions.filter(tx => (filter === 'all' || tx.status === filter) && (tx.client + ' ' + tx.plan).toLowerCase().includes(query.toLowerCase()));
+    const exportReport = () => {
+        const csv = '\uFEFFAluno;Plano;Data;Valor;Status\n' + filteredTransactions.map(tx => [tx.client, tx.plan, tx.date, tx.amount.toFixed(2), tx.status].join(';')).join('\n');
+        const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        const link = document.createElement('a'); link.href = url; link.download = 'shapeup-financeiro.csv'; link.click(); URL.revokeObjectURL(url);
+    };
 
     const totalRevenue  = 145890;
     const totalExpenses = 39200;
     const netProfit     = totalRevenue - totalExpenses;
     const totalClients  = subscriptionPlans.reduce((s, p) => s + p.activeClients, 0);
 
+    const overdueCount = recentTransactions.filter(tx => tx.status === 'overdue').length;
     const metrics = [
-        {
-            icon: <DollarSign size={22} color="#10b981" />,
-            bg: 'rgba(16, 185, 129, 0.1)',
-            label: t('gym.financial.metric.revenue') || 'Gross Revenue',
-            value: fmt(totalRevenue),
-            trend: '+8.4%',
-            trendClass: 'positive',
-        },
-        {
-            icon: <TrendingDown size={22} color="#ef4444" />,
-            bg: 'rgba(239, 68, 68, 0.1)',
-            label: t('gym.financial.metric.expenses') || 'Expenses',
-            value: fmt(totalExpenses),
-            trend: '+2.1%',
-            trendClass: 'negative',
-        },
-        {
-            icon: <TrendingUp size={22} color="var(--primary)" />,
-            bg: 'rgba(59, 130, 246, 0.1)',
-            label: t('gym.financial.metric.net') || 'Net Profit',
-            value: fmt(netProfit),
-            trend: '+11.2%',
-            trendClass: 'positive',
-        },
-        {
-            icon: <Users size={22} color="#8b5cf6" />,
-            bg: 'rgba(139, 92, 246, 0.1)',
-            label: t('gym.financial.metric.active') || 'Active Subscribers',
-            value: totalClients.toLocaleString('pt-BR'),
-            trend: '+56',
-            trendClass: 'positive',
-        },
+        { label: 'Receita recorrente (MRR)', value: fmt(totalRevenue), trend: totalClients + ' membros', trendClass: 'positive' },
+        { label: 'Inadimplência nas cobranças', value: Math.round(overdueCount / recentTransactions.length * 100) + '%', trend: overdueCount + ' em aberto', trendClass: 'negative' },
+        { label: 'Ticket médio / aluno', value: fmt(totalRevenue / totalClients), trend: 'Receita por assinatura', trendClass: 'positive' },
+        { label: 'Despesas operacionais', value: fmt(totalExpenses), trend: 'Folha & manutenção', trendClass: '' },
+        { label: 'Resultado líquido do mês', value: fmt(netProfit), trend: Math.round(netProfit / totalRevenue * 100) + '% de margem', trendClass: 'positive' },
     ];
 
     const statusMeta = {
-        paid:    { label: t('gym.financial.status.paid')    || 'Paid',    icon: <CheckCircle size={13} />, cls: 'paid' },
-        pending: { label: t('gym.financial.status.pending') || 'Pending', icon: <Clock size={13} />,       cls: 'pending' },
-        overdue: { label: t('gym.financial.status.overdue') || 'Overdue', icon: <XCircle size={13} />,     cls: 'overdue' },
+        paid:    { label: t('gym.financial.status.paid')    || 'Paid',    cls: 'paid' },
+        pending: { label: t('gym.financial.status.pending') || 'Pending', cls: 'pending' },
+        overdue: { label: t('gym.financial.status.overdue') || 'Overdue', cls: 'overdue' },
     };
 
     return (
-        <div className="su-clients-dashboard">
+        <div className="su-clients-dashboard su-finance-workspace">
             {/* Header */}
             <div className="su-dashboard-header-flex" style={{ marginBottom: '2rem' }}>
                 <div>
-                    <h1 className="su-page-title">{t('gym.financial.title') || 'Financial Overview'}</h1>
+                    <h1 className="su-page-title">Gestão financeira</h1>
                     <p className="su-page-subtitle">{t('gym.financial.subtitle') || 'Monthly revenue, expenses and subscriber analytics.'}</p>
                 </div>
-                <button className="fin-export-btn">
+                <button className="fin-export-btn" onClick={exportReport}>
                     <Download size={16} /> {t('gym.financial.btn.export') || 'Export Report'}
                 </button>
             </div>
@@ -111,12 +91,11 @@ const FinancialGym = () => {
             <div className="fin-metrics-grid">
                 {metrics.map((m, i) => (
                     <Card key={i} className="gym-metric-card fin-kpi-card">
-                        <div className="gym-metric-icon-wrap" style={{ background: m.bg }}>{m.icon}</div>
                         <div className="gym-metric-body">
                             <span className="gym-metric-label">{m.label}</span>
                             <span className="gym-metric-value fin-value">{m.value}</span>
                             <span className={`gym-metric-trend ${m.trendClass}`}>
-                                {m.trend} {t('gym.metric.this_month') || 'this month'}
+                                {m.trend}
                             </span>
                         </div>
                     </Card>
@@ -124,7 +103,8 @@ const FinancialGym = () => {
             </div>
 
             {/* Chart + Plans side-by-side */}
-            <div className="fin-mid-grid">
+            <nav className="su-finance-tabs" aria-label="Visões financeiras"><button type="button" aria-pressed={view === 'transactions'} onClick={() => {setView('transactions'); setFilter('all');}}>Visão geral & fluxo</button><button type="button" aria-pressed={view === 'transactions' && filter === 'pending'} onClick={() => {setView('transactions'); setFilter('pending');}}>Cobranças pendentes</button><button type="button" aria-pressed={view === 'analytics'} onClick={() => setView('analytics')}>Receitas & planos</button></nav>
+            <div className="fin-mid-grid" hidden={view !== 'analytics'}>
                 {/* Revenue Chart */}
                 <Card className="fin-chart-card">
                     <div className="fin-card-header">
@@ -143,26 +123,26 @@ const FinancialGym = () => {
                     </div>
                     <div style={{ height: 220 }}>
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={monthlyRevenue} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                            <AreaChart data={period === 'month' ? monthlyRevenue.slice(-1) : period === 'quarter' ? monthlyRevenue.slice(-3) : monthlyRevenue} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="gradRev" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
-                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="var(--success)" stopOpacity={0.22} />
+                                        <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
                                     </linearGradient>
                                     <linearGradient id="gradExp" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2} />
-                                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="var(--error)" stopOpacity={0.18} />
+                                        <stop offset="95%" stopColor="var(--error)" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
                                 <XAxis dataKey="month" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
                                 <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `R$${(v/1000).toFixed(0)}k`} />
                                 <RechartsTooltip
-                                    contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 8, fontSize: 12 }}
+                                    contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', fontSize: 12 }}
                                     formatter={(v) => fmt(v)}
                                 />
-                                <Area type="monotone" dataKey="revenue"  stroke="#10b981" fill="url(#gradRev)" strokeWidth={2} name={t('gym.financial.chart.revenue') || 'Revenue'} />
-                                <Area type="monotone" dataKey="expenses" stroke="#ef4444" fill="url(#gradExp)" strokeWidth={2} name={t('gym.financial.chart.expenses') || 'Expenses'} />
+                                <Area type="monotone" dataKey="revenue"  stroke="var(--success)" fill="url(#gradRev)" strokeWidth={2} name={t('gym.financial.chart.revenue') || 'Revenue'} />
+                                <Area type="monotone" dataKey="expenses" stroke="var(--error)" fill="url(#gradExp)" strokeWidth={2} name={t('gym.financial.chart.expenses') || 'Expenses'} />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
@@ -172,7 +152,6 @@ const FinancialGym = () => {
                 <Card className="fin-plans-card">
                     <div className="fin-card-header">
                         <h2 className="fin-card-title">{t('gym.financial.plans.title') || 'Subscription Plans'}</h2>
-                        <CreditCard size={18} style={{ color: 'var(--text-muted)' }} />
                     </div>
                     <div className="fin-plans-list">
                         {subscriptionPlans.map(plan => {
@@ -199,11 +178,11 @@ const FinancialGym = () => {
             </div>
 
             {/* Recent Transactions */}
-            <Card className="fin-tx-card" style={{ padding: 0, overflow: 'hidden' }}>
+            <Card className={`fin-tx-card ${view !== 'transactions' ? 'su-finance-hidden' : ''}`} style={{ padding: 0, overflow: 'hidden' }}>
                 <div className="fin-card-header" style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--border-color)' }}>
-                    <h2 className="fin-card-title">{t('gym.financial.tx.title') || 'Recent Transactions'}</h2>
+                    <div><h2 className="fin-card-title">Fluxo de cobranças e transações recentes</h2><p className="su-text-muted">Histórico consolidado de cobranças da unidade.</p></div><div className="su-finance-filters"><select aria-label="Status das cobranças" value={filter} onChange={event => setFilter(event.target.value)}><option value="all">Todas</option><option value="pending">Pendentes</option><option value="overdue">Atrasadas</option><option value="paid">Confirmadas</option></select><input aria-label="Buscar cobrança" placeholder="Buscar aluno ou plano..." value={query} onChange={event => setQuery(event.target.value)} /></div>
                 </div>
-                <table className="fin-tx-table">
+                <div className="su-finance-table-scroll"><table className="fin-tx-table">
                     <thead>
                         <tr>
                             <th>{t('gym.financial.tx.col.client') || 'Client'}</th>
@@ -214,7 +193,7 @@ const FinancialGym = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {recentTransactions.map(tx => {
+                        {filteredTransactions.map(tx => {
                             const s = statusMeta[tx.status] || statusMeta.pending;
                             return (
                                 <tr key={tx.id}>
@@ -228,13 +207,13 @@ const FinancialGym = () => {
                                     <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{tx.date}</td>
                                     <td style={{ fontWeight: 600, color: 'var(--text-main)' }}>{fmt(tx.amount)}</td>
                                     <td>
-                                        <span className={`fin-tx-status ${s.cls}`}>{s.icon} {s.label}</span>
+                                        <span className={`fin-tx-status ${s.cls}`}>{s.label}</span>
                                     </td>
                                 </tr>
                             );
                         })}
                     </tbody>
-                </table>
+                </table></div><footer className="su-finance-table-footer">{filteredTransactions.length} cobranças exibidas</footer>
             </Card>
         </div>
     );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle, CreditCard, DollarSign } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
 import Button from './Button';
@@ -86,9 +86,9 @@ const ClientBillingModal = ({ isOpen, onClose, client, onSave }) => {
 
                 <div className="su-modal-body" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-                    <div style={{ backgroundColor: 'var(--bg-main)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
-                        <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>{t('clients.billing.for')}</span>
-                        <div style={{ fontWeight: 600, fontSize: '1.1rem', marginTop: '0.25rem' }}>{client.name}</div>
+                    <div className="su-billing-for">
+                        <span className="su-billing-for-label">{t('clients.billing.for')}</span>
+                        <div className="su-billing-for-name">{client.name}</div>
                     </div>
 
                     <div className="su-billing-type-selector" data-tour="billing-type">
@@ -96,14 +96,12 @@ const ClientBillingModal = ({ isOpen, onClose, client, onSave }) => {
                             className={`su-billing-type-btn ${billingType === 'plan' ? 'active' : ''}`}
                             onClick={() => setBillingType('plan')}
                         >
-                            <CreditCard size={18} />
                             {t('clients.billing.type.plan')}
                         </button>
                         <button
                             className={`su-billing-type-btn ${billingType === 'custom' ? 'active' : ''}`}
                             onClick={() => setBillingType('custom')}
                         >
-                            <DollarSign size={18} />
                             {t('clients.billing.type.custom')}
                         </button>
                     </div>
@@ -128,7 +126,7 @@ const ClientBillingModal = ({ isOpen, onClose, client, onSave }) => {
                                                 <div style={{ fontWeight: 700, color: 'var(--primary)' }}>${plan.price}/mo</div>
                                             </div>
                                             <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{plan.desc}</div>
-                                            {selectedPlanId === plan.id && <CheckCircle className="su-plan-checkmark" size={18} />}
+                                            {selectedPlanId === plan.id && <span className="su-plan-checkmark">✓</span>}
                                         </div>
                                     ))}
                                 </div>

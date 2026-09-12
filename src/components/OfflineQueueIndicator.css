@@ -1,7 +1,7 @@
 .su-offline-indicator {
     position: fixed;
-    bottom: 1.25rem;
-    right: 1.25rem;
+    bottom: 1.5rem;
+    right: 1.5rem;
     z-index: 500;
     display: flex;
     flex-direction: column;
@@ -12,21 +12,24 @@
 .su-offline-pill {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 999px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-card);
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    font-weight: 600;
-    box-shadow: var(--shadow-md);
+    gap: 0.55rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 0;
+    border: 1px solid var(--text-main);
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    box-shadow: none;
     cursor: pointer;
 }
 
 .su-offline-pill.attention {
-    color: var(--warning);
-    border-color: rgba(245, 158, 11, 0.4);
+    color: var(--error);
+    border-color: var(--error);
 }
 
 .su-offline-spin {
@@ -39,23 +42,26 @@
 }
 
 .su-offline-panel {
-    width: 320px;
-    max-height: 320px;
+    width: 20rem;
+    max-height: 20rem;
     overflow-y: auto;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    padding: 0.5rem;
+    background: var(--bg-main);
+    border: 1px solid var(--text-main);
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0.65rem 0.75rem 0.85rem;
 }
 
 .su-offline-panel-header {
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--text-muted);
-    padding: 0.25rem 0.5rem 0.5rem;
+    color: var(--text-main);
+    padding: 0.15rem 0.25rem 0.65rem;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.35rem;
 }
 
 .su-offline-panel-item {
@@ -63,12 +69,17 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.5rem;
-    padding: 0.4rem 0.5rem;
-    border-radius: var(--radius-sm);
+    padding: 0.55rem 0.25rem;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 0;
+}
+
+.su-offline-panel-item:last-child {
+    border-bottom: none;
 }
 
 .su-offline-panel-item:hover {
-    background: var(--bg-input);
+    background: transparent;
 }
 
 .su-offline-panel-item-info {
@@ -78,7 +89,7 @@
 }
 
 .su-offline-panel-item-endpoint {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: var(--text-main);
     white-space: nowrap;
     overflow: hidden;
@@ -121,4 +132,10 @@
 
 .su-offline-panel-item-actions button:hover {
     color: var(--text-main);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .su-offline-spin {
+        animation: none;
+    }
 }

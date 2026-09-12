@@ -1,5 +1,6 @@
 import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { withLang } from '../../../../test/withLang';
 import SubstituteItemModal from '../SubstituteItemModal';
 
 const mockSuggestSubstitutes = vi.fn();
@@ -40,12 +41,14 @@ describe('SubstituteItemModal', () => {
     it('substitutes via suggestion without changing saved plan', async () => {
         const onSubstituted = vi.fn();
         const { getByTestId } = render(
-            <SubstituteItemModal
-                entry={entry}
-                date="2026-09-10"
-                onClose={vi.fn()}
-                onSubstituted={onSubstituted}
-            />
+            withLang(
+                <SubstituteItemModal
+                    entry={entry}
+                    date="2026-09-10"
+                    onClose={vi.fn()}
+                    onSubstituted={onSubstituted}
+                />
+            )
         );
 
         await waitFor(() => {
@@ -67,12 +70,14 @@ describe('SubstituteItemModal', () => {
     it('substitutes via free search', async () => {
         const onSubstituted = vi.fn();
         const { getByTestId } = render(
-            <SubstituteItemModal
-                entry={entry}
-                date="2026-09-10"
-                onClose={vi.fn()}
-                onSubstituted={onSubstituted}
-            />
+            withLang(
+                <SubstituteItemModal
+                    entry={entry}
+                    date="2026-09-10"
+                    onClose={vi.fn()}
+                    onSubstituted={onSubstituted}
+                />
+            )
         );
 
         await waitFor(() => expect(getByTestId('free-search-input')).toBeInTheDocument());

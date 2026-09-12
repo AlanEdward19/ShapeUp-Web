@@ -1,4 +1,6 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { publicSurfaceI18n } from '../i18n/publicSurface';
+import { appSurfaceI18n } from '../i18n/appSurface';
 
 const LanguageContext = createContext();
 
@@ -15,6 +17,10 @@ const getInitialLanguage = () => {
 
 export const LanguageProvider = ({ children }) => {
     const [language, setLanguageState] = useState(getInitialLanguage);
+
+    useEffect(() => {
+        document.documentElement.lang = language === 'pt-BR' ? 'pt-BR' : language;
+    }, [language]);
 
     const setLanguage = (lang) => {
         setLanguageState(lang);
@@ -217,6 +223,8 @@ export const LanguageProvider = ({ children }) => {
             'login.email.placeholder': 'you@example.com',
             'login.password': 'Password',
             'login.password.placeholder': '••••••••',
+            'login.password.show': 'Show password',
+            'login.password.hide': 'Hide password',
             'login.forgot': 'Forgot password?',
             'login.btn.signin': 'Sign In',
             'login.btn.signing': 'Signing in...',
@@ -477,6 +485,33 @@ export const LanguageProvider = ({ children }) => {
             'pro.builder.summary.rpe': 'Avg RPE Target',
             'pro.builder.summary.phase': 'Phase',
             'pro.builder.summary.diff': 'Difficulty',
+            'anatomy.map.title': 'Muscle map',
+            'anatomy.map.front': 'Front',
+            'anatomy.map.back': 'Back',
+            'anatomy.map.empty': 'No targeted muscles on this workout yet.',
+            'anatomy.map.hint': '{n} regions highlighted',
+            'anatomy.region.UpperChest': 'Upper chest',
+            'anatomy.region.MiddleChest': 'Mid chest',
+            'anatomy.region.LowerChest': 'Lower chest',
+            'anatomy.region.Biceps': 'Biceps',
+            'anatomy.region.Triceps': 'Triceps',
+            'anatomy.region.Forearms': 'Forearms',
+            'anatomy.region.DeltoidAnterior': 'Front delt',
+            'anatomy.region.DeltoidLateral': 'Side delt',
+            'anatomy.region.DeltoidPosterior': 'Rear delt',
+            'anatomy.region.Traps': 'Traps',
+            'anatomy.region.UpperBack': 'Upper back',
+            'anatomy.region.MiddleBack': 'Mid back',
+            'anatomy.region.LowerBack': 'Lower back',
+            'anatomy.region.Lats': 'Lats',
+            'anatomy.region.AbsUpper': 'Upper abs',
+            'anatomy.region.AbsLower': 'Lower abs',
+            'anatomy.region.AbsObliques': 'Obliques',
+            'anatomy.region.Quadriceps': 'Quads',
+            'anatomy.region.Hamstrings': 'Hamstrings',
+            'anatomy.region.Glutes': 'Glutes',
+            'anatomy.region.Calves': 'Calves',
+            'anatomy.region.HipFlexors': 'Hip flexors',
             'pro.builder.chart.intensity': 'Intensity Distribution',
             'pro.builder.chart.tech': 'Technique Usage',
             'pro.builder.btn.save': 'Save Plan',
@@ -891,13 +926,13 @@ export const LanguageProvider = ({ children }) => {
             'tour.settings_client.3': 'Check your active subscription tier and billing cycle here.',
             'tour.settings_client.4': 'Customize which alerts you want to receive, like workout reminders or new messages from your coach.',
 
-            'landing.header.login': 'Already a customer / Sign in',
+            'landing.header.login': 'Sign in',
             'landing.hero.badge': 'THE ONLY SOFTWARE YOU NEED',
             'landing.hero.title.pre': 'Level up as a Coach. ',
             'landing.hero.title.highlight': 'Surpass your limits',
             'landing.hero.title.post': ' as an Athlete.',
-            'landing.hero.subtitle': 'The definitive platform for intelligent workout prescription, advanced periodization, and real progress tracking. Built for independent coaches, gyms, and athletes who won’t settle for the basics.',
-            'landing.hero.cta': 'See Plans',
+            'landing.hero.subtitle': 'Log sets, load, and RPE. See adherence by week. Coaches prescribe; gyms keep staff and members linked. One product, three desks.',
+            'landing.hero.cta': 'Create free account',
             'landing.features.title': 'Engineered for Results',
             'landing.features.subtitle': 'Everything you need to level up your training and your revenue.',
             'landing.features.builder.title': 'Smart Builder',
@@ -1116,7 +1151,7 @@ export const LanguageProvider = ({ children }) => {
             'gym.turnstile.metric.today': 'Acessos Hoje',
             'gym.turnstile.metric.blocked': 'Bloqueados',
 
-            'pro.dashboard.title': 'Visão Geral do Painel',
+            'pro.dashboard.title': 'Painel do treinador',
             'pro.dashboard.subtitle': 'Veja o que está acontecendo com seus clientes hoje.',
             'pro.dashboard.invite': 'Convidar Cliente',
             'pro.dashboard.metric.active': 'Clientes Ativos',
@@ -1148,11 +1183,13 @@ export const LanguageProvider = ({ children }) => {
             'header.role.gym': 'Academia',
             'login.role.label': 'Tipo de Conta',
             'login.back': 'Voltar para o Início',
-            'login.tagline': 'Treine com inteligência.',
+            'login.tagline': 'Acesse seu workspace de performance física.',
             'login.email': 'Endereço de e-mail',
             'login.email.placeholder': 'voce@exemplo.com',
             'login.password': 'Senha',
             'login.password.placeholder': '••••••••',
+            'login.password.show': 'Mostrar senha',
+            'login.password.hide': 'Ocultar senha',
             'login.forgot': 'Esqueceu a senha?',
             'login.btn.signin': 'Entrar',
             'login.btn.signing': 'Entrando...',
@@ -1409,6 +1446,33 @@ export const LanguageProvider = ({ children }) => {
             'pro.builder.summary.rpe': 'RPE Médio Alvo',
             'pro.builder.summary.phase': 'Fase',
             'pro.builder.summary.diff': 'Dificuldade',
+            'anatomy.map.title': 'Mapa muscular',
+            'anatomy.map.front': 'Frente',
+            'anatomy.map.back': 'Costas',
+            'anatomy.map.empty': 'Nenhum músculo alvo neste treino ainda.',
+            'anatomy.map.hint': '{n} regiões destacadas',
+            'anatomy.region.UpperChest': 'Peito superior',
+            'anatomy.region.MiddleChest': 'Peito médio',
+            'anatomy.region.LowerChest': 'Peito inferior',
+            'anatomy.region.Biceps': 'Bíceps',
+            'anatomy.region.Triceps': 'Tríceps',
+            'anatomy.region.Forearms': 'Antebraços',
+            'anatomy.region.DeltoidAnterior': 'Deltóide anterior',
+            'anatomy.region.DeltoidLateral': 'Deltóide lateral',
+            'anatomy.region.DeltoidPosterior': 'Deltóide posterior',
+            'anatomy.region.Traps': 'Trapézio',
+            'anatomy.region.UpperBack': 'Costas superior',
+            'anatomy.region.MiddleBack': 'Costas média',
+            'anatomy.region.LowerBack': 'Costas inferior',
+            'anatomy.region.Lats': 'Latíssimo',
+            'anatomy.region.AbsUpper': 'Abdômen superior',
+            'anatomy.region.AbsLower': 'Abdômen inferior',
+            'anatomy.region.AbsObliques': 'Oblíquos',
+            'anatomy.region.Quadriceps': 'Quadríceps',
+            'anatomy.region.Hamstrings': 'Isquiotibiais',
+            'anatomy.region.Glutes': 'Glúteos',
+            'anatomy.region.Calves': 'Panturrilhas',
+            'anatomy.region.HipFlexors': 'Flexores de quadril',
             'pro.builder.chart.intensity': 'Distribuição de Intensidade',
             'pro.builder.chart.tech': 'Uso de Técnica',
             'pro.builder.btn.save': 'Salvar Plano',
@@ -1835,15 +1899,15 @@ export const LanguageProvider = ({ children }) => {
             'tour.settings_client.3': 'Verifique seu nível de assinatura ativo e o ciclo de cobrança aqui.',
             'tour.settings_client.4': 'Personalize quais alertas deseja receber, como lembretes de treino ou novas mensagens do seu treinador.',
 
-            'landing.header.login': 'Já sou cliente / Entrar',
+            'landing.header.login': 'Entrar',
             'landing.hero.badge': 'O ÚNICO SOFTWARE QUE VOCÊ PRECISA',
             'landing.hero.title.pre': 'Evolua como Treinador. ',
             'landing.hero.title.highlight': 'Supere seus limites',
             'landing.hero.title.post': ' como Atleta.',
-            'landing.hero.subtitle': 'A plataforma definitiva para prescrição inteligente de treinos, periodização avançada, e acompanhamento de evolução real. Feita para treinadores independentes, academias e atletas que não aceitam o básico.',
-            'landing.hero.cta': 'Conhecer Planos',
-            'landing.features.title': 'Engenharia de Resultados',
-            'landing.features.subtitle': 'Tudo que você precisa para elevar o nível do seu treinamento e faturamento.',
+            'landing.hero.subtitle': 'Registre séries, carga e RPE. Veja aderência por semana. Treinador prescreve; academia mantém equipe e alunos ligados. Um produto, três mesas.',
+            'landing.hero.cta': 'Criar conta grátis',
+            'landing.features.title': 'Menos cliques e zero burocracia. O foco no que gera resultado.',
+            'landing.features.subtitle': 'Desenvolvido para a rotina de quem acompanha alunos, prescreve treinos e registra cada evolução.',
             'landing.features.builder.title': 'Construtor Inteligente',
             'landing.features.builder.desc': 'Prescreva treinos complexos em segundos. Calcule volume estrutural, RPE, e tempo estimado de sessão automaticamente enquanto monta a periodização.',
             'landing.features.metrics.title': 'Métricas de Assertividade e Lucro',
@@ -2098,6 +2162,8 @@ export const LanguageProvider = ({ children }) => {
             'login.email.placeholder': 'tu@ejemplo.com',
             'login.password': 'Contraseña',
             'login.password.placeholder': '••••••••',
+            'login.password.show': 'Mostrar contraseña',
+            'login.password.hide': 'Ocultar contraseña',
             'login.forgot': '¿Olvidaste tu contraseña?',
             'login.btn.signin': 'Iniciar Sesión',
             'login.btn.signing': 'Iniciando sesión...',
@@ -2358,6 +2424,33 @@ export const LanguageProvider = ({ children }) => {
             'pro.builder.summary.rpe': 'RPE Objetivo Prom.',
             'pro.builder.summary.phase': 'Fase',
             'pro.builder.summary.diff': 'Dificultad',
+            'anatomy.map.title': 'Mapa muscular',
+            'anatomy.map.front': 'Frente',
+            'anatomy.map.back': 'Espalda',
+            'anatomy.map.empty': 'Aún no hay músculos objetivo en este entrenamiento.',
+            'anatomy.map.hint': '{n} regiones resaltadas',
+            'anatomy.region.UpperChest': 'Pecho superior',
+            'anatomy.region.MiddleChest': 'Pecho medio',
+            'anatomy.region.LowerChest': 'Pecho inferior',
+            'anatomy.region.Biceps': 'Bíceps',
+            'anatomy.region.Triceps': 'Tríceps',
+            'anatomy.region.Forearms': 'Antebrazos',
+            'anatomy.region.DeltoidAnterior': 'Deltoides anterior',
+            'anatomy.region.DeltoidLateral': 'Deltoides lateral',
+            'anatomy.region.DeltoidPosterior': 'Deltoides posterior',
+            'anatomy.region.Traps': 'Trapecio',
+            'anatomy.region.UpperBack': 'Espalda superior',
+            'anatomy.region.MiddleBack': 'Espalda media',
+            'anatomy.region.LowerBack': 'Espalda baja',
+            'anatomy.region.Lats': 'Dorsal',
+            'anatomy.region.AbsUpper': 'Abdominales superiores',
+            'anatomy.region.AbsLower': 'Abdominales inferiores',
+            'anatomy.region.AbsObliques': 'Oblicuos',
+            'anatomy.region.Quadriceps': 'Cuádriceps',
+            'anatomy.region.Hamstrings': 'Isquiotibiales',
+            'anatomy.region.Glutes': 'Glúteos',
+            'anatomy.region.Calves': 'Gemelos',
+            'anatomy.region.HipFlexors': 'Flexores de cadera',
             'pro.builder.chart.intensity': 'Distribución de Intensidad',
             'pro.builder.chart.tech': 'Uso de Técnicas',
             'pro.builder.btn.save': 'Guardar Plan',
@@ -2772,13 +2865,13 @@ export const LanguageProvider = ({ children }) => {
             'tour.settings_client.3': 'Consulta aquí tu nivel de suscripción activo y ciclo de facturación.',
             'tour.settings_client.4': 'Personaliza qué alertas deseas recibir, como recordatorios de entrenamiento o nuevos mensajes de tu entrenador.',
 
-            'landing.header.login': 'Ya soy cliente / Iniciar sesión',
+            'landing.header.login': 'Entrar',
             'landing.hero.badge': 'EL ÚNICO SOFTWARE QUE NECESITAS',
             'landing.hero.title.pre': 'Evoluciona como Entrenador. ',
             'landing.hero.title.highlight': 'Supera tus límites',
             'landing.hero.title.post': ' como Atleta.',
-            'landing.hero.subtitle': 'La plataforma definitiva para la prescripción inteligente de entrenamientos, periodización avanzada y seguimiento real del progreso. Hecha para entrenadores independientes, gimnasios y atletas que no se conforman con lo básico.',
-            'landing.hero.cta': 'Ver Planes',
+            'landing.hero.subtitle': 'Registra series, carga y RPE. Mira la adherencia por semana. El entrenador prescribe; el gimnasio mantiene staff y alumnos vinculados. Un producto, tres mesas.',
+            'landing.hero.cta': 'Crear cuenta gratis',
             'landing.features.title': 'Ingeniería para Resultados',
             'landing.features.subtitle': 'Todo lo que necesitas para elevar el nivel de tu entrenamiento y tus ingresos.',
             'landing.features.builder.title': 'Constructor Inteligente',
@@ -2874,12 +2967,31 @@ export const LanguageProvider = ({ children }) => {
         }
     };
 
-    const t = (key) => {
-        return translations[language]?.[key] || translations['en'][key] || key;
+    Object.entries(publicSurfaceI18n).forEach(([lang, keys]) => {
+        Object.assign(translations[lang], keys);
+    });
+    Object.entries(appSurfaceI18n).forEach(([lang, keys]) => {
+        Object.assign(translations[lang], keys);
+    });
+
+    const t = (key, vars) => {
+        let str = translations[language]?.[key] || translations['en'][key] || key;
+        if (vars) {
+            Object.entries(vars).forEach(([name, value]) => {
+                str = str.replaceAll(`{${name}}`, String(value));
+            });
+        }
+        return str;
+    };
+    const copyKeys = new Map(Object.entries(translations['pt-BR']).map(([key, text]) => [text, key]));
+    const translateCopy = (text) => {
+        if (language === 'pt-BR') return text;
+        const key = copyKeys.get(text);
+        return key ? (translations[language]?.[key] || text) : text;
     };
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t, unitSystem, setUnitSystem, convertWeight, formatWeight }}>
+        <LanguageContext.Provider value={{ language, setLanguage, t, translateCopy, unitSystem, setUnitSystem, convertWeight, formatWeight }}>
             {children}
         </LanguageContext.Provider>
     );

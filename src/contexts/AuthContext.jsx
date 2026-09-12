@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
     signInWithEmailAndPassword,
+    setPersistence,
+    browserLocalPersistence,
+    browserSessionPersistence,
     createUserWithEmailAndPassword,
     signInWithPopup,
     signOut as firebaseSignOut,
@@ -36,7 +39,8 @@ export const AuthProvider = ({ children }) => {
     /**
      * Sign in with email + password.
      */
-    const signIn = async (email, password) => {
+    const signIn = async (email, password, remember = true) => {
+        await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
         const credential = await signInWithEmailAndPassword(auth, email, password);
         
         // Sync scopes on the backend and force-refresh the Firebase token
@@ -56,7 +60,8 @@ export const AuthProvider = ({ children }) => {
     /**
      * Sign in with Google popup.
      */
-    const signInWithGoogle = async () => {
+    const signInWithGoogle = async (remember = true) => {
+        await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
         const credential = await signInWithPopup(auth, googleProvider);
 
         // Sync scopes on the backend and force-refresh the Firebase token

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { FileText, Download, Calendar, Users, Filter, Plus, ChevronDown, CheckCircle, XCircle, Clock, MoreVertical, AlertTriangle } from 'lucide-react';
+import { Download, ChevronDown, Plus, Clock, AlertTriangle } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Card from '../../components/Card';
@@ -628,7 +628,6 @@ setTimeout(() => {
                 {/* Generator Configurator */}
                 <Card className="su-reports-generator" data-tour="rep-generator">
                     <div className="su-generator-header">
-                        <FileText size={24} className="su-text-primary" />
                         <h2>{t('reports.generator.title')}</h2>
                     </div>
 
@@ -651,7 +650,7 @@ setTimeout(() => {
 
                         <div className="su-form-row">
                             <div className="su-form-group su-flex-1">
-                                <label className="su-form-label"><Users size={14} /> {t('reports.form.scope')}</label>
+                                <label className="su-form-label">{t('reports.form.scope')}</label>
                                 <div className="su-select-wrapper">
                                     <select
                                         className="su-select su-full-width"
@@ -686,7 +685,7 @@ setTimeout(() => {
                             )}
 
                             <div className="su-form-group su-flex-1">
-                                <label className="su-form-label"><Calendar size={14} /> {t('reports.form.range')}</label>
+                                <label className="su-form-label">{t('reports.form.range')}</label>
                                 <div className="su-select-wrapper">
                                     <select
                                         className="su-select su-full-width"
@@ -808,15 +807,14 @@ setTimeout(() => {
                                         <tr key={report.id}>
                                             <td>
                                                 <div className="su-report-name-cell">
-                                                    <FileText size={16} className="su-text-muted" />
-                                                    <span>{report.name}</span>
+                                                <span>{report.name}</span>
                                                 </div>
                                             </td>
                                             <td><span className={`su-report-type-tag ${report.type}`}>{report.type}</span></td>
                                             <td>{report.date}</td>
                                             <td>
                                                 <span className="su-status-badge completed">
-                                                    <CheckCircle size={12} /> {t('reports.history.status.completed')}
+                                                    {t('reports.history.status.completed')}
                                                 </span>
                                             </td>
                                             <td>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Logo from '../components/Logo/Logo';
@@ -30,8 +29,7 @@ const ResetPassword = () => {
         }
 
         if (password !== confirmPassword) {
-            // Reusing a translation or hardcoding for standard logic
-            setError('Senhas não coincidem / Passwords do not match');
+            setError(t('reset.match'));
             return;
         }
 
@@ -59,55 +57,59 @@ const ResetPassword = () => {
     if (success) {
         return (
             <div className="login-container">
-                <div className="login-bg-shape login-bg-shape-1"></div>
-                <div className="login-bg-shape login-bg-shape-2"></div>
+                <header className="su-auth-header">
+                    <Link to="/" className="su-auth-logo">
+                        <Logo className="login-logo-img" />
+                        <span>ShapeUp</span>
+                    </Link>
+                    <Link to="/login" className="su-auth-back">{t('forgot.back')}</Link>
+                </header>
 
-                <div className="login-content" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-                    <Card className="login-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '3rem 2rem' }}>
-                        <div style={{ padding: '1rem', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '50%', marginBottom: '1.5rem', display: 'inline-flex' }}>
-                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--success, #10b981)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                        </div>
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.75rem', color: 'var(--text-main)' }}>{t('reset.success')}</h2>
-                        <p className="su-text-muted" style={{ marginBottom: '2rem', lineHeight: '1.5' }}>
-                            Você já pode fazer o login com sua nova senha.
+                <section className="su-auth-hero">
+                    <div className="su-auth-copy">
+                        <h1 className="su-auth-title">{t('reset.success')}</h1>
+                        <p className="su-auth-subtitle">
+                            {t('reset.ready')}
                         </p>
-                        <Link to="/login" style={{ textDecoration: 'none', width: '100%' }}>
-                            <Button fullWidth>Ir para o Login</Button>
-                        </Link>
-                    </Card>
-                </div>
+                        <div className="su-auth-cta-group">
+                            <Link to="/login" className="su-auth-btn-primary">{t('reset.goto_login')}</Link>
+                        </div>
+                    </div>
+
+                    <aside className="su-auth-ledger" aria-hidden="true">
+                        <p className="su-auth-ledger-label">{t('reset.ledger.label')}</p>
+                        <ol className="su-auth-ledger-list">
+                            <li><span>{t('reset.ledger.password')}</span><b>Ok</b></li>
+                            <li className="is-live"><span>{t('reset.ledger.login')}</span><b>{t('reset.ledger.now')}</b></li>
+                        </ol>
+                    </aside>
+                </section>
             </div>
         );
     }
 
     return (
-        <div className="login-container">
-            <div className="login-bg-shape login-bg-shape-1"></div>
-            <div className="login-bg-shape login-bg-shape-2"></div>
+        <div className="login-container su-auth-centered">
+            <header className="su-auth-header">
+                <Link to="/" className="su-auth-logo">
+                    <Logo className="login-logo-img" />
+                    <span>ShapeUp</span>
+                </Link>
+                <Link to="/login" className="su-auth-back">{t('forgot.back')}</Link>
+            </header>
 
-            <div className="login-content">
-                <div className="login-header">
-                    <div className="login-logo">
-                        <Logo className="login-logo-img" />
-                        <span className="login-logo-text">ShapeUp</span>
-                    </div>
-                    <h1 className="login-tagline">{t('reset.tagline')}</h1>
+            <section className="su-auth-hero">
+                <div className="su-auth-copy">
+                    <h1 className="su-auth-title">{t('reset.title')}</h1>
+                    <p className="su-auth-subtitle">{t('reset.tagline')}</p>
+                    <p className="su-auth-subtitle">{t('reset.desc')}</p>
                 </div>
 
-                <Card className="login-card">
+                <div className="su-auth-form-wrap">
                     <form className="login-form" onSubmit={handleSubmit}>
-                        <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-                            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem' }}>{t('reset.title')}</h2>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.4' }}>
-                                {t('reset.desc')}
-                            </p>
-                        </div>
-
                         {!oobCode && (
-                            <div style={{ backgroundColor: 'var(--danger-bg, rgba(239,68,68,0.1))', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid var(--danger)' }}>
-                                <p style={{ color: 'var(--danger)', margin: 0, fontSize: '0.9rem', textAlign: 'center' }}>
-                                    ⚠️ Nenhum código de recuperação encontrado na URL. Utilize o link enviado para o seu e-mail.
-                                </p>
+                            <div className="su-auth-code-note">
+                                {t('reset.no_code')}
                             </div>
                         )}
 
@@ -132,23 +134,19 @@ const ResetPassword = () => {
                         />
 
                         {error && (
-                            <p style={{ color: 'var(--danger, #ef4444)', fontSize: '0.875rem', marginTop: '-0.25rem', textAlign: 'center' }}>
-                                {error}
-                            </p>
+                            <p className="su-auth-alert">{error}</p>
                         )}
 
                         <Button type="submit" fullWidth className="btn-sign-in" disabled={loading || !oobCode}>
                             {loading ? t('reset.btn.loading') : t('reset.btn')}
                         </Button>
-                        
-                        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-                            <Link to="/login" style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.9rem' }}>
-                                Cancelar
-                            </Link>
-                        </div>
                     </form>
-                </Card>
-            </div>
+
+                    <p className="login-footer-text">
+                        <Link to="/login">{t('common.cancel')}</Link>
+                    </p>
+                </div>
+            </section>
         </div>
     );
 };

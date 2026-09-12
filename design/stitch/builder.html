@@ -1,0 +1,760 @@
+<!DOCTYPE html><html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ShapeUp Coach Pro — Criador de Treino &amp; Periodização</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Source+Sans+3:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            // Diretrizes Warm Dark ShapeUp
+            espresso: "#171311",
+            surface: "#211A17",
+            "surface-elevated": "#29211D",
+            "surface-hover": "#302620",
+            "border-subtle": "#3A2D27",
+            "text-primary": "#F3EAE5",
+            "text-secondary": "#B8AAA2",
+            "text-muted": "#85766F",
+            // Cores funcionais estritas
+            terracota: "#E06C43",
+            "terracota-hover": "#c85a33",
+            oliva: "#7D986B",
+            ocre: "#D4A359"
+          },
+          fontFamily: {
+            display: ["'Barlow Condensed'", "sans-serif"],
+            sans: ["'Source Sans 3'", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #171311;
+        color: #F3EAE5;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #171311;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #3A2D27;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4a3b34;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      vertical-align: middle;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="bg-espresso font-sans text-sm text-text-primary antialiased selection:bg-terracota/30 selection:text-text-primary min-h-screen">
+<!-- SIDEBAR COACH PRO PADRONIZADA (260px) -->
+<aside class="fixed left-0 top-0 h-screen w-[260px] bg-surface border-r border-border-subtle z-50 flex flex-col justify-between select-none">
+<div class="flex flex-col flex-1 min-h-0">
+<!-- Brand Header -->
+<div class="h-16 px-5 flex items-center justify-between border-b border-border-subtle/80">
+<div class="flex items-center gap-2.5">
+<img alt="ShapeUp Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgE4ytcV4Qa_eUhI-L5JnH4220fpFNYPLX9OCvE0aEZyiXWiU7uP18mQU3yOJ2SfshY-UYN6X2iQjJpNPq74cId3ZknanZY8vKIAqm1Ly7E0NuJIoGvQUTWPu3pTug8febnHl1_wK6USd4QcLFs-5YLO8HFwvFp4gkx0zYyq42c2pnOL9fx6Jkb0uprpYPMLceVnwcLGKerV7_DtDjO_NLsIxjBXooKbd1_2tn3SNXQ4m_wx4GVKpJ">
+<span class="font-display font-bold text-xl text-text-primary tracking-wider uppercase">ShapeUp</span>
+</div>
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-terracota/15 text-terracota border border-terracota/30">Coach Pro</span>
+</div>
+<!-- Navigation -->
+<div class="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+<div>
+<p class="px-3 mb-2 text-[11px] font-semibold uppercase tracking-wider text-text-muted">Prescrição &amp; Consultoria</p>
+<nav class="flex flex-col gap-0.5">
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors text-xs font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-text-muted">dashboard</span>
+<span>Painel do Treinador</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-text-muted">groups</span>
+<span>Meus Alunos</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md bg-surface-elevated text-terracota border-l-2 border-terracota text-sm font-semibold" href="#">
+<span class="material-symbols-outlined text-[19px] text-terracota">edit_calendar</span>
+<span class="text-text-primary">Criador &amp; Periodização</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-text-muted">fitness_center</span>
+<span>Biblioteca de Exercícios</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-text-muted">restaurant</span>
+<span>Painel Nutricional</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors text-sm font-medium" href="#">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[19px] text-text-muted">chat</span>
+<span>Mensagens</span>
+</div>
+<span class="px-1.5 py-0.2 rounded text-[11px] font-semibold bg-terracota text-espresso">3</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-text-secondary hover:bg-surface-elevated hover:text-text-primary transition-colors text-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[19px] text-text-muted">settings</span>
+<span>Configurações</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+<!-- Coach Identity Footer -->
+<div class="p-3 bg-surface border-t border-border-subtle">
+<div class="flex items-center justify-between p-2 rounded-md hover:bg-surface-elevated transition-colors">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative shrink-0">
+<img alt="Rodrigo Silva" class="w-8 h-8 rounded-full object-cover ring-1 ring-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2ztTtCwaRB-9gY6ru0K6yRVXtbbPCa7LM2iVkJHY4GcZNo9Xo0PWpHyvr15QunVSgzjEtiJ3Y0Jf7dIP_WEXe3snyKCoPUi3r1tiiJqyhE6F-pLsvNZn4uBbQbx5GiKtbOUc3oOM9lKrSEbb2O-sp1aSkmC6qAWoPoFxoRpWvEJWM7nmPuV65GuEe1-ZFlLXQQL1uUq0EcypqLTUxMbk9kmLuP9UXFmNJZRDH_LcMCj3rdk_0gscl">
+<span class="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-oliva ring-1 ring-surface"></span>
+</div>
+<div class="min-w-0">
+<p class="text-xs font-semibold text-text-primary truncate">Rodrigo Silva</p>
+<p class="text-[11px] text-text-muted truncate">Treinador Master</p>
+</div>
+</div>
+<button class="p-1 rounded text-text-muted hover:text-text-primary transition-colors" title="Sair da Conta" type="button">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- WORKSPACE CONTENT CONTAINER (Offset sidebar 260px) -->
+<div class="pl-[260px] flex flex-col min-h-screen">
+<!-- WORKSPACE TOPBAR -->
+<header class="sticky top-0 z-40 h-16 bg-surface/95 backdrop-blur-md border-b border-border-subtle px-6 flex items-center justify-between">
+<!-- Breadcrumb Operacional -->
+<div class="flex items-center gap-2 text-xs">
+<span class="text-text-muted hover:text-text-secondary cursor-pointer">Treinos</span>
+<span class="text-text-muted">/</span>
+<div class="flex items-center gap-1.5 text-text-secondary">
+<img alt="Juliana Mendes" class="w-5 h-5 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJDBCUNLwXLbrJpAJytayJt-SrU0YaLCW_geSiIyUUn3SZoTCTrfzbFoXUvaAFk2UVQI30zF4kP-qLgImFJJy2KcKXHszCTknGWtoKJxfuEf05nazO0DiXTIxYDGE1mxU5iL-Ur2-5zKOJOyNdc4h088k6uGH_WeS2N8W7MQRSSXYmNDKbe4KtutLIPlTlTVCsnaFHh7MbjFY4Kg3jG9H-4OAV9GaTJTxhK26qB66WhQ_rFXvBRosb">
+<span class="font-medium text-text-primary">Juliana Mendes</span>
+</div>
+<span class="text-text-muted">/</span>
+<span class="font-semibold text-text-primary">Periodização 2024.2 • Mesociclo de Hipertrofia</span>
+</div>
+<!-- Actions & Sync Status -->
+<div class="flex items-center gap-4">
+<!-- Status de sincronização discreto -->
+<div class="flex items-center gap-1.5 text-xs text-oliva">
+<span class="w-2 h-2 rounded-full bg-oliva"></span>
+<span class="text-text-secondary font-medium">Sincronizado na nuvem</span>
+</div>
+<div class="h-4 w-px bg-border-subtle"></div>
+<div class="flex items-center gap-2">
+<!-- Salvar Rascunho (Ghost / Outline Neutro) -->
+<button class="px-3.5 py-1.5 rounded-md border border-border-subtle text-text-secondary hover:text-text-primary hover:bg-surface-elevated text-xs font-semibold transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">save</span>
+<span>Salvar Rascunho</span>
+</button>
+<!-- Modo Aluno -->
+<button class="px-3 py-1.5 rounded-md border border-border-subtle text-text-secondary hover:text-text-primary hover:bg-surface-elevated text-xs font-medium transition-colors flex items-center gap-1.5" title="Visualizar exatamente como o aluno verá no app" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span class="hidden sm:inline">Modo Aluno</span>
+</button>
+<!-- Publicar Treino (Terracota Sólido) -->
+<button class="px-4 py-1.5 rounded-md bg-terracota hover:bg-terracota-hover text-white text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[16px]">send</span>
+<span>Publicar Treino</span>
+</button>
+</div>
+</div>
+</header>
+<!-- WORKSPACE BODY -->
+<main class="flex-1 px-8 lg:px-12 py-10 space-y-12 max-w-[1400px] w-full mx-auto">
+<!-- CONTEXT HEADER DA PERIODIZAÇÃO DESCOMPRIMIDO -->
+<section class="border-b border-border-subtle pb-8 space-y-8">
+<div class="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+<div>
+<div class="flex flex-wrap items-center gap-3 mb-2.5">
+<h1 class="font-display text-2xl lg:text-3xl font-bold tracking-normal text-text-primary">
+          Mesociclo de Hipertrofia Específica — Fase 2
+        </h1>
+<span class="px-2.5 py-1 rounded text-xs font-semibold bg-oliva/15 text-oliva border border-oliva/25 font-sans tracking-normal">Semana 5 de 12</span>
+</div>
+<p class="text-sm text-text-secondary font-sans leading-relaxed">
+        Prescrito para <strong class="text-text-primary font-semibold">Juliana Mendes</strong> • Atleta Avançada • Foco em desenvolvimento de glúteos e definição de quadríceps
+      </p>
+</div>
+<div class="flex flex-wrap items-center gap-8 py-3.5 px-6 rounded-lg bg-surface border border-border-subtle shadow-sm font-sans divide-x divide-border-subtle">
+<div class="flex flex-col pr-2">
+<span class="text-xs font-medium text-text-muted mb-1">Divisão</span>
+<span class="text-sm font-semibold text-text-primary">ABCDE <span class="text-xs font-normal text-text-muted">(5 dias/sem)</span></span>
+</div>
+<div class="pl-8 flex flex-col pr-2">
+<span class="text-xs font-medium text-text-muted mb-1">Volume Semanal</span>
+<span class="text-sm font-semibold text-text-primary"><strong class="text-terracota font-bold text-base">84</strong> séries totais</span>
+</div>
+<div class="pl-8 flex flex-col pr-2">
+<span class="text-xs font-medium text-text-muted mb-1">Foco Prioritário</span>
+<span class="text-sm font-semibold text-ocre">Glúteo &amp; Quadríceps</span>
+</div>
+<div class="pl-8 flex flex-col">
+<span class="text-xs font-medium text-text-muted mb-1">RPE Alvo Médio</span>
+<span class="text-sm font-semibold text-text-primary"><strong class="font-bold text-base">8.5</strong> <span class="text-text-muted font-normal">/ 10</span></span>
+</div>
+</div>
+</div>
+<!-- RÉGUA DE TREINOS COM ESPAÇAMENTO E ELEGÂNCIA DESCOMPRIMIDA -->
+<div class="flex items-center gap-3 overflow-x-auto pt-2 border-t border-border-subtle/50 font-sans scrollbar-none">
+<button class="relative px-5 py-3 rounded-lg bg-surface-elevated text-text-primary text-xs font-semibold flex items-center gap-3 border border-border-subtle shadow-sm transition-all" type="button">
+<span class="w-2.5 h-2.5 rounded-full bg-terracota ring-2 ring-terracota/20"></span>
+<span class="text-sm font-bold">Treino A</span>
+<span class="text-text-secondary font-normal text-xs">Quadríceps &amp; Panturrilha</span>
+<span class="ml-2 px-2.5 py-0.5 rounded text-[11px] font-medium bg-espresso text-text-secondary border border-border-subtle">18 séries</span>
+<div class="absolute -bottom-1 left-4 right-4 h-[2px] bg-terracota rounded-full"></div>
+</button>
+<button class="px-5 py-3 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface text-xs font-medium flex items-center gap-3 transition-colors" type="button">
+<span class="w-2 h-2 rounded-full bg-text-muted/40"></span>
+<span class="text-sm font-semibold">Treino B</span>
+<span class="text-text-muted font-normal text-xs">Costas &amp; Bíceps</span>
+<span class="ml-2 px-2 py-0.5 rounded text-[11px] bg-surface text-text-muted border border-border-subtle/40">16 séries</span>
+</button>
+<button class="px-5 py-3 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface text-xs font-medium flex items-center gap-3 transition-colors" type="button">
+<span class="w-2 h-2 rounded-full bg-text-muted/40"></span>
+<span class="text-sm font-semibold">Treino C</span>
+<span class="text-text-muted font-normal text-xs">Glúteos &amp; Posteriores</span>
+<span class="ml-2 px-2 py-0.5 rounded text-[11px] bg-surface text-text-muted border border-border-subtle/40">20 séries</span>
+</button>
+<button class="px-5 py-3 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface text-xs font-medium flex items-center gap-3 transition-colors" type="button">
+<span class="w-2 h-2 rounded-full bg-text-muted/40"></span>
+<span class="text-sm font-semibold">Treino D</span>
+<span class="text-text-muted font-normal text-xs">Peitoral &amp; Ombros</span>
+<span class="ml-2 px-2 py-0.5 rounded text-[11px] bg-surface text-text-muted border border-border-subtle/40">14 séries</span>
+</button>
+<button class="px-5 py-3 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface text-xs font-medium flex items-center gap-3 transition-colors" type="button">
+<span class="w-2 h-2 rounded-full bg-text-muted/40"></span>
+<span class="text-sm font-semibold">Treino E</span>
+<span class="text-text-muted font-normal text-xs">Ênfase Posterior &amp; Core</span>
+<span class="ml-2 px-2 py-0.5 rounded text-[11px] bg-surface text-text-muted border border-border-subtle/40">16 séries</span>
+</button>
+<button class="px-4 py-2.5 text-text-muted hover:text-text-primary hover:bg-surface rounded-lg text-xs font-medium flex items-center gap-2 transition-colors ml-auto shrink-0 border border-transparent hover:border-border-subtle" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>Nova Aba</span>
+</button>
+</div>
+</section>
+<!-- ROTINA ATIVA: LISTA DE EXERCÍCIOS TOTALMENTE DESCOMPRIMIDA COM RESPIRO VERTICAL -->
+<section class="space-y-8">
+<!-- Subheader com Ações de Lote e Contadores -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+<div class="flex items-center gap-3">
+<h2 class="text-lg font-bold text-text-primary font-sans flex items-center gap-3">
+<span>Exercícios Prescritos</span>
+<span class="text-xs font-normal text-text-muted px-2.5 py-0.5 rounded-full bg-surface border border-border-subtle">4 exercícios • tempo estimado: ~55 min</span>
+</h2>
+</div>
+<div class="flex items-center gap-4 text-xs font-sans">
+<button class="px-3 py-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface border border-border-subtle/60 transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined text-[18px] text-text-muted">swap_vert</span>
+<span>Reordenar Ordem</span>
+</button>
+<div class="h-4 w-px bg-border-subtle"></div>
+<div class="flex items-center gap-2 text-text-secondary py-1 px-2.5 bg-surface rounded-md border border-border-subtle/60">
+<span class="material-symbols-outlined text-[18px] text-text-muted">timer</span>
+<span>Descanso padrão: <strong class="text-text-primary font-semibold">90s</strong></span>
+</div>
+</div>
+</div>
+<!-- EXERCÍCIOS INDIVIDUAIS: BLOCOS AMPLOS SEPARADOS COM RESPIRO (mb-8) -->
+<div class="space-y-8">
+<!-- EXERCÍCIO 1: Agachamento Livre com Barra -->
+<article class="bg-surface border border-border-subtle rounded-xl p-6 lg:p-7 space-y-6 shadow-sm font-sans transition-colors">
+<div class="flex items-center justify-between gap-4 pb-4 border-b border-border-subtle/50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-text-muted cursor-grab hover:text-text-secondary text-[20px] p-1">drag_indicator</span>
+<span class="w-8 h-8 rounded-lg bg-surface-elevated border border-border-subtle text-text-secondary text-xs font-bold flex items-center justify-center font-display text-base">01</span>
+<div>
+<div class="flex flex-wrap items-center gap-3">
+<h3 class="text-base font-bold text-text-primary tracking-normal">Agachamento Livre com Barra</h3>
+<span class="px-2.5 py-0.5 rounded text-[11px] font-medium bg-espresso text-text-secondary border border-border-subtle">Barra Olímpica</span>
+<span class="px-2.5 py-0.5 rounded text-[11px] font-medium bg-ocre/10 text-ocre border border-ocre/25">Composto Primário</span>
+</div>
+<p class="text-xs text-text-secondary mt-1 flex items-center gap-2">
+<span>Alvo principal: <strong class="text-text-primary font-medium">Quadríceps &amp; Glúteo Máximo</strong></span>
+<span class="text-text-muted">•</span>
+<span>Descanso sugerido: 120s</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors" title="Substituir Exercício" type="button">
+<span class="material-symbols-outlined text-[20px]">cached</span>
+</button>
+<button class="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors" title="Mais opções" type="button">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- TABELA DESCOMPRIMIDA COM LINHAS GENEROSAS (py-3.5) -->
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead>
+<tr class="text-text-secondary text-xs font-medium border-b border-border-subtle pb-3">
+<th class="pb-3 font-semibold w-16 text-center">SÉRIE</th>
+<th class="pb-3 font-semibold w-48">TIPO DE SÉRIE</th>
+<th class="pb-3 font-semibold w-40">CARGA</th>
+<th class="pb-3 font-semibold w-44">REPETIÇÕES ALVO</th>
+<th class="pb-3 font-semibold w-32">RPE ALVO</th>
+<th class="pb-3 font-semibold w-36">DESCANSO</th>
+<th class="pb-3 font-semibold text-right pr-3">AÇÃO</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle/50">
+<tr class="hover:bg-surface-elevated/40 transition-colors">
+<td class="py-3.5 text-center font-bold text-text-secondary">1</td>
+<td class="py-3.5">
+<span class="px-3 py-1.5 rounded-md text-xs font-medium bg-surface-elevated text-text-secondary border border-border-subtle">Aquecimento</span>
+</td>
+<td class="py-3.5">
+<div class="flex items-center gap-2">
+<input class="w-20 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="40">
+<span class="text-text-muted font-medium text-xs">kg</span>
+</div>
+</td>
+<td class="py-3.5">
+<input class="w-32 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="15 reps">
+</td>
+<td class="py-3.5 text-text-secondary font-medium pl-1">RPE 6</td>
+<td class="py-3.5 text-text-secondary pl-1">90s</td>
+<td class="py-3.5 text-right pr-3">
+<button class="text-text-muted hover:text-text-primary p-1.5 rounded hover:bg-surface-elevated transition-colors" title="Remover série" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-elevated/40 transition-colors">
+<td class="py-3.5 text-center font-bold text-text-secondary">2</td>
+<td class="py-3.5">
+<span class="px-3 py-1.5 rounded-md text-xs font-medium bg-espresso text-text-secondary border border-border-subtle">Carga Efetiva</span>
+</td>
+<td class="py-3.5">
+<div class="flex items-center gap-2">
+<input class="w-20 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="85">
+<span class="text-text-muted font-medium text-xs">kg</span>
+</div>
+</td>
+<td class="py-3.5">
+<input class="w-32 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="8 - 10 reps">
+</td>
+<td class="py-3.5 text-ocre font-bold pl-1">RPE 8</td>
+<td class="py-3.5 text-text-secondary pl-1">120s</td>
+<td class="py-3.5 text-right pr-3">
+<button class="text-text-muted hover:text-text-primary p-1.5 rounded hover:bg-surface-elevated transition-colors" title="Remover série" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-elevated/40 transition-colors">
+<td class="py-3.5 text-center font-bold text-text-secondary">3</td>
+<td class="py-3.5">
+<span class="px-3 py-1.5 rounded-md text-xs font-medium bg-espresso text-text-secondary border border-border-subtle">Carga Efetiva</span>
+</td>
+<td class="py-3.5">
+<div class="flex items-center gap-2">
+<input class="w-20 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="85">
+<span class="text-text-muted font-medium text-xs">kg</span>
+</div>
+</td>
+<td class="py-3.5">
+<input class="w-32 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="8 - 10 reps">
+</td>
+<td class="py-3.5 text-ocre font-bold pl-1">RPE 8.5</td>
+<td class="py-3.5 text-text-secondary pl-1">120s</td>
+<td class="py-3.5 text-right pr-3">
+<button class="text-text-muted hover:text-text-primary p-1.5 rounded hover:bg-surface-elevated transition-colors" title="Remover série" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-elevated/40 transition-colors bg-terracota/5">
+<td class="py-3.5 text-center font-bold text-terracota">4</td>
+<td class="py-3.5">
+<span class="px-3 py-1.5 rounded-md text-xs font-semibold bg-terracota/20 text-terracota border border-terracota/30">Top Set</span>
+</td>
+<td class="py-3.5">
+<div class="flex items-center gap-2">
+<input class="w-20 bg-espresso border border-terracota/40 rounded-md px-3 py-1.5 text-xs text-terracota font-bold focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="95">
+<span class="text-terracota/80 font-medium text-xs">kg</span>
+</div>
+</td>
+<td class="py-3.5">
+<input class="w-32 bg-espresso border border-terracota/40 rounded-md px-3 py-1.5 text-xs text-text-primary font-bold focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="6 reps">
+</td>
+<td class="py-3.5 text-terracota font-bold pl-1">RPE 9.5</td>
+<td class="py-3.5 text-text-secondary font-medium pl-1">150s</td>
+<td class="py-3.5 text-right pr-3">
+<button class="text-text-muted hover:text-text-primary p-1.5 rounded hover:bg-surface-elevated transition-colors" title="Remover série" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- INSTRUÇÃO TÉCNICA E ADIÇÃO COM AMPLO RESPIRO VERTICAL -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 border-t border-border-subtle/50">
+<div class="flex items-center gap-3 text-xs text-text-secondary flex-1 bg-surface-elevated/30 px-4 py-2.5 rounded-lg border border-border-subtle/40">
+<span class="material-symbols-outlined text-[18px] text-ocre shrink-0">edit_note</span>
+<span class="text-text-secondary font-semibold shrink-0">Instrução técnica:</span>
+<input class="bg-transparent border-0 border-b border-transparent hover:border-border-subtle focus:border-terracota focus:outline-none text-text-primary text-xs w-full py-1" type="text" value="Pausa de 1s no ponto de maior flexão, manter tronco firme e pés na largura dos ombros.">
+</div>
+<button class="px-4 py-2 rounded-lg text-xs font-semibold text-text-secondary hover:text-terracota hover:bg-surface-elevated border border-border-subtle/40 transition-colors flex items-center gap-2 shrink-0 self-start md:self-auto" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Adicionar série</span>
+</button>
+</div>
+</article>
+<!-- EXERCÍCIO 2: Elevação Pélvica com Barra -->
+<article class="bg-surface border border-border-subtle rounded-xl p-6 lg:p-7 space-y-6 shadow-sm font-sans transition-colors">
+<div class="flex items-center justify-between gap-4 pb-4 border-b border-border-subtle/50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-text-muted cursor-grab hover:text-text-secondary text-[20px] p-1">drag_indicator</span>
+<span class="w-8 h-8 rounded-lg bg-surface-elevated border border-border-subtle text-text-secondary text-xs font-bold flex items-center justify-center font-display text-base">02</span>
+<div>
+<div class="flex flex-wrap items-center gap-3">
+<h3 class="text-base font-bold text-text-primary tracking-normal">Elevação Pélvica com Barra</h3>
+<span class="px-2.5 py-0.5 rounded text-[11px] font-medium bg-espresso text-text-secondary border border-border-subtle">Barra + Banco</span>
+<span class="px-2.5 py-0.5 rounded text-[11px] font-medium bg-ocre/10 text-ocre border border-ocre/25">Rest-Pause na Última</span>
+</div>
+<p class="text-xs text-text-secondary mt-1 flex items-center gap-2">
+<span>Alvo principal: <strong class="text-text-primary font-medium">Glúteo Máximo</strong></span>
+<span class="text-text-muted">•</span>
+<span>Descanso padrão: 90s</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors" title="Substituir Exercício" type="button">
+<span class="material-symbols-outlined text-[20px]">cached</span>
+</button>
+<button class="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors" title="Mais opções" type="button">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead>
+<tr class="text-text-secondary text-xs font-medium border-b border-border-subtle pb-3">
+<th class="pb-3 font-semibold w-16 text-center">SÉRIE</th>
+<th class="pb-3 font-semibold w-48">TIPO DE SÉRIE</th>
+<th class="pb-3 font-semibold w-40">CARGA</th>
+<th class="pb-3 font-semibold w-44">REPETIÇÕES ALVO</th>
+<th class="pb-3 font-semibold w-32">RPE ALVO</th>
+<th class="pb-3 font-semibold w-36">DESCANSO</th>
+<th class="pb-3 font-semibold text-right pr-3">AÇÃO</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle/50">
+<tr class="hover:bg-surface-elevated/40 transition-colors">
+<td class="py-3.5 text-center font-bold text-text-secondary">1 - 3</td>
+<td class="py-3.5">
+<span class="px-3 py-1.5 rounded-md text-xs font-medium bg-espresso text-text-secondary border border-border-subtle">3x Efetivas</span>
+</td>
+<td class="py-3.5">
+<div class="flex items-center gap-2">
+<input class="w-20 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="110">
+<span class="text-text-muted font-medium text-xs">kg</span>
+</div>
+</td>
+<td class="py-3.5">
+<input class="w-32 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="10 - 12 reps">
+</td>
+<td class="py-3.5 text-ocre font-bold pl-1">RPE 8.5</td>
+<td class="py-3.5 text-text-secondary pl-1">90s</td>
+<td class="py-3.5 text-right pr-3">
+<button class="text-text-muted hover:text-text-primary p-1.5 rounded hover:bg-surface-elevated transition-colors" title="Remover série" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-elevated/40 transition-colors bg-terracota/5">
+<td class="py-3.5 text-center font-bold text-terracota">4</td>
+<td class="py-3.5">
+<span class="px-3 py-1.5 rounded-md text-xs font-semibold bg-terracota/20 text-terracota border border-terracota/30">Rest-Pause (3x)</span>
+</td>
+<td class="py-3.5">
+<div class="flex items-center gap-2">
+<input class="w-20 bg-espresso border border-terracota/40 rounded-md px-3 py-1.5 text-xs text-terracota font-bold focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="110">
+<span class="text-terracota/80 font-medium text-xs">kg</span>
+</div>
+</td>
+<td class="py-3.5">
+<input class="w-36 bg-espresso border border-terracota/40 rounded-md px-3 py-1.5 text-xs text-text-primary font-bold focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="10 + 4 + 3 reps">
+</td>
+<td class="py-3.5 text-terracota font-bold pl-1">RPE 10 (Falha)</td>
+<td class="py-3.5 text-text-secondary font-medium pl-1">15s micro</td>
+<td class="py-3.5 text-right pr-3">
+<button class="text-text-muted hover:text-text-primary p-1.5 rounded hover:bg-surface-elevated transition-colors" title="Remover série" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 border-t border-border-subtle/50">
+<div class="flex items-center gap-3 text-xs text-text-secondary flex-1 bg-surface-elevated/30 px-4 py-2.5 rounded-lg border border-border-subtle/40">
+<span class="material-symbols-outlined text-[18px] text-ocre shrink-0">edit_note</span>
+<span class="text-text-secondary font-semibold shrink-0">Instrução técnica:</span>
+<input class="bg-transparent border-0 border-b border-transparent hover:border-border-subtle focus:border-terracota focus:outline-none text-text-primary text-xs w-full py-1" type="text" value="Na 4ª série: 10 reps até RPE 9.5, respire 15s sem sair da barra, faça 4 reps, pause 15s e vá até a falha com postura intacta.">
+</div>
+<button class="px-4 py-2 rounded-lg text-xs font-semibold text-text-secondary hover:text-terracota hover:bg-surface-elevated border border-border-subtle/40 transition-colors flex items-center gap-2 shrink-0 self-start md:self-auto" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Adicionar série</span>
+</button>
+</div>
+</article>
+<!-- EXERCÍCIO 3: Leg Press 45º Inclinado -->
+<article class="bg-surface border border-border-subtle rounded-xl p-6 lg:p-7 space-y-6 shadow-sm font-sans transition-colors">
+<div class="flex items-center justify-between gap-4 pb-4 border-b border-border-subtle/50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-text-muted cursor-grab hover:text-text-secondary text-[20px] p-1">drag_indicator</span>
+<span class="w-8 h-8 rounded-lg bg-surface-elevated border border-border-subtle text-text-secondary text-xs font-bold flex items-center justify-center font-display text-base">03</span>
+<div>
+<div class="flex flex-wrap items-center gap-3">
+<h3 class="text-base font-bold text-text-primary tracking-normal">Leg Press 45º Inclinado</h3>
+<span class="px-2.5 py-0.5 rounded text-[11px] font-medium bg-espresso text-text-secondary border border-border-subtle">Aparelho Articulado</span>
+<span class="px-2.5 py-0.5 rounded text-[11px] font-medium bg-ocre/10 text-ocre border border-ocre/25">Duplo Drop-Set 4ª Série</span>
+</div>
+<p class="text-xs text-text-secondary mt-1 flex items-center gap-2">
+<span>Alvo principal: <strong class="text-text-primary font-medium">Quadríceps (Vasto Lateral e Medial)</strong></span>
+<span class="text-text-muted">•</span>
+<span>Pés na base média-baixa</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors" title="Substituir Exercício" type="button">
+<span class="material-symbols-outlined text-[20px]">cached</span>
+</button>
+<button class="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors" title="Mais opções" type="button">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead>
+<tr class="text-text-secondary text-xs font-medium border-b border-border-subtle pb-3">
+<th class="pb-3 font-semibold w-16 text-center">SÉRIE</th>
+<th class="pb-3 font-semibold w-48">TIPO DE SÉRIE</th>
+<th class="pb-3 font-semibold w-40">CARGA</th>
+<th class="pb-3 font-semibold w-44">REPETIÇÕES ALVO</th>
+<th class="pb-3 font-semibold w-32">RPE ALVO</th>
+<th class="pb-3 font-semibold w-36">DESCANSO</th>
+<th class="pb-3 font-semibold text-right pr-3">AÇÃO</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle/50">
+<tr class="hover:bg-surface-elevated/40 transition-colors">
+<td class="py-3.5 text-center font-bold text-text-secondary">1 - 3</td>
+<td class="py-3.5">
+<span class="px-3 py-1.5 rounded-md text-xs font-medium bg-espresso text-text-secondary border border-border-subtle">3x Pesada</span>
+</td>
+<td class="py-3.5">
+<div class="flex items-center gap-2">
+<input class="w-20 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="220">
+<span class="text-text-muted font-medium text-xs">kg</span>
+</div>
+</td>
+<td class="py-3.5">
+<input class="w-32 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="10 reps">
+</td>
+<td class="py-3.5 text-ocre font-bold pl-1">RPE 8.5</td>
+<td class="py-3.5 text-text-secondary pl-1">90s</td>
+<td class="py-3.5 text-right pr-3">
+<button class="text-text-muted hover:text-text-primary p-1.5 rounded hover:bg-surface-elevated transition-colors" title="Remover série" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-elevated/40 transition-colors bg-terracota/5">
+<td class="py-3.5 text-center font-bold text-terracota">4</td>
+<td class="py-3.5">
+<span class="px-3 py-1.5 rounded-md text-xs font-semibold bg-terracota/20 text-terracota border border-terracota/30">Duplo Drop-Set</span>
+</td>
+<td class="py-3.5">
+<div class="flex items-center gap-2">
+<input class="w-36 bg-espresso border border-terracota/40 rounded-md px-3 py-1.5 text-xs text-terracota font-bold focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="220 &gt; 160 &gt; 100">
+<span class="text-terracota/80 font-medium text-xs">kg</span>
+</div>
+</td>
+<td class="py-3.5">
+<input class="w-36 bg-espresso border border-terracota/40 rounded-md px-3 py-1.5 text-xs text-text-primary font-bold focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="8 + falha + falha">
+</td>
+<td class="py-3.5 text-terracota font-bold pl-1">RPE 10</td>
+<td class="py-3.5 text-text-secondary font-medium pl-1">Sem descanso</td>
+<td class="py-3.5 text-right pr-3">
+<button class="text-text-muted hover:text-text-primary p-1.5 rounded hover:bg-surface-elevated transition-colors" title="Remover série" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 border-t border-border-subtle/50">
+<div class="flex items-center gap-3 text-xs text-text-secondary flex-1 bg-surface-elevated/30 px-4 py-2.5 rounded-lg border border-border-subtle/40">
+<span class="material-symbols-outlined text-[18px] text-ocre shrink-0">edit_note</span>
+<span class="text-text-secondary font-semibold shrink-0">Instrução técnica:</span>
+<input class="bg-transparent border-0 border-b border-transparent hover:border-border-subtle focus:border-terracota focus:outline-none text-text-primary text-xs w-full py-1" type="text" value="Amplitude total sem descolar a lombar do encosto. Redução imediata das anilhas sem intervalo entre drops.">
+</div>
+<button class="px-4 py-2 rounded-lg text-xs font-semibold text-text-secondary hover:text-terracota hover:bg-surface-elevated border border-border-subtle/40 transition-colors flex items-center gap-2 shrink-0 self-start md:self-auto" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Adicionar série</span>
+</button>
+</div>
+</article>
+<!-- EXERCÍCIO 4: Cadeira Extensora Unilateral -->
+<article class="bg-surface border border-border-subtle rounded-xl p-6 lg:p-7 space-y-6 shadow-sm font-sans transition-colors">
+<div class="flex items-center justify-between gap-4 pb-4 border-b border-border-subtle/50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-text-muted cursor-grab hover:text-text-secondary text-[20px] p-1">drag_indicator</span>
+<span class="w-8 h-8 rounded-lg bg-surface-elevated border border-border-subtle text-text-secondary text-xs font-bold flex items-center justify-center font-display text-base">04</span>
+<div>
+<div class="flex flex-wrap items-center gap-3">
+<h3 class="text-base font-bold text-text-primary tracking-normal">Cadeira Extensora Unilateral</h3>
+<span class="px-2.5 py-0.5 rounded text-[11px] font-medium bg-espresso text-text-secondary border border-border-subtle">Máquina</span>
+<span class="px-2.5 py-0.5 rounded text-[11px] font-medium bg-surface-elevated text-text-secondary border border-border-subtle">Pico de Isometria (2s)</span>
+</div>
+<p class="text-xs text-text-secondary mt-1 flex items-center gap-2">
+<span>Alvo principal: <strong class="text-text-primary font-medium">Reto Femoral isolado</strong></span>
+<span class="text-text-muted">•</span>
+<span>Descanso entre pernas: 45s</span>
+</p>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors" title="Substituir Exercício" type="button">
+<span class="material-symbols-outlined text-[20px]">cached</span>
+</button>
+<button class="p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-surface-elevated transition-colors" title="Mais opções" type="button">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead>
+<tr class="text-text-secondary text-xs font-medium border-b border-border-subtle pb-3">
+<th class="pb-3 font-semibold w-16 text-center">SÉRIE</th>
+<th class="pb-3 font-semibold w-48">TIPO DE SÉRIE</th>
+<th class="pb-3 font-semibold w-40">CARGA</th>
+<th class="pb-3 font-semibold w-44">REPETIÇÕES ALVO</th>
+<th class="pb-3 font-semibold w-32">RPE ALVO</th>
+<th class="pb-3 font-semibold w-36">DESCANSO</th>
+<th class="pb-3 font-semibold text-right pr-3">AÇÃO</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle/50">
+<tr class="hover:bg-surface-elevated/40 transition-colors">
+<td class="py-3.5 text-center font-bold text-text-secondary">1 - 3</td>
+<td class="py-3.5">
+<span class="px-3 py-1.5 rounded-md text-xs font-medium bg-espresso text-text-secondary border border-border-subtle">Unilateral</span>
+</td>
+<td class="py-3.5">
+<div class="flex items-center gap-2">
+<input class="w-20 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="45">
+<span class="text-text-muted font-medium text-xs">kg/lado</span>
+</div>
+</td>
+<td class="py-3.5">
+<input class="w-32 bg-espresso border border-border-subtle rounded-md px-3 py-1.5 text-xs text-text-primary font-medium focus:border-terracota focus:outline-none text-center shadow-inner" type="text" value="12 - 15 reps">
+</td>
+<td class="py-3.5 text-ocre font-bold pl-1">RPE 8.5</td>
+<td class="py-3.5 text-text-secondary pl-1">60s</td>
+<td class="py-3.5 text-right pr-3">
+<button class="text-text-muted hover:text-text-primary p-1.5 rounded hover:bg-surface-elevated transition-colors" title="Remover série" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4 border-t border-border-subtle/50">
+<div class="flex items-center gap-3 text-xs text-text-secondary flex-1 bg-surface-elevated/30 px-4 py-2.5 rounded-lg border border-border-subtle/40">
+<span class="material-symbols-outlined text-[18px] text-ocre shrink-0">edit_note</span>
+<span class="text-text-secondary font-semibold shrink-0">Instrução técnica:</span>
+<input class="bg-transparent border-0 border-b border-transparent hover:border-border-subtle focus:border-terracota focus:outline-none text-text-primary text-xs w-full py-1" type="text" value="Segure 2 segundos de contração máxima no topo de cada repetição. Sem impulso.">
+</div>
+<button class="px-4 py-2 rounded-lg text-xs font-semibold text-text-secondary hover:text-terracota hover:bg-surface-elevated border border-border-subtle/40 transition-colors flex items-center gap-2 shrink-0 self-start md:self-auto" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Adicionar série</span>
+</button>
+</div>
+</article>
+</div>
+<!-- BARRA INFERIOR DE ESTÍMULO E AÇÕES TOTALMENTE DESCOMPRIMIDA -->
+<div class="pt-4 pb-8 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 border-t border-border-subtle">
+<div class="flex flex-wrap items-center gap-4 font-sans">
+<button class="px-5 py-3 rounded-lg bg-terracota/15 border border-terracota/30 hover:bg-terracota/20 text-terracota text-xs font-bold flex items-center gap-2.5 transition-colors shadow-sm" type="button">
+<span class="material-symbols-outlined text-[20px]">library_add</span>
+<span>Adicionar da Biblioteca ShapeUp</span>
+</button>
+<button class="px-5 py-3 rounded-lg border border-border-subtle bg-surface hover:bg-surface-elevated text-text-primary text-xs font-medium flex items-center gap-2.5 transition-colors" type="button">
+<span class="material-symbols-outlined text-text-muted text-[20px]">add_circle_outline</span>
+<span>Criar Exercício Personalizado</span>
+</button>
+</div>
+<div class="flex items-center gap-6 bg-surface px-6 py-3.5 rounded-lg border border-border-subtle text-xs font-sans shadow-sm">
+<div class="flex items-center gap-2 text-text-secondary">
+<span class="material-symbols-outlined text-oliva text-[18px]">verified</span>
+<span class="font-semibold text-text-primary">Estímulo Treino A:</span>
+</div>
+<div class="h-4 w-px bg-border-subtle"></div>
+<div class="flex flex-wrap items-center gap-5">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-terracota"></span>
+<span class="text-text-secondary">Quadríceps:</span>
+<strong class="text-text-primary font-bold">10 séries</strong>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-ocre"></span>
+<span class="text-text-secondary">Glúteo:</span>
+<strong class="text-text-primary font-bold">4 séries</strong>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-oliva"></span>
+<span class="text-text-secondary">Panturrilha:</span>
+<strong class="text-text-primary font-bold">4 séries</strong>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- FLOATING QUICK CHAT / FEEDBACK BUTTON -->
+<aside aria-label="Suporte Rápido" class="fixed bottom-5 right-5 z-40">
+<button class="w-10 h-10 rounded-full bg-surface-elevated border border-border-subtle text-text-secondary hover:text-terracota hover:border-terracota/40 flex items-center justify-center transition-colors shadow-lg" title="Assistente do Treinador" type="button">
+<span class="material-symbols-outlined text-[20px]">smart_toy</span>
+</button>
+</aside>
+</body></html>

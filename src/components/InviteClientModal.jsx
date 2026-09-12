@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Mail, CheckCircle, Send } from 'lucide-react';
+import { X, Send } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
 import { enqueueMutation } from '../services/mutationQueue';
@@ -80,11 +80,6 @@ const InviteClientModal = ({ onClose, onInvite }) => {
 
                 {!sent ? (
                     <>
-                        <div className="su-modal-icon-header">
-                            <div className="su-modal-icon-circle">
-                                <Mail size={24} />
-                            </div>
-                        </div>
                         <h2 className="su-modal-title">{t('clients.invite.title')}</h2>
                         <p className="su-modal-subtitle">
                             {t('clients.invite.subtitle')}
@@ -93,7 +88,6 @@ const InviteClientModal = ({ onClose, onInvite }) => {
                         <div className="su-modal-form" data-tour="invite-email">
                             <label className="su-modal-label">{t('clients.invite.label')}</label>
                             <div className="su-modal-input-row">
-                                <Mail size={16} className="su-modal-input-icon" />
                                 <input
                                     autoFocus
                                     type="email"
@@ -116,9 +110,6 @@ const InviteClientModal = ({ onClose, onInvite }) => {
                     </>
                 ) : (
                     <div className="su-modal-success">
-                        <div className="su-modal-success-icon">
-                            <CheckCircle size={48} />
-                        </div>
                         <h2 className="su-modal-title">{t('clients.invite.success.title')}</h2>
                         <p className="su-modal-subtitle">
                             {t('clients.invite.success.desc').split('{{email}}')[0]}

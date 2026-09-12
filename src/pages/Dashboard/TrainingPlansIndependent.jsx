@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, CalendarDays, Plus, FastForward, Award, TrendingUp, X, Trash2, Dumbbell as DumbbellIcon, Save, Settings2, Copy, History, ChevronUp, ChevronDown, Activity } from 'lucide-react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useLocation, useNavigate } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
-import Card from '../../components/Card';
 import Button from '../../components/Button';
-import Input from '../../components/Input';
-import ExerciseModal from '../../components/ExerciseModal';
 import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
 import {
@@ -23,6 +19,7 @@ import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
+import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import './TrainingPlansClient.css';
 import './TrainingPlansProfessional.css';
 
@@ -73,7 +70,7 @@ const formatTime = (totalSeconds) => {
 const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart }) => {
     const { t } = useLanguage();
     return (
-        <Card className="su-independent-plan-card">
+        <div className="su-independent-plan-card">
             <div className="su-plan-card-body">
                 <div className="su-plan-card-main">
                     <span className="su-phase-badge">
@@ -84,27 +81,28 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart }) => {
                         {t('pro.builder.diff')}: <strong>{t(`pro.builder.diff.${plan.difficulty?.toLowerCase()}`) || plan.difficulty}</strong> · {plan.weeks} {t('pro.client.plan.weeks')}
                     </p>
                     <div className="su-ex-count-badge">
-                        <Activity size={14} />
                         <span>{flattenBlockExercises(plan.blocks).length} {t('pro.client.plan.exercises')}</span>
                     </div>
+                    <WorkoutBodyMap exercises={flattenBlockExercises(plan.blocks)} compact />
                 </div>
                 <div className="su-plan-card-side">
                     <button className="su-execute-btn-large" onClick={() => onStart(plan)}>
-                        <Play size={20} fill="currentColor" />
                         {t('client.training.card.btn')}
                     </button>
                     <div className="su-plan-tiny-actions">
-                        <button onClick={() => onEdit(plan)} title={t('pro.client.plan.btn.edit')}><Settings2 size={16} /></button>
-                        <button onClick={() => onCopy(plan)} title={t('pro.client.plan.btn.copy')}><Copy size={16} /></button>
-                        <button onClick={() => onDelete(plan)} title={t('independent.builder.btn.delete')} className="delete"><Trash2 size={16} /></button>
+                        <button onClick={() => onEdit(plan)} title={t('pro.client.plan.btn.edit')}>{t('pro.client.plan.btn.edit')}</button>
+                        <button onClick={() => onCopy(plan)} title={t('pro.client.plan.btn.copy')}>{t('pro.client.plan.btn.copy')}</button>
+                        <button onClick={() => onDelete(plan)} title={t('independent.builder.btn.delete')} className="delete">{t('independent.builder.btn.delete')}</button>
                     </div>
                 </div>
             </div>
-        </Card>
+        </div>
     );
 };
 
 const TrainingPlansIndependent = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
@@ -121,24 +119,30 @@ const TrainingPlansIndependent = () => {
     const [plans, setPlans] = useState([]);
     const [, setLoadingPlans] = useState(true);
     const [editingPlan, setEditingPlan] = useState(null);
-    
+    useEffect(() => {
+        if (!location.state?.create) return;
+        const exercise = location.state.exercise;
+        setEditingPlan({ id: `p${Date.now()}`, name: 'Novo plano de treino', phase: 'Hypertrophy', difficulty: 'Intermediate', weeks: 6, active: false, notes: '', history: [], blocks: exercise ? [{ id: `b${Date.now()}`, type: 'straight', exercises: [{ ...exercise, exerciseId: exercise.id, id: `e${Date.now()}`, notes: '', sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '', intensityType: 'rpe', intensityValue: '8', rest: '90' }] }] }] : [] });
+        navigate(location.pathname, { replace: true, state: null });
+    }, [location.state, location.pathname, navigate]);
+
     // Fetch plans from API on mount
     useEffect(() => {
         const fetchPlans = async () => {
             try {
                 setLoadingPlans(true);
-                
+
                 // 1. Get real User ID from getMe
                 console.log('TrainingPlansIndependent: Calling getMe()...');
                 const me = await getMe();
                 const userId = me.id || me.userId;
-                
+
                 if (!userId) {
                     console.warn('TrainingPlansIndependent: No valid user ID returned from getMe.');
                     setLoadingPlans(false);
                     return;
                 }
-                
+
                 console.log('TrainingPlansIndependent: Fetching plans for user:', userId);
                 const response = await getWorkoutPlansByUser(userId);
                 console.log('TrainingPlansIndependent: API Response:', response);
@@ -146,13 +150,13 @@ const TrainingPlansIndependent = () => {
                 const raw = Array.isArray(response)
                     ? response
                     : (response?.data || response?.items || []);
-                
+
                 // Normalizar planos da API para o formato interno do PlanEditor
                 const data = raw.map(p => normalizePlan(p));
-                
+
                 console.log('TrainingPlansIndependent: Final plans data:', data);
                 setPlans(data);
-                
+
                 // Backup cache
                 localStorage.setItem('shapeup_independent_plans', JSON.stringify(data));
             } catch (err) {
@@ -239,7 +243,7 @@ const TrainingPlansIndependent = () => {
             exercises: exercisesWithProgress
         };
     }, [workoutSessionId, unitSystem]);
-    
+
     /**
      * Sincroniza o estado atual do treino com o servidor.
      * Só envia se houver mudança no payload filtrado desde a última sincronização.
@@ -340,6 +344,7 @@ const TrainingPlansIndependent = () => {
                 const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => ({
                     id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
                     name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
+                    muscles: ex.muscles || [],
                     target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
                     sets: ex.sets.map((s, sIdx) => ({
                         id: `s_${exIdx}_${sIdx}`,
@@ -449,7 +454,7 @@ const TrainingPlansIndependent = () => {
     // Debounced synchronization: Only sync state when changes occur and have settled (2s)
     useEffect(() => {
         if (!sessionActive || !workoutSessionId || !hasFirstDoneRef.current) return;
-        
+
         const timerId = setTimeout(() => {
             syncWorkoutStateIfNeeded({
                 sourceExercises: sessionExercises,
@@ -601,6 +606,7 @@ const TrainingPlansIndependent = () => {
         const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => ({
             id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
             name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
+            muscles: ex.muscles || [],
             target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
             sets: ex.sets.map((s, sIdx) => ({
                 id: `s_${exIdx}_${sIdx}`,
@@ -687,6 +693,7 @@ const TrainingPlansIndependent = () => {
             status: sessionStatus,
             exercises: sessionExercises.map(ex => ({
                 name: ex.name,
+                muscles: ex.muscles || [],
                 skipped: ex.sets.every(s => !s.completed),
                 sets: ex.sets.filter(s => s.completed).map((s, idx) => ({
                     set: idx + 1,
@@ -760,22 +767,28 @@ const TrainingPlansIndependent = () => {
                     <div className={`su-rest-timer-group ${isResting ? 'active' : ''}`}>
                         <div className="su-rest-controls">
                             <button className="su-adjust-rest-btn minus" onClick={() => setRestTimer(p => Math.max(0, p - 15))}>-15s</button>
-                            <div className="su-rest-clock-display"><Clock size={20} /> <span className="su-timer-digits">{formatTime(restTimer)}</span></div>
+                            <div className="su-rest-clock-display"><span className="su-timer-kicker">Rest</span> <span className="su-timer-digits">{formatTime(restTimer)}</span></div>
                             <button className="su-adjust-rest-btn plus" onClick={() => setRestTimer(p => p + 15)}>+15s</button>
                         </div>
                     </div>
                     <div className="su-session-header-right">
-                        {isResting && <button className="su-skip-rest-btn" onClick={() => setIsResting(false)}><FastForward size={16} /> {t('client.session.btn.skip')}</button>}
+                        {isResting && <button className="su-skip-rest-btn" onClick={() => setIsResting(false)}>{t('client.session.btn.skip')}</button>}
                     </div>
                 </div>
 
                 <div className="su-execution-scroll">
-                    {sessionExercises.map((ex, exIdx) => (
-                        <Card key={ex.id} className="su-execution-card su-mb-6">
+                    <WorkoutBodyMap exercises={sessionExercises} compact />
+                    {sessionExercises.map((ex, exIdx) => {
+                        const liveSetIndex = ex.sets.findIndex(s => !s.completed);
+                        return (
+                        <article key={ex.id} className="su-ledger-exercise">
                             <div className="su-ex-execution-header">
-                                <div>
-                                    <h3 className="su-se-ex-title">{exIdx + 1}. {ex.name}</h3>
-                                    <span className="su-ex-target">{ex.target}</span>
+                                <div className="su-ex-index-group">
+                                    <span className="su-ledger-num">{String(exIdx + 1).padStart(2, '0')}</span>
+                                    <div>
+                                        <h3 className="su-se-ex-title">{ex.name}</h3>
+                                        <span className="su-ex-target">{ex.target}</span>
+                                    </div>
                                 </div>
                             </div>
                             <div className="su-sets-execution">
@@ -790,7 +803,7 @@ const TrainingPlansIndependent = () => {
                                     <div className="col-done">{t('client.session.table.done')}</div>
                                 </div>
                                 {ex.sets.map((s, sIdx) => (
-                                    <div key={s.id} className={`su-exec-row ${s.completed ? 'completed' : ''}`}>
+                                    <div key={s.id} className={`su-exec-row ${s.completed ? 'completed' : ''} ${sIdx === liveSetIndex ? 'live' : ''}`}>
                                         <div className="col-set">
                                             <span className={`su-set-badge ${s.type}`} onClick={() => {
                                                 const types = ['warmup', 'working', 'topset', 'backoff'];
@@ -808,7 +821,6 @@ const TrainingPlansIndependent = () => {
                                         </div>
                                         <div className="col-rest">
                                             <div className="su-rest-display">
-                                                <Clock size={16} />
                                                 <span>{s.prescribedRest}s</span>
                                             </div>
                                         </div>
@@ -834,7 +846,7 @@ const TrainingPlansIndependent = () => {
                                                         });
                                                     }}
                                                 />
-                                                <span className="su-failure-icon">🔥</span>
+                                                <span className="su-failure-icon" />
                                             </label>
                                         </div>
                                         <div className="col-done">
@@ -857,13 +869,14 @@ const TrainingPlansIndependent = () => {
                                                 }
 
                                                 if (completedState && s.prescribedRest > 0) { setRestTimer(s.prescribedRest); setIsResting(true); }
-                                            }}><CheckCircle size={22} /></button>
+                                            }} aria-label={t('client.session.table.done')} />
                                         </div>
                                     </div>
                                 ))}
                             </div>
-                        </Card>
-                    ))}
+                        </article>
+                        );
+                    })}
                     <div className="su-session-footer su-mt-8 su-mb-12">
                         <Button size="lg" fullWidth className="su-complete-session-btn" onClick={finishSession} disabled={isFinishingSession}>{t('client.session.btn.finish')}</Button>
                     </div>
@@ -922,12 +935,9 @@ const TrainingPlansIndependent = () => {
                 {showOverviewModal && (
                     <div className="su-gamified-overlay">
                         <div className="su-gamified-content">
-                            <button className="su-close-gamified" onClick={handleSessionCompleted}>
-                                <X size={24} />
-                            </button>
+                            <button className="su-close-gamified" onClick={handleSessionCompleted} aria-label="Close">×</button>
 
                             <div className="su-gamified-header">
-                                <div className="su-trophy-icon">🏆</div>
                                 <h2>{t('client.session.modal.gamified.title')}</h2>
                             </div>
 
@@ -1006,16 +1016,15 @@ const TrainingPlansIndependent = () => {
                     <h1 className="su-page-title">{t('client.training.title')}</h1>
                     <p className="su-text-muted">{t('independent.training.subtitle')}</p>
                 </div>
-                <Button className="su-mt-4" icon={<Plus size={18} />} onClick={handleAddPlan}>{t('independent.training.btn.create')}</Button>
+                <Button className="su-mt-4" onClick={handleAddPlan}>{t('independent.training.btn.create')}</Button>
             </div>
 
             <div className="su-independent-plans-list su-mt-8" data-tour="idep-tp-card">
                 {plans.length === 0 ? (
-                    <Card className="su-empty-state-card" style={{ textAlign: 'center', padding: '4rem' }}>
-                        <DumbbellIcon size={40} className="su-text-muted su-mb-4" />
-                        <h3>{t('independent.training.empty.title')}</h3>
+                    <div className="su-ledger-sheet su-ledger-sheet--empty">
+                        <h3 className="su-plan-title">{t('independent.training.empty.title')}</h3>
                         <Button className="su-mt-4" onClick={handleAddPlan}>{t('independent.training.btn.create')}</Button>
-                    </Card>
+                    </div>
                 ) : (
                     plans.map(plan => (
                         <IndependentPlanCard
@@ -1037,24 +1046,22 @@ const TrainingPlansIndependent = () => {
                         <p className="su-text-muted">{t('independent.training.history.empty')}</p>
                     ) : (
                         paginatedHistory.map(hist => (
-                            <Card key={hist.id} className="su-independent-history-item" onClick={() => setShowSessionDetail(hist)}>
+                            <button type="button" key={hist.id} className="su-independent-history-item" onClick={() => setShowSessionDetail(hist)}>
                                 <div className="su-hist-item-left">
                                     <div className="su-hist-item-date">
-                                        <CalendarDays size={14} />
                                         <span>{hist.date}</span>
                                     </div>
                                     <div className="su-hist-item-title">{hist.planName}</div>
                                 </div>
                                 <div className="su-hist-item-right">
                                     <div className="su-hist-item-stat">
-                                        <Clock size={14} />
                                         <span>{hist.duration}</span>
                                     </div>
                                     <div className="su-hist-item-stat volume">
                                         <span>{hist.convertedVol} {t('client.training.history.vol')}</span>
                                     </div>
                                 </div>
-                            </Card>
+                            </button>
                         ))
                     )}
                 </div>
@@ -1064,6 +1071,7 @@ const TrainingPlansIndependent = () => {
                 <SessionDetailModal
                     session={showSessionDetail}
                     planName={showSessionDetail.planName}
+                    planExercises={flattenBlockExercises(plans.find(p => p.name === showSessionDetail.planName)?.blocks)}
                     onClose={() => setShowSessionDetail(null)}
                 />
             )}
@@ -1071,25 +1079,22 @@ const TrainingPlansIndependent = () => {
             {showDeleteConfirm && (
                 <div className="su-modal-overlay su-delete-confirm-overlay" onClick={() => { setShowDeleteConfirm(false); setPlanToDelete(null); }}>
                     <div className="su-modal-box su-delete-confirm-content su-alert-modal-box" onClick={e => e.stopPropagation()}>
-                        <div className="su-delete-icon-ring">
-                            <Trash2 size={32} />
-                        </div>
                         <h2>{t('independent.builder.delete.title') || 'Excluir Treino?'}</h2>
                         <p className="su-text-muted">
-                            {t('independent.builder.delete.desc') || 'Tem certeza que deseja excluir o treino'} 
-                            <strong> {planToDelete?.name}</strong>? 
+                            {t('independent.builder.delete.desc') || 'Tem certeza que deseja excluir o treino'}
+                            <strong> {planToDelete?.name}</strong>?
                             <br/>{t('independent.builder.delete.warning') || 'Essa ação não pode ser desfeita.'}
                         </p>
                         <div className="su-modal-actions" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                            <Button 
-                                variant="outline" 
+                            <Button
+                                variant="outline"
                                 className="su-cancel-btn"
                                 onClick={() => { setShowDeleteConfirm(false); setPlanToDelete(null); }}
                                 style={{ minWidth: '120px' }}
                             >
                                 {t('common.cancel') || 'Cancelar'}
                             </Button>
-                            <Button 
+                            <Button
                                 className="su-confirm-delete-btn"
                                 onClick={(e) => {
                                     e.preventDefault();

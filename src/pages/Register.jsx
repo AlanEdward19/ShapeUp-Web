@@ -1,20 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import Logo from '../components/Logo/Logo';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { enqueueMutation } from '../services/mutationQueue';
+import { isHoneypotFilled, validateBirthDate, validateEmail, validatePassword, validateRequiredName } from '../utils/formValidation';
 import './Login.css';
 
-const Register = () => {
-    const { t } = useLanguage();
+const Register = ({ renderView } = {}) => {
+    const { t, language } = useLanguage();
     const { register, signInWithGoogle } = useAuth();
     const navigate = useNavigate();
 
-    const [selectedRole, setSelectedRole] = useState('independent');
-    const [error, setError] = useState('');
+    const [selectedRole, setSelectedRole] = useState(() => { const role = new URLSearchParams(window.location.search).get('role'); return ['professional', 'gym', 'independent'].includes(role) ? role : 'professional'; });
+    const [step, setStep] = useState(0);
+    const [fullName, setFullName] = useState('');
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+    const pt = language === 'pt-BR';
+    const [errorKey, setError] = useState('');
+    const error = errorKey ? t(errorKey) : '';
     const [loading, setLoading] = useState(false);
     const [inviteToken, setInviteToken] = useState(null);
 
@@ -26,7 +32,6 @@ const Register = () => {
             setInviteToken(payloadStr);
             setSelectedRole('client');
 
-            // Clean the URL visually
             const url = new URL(window.location);
             url.searchParams.delete("payload");
             window.history.replaceState({}, document.title, url.toString());
@@ -35,22 +40,48 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const fields = e.currentTarget.elements;
+        if (!inviteToken && step < 2) {
+            const validation = step === 0
+                ? validateRequiredName(fullName) || validateEmail(fields.email.value)
+                : validatePassword(fields.password.value) || validatePassword(fields.confirmPassword.value);
+            if (validation) { setError(validation); return; }
+            if (step === 1 && fields.password.value !== fields.confirmPassword.value) { setError('form.password.mismatch'); return; }
+            setError(''); setStep(step + 1); return;
+        }
+        if (fields.password.value !== fields.confirmPassword.value) { setError('form.password.mismatch'); return; }
+        if (inviteToken && !acceptedTerms) { setError('form.terms.required'); return; }
+        const firstName = fields.firstName.value.trim();
+        const lastName = fields.lastName.value.trim();
+        const email = fields.email.value.trim().toLowerCase();
+        const password = fields.password.value;
+        const birthDate = fields.birthDate.value;
+        const honeypot = fields.company_url.value;
 
-        const firstName = e.target.firstName.value.trim();
-        const lastName = e.target.lastName.value.trim();
-        const email = e.target.email.value.trim().toLowerCase();
-        const password = e.target.password.value;
+        if (isHoneypotFilled(honeypot)) {
+            setError('form.spam');
+            return;
+        }
+
+        const firstErr = validateRequiredName(firstName);
+        const lastErr = validateRequiredName(lastName);
+        const emailErr = validateEmail(email);
+        const passErr = validatePassword(password);
+        const birthErr = inviteToken ? null : validateBirthDate(birthDate);
+        const firstFail = firstErr || lastErr || emailErr || passErr || birthErr;
+        if (firstFail) {
+            setError(firstFail);
+            return;
+        }
 
         setError('');
         setLoading(true);
 
         try {
-            await register(email, password);
+            const registration = await register(email, password);
+            localStorage.setItem(`shapeup_registration_${registration?.user?.uid || 'current'}`, JSON.stringify({ name: fullName.trim(), phone: fields.phone.value, role: selectedRole }));
 
             if (inviteToken) {
-                // Enqueued (offline foundation): O backend faz toda a validação pelo payload.
-                // Fire-and-forget -- a navegação segue de qualquer forma; se falhar depois de
-                // reconectar (payload expirado, etc.), aparece no OfflineQueueIndicator.
                 enqueueMutation({
                     endpoint: '/api/gym-management/trainer-client-invites/accept',
                     method: 'POST',
@@ -93,7 +124,7 @@ const Register = () => {
 
             navigate('/login');
         } catch (err) {
-            setError(getErrorMessage(err.code, t));
+            setError(getErrorMessage(err.code, key => key));
         } finally {
             setLoading(false);
         }
@@ -106,56 +137,46 @@ const Register = () => {
             await signInWithGoogle(selectedRole);
             navigate('/dashboard');
         } catch (err) {
-            setError(getErrorMessage(err.code, t));
+            setError(getErrorMessage(err.code, key => key));
         } finally {
             setLoading(false);
         }
     };
 
-    return (
-        <div className="login-container">
-            <div className="login-bg-shape login-bg-shape-1"></div>
-            <div className="login-bg-shape login-bg-shape-2"></div>
+    const roles = [
+        { id: 'professional', label: pt ? 'Personal Trainer / Coach' : t('login.role.trainer') },
+        { id: 'independent', label: pt ? 'Atleta / Aluno' : t('login.role.independent') },
+        { id: 'gym', label: pt ? 'Gestor de Academia ou Studio' : t('login.role.gym') },
+    ];
 
-            <div className="login-content">
-                <Link to="/" className="su-back-to-home" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)', textDecoration: 'none', marginBottom: '2rem', fontSize: '0.9rem', fontWeight: 500 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                    {t('login.back')}
+    if (renderView) return renderView({ selectedRole, setSelectedRole, step, setStep, fullName, setFullName, acceptedTerms, setAcceptedTerms, error, loading, inviteToken, handleSubmit, handleGoogleSignIn });
+    return (
+        <div className={`login-container su-auth-centered ${inviteToken ? 'su-auth-invitation' : 'su-registration-workspace'}`}>
+            <header className="su-auth-header">
+                <Link to="/" className="su-auth-logo">
+                    <Logo className="login-logo-img" />
+                    <span>ShapeUp</span>
                 </Link>
-                <div className="login-header">
-                    <div className="login-logo">
-                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="40" height="40" rx="10" fill="var(--primary)" />
-                            <path d="M12 28L20 12L28 28H12Z" fill="white" />
-                        </svg>
-                        <span className="login-logo-text">ShapeUp</span>
-                    </div>
-                    <h1 className="login-tagline">{t('register.tagline')}</h1>
+                <Link to="/" className="su-auth-back">{t('login.back')}</Link>
+            </header>
+
+            <section className="su-auth-hero">
+                <div className="su-auth-copy">
+                    {!inviteToken && <ol className="su-register-progress" aria-label={pt ? "Etapas de cadastro" : "Registration steps"}>{(pt ? ["Perfil & identificação", "Credenciais", "Parâmetros"] : ["Profile & identity", "Credentials", "Preferences"]).map((label, index) => <li key={label} aria-current={step === index ? "step" : undefined} className={index <= step ? "is-active" : ""}><span>{index + 1}</span>{label}</li>)}</ol>}
+                    {inviteToken && <div className="su-invitation-note"><span className="su-invitation-badge">Convite para acompanhamento</span><p>{language === 'pt-BR' ? 'Você está entrando por um convite. Complete seu cadastro para vincular seu perfil ao treinador.' : 'You are joining through an invitation. Complete your registration to connect with your coach.'}</p></div>}
+                    <h1 className="su-auth-title">{inviteToken ? (language === 'pt-BR' ? 'Ativação de conta' : 'Activate your account') : (pt ? ['Como você pretende usar o ShapeUp?', 'Configure seu acesso', 'Últimos detalhes do seu perfil'][step] : ['How will you use ShapeUp?', 'Set up your access', 'Complete your profile'][step])}</h1>
+                    <p className="su-auth-subtitle">{pt ? (inviteToken ? 'Defina suas credenciais para vincular seu perfil e acessar sua rotina.' : 'Configure seu ambiente de trabalho de acordo com seu papel de atuação.') : t('register.tagline')}</p>
+
                 </div>
 
-                <Card className="login-card">
-                    <form className="login-form" onSubmit={handleSubmit}>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <div style={{ flex: 1 }}>
-                                <Input
-                                    id="firstName"
-                                    type="text"
-                                    label={t('register.first_name')}
-                                    placeholder={t('register.first_name.placeholder')}
-                                    required
-                                />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <Input
-                                    id="lastName"
-                                    type="text"
-                                    label={t('register.last_name')}
-                                    placeholder={t('register.last_name.placeholder')}
-                                    required
-                                />
-                            </div>
-                        </div>
-
+                <div className="su-auth-form-wrap">
+                    <form className="login-form" onSubmit={handleSubmit} noValidate>
+                        <div className="su-register-stage" hidden={!inviteToken && step !== 0}>
+                        {!inviteToken && <fieldset className="su-register-roles"><legend className="su-visually-hidden">{language === 'pt-BR' ? 'Como você pretende usar o ShapeUp?' : 'How will you use ShapeUp?'}</legend>{roles.map(role => <label key={role.id} className={selectedRole === role.id ? 'is-selected' : ''}><input type="radio" name="profileRole" value={role.id} checked={selectedRole === role.id} onChange={() => setSelectedRole(role.id)} /><span><strong>{role.label}</strong><small>{role.id === 'professional' ? (language === 'pt-BR' ? 'Prescrição de treinos e acompanhamento de alunos.' : 'Training plans and athlete management.') : role.id === 'gym' ? (language === 'pt-BR' ? 'Gestão de equipe, alunos e operação.' : 'Manage staff, members and operations.') : (language === 'pt-BR' ? 'Seus treinos, nutrição e progresso.' : 'Your workouts, nutrition and progress.')}</small></span></label>)}</fieldset>}
+                        <h2 className="su-registration-section-label">{pt ? 'Dados de identificação' : 'Identification'}</h2>
+                        <Input id="fullName" label={pt ? 'Nome completo' : 'Full name'} placeholder={pt ? 'Seu nome completo' : 'Your full name'} value={fullName} onChange={event => setFullName(event.target.value)} required autoComplete="name" />
+                        <input type="hidden" name="firstName" value={fullName.trim().split(/\s+/)[0] || ''} />
+                        <input type="hidden" name="lastName" value={fullName.trim().split(/\s+/).slice(1).join(' ')} />
                         <Input
                             id="email"
                             type="email"
@@ -163,13 +184,24 @@ const Register = () => {
                             placeholder={t('login.email.placeholder')}
                             required
                         />
+                        <Input id="phone" type="tel" label={pt ? 'Telefone / WhatsApp com DDD' : 'Phone number'} placeholder="(11) 98765-4321" autoComplete="tel" />
+                        </div>
+                        <div className={`su-register-stage ${inviteToken ? 'su-invitation-passwords' : ''}`} hidden={!inviteToken && step !== 1}>
                         <Input
                             id="password"
                             type="password"
                             label={t('login.password')}
                             placeholder={t('login.password.placeholder')}
                             required
+                            minLength={8}
                         />
+                        <Input id="confirmPassword" type="password" label={pt ? "Confirmar senha" : "Confirm password"} required minLength={8} autoComplete="new-password" />
+                        </div>
+                        <div className="su-visually-hidden" aria-hidden="true">
+                            <label htmlFor="company_url">Company</label>
+                            <input id="company_url" name="company_url" type="text" tabIndex={-1} autoComplete="off" />
+                        </div>
+                        <div className="su-register-stage" hidden={Boolean(inviteToken) || step !== 2}>
                         <Input
                             id="birthDate"
                             type="date"
@@ -177,18 +209,18 @@ const Register = () => {
                             required
                         />
 
-                        {/* Role selection removed, defaulting to standard registration */}
-
+                        {!inviteToken && <p className="su-text-muted">{pt ? "Após criar a conta, você poderá definir seus objetivos, unidades e rotina no setup guiado." : "After creating your account, set your goals, units and routine in the guided setup."}</p>}
+                        </div>
+                        {inviteToken && <label className="su-invitation-terms"><input type="checkbox" checked={acceptedTerms} onChange={event => setAcceptedTerms(event.target.checked)} /> <span>Li e concordo com os <Link to="/terms">Termos de Uso</Link> e a <Link to="/privacy">Política de Privacidade</Link>.</span></label>}
                         {error && (
-                            <p style={{ color: 'var(--danger, #ef4444)', fontSize: '0.875rem', marginTop: '-0.25rem', textAlign: 'center' }}>
-                                {error}
-                            </p>
+                            <p className="su-auth-alert">{error}</p>
                         )}
 
-                        <Button type="submit" fullWidth className="btn-sign-in" disabled={loading} style={{ marginTop: '0.5rem' }}>
-                            {loading ? t('register.btn.creating') : t('register.btn.create')}
+                        <Button type="submit" fullWidth className="btn-sign-in" disabled={loading}>
+                            {loading ? t('register.btn.creating') : !inviteToken && step < 2 ? (pt ? 'Continuar configuração →' : 'Continue setup →') : inviteToken && pt ? 'Ativar conta e entrar →' : t('register.btn.create')}
                         </Button>
 
+                        {!inviteToken && step > 0 && <Button type="button" variant="outline" fullWidth onClick={() => { setError(''); setStep(step - 1); }}>{pt ? "Voltar à etapa anterior" : "Back to previous step"}</Button>}
                         <div className="login-divider">
                             <span>{t('login.divider')}</span>
                         </div>
@@ -212,12 +244,22 @@ const Register = () => {
                             {t('register.btn.google')}
                         </Button>
                     </form>
-                </Card>
+                    <div className="su-auth-cta-group">
+                        <span className="login-footer-text">
+                            {t('register.already')} <Link to="/login">{t('register.signin')}</Link>
+                        </span>
+                    </div>
 
-                <p className="login-footer-text">
-                    {t('register.already')} <Link to="/login">{t('register.signin')}</Link>
-                </p>
-            </div>
+                    <aside className="su-auth-ledger" aria-hidden="true">
+                        <p className="su-auth-ledger-label">Cadastro</p>
+                        <ol className="su-auth-ledger-list">
+                            <li><span>Nome</span><b>01</b></li>
+                            <li><span>Conta</span><b>02</b></li>
+                            <li className="is-live"><span>Treinar</span><b>03</b></li>
+                        </ol>
+                    </aside>
+                </div>
+            </section>
         </div>
     );
 };

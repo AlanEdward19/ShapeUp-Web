@@ -3,6 +3,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import DiaryDay from '../DiaryDay';
 import { isMacroGoalMet } from '../nutritionUtils';
+import { withLang } from '../../../../test/withLang';
 
 const mockGetDiaryDay = vi.fn();
 const mockGetNutritionProfile = vi.fn();
@@ -39,11 +40,13 @@ const sampleDiary = {
 };
 
 const renderDiaryDay = () =>
-    render(
-        <MemoryRouter>
-            <DiaryDay />
-        </MemoryRouter>
-    );
+        render(
+            withLang(
+            <MemoryRouter>
+                <DiaryDay />
+            </MemoryRouter>
+            )
+        );
 
 describe('DiaryDay', () => {
     beforeEach(() => {
@@ -77,7 +80,7 @@ describe('DiaryDay', () => {
         const { getByTestId } = renderDiaryDay();
 
         await waitFor(() => {
-            expect(getByTestId('empty-day')).toHaveTextContent('Nenhuma refeição registrada');
+            expect(getByTestId('empty-day')).toHaveTextContent('No meals logged');
         });
     });
 
@@ -106,7 +109,7 @@ describe('DiaryDay', () => {
         const { getByTestId } = renderDiaryDay();
 
         await waitFor(() => {
-            expect(getByTestId('goal-celebration')).toHaveTextContent('Meta batida!');
+            expect(getByTestId('goal-celebration')).toHaveTextContent('Goal hit!');
         });
     });
 });

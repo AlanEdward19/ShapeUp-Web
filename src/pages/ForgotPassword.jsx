@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Logo from '../components/Logo/Logo';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
-import './Login.css'; // Reusing styles
+import './Login.css';
 
-const ForgotPassword = () => {
-    const { t } = useLanguage();
+const ForgotPassword = ({ renderView } = {}) => {
+    const { t, language } = useLanguage();
     const { resetPassword } = useAuth();
 
     const [email, setEmail] = useState('');
@@ -37,29 +36,26 @@ const ForgotPassword = () => {
         }
     };
 
+    if (renderView) return renderView({ email, setEmail, error, success, setSuccess, loading, handleSubmit });
     return (
-        <div className="login-container">
-            <div className="login-bg-shape login-bg-shape-1"></div>
-            <div className="login-bg-shape login-bg-shape-2"></div>
+        <div className="login-container su-auth-centered su-recovery">
+            <header className="su-auth-header">
+                <Link to="/" className="su-auth-logo">
+                    <Logo className="login-logo-img" />
+                    <span>ShapeUp</span>
+                </Link>
+                <Link to="/login" className="su-auth-back">{t('forgot.back')}</Link>
+            </header>
 
-            <div className="login-content">
-                <div className="login-header">
-                    <div className="login-logo">
-                        <Logo className="login-logo-img" />
-                        <span className="login-logo-text">ShapeUp</span>
-                    </div>
-                    <h1 className="login-tagline">{t('forgot.tagline')}</h1>
+            <section className="su-auth-hero">
+                <div className="su-auth-copy">
+                    <span className="su-recovery-kicker">↶ Autenticação · Proteção de credenciais</span><h1 className="su-auth-title">{language === 'pt-BR' ? 'Recuperação de acesso' : t('forgot.title')}</h1>
+                    <p className="su-auth-subtitle">{t('forgot.tagline')}</p>
+                    <p className="su-auth-subtitle">{t('forgot.desc')}</p>
                 </div>
 
-                <Card className="login-card">
+                <div className="su-auth-form-wrap">
                     <form className="login-form" onSubmit={handleSubmit}>
-                        <div style={{ marginBottom: '1.5rem', textAlign: 'center' }}>
-                            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem' }}>{t('forgot.title')}</h2>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.4' }}>
-                                {t('forgot.desc')}
-                            </p>
-                        </div>
-
                         <Input
                             id="email"
                             type="email"
@@ -71,28 +67,32 @@ const ForgotPassword = () => {
                         />
 
                         {error && (
-                            <p style={{ color: 'var(--danger, #ef4444)', fontSize: '0.875rem', marginTop: '-0.25rem', textAlign: 'center' }}>
-                                {error}
-                            </p>
+                            <p className="su-auth-alert">{error}</p>
                         )}
                         {success && (
-                            <p style={{ color: 'var(--success, #10b981)', fontSize: '0.875rem', marginTop: '-0.25rem', textAlign: 'center' }}>
-                                {success}
-                            </p>
+                            <p className="su-auth-alert is-ok">{success}</p>
                         )}
 
                         <Button type="submit" fullWidth className="btn-sign-in" disabled={loading || !email}>
                             {loading ? t('forgot.btn.sending') : t('forgot.btn')}
                         </Button>
-
-                        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-                            <Link to="/login" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 500 }}>
-                                ← {t('forgot.back')}
-                            </Link>
-                        </div>
                     </form>
-                </Card>
-            </div>
+
+                    <p className="su-recovery-help">Dúvidas ou perda de acesso ao e-mail? Fale com a equipe de suporte ou com a administração da sua academia.</p>
+                    <p className="login-footer-text">
+                        <Link to="/login">{t('forgot.back')}</Link>
+                    </p>
+
+                    <aside className="su-auth-ledger" aria-hidden="true">
+                        <p className="su-auth-ledger-label">{t('forgot.ledger.label')}</p>
+                        <ol className="su-auth-ledger-list">
+                            <li><span>{t('forgot.ledger.email')}</span><b>01</b></li>
+                            <li><span>{t('forgot.ledger.link')}</span><b>02</b></li>
+                            <li className="is-live"><span>{t('forgot.ledger.back')}</span><b>03</b></li>
+                        </ol>
+                    </aside>
+                </div>
+            </section>
         </div>
     );
 };

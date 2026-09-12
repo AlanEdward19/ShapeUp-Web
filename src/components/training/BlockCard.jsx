@@ -1,6 +1,5 @@
 import Input from '../Input';
 import Button from '../Button';
-import { Trash2, Plus } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import ExerciseRow from './ExerciseRow';
 import { BLOCK_TYPES } from '../../utils/trainingEnums';
@@ -72,7 +71,7 @@ const BlockCard = ({ block, onChange, onRemove, onAddExercise }) => {
                 )}
 
                 <button className="su-icon-btn su-error-text" onClick={onRemove} title={t('pro.builder.block.remove')}>
-                    <Trash2 size={18} />
+                    ×
                 </button>
             </div>
 
@@ -81,6 +80,7 @@ const BlockCard = ({ block, onChange, onRemove, onAddExercise }) => {
                     <ExerciseRow
                         key={ex.id ?? exIdx}
                         exercise={ex}
+                        index={exIdx}
                         blockType={block.type}
                         onChange={(field, value) => updateExercise(exIdx, field, value)}
                         onRemove={() => removeExercise(exIdx)}
@@ -88,7 +88,7 @@ const BlockCard = ({ block, onChange, onRemove, onAddExercise }) => {
                 ))}
             </div>
 
-            <Button variant="outline" icon={<Plus size={16} />} className="su-mt-2" onClick={onAddExercise}>
+            <Button variant="outline" className="su-mt-2" onClick={onAddExercise}>
                 {t('pro.builder.block.add_exercise')}
             </Button>
         </div>

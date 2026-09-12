@@ -1,8 +1,7 @@
-/* Extra styles for SuggestExerciseModal — layered on top of su-modal-* base classes */
-
 .su-suggest-modal {
     max-width: 560px;
     gap: 1rem;
+    border-radius: var(--radius-sm);
 }
 
 .su-suggest-field {
@@ -12,8 +11,11 @@
 }
 
 .su-suggest-label {
-    font-size: 0.875rem;
-    font-weight: 600;
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--text-main);
 }
 
@@ -27,9 +29,11 @@
     color: var(--text-muted);
     font-size: 0.8rem;
     margin-left: 0.35rem;
+    text-transform: none;
+    letter-spacing: 0;
+    font-family: var(--font-sans);
 }
 
-/* Compound / Isolation row */
 .su-suggest-toggle-row {
     display: flex;
     gap: 0.5rem;
@@ -39,23 +43,23 @@
     flex: 1;
     padding: 0.55rem 1rem;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     background: transparent;
     color: var(--text-muted);
-    font-family: inherit;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: all var(--transition-fast);
 }
 
 .su-suggest-toggle.active {
-    border-color: #7c3aed;
-    color: #7c3aed;
-    background: rgba(124, 58, 237, 0.07);
+    border-color: var(--primary);
+    color: var(--primary);
+    background: color-mix(in oklch, var(--primary) 12%, transparent);
 }
 
-/* Muscle / Equipment chip grid */
 .su-suggest-chips {
     display: flex;
     flex-wrap: wrap;
@@ -63,26 +67,30 @@
 }
 
 .su-suggest-chip {
-    padding: 0.3rem 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 999px;
+    padding: 0.25rem 0.55rem;
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 0;
     background: transparent;
     color: var(--text-muted);
     font-family: inherit;
-    font-size: 0.78rem;
-    font-weight: 500;
+    font-size: 0.8rem;
     cursor: pointer;
-    transition: all var(--transition-fast);
-    line-height: 1.4;
 }
 
-.su-suggest-chip:hover {
-    border-color: var(--text-muted);
-    color: var(--text-main);
-}
-
+.su-suggest-chip:hover,
 .su-suggest-chip.active {
-    border-color: #7c3aed;
-    background: rgba(124, 58, 237, 0.1);
-    color: #7c3aed;
+    border-bottom-color: var(--primary);
+    color: var(--primary);
+}
+
+.su-suggest-modal .su-modal-title {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.su-suggest-modal .su-modal-icon-header,
+.su-suggest-modal .su-modal-icon-circle {
+    display: none;
 }

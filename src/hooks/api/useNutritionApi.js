@@ -102,9 +102,10 @@ export const useNutritionApi = () => {
     }, []);
 
     const completeOnboarding = useCallback(async (command) => {
+        const activityAliases = { LightlyActive: 'Light', ModeratelyActive: 'Moderate', ExtraActive: 'VeryActive' };
         return await apiClient('/api/nutrition/profile/onboarding', {
             method: 'POST',
-            body: JSON.stringify(command)
+            body: JSON.stringify({ ...command, activityLevel: activityAliases[command.activityLevel] || command.activityLevel })
         });
     }, []);
 

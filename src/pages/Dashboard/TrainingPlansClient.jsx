@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, CheckCircle, Clock, ChevronRight, ChevronLeft, CalendarDays, Plus, FastForward, Award, TrendingUp, X, Trash2 } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
-import Card from '../../components/Card';
 import Button from '../../components/Button';
-import Input from '../../components/Input';
 import ExerciseModal from '../../components/ExerciseModal';
 import { exercisesDB } from '../../data/mockExercises';
 import { addNotification } from '../../utils/notifications';
@@ -14,6 +11,7 @@ import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
+import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import { mapSetType, mapTechnique } from '../../utils/trainingEnums';
 import './TrainingPlansClient.css';
 
@@ -242,6 +240,7 @@ const ClientView = () => {
                 const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => ({
                     id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
                     name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
+                    muscles: ex.muscles || [],
                     target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
                     sets: ex.sets.map((s, sIdx) => ({
                         id: `s_${exIdx}_${sIdx}`,
@@ -395,6 +394,7 @@ const ClientView = () => {
             return {
                 id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
                 name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
+                muscles: ex.muscles || [],
                 target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
                 sets: ex.sets.map((s, sIdx) => ({
                     id: `s_${exIdx}_${sIdx}`,
@@ -611,6 +611,7 @@ const ClientView = () => {
                         status: sessionStatus,
                         exercises: exercises.map(ex => ({
                             name: ex.name,
+                            muscles: ex.muscles || [],
                             skipped: ex.sets.every(s => !s.completed),
                             sets: ex.sets.filter(s => s.completed).map((s, idx) => ({
                                 set: idx + 1,
@@ -768,14 +769,14 @@ const ClientView = () => {
                 <h1 className="su-page-title su-mb-6">{t('client.training.title')}</h1>
 
                 {assignedPlans.length === 0 ? (
-                    <Card className="su-active-plan-card" data-tour="tp-plan-card" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-                        <h3 style={{ marginBottom: '0.5rem' }}>{t('client.training.empty.title')}</h3>
+                    <div className="su-ledger-sheet su-ledger-sheet--empty" data-tour="tp-plan-card">
+                        <h3 className="su-plan-title">{t('client.training.empty.title')}</h3>
                         <p data-tour="tp-start-btn" className="su-text-muted">{t('client.training.empty.desc')}</p>
-                    </Card>
+                    </div>
                 ) : (
                     <div data-tour="tp-plan-card">
                         {assignedPlans.map(plan => (
-                            <Card key={plan.id} className="su-active-plan-card su-mb-4">
+                            <div key={plan.id} className="su-ledger-sheet su-mb-4">
                                 <div className="su-plan-hero">
                                     <div className="su-plan-hero-content">
                                         <span className="su-tag">{plan.phase}</span>
@@ -784,18 +785,19 @@ const ClientView = () => {
 
                                         <div className="su-plan-meta-row">
                                             <div className="su-meta-pill">
-                                                <DumbbellIcon size={16} /> {flattenBlockExercises(plan.blocks).length} {t('client.training.card.exercises')}
+                                                {flattenBlockExercises(plan.blocks).length} {t('client.training.card.exercises')}
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="su-plan-hero-action" data-tour="tp-start-btn">
-                                        <Button size="lg" icon={<Play size={20} fill="currentColor" />} onClick={() => startSessionForPlan(plan)}>
+                                        <Button size="lg" onClick={() => startSessionForPlan(plan)}>
                                             {t('client.training.card.btn')}
                                         </Button>
                                     </div>
                                 </div>
-                            </Card>
+                                <WorkoutBodyMap exercises={flattenBlockExercises(plan.blocks)} compact />
+                            </div>
                         ))}
                     </div>
                 )}
@@ -806,27 +808,24 @@ const ClientView = () => {
                         <p className="su-text-muted">{t('client.training.history.empty')}</p>
                     ) : (
                         paginatedHistory.map((hist) => (
-                            <Card
+                            <button
+                                type="button"
                                 key={hist.id}
                                 className="su-history-card"
-                                style={{ cursor: 'pointer' }}
                                 onClick={() => {
                                     setSelectedSession(hist);
                                     setShowSessionModal(true);
                                 }}
                             >
                                 <div className="su-hist-left">
-                                    <div className="su-hist-date">
-                                        <CalendarDays size={18} className="su-text-muted" /> {hist.date}
-                                    </div>
+                                    <div className="su-hist-date">{hist.date}</div>
                                     <div className="su-hist-title">{hist.planName}</div>
                                 </div>
                                 <div className="su-hist-right">
-                                    {/* <span className="su-pr-badge">New PR!</span> */}
-                                    <span className="su-text-muted">⏱ {hist.duration}</span>
+                                    <span className="su-text-muted">{hist.duration}</span>
                                     <span className="su-hist-vol">{hist.convertedVol} {t('client.training.history.vol')}</span>
                                 </div>
-                            </Card>
+                            </button>
                         ))
                     )}
                 </div>
@@ -837,7 +836,6 @@ const ClientView = () => {
                             variant="outline"
                             onClick={() => setHistoryPage(p => Math.max(1, p - 1))}
                             disabled={historyPage === 1}
-                            icon={<ChevronLeft size={16} />}
                         >
                             {t('client.training.pagination.prev')}
                         </Button>
@@ -849,7 +847,7 @@ const ClientView = () => {
                             onClick={() => setHistoryPage(p => Math.min(totalPages, p + 1))}
                             disabled={historyPage === totalPages}
                         >
-                            {t('client.training.pagination.next')} <ChevronRight size={16} style={{ marginLeft: '4px' }} />
+                            {t('client.training.pagination.next')}
                         </Button>
                     </div>
                 )}
@@ -858,6 +856,7 @@ const ClientView = () => {
                     <SessionDetailModal
                         session={selectedSession}
                         planName={selectedSession.planName}
+                        planExercises={flattenBlockExercises(assignedPlans.find(p => p.name === selectedSession.planName)?.blocks)}
                         onClose={() => {
                             setShowSessionModal(false);
                             setSelectedSession(null);
@@ -890,7 +889,7 @@ const ClientView = () => {
                         </button>
 
                         <div className="su-rest-clock-display">
-                            <Clock size={20} />
+                            <span className="su-timer-kicker">Rest</span>
                             <span className="su-timer-digits">
                                 {formatTime(restTimer)}
                             </span>
@@ -910,7 +909,6 @@ const ClientView = () => {
                     {isResting && <span className="su-timer-label">{t('client.session.resting')}</span>}
                     {isResting && (
                         <button className="su-skip-rest-btn" onClick={skipRest} title={t('client.session.btn.skip')}>
-                            <FastForward size={16} />
                             {t('client.session.btn.skip')}
                         </button>
                     )}
@@ -1043,14 +1041,12 @@ const ClientView = () => {
                 return (
                     <div className="su-gamified-overlay">
                         <div className="su-gamified-content">
-                            <button className="su-close-gamified" onClick={skipOverviewAndFinish}>
-                                <X size={24} />
-                            </button>
+                            <button className="su-close-gamified" onClick={skipOverviewAndFinish} aria-label="Close">×</button>
 
                             <div className="su-gamified-header">
-                                <div className="su-trophy-icon">🏆</div>
-                                <h2>{t('client.session.modal.gamified.title')}</h2>
-                                <p>{t('client.session.modal.gamified.desc')} {activePlan?.name || t('client.session.modal.gamified.fallback')}.</p>
+                                <p className="su-ledger-kicker">{t('client.session.modal.gamified.title')}</p>
+                                <h2>{activePlan?.name || t('client.session.modal.gamified.fallback')}</h2>
+                                <p>{t('client.session.modal.gamified.desc')}</p>
                             </div>
 
                             <div className="su-gamified-stats">
@@ -1058,9 +1054,7 @@ const ClientView = () => {
                                     <span className="su-stat-value">{totalVol.toLocaleString()}</span>
                                     <span className="su-stat-label">{t('client.session.modal.gamified.vol').replace('(kg)', `(${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)}</span>
                                     {totalVol > 0 && (
-                                        <div className="su-stat-trend up">
-                                            <TrendingUp size={14} /> +XP
-                                        </div>
+                                        <div className="su-stat-trend up">XP</div>
                                     )}
                                 </div>
                                 <div className="su-stat-box">
@@ -1070,7 +1064,6 @@ const ClientView = () => {
                                 <div className="su-stat-box highlight" style={newPrsCount === 0 ? { opacity: 0.6 } : {}}>
                                     <span className="su-stat-value">{newPrsCount}</span>
                                     <span className="su-stat-label">{t('client.session.modal.gamified.prs')}</span>
-                                    <Award size={18} className="su-stat-icon-abs" />
                                 </div>
                             </div>
 
@@ -1085,21 +1078,24 @@ const ClientView = () => {
             })()}
 
             <div className="su-execution-scroll" data-tour="se-exercises">
-                {exercises.map((exercise, exIndex) => (
-                    <Card key={exercise.id} className="su-execution-card">
-                        <div className="su-ex-execution-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <div>
-                                <h3>{exIndex + 1}. {exercise.name}</h3>
-                                <span className="su-ex-target">{exercise.target}</span>
+                <WorkoutBodyMap exercises={exercises} compact />
+                {exercises.map((exercise, exIndex) => {
+                    const liveSetIndex = exercise.sets.findIndex(s => !s.completed);
+                    return (
+                    <article key={exercise.id} className="su-ledger-exercise">
+                        <div className="su-ex-execution-header">
+                            <div className="su-ex-index-group">
+                                <span className="su-ledger-num">{String(exIndex + 1).padStart(2, '0')}</span>
+                                <div>
+                                    <h3>{exercise.name}</h3>
+                                    <span className="su-ex-target">{exercise.target}</span>
+                                </div>
                             </div>
                             <Button
                                 variant="outline"
                                 size="sm"
-                                icon={<Play size={14} />}
                                 onClick={() => {
-                                    // Try to find the detailed exercise definition from the global database
                                     const exDef = exercisesDB.find(e => e.name.toLowerCase() === exercise.name.toLowerCase());
-                                    // If found, open modal. Otherwise, create a mock fallback to prevent crash
                                     if (exDef) {
                                         setViewingExerciseDef(exDef);
                                     } else {
@@ -1131,7 +1127,7 @@ const ClientView = () => {
 
                             {/* Sets Iteration */}
                             {exercise.sets.map((set, setIndex) => (
-                                <div key={set.id} className={`su-exec-row ${set.completed ? 'completed' : ''}`}>
+                                <div key={set.id} className={`su-exec-row ${set.completed ? 'completed' : ''} ${setIndex === liveSetIndex ? 'live' : ''}`}>
                                     <div className="col-set">
                                         {set.isExtra ? (
                                             <select
@@ -1161,7 +1157,6 @@ const ClientView = () => {
                                     </div>
                                     <div className="col-rest">
                                         <div className="su-rest-display">
-                                            <Clock size={16} />
                                             <span>{set.prescribedRest}s</span>
                                         </div>
                                     </div>
@@ -1204,7 +1199,7 @@ const ClientView = () => {
                                                 onChange={() => toggleFailure(exIndex, setIndex)}
                                                 className="su-visually-hidden"
                                             />
-                                            <span className="su-failure-icon">🔥</span>
+                                            <span className="su-failure-icon" />
                                         </label>
                                     </div>
                                     <div className="col-done">
@@ -1213,18 +1208,16 @@ const ClientView = () => {
                                                 <button
                                                     className="su-btn-icon-danger"
                                                     onClick={() => removeExtraSet(exIndex, setIndex)}
-                                                    style={{ border: 'none', background: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
                                                     title="Remove extra set"
                                                 >
-                                                    <Trash2 size={18} />
+                                                    ×
                                                 </button>
                                             )}
                                             <button
                                                 className={`su-check-circle ${set.completed ? 'checked' : ''}`}
                                                 onClick={() => toggleSetComplete(exIndex, setIndex, set.prescribedRest)}
-                                            >
-                                                <CheckCircle size={28} />
-                                            </button>
+                                                aria-label={t('client.session.table.done')}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -1233,12 +1226,13 @@ const ClientView = () => {
                             {/* Dynamic + Add Set Action */}
                             <div className="su-add-set-row" data-tour="se-add-set">
                                 <button className="su-add-set-btn" onClick={() => addExtraSet(exIndex)}>
-                                    <Plus size={16} /> {t('client.session.btn.add_set')}
+                                    {t('client.session.btn.add_set')}
                                 </button>
                             </div>
                         </div>
-                    </Card>
-                ))}
+                    </article>
+                    );
+                })}
 
                 <div className="su-finish-run-container">
                     <Button size="lg" fullWidth className="su-complete-session-btn" onClick={finishSession} disabled={isFinishingSession}>
@@ -1260,43 +1254,35 @@ const ClientView = () => {
     );
 };
 
-const DumbbellIcon = ({ size }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14.4 14.4l-4.8-4.8" />
-        <path d="M6 18l-1.2-1.2a2.82 2.82 0 0 1 0-4l1.4-1.4a2.82 2.82 0 0 1 4 0l1.2 1.2" />
-        <path d="M18 6l1.2 1.2a2.82 2.82 0 0 1 0 4l-1.4 1.4a2.82 2.82 0 0 1-4 0L12.6 11.4" />
-        <path d="M4 14l-2 2" />
-        <path d="M20 10l2-2" />
-    </svg>
-)
-
-// ─── SESSION DETAIL MODAL (matches coach view) ────────────────────
-const SET_TYPE_COLORS = { warmup: '#94a3b8', feeder: '#a78bfa', working: '#60a5fa', topset: '#f59e0b', backoff: '#34d399' };
 const SetTypeBadge = ({ type }) => {
     const { t } = useLanguage();
     return (
-        <span style={{
-            fontSize: '0.7rem', fontWeight: 700, padding: '0.15rem 0.5rem',
-            borderRadius: 999, color: '#fff', background: SET_TYPE_COLORS[type] || '#94a3b8',
-            textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap'
-        }}>{t(`client.session.set_type.${type}`) || type}</span>
+        <span className={`su-set-type-chip ${type}`}>
+            {t(`client.session.set_type.${type}`) || type}
+        </span>
     );
 };
 
-const SessionDetailModal = ({ session, planName, onClose }) => {
+const SessionDetailModal = ({ session, planName, onClose, planExercises = [] }) => {
     const { t, unitSystem, convertWeight } = useLanguage();
 
     // We infer the original scale from the session's totalVol
     const originUnit = (session.totalVol || '').includes('lbs') ? 'imperial' : 'metric';
+    const mapExercises = (session.exercises || []).map(ex => {
+        if ((ex.muscles && ex.muscles.length) || ex.target) return ex;
+        const match = planExercises.find(p => p.name === ex.name);
+        return match ? { ...ex, muscles: match.muscles || [] } : ex;
+    });
 
     return (
         <div className="su-modal-overlay" onClick={onClose} style={{ zIndex: 10000 }}>
             <div className="su-modal-box su-session-detail-modal" onClick={e => e.stopPropagation()}>
-                <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
+                <button className="su-modal-close" onClick={onClose} aria-label="Close">×</button>
                 <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '0.25rem' }}>{planName}</h2>
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
                     {session.date} · {session.duration} · {session.convertedVol || session.totalVol} {t('client.training.history.vol')} · RPE {session.rpe}
                 </p>
+                <WorkoutBodyMap exercises={mapExercises} compact />
                 <div className="su-sd-exercises" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
                     {session.exercises.map((ex, i) => (
                         <div key={i} className="su-sd-ex-block" style={{ marginBottom: '1.5rem' }}>

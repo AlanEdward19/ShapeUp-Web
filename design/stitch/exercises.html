@@ -1,0 +1,712 @@
+<!DOCTYPE html><html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ShapeUp Coach - Biblioteca de Exercícios</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&amp;family=Source+Sans+3:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "bg-base": "#171311",
+            "surface": "#211A17",
+            "surface-subtle": "#29211D",
+            "surface-muted": "#1A1513",
+            "border-subtle": "#3A2D27",
+            "border-strong": "#4D3C34",
+            "text-primary": "#F3EAE5",
+            "text-secondary": "#B8AAA2",
+            "text-muted": "#85766F",
+            "brand-terracotta": "#E06C43",
+            "brand-terracotta-hover": "#ec784f",
+            "brand-terracotta-muted": "rgba(224, 108, 67, 0.15)",
+            "brand-olive": "#7D986B",
+            "brand-olive-muted": "rgba(125, 152, 107, 0.16)",
+            "brand-ochre": "#D4A359",
+            "brand-ochre-muted": "rgba(212, 163, 89, 0.15)"
+          },
+          fontFamily: {
+            sans: ["'Source Sans 3'", "sans-serif"],
+            condensed: ["'Barlow Condensed'", "sans-serif"],
+            mono: ["'JetBrains Mono'", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #171311; }
+    ::-webkit-scrollbar-thumb { background: #3A2D27; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4D3C34; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-bg-base font-sans text-text-primary min-h-screen selection:bg-brand-terracotta selection:text-white antialiased flex overflow-hidden">
+<!-- Permanent Sidebar (ShapeUp Coach Pro) -->
+<aside class="w-64 shrink-0 h-screen bg-surface border-r border-border-subtle flex flex-col justify-between z-40 select-none">
+<div class="flex flex-col flex-1 overflow-y-auto">
+<!-- Logo header -->
+<div class="h-14 px-4 border-b border-border-subtle flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded bg-brand-terracotta flex items-center justify-center text-white font-black text-lg shadow-sm">
+<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+<path d="M4 6h4v12H4zm6-3h4v18h-4zm6 6h4v9h-4z"></path>
+</svg>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="font-condensed font-bold tracking-wider text-text-primary leading-tight text-lg uppercase">SHAPEUP</span>
+<span class="font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-brand-terracotta/15 text-brand-terracotta border border-brand-terracotta/30 font-semibold">Coach Pro</span>
+</div>
+</div>
+<span class="w-2 h-2 rounded-full bg-brand-olive" title="Sistema Online"></span>
+</div>
+<!-- Navigation -->
+<nav class="p-3 space-y-4 text-sm">
+<div>
+<div class="px-2 pb-1.5 font-mono text-[10px] uppercase tracking-wider text-text-muted">Prescrição &amp; Treinamento</div>
+<ul class="space-y-0.5">
+<li>
+<a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">dashboard</span>
+<span>Painel do Treinador</span>
+</a>
+</li>
+<li>
+<a class="flex items-center justify-between px-2.5 py-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors" href="#">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[19px]">group</span>
+<span>Meus Alunos</span>
+</span>
+<span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-surface-subtle text-text-muted">14</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">calendar_month</span>
+<span>Criador &amp; Periodização</span>
+</a>
+</li>
+<li>
+<a class="flex items-center justify-between px-2.5 py-1.5 rounded-md bg-surface-subtle text-text-primary font-medium border-l-2 border-brand-terracotta" href="#">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[19px] text-brand-terracotta">fitness_center</span>
+<span>Biblioteca de Exercícios</span>
+</span>
+<span class="font-mono text-[10px] text-brand-terracotta font-semibold">142</span>
+</a>
+</li>
+</ul>
+</div>
+<div>
+<div class="px-2 pb-1.5 font-mono text-[10px] uppercase tracking-wider text-text-muted">Acompanhamento &amp; Gestão</div>
+<ul class="space-y-0.5">
+<li>
+<a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">restaurant</span>
+<span>Painel Nutricional</span>
+</a>
+</li>
+<li>
+<a class="flex items-center justify-between px-2.5 py-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors" href="#">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[19px]">chat</span>
+<span>Mensagens</span>
+</span>
+<span class="font-mono text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-brand-terracotta/20 text-brand-terracotta">3</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">settings</span>
+<span>Configurações</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+</div>
+<!-- User Profile Footer -->
+<div class="p-3 border-t border-border-subtle bg-surface-muted flex items-center justify-between">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="relative shrink-0">
+<img alt="Rodrigo Silva" class="w-9 h-9 rounded-full object-cover border border-border-subtle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZBxBbsCisp52e_xNGNDkrGBW5TKZHS5JrUKhX3yQW6lgsBpSLZP0nEIrhci-zTY-TvknxuhvmxZR3LtZW3Zk4cMg8Bqf3lE8DfOHXlxuraj4wTbitwAGl0eAJRMBRGsjj1iFIWuz48i5cQsvgE57s5kfFLYgAEui5s2qZ1sjpEk-6ymo2wg1QsOAbkUFU2vtxi-7Yl2Y0xwJ2HrVXkI4T-q3Wa7itjn9i92kdIFj-6WxUXc54GolC">
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-brand-olive border border-surface-muted"></span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-semibold text-text-primary truncate">Rodrigo Silva</span>
+<span class="font-mono text-[10px] text-text-muted truncate">CREF 049281-G/SP</span>
+</div>
+</div>
+<button class="text-text-muted hover:text-text-primary p-1 transition-colors" title="Encerrar sessão" type="button">
+<span class="material-symbols-outlined text-[18px]">logout</span>
+</button>
+</div>
+</aside>
+<!-- Main Application Container -->
+<div class="flex-1 flex flex-col h-screen overflow-hidden bg-bg-base">
+<!-- Topbar: Quick Action, Title & Global Actions -->
+<header class="h-14 bg-surface border-b border-border-subtle flex items-center justify-between px-6 shrink-0 z-30"><div class="flex items-center gap-3"><h1 class="font-condensed text-xl font-bold uppercase tracking-wider text-text-primary flex items-center gap-2"><span>Biblioteca de Exercícios</span><span class="text-xs font-mono font-normal text-text-muted">(142 cadastrados)</span></h1></div><div class="flex items-center gap-3"><div class="inline-flex rounded border border-border-subtle p-0.5 bg-surface-muted text-xs"><button class="px-2.5 py-1 rounded text-xs font-medium bg-surface text-text-primary" id="viewModeList" onclick="setViewMode('list')">Lista</button><button class="px-2.5 py-1 rounded text-xs font-medium text-text-muted hover:text-text-primary transition-colors" id="viewModeCards" onclick="setViewMode('cards')">Cards</button></div><div class="h-4 w-px bg-border-subtle"></div><button class="h-8 px-3 text-xs text-text-secondary hover:text-text-primary flex items-center gap-1.5 transition-colors border border-border-subtle rounded hover:bg-surface-subtle" type="button"><span class="material-symbols-outlined text-[15px] text-brand-ochre">star</span><span>Mais Usados</span></button><button class="h-8 px-3.5 bg-brand-terracotta hover:bg-brand-terracotta-hover text-white rounded text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm" onclick="showToast('Abrindo formulário de exercício personalizado...')" type="button"><span class="material-symbols-outlined text-[16px]">add</span><span>Novo Exercício</span></button></div></header>
+<!-- Search & Filter Bar (Fast Tactical Coach UX) -->
+<section class="bg-surface border-b border-border-subtle px-6 pt-3.5 pb-3 space-y-3 shrink-0"><div class="relative flex items-center"><span class="material-symbols-outlined absolute left-3.5 text-[18px] text-text-muted pointer-events-none">search</span><input class="w-full h-9 pl-10 pr-20 bg-bg-base border border-border-subtle focus:border-brand-terracotta rounded text-xs text-text-primary placeholder:text-text-muted focus:ring-0 focus:outline-none transition-all" id="globalExerciseSearch" placeholder="Buscar exercício por nome, músculo ou equipamento..." type="text"><div class="absolute right-3 flex items-center gap-1 pointer-events-none"><span class="font-mono text-[10px] text-text-muted bg-surface border border-border-subtle px-1 rounded">⌘K</span></div></div><div class="flex flex-col gap-2 pt-0.5"><div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5"><span class="font-mono text-[10px] uppercase text-text-muted shrink-0 mr-1.5">Grupo:</span><button class="muscle-pill px-2.5 py-1 rounded text-xs font-medium bg-brand-terracotta text-white shrink-0" data-group="all" onclick="filterByGroup(this, 'all')">Todos</button><button class="muscle-pill px-2.5 py-1 rounded text-xs text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors shrink-0" data-group="peitoral" onclick="filterByGroup(this, 'peitoral')">Peitoral</button><button class="muscle-pill px-2.5 py-1 rounded text-xs text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors shrink-0" data-group="costas" onclick="filterByGroup(this, 'costas')">Dorsal / Costas</button><button class="muscle-pill px-2.5 py-1 rounded text-xs text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors shrink-0" data-group="quadriceps" onclick="filterByGroup(this, 'quadriceps')">Quadríceps</button><button class="muscle-pill px-2.5 py-1 rounded text-xs text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors shrink-0" data-group="gluteos" onclick="filterByGroup(this, 'gluteos')">Glúteos &amp; Posterior</button><button class="muscle-pill px-2.5 py-1 rounded text-xs text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors shrink-0" data-group="ombros" onclick="filterByGroup(this, 'ombros')">Ombros</button><button class="muscle-pill px-2.5 py-1 rounded text-xs text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors shrink-0" data-group="biceps" onclick="filterByGroup(this, 'biceps')">Bíceps</button><button class="muscle-pill px-2.5 py-1 rounded text-xs text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors shrink-0" data-group="triceps" onclick="filterByGroup(this, 'triceps')">Tríceps</button><button class="muscle-pill px-2.5 py-1 rounded text-xs text-text-secondary hover:text-text-primary hover:bg-surface-subtle transition-colors shrink-0" data-group="core" onclick="filterByGroup(this, 'core')">Abdômen / Core</button></div><div class="flex items-center justify-between text-xs pt-1.5 border-t border-border-subtle flex-wrap gap-2"><div class="flex items-center gap-1 flex-wrap"><span class="font-mono text-[10px] uppercase text-text-muted mr-1.5">Equipamento:</span><button class="equip-btn px-2 py-0.5 rounded text-[11px] bg-surface-subtle text-text-primary font-medium" onclick="filterByEquip(this, 'all')">Todos</button><button class="equip-btn px-2 py-0.5 rounded text-[11px] text-text-muted hover:text-text-secondary" onclick="filterByEquip(this, 'Barra')">Barra</button><button class="equip-btn px-2 py-0.5 rounded text-[11px] text-text-muted hover:text-text-secondary" onclick="filterByEquip(this, 'Halteres')">Halteres</button><button class="equip-btn px-2 py-0.5 rounded text-[11px] text-text-muted hover:text-text-secondary" onclick="filterByEquip(this, 'Polia')">Polia / Cabo</button><button class="equip-btn px-2 py-0.5 rounded text-[11px] text-text-muted hover:text-text-secondary" onclick="filterByEquip(this, 'Máquina')">Máquina</button><button class="equip-btn px-2 py-0.5 rounded text-[11px] text-text-muted hover:text-text-secondary" onclick="filterByEquip(this, 'Corporal')">Peso Corporal</button></div><div class="flex items-center gap-3 font-mono text-[11px] text-text-muted"><span>ORDENAR:</span><select class="bg-transparent text-text-secondary hover:text-text-primary focus:outline-none cursor-pointer"><option>Taxa de Uso (% Alunos)</option><option>Ordem Alfabética (A-Z)</option><option>Grupo Muscular</option></select></div></div></div></section>
+<!-- Workspace Body: Table List + Integrated Interactive Slide-Over Drawer -->
+<div class="flex-1 flex overflow-hidden relative">
+<!-- Exercise Catalog View (Left/Main Table) -->
+<section class="flex-1 flex flex-col h-full bg-bg-base overflow-hidden min-w-0">
+<!-- Subheader: Count & Sorting -->
+<div class="px-6 py-2 border-b border-border-subtle bg-surface/50 flex items-center justify-between text-xs shrink-0">
+<div class="flex items-center gap-3">
+<span class="text-text-secondary font-medium font-mono text-xs" id="exerciseCountLabel">Exibindo 9 de 142 exercícios</span>
+<span class="text-border-subtle">|</span>
+<span class="text-[11px] text-text-muted flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-brand-terracotta">info</span>
+              Selecione uma linha para inspecionar guia biomecânico
+            </span>
+</div>
+<div class="flex items-center gap-2 font-mono text-[11px] text-text-muted">
+<span>ORDENAR:</span>
+<select class="bg-surface-subtle border border-border-subtle rounded px-2 py-0.5 text-xs text-text-primary focus:ring-0 focus:outline-none">
+<option>Taxa de Uso (% Alunos)</option>
+<option>Ordem Alfabética (A-Z)</option>
+<option>Grupo Muscular</option>
+<option>Maior Demanda / Composto</option>
+</select>
+</div>
+</div>
+<!-- Table Columns Header -->
+<div class="px-6 py-2 bg-surface-muted border-b border-border-subtle flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-text-muted select-none shrink-0"><div class="flex items-center gap-4 flex-1 min-w-0"><span class="w-16">CÓDIGO</span><span class="flex-1">EXERCÍCIO &amp; MÚSCULO ALVO</span></div><div class="hidden md:flex items-center gap-4 w-2/5 justify-between px-2"><span class="w-24">EQUIPAMENTO</span><span class="w-28">PADRÃO MOTOR</span><span class="w-20 text-center">REFERÊNCIA</span><span class="w-16 text-center">USO</span></div><div class="w-20 text-right pr-2">AÇÕES</div></div>
+<!-- Exercise Rows (Dense, Rich and Operational) -->
+<div class="flex-1 overflow-y-auto divide-y divide-border-subtle" id="exerciseListContainer"><!-- Row 1: Agachamento Livre -->
+<div class="exercise-item active-item group px-6 py-2.5 flex items-center justify-between gap-4 cursor-pointer bg-surface-subtle border-l-2 border-brand-terracotta hover:bg-surface-subtle transition-colors" data-desc="Padrão fundamental de agachamento com barra apoiada sobre o trapézio médio, exigindo mobilidade glenoumeral e estabilidade do complexo lombo-pélvico." data-equip="Barra" data-error="Colapso em valgo dinâmico dos joelhos e retroversão pélvica precoce ('butt wink')." data-group="quadriceps" data-id="EX-101" data-level="Avançado" data-muscle="Membros Inferiores (Quadríceps &amp; Glúteos)" data-name="Agachamento Livre com Barra" data-pattern="Composto Dominante Joelho" data-reps="6 a 10 reps" data-rest="120 a 180s" data-secondary="Glúteo Máximo, Adutores, Paravertebrais" data-sets="3 a 4 séries" data-step1="Barra apoiada sobre o trapézio médio. Pegada firme com cotovelos sob a barra e pés levemente abduzidos (15-30°)." data-step2="Inicie flexionando joelhos e quadris simultaneamente com coluna neutra, mantendo pressão uniforme nos 3 pontos dos pés." data-step3="Desça até que a linha da coxa ultrapasse a paralela do joelho com controle. Empurre o chão com retorno contínuo." data-subs="Agachamento no Smith, Leg Press 45°, Agachamento Frontal" data-usage="94%" data-vars="4 variações">
+<div class="flex items-center gap-4 min-w-0 flex-1">
+<span class="w-16 font-mono text-xs text-text-muted">EX-101</span>
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-medium text-sm text-text-primary truncate group-hover:text-brand-terracotta transition-colors">Agachamento Livre com Barra</span>
+</div>
+<div class="text-xs text-text-muted truncate mt-0.5">
+<span class="text-text-secondary">Quadríceps &amp; Glúteos</span> · Glúteo Máximo, Adutores, Lombar
+</div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4 w-2/5 justify-between px-2 text-xs">
+<span class="w-24 text-text-muted truncate">Barra Olímpica</span>
+<span class="w-28 text-text-secondary truncate">Composto / Joelho</span>
+<span class="w-20 text-center font-mono text-xs text-text-secondary">3-4 × 6-10</span>
+<span class="w-16 text-center font-mono text-xs text-brand-olive">94%</span>
+</div>
+<div class="flex items-center gap-1 shrink-0 w-20 justify-end">
+<button class="p-1 rounded text-text-muted hover:text-brand-terracotta hover:bg-surface transition-colors" onclick="event.stopPropagation(); addQuickExercise('Agachamento Livre com Barra')" title="Inserir na Ficha">
+<span class="material-symbols-outlined text-[17px]">playlist_add</span>
+</button>
+<button class="p-1 rounded text-brand-terracotta transition-colors" title="Inspecionar">
+<span class="material-symbols-outlined text-[17px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Row 2: Supino Reto -->
+<div class="exercise-item group px-6 py-2.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-surface-subtle transition-colors border-l-2 border-transparent" data-desc="Exercício padrão-ouro para empurrar horizontal com foco em hipertrofia e força máxima para o complexo peitoral." data-equip="Barra" data-error="Abertura excessiva dos cotovelos (90° em relação ao tronco) sobrecarregando a cápsula anterior do ombro." data-group="peitoral" data-id="EX-102" data-level="Intermediário" data-muscle="Peitoral Maior &amp; Tríceps" data-name="Supino Reto com Barra" data-pattern="Composto Empurrar Horizontal" data-reps="6 a 8 reps" data-rest="90 a 150s" data-secondary="Deltoide Anterior, Tríceps Braquial, Serrátil" data-sets="3 a 4 séries" data-step1="Cinco pontos de apoio no banco (pés firmes no chão, glúteos, escápulas retraídas e cabeça). Pegada pouco além dos ombros." data-step2="Desça controlando a barra até o terço inferior do esterno, cotovelos em ângulo de 45° a 70° em relação ao tronco." data-step3="Empurre de volta com força explosiva sem perder o arco torácico natural nem descolar as escápulas." data-subs="Supino com Halteres, Supino Inclinado, Supino no Smith" data-usage="91%" data-vars="3 variações">
+<div class="flex items-center gap-4 min-w-0 flex-1">
+<span class="w-16 font-mono text-xs text-text-muted">EX-102</span>
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-medium text-sm text-text-primary truncate group-hover:text-brand-terracotta transition-colors">Supino Reto com Barra</span>
+</div>
+<div class="text-xs text-text-muted truncate mt-0.5">
+<span class="text-text-secondary">Peitoral Maior</span> · Tríceps Braquial, Deltoide Anterior
+</div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4 w-2/5 justify-between px-2 text-xs">
+<span class="w-24 text-text-muted truncate">Barra Olímpica</span>
+<span class="w-28 text-text-secondary truncate">Composto / Empurrar</span>
+<span class="w-20 text-center font-mono text-xs text-text-secondary">3-4 × 6-8</span>
+<span class="w-16 text-center font-mono text-xs text-brand-olive">91%</span>
+</div>
+<div class="flex items-center gap-1 shrink-0 w-20 justify-end">
+<button class="p-1 rounded text-text-muted hover:text-brand-terracotta hover:bg-surface transition-colors" onclick="event.stopPropagation(); addQuickExercise('Supino Reto com Barra')" title="Inserir na Ficha">
+<span class="material-symbols-outlined text-[17px]">playlist_add</span>
+</button>
+<button class="p-1 rounded text-text-muted hover:text-text-primary transition-colors" title="Inspecionar">
+<span class="material-symbols-outlined text-[17px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Row 3: Elevação Pélvica -->
+<div class="exercise-item group px-6 py-2.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-surface-subtle transition-colors border-l-2 border-transparent" data-desc="Pico de ativação concêntrica no glúteo máximo através da extensão terminal de quadril contra resistência vertical estável." data-equip="Barra" data-error="Hiperlordose lombar no ápice em vez de retroversão posterior da pelve." data-group="gluteos" data-id="EX-103" data-level="Intermediário" data-muscle="Glúteo Máximo &amp; Isquiotibiais" data-name="Elevação Pélvica com Barra" data-pattern="Dominante Quadril" data-reps="8 a 12 reps" data-rest="90 a 120s" data-secondary="Isquiotibiais, Core Profundo" data-sets="3 a 4 séries" data-step1="Escápulas apoiadas na borda inferior do banco estável com almofada protetora sobre o púbis." data-step2="Pés alinhados na largura dos quadris, tíbias verticais no ponto mais alto da extensão." data-step3="Eleve o quadril contraindo vigorosamente os glúteos e sustentando 1s no ápice sem hiperextensão lombar." data-subs="Elevação Pélvica na Máquina, Glute Bridge no Solo, Hip Thrust Unilateral" data-usage="88%" data-vars="3 variações">
+<div class="flex items-center gap-4 min-w-0 flex-1">
+<span class="w-16 font-mono text-xs text-text-muted">EX-103</span>
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-medium text-sm text-text-primary truncate group-hover:text-brand-terracotta transition-colors">Elevação Pélvica com Barra</span>
+</div>
+<div class="text-xs text-text-muted truncate mt-0.5">
+<span class="text-text-secondary">Glúteo Máximo</span> · Isquiotibiais, Core Profundo
+</div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4 w-2/5 justify-between px-2 text-xs">
+<span class="w-24 text-text-muted truncate">Barra + Banco</span>
+<span class="w-28 text-text-secondary truncate">Dominante Quadril</span>
+<span class="w-20 text-center font-mono text-xs text-text-secondary">3-4 × 8-12</span>
+<span class="w-16 text-center font-mono text-xs text-brand-olive">88%</span>
+</div>
+<div class="flex items-center gap-1 shrink-0 w-20 justify-end">
+<button class="p-1 rounded text-text-muted hover:text-brand-terracotta hover:bg-surface transition-colors" onclick="event.stopPropagation(); addQuickExercise('Elevação Pélvica com Barra')" title="Inserir na Ficha">
+<span class="material-symbols-outlined text-[17px]">playlist_add</span>
+</button>
+<button class="p-1 rounded text-text-muted hover:text-text-primary transition-colors" title="Inspecionar">
+<span class="material-symbols-outlined text-[17px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Row 4: Puxada Alta -->
+<div class="exercise-item group px-6 py-2.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-surface-subtle transition-colors border-l-2 border-transparent" data-desc="Tração vertical essencial para largura dorsal e controle escapular sem sobrecarga desnecessária na articulação dos ombros." data-equip="Polia" data-error="Balanço lombar excessivo e puxada atrás da nuca sobrecarregando a coluna cervical." data-group="costas" data-id="EX-104" data-level="Iniciante / Intermediário" data-muscle="Dorsal &amp; Redondo Maior" data-name="Puxada Alta Pronada" data-pattern="Composto Puxar Vertical" data-reps="8 a 12 reps" data-rest="60 a 90s" data-secondary="Bíceps Braquial, Braquiorradial, Trapézio Inferior" data-sets="3 a 4 séries" data-step1="Ajuste o apoio das coxas para estabilização pélvica. Segure na curvatura da barra com pegada pronada." data-step2="Inicie deprimindo ativamente as escápulas antes de flexionar os cotovelos para baixo." data-step3="Puxe até o terço superior do peitoral mantendo inclinação sutil de 10-15° no tronco." data-subs="Barra Fixa Pronada, Puxada com Triângulo, Puxada Supinada" data-usage="85%" data-vars="2 variações">
+<div class="flex items-center gap-4 min-w-0 flex-1">
+<span class="w-16 font-mono text-xs text-text-muted">EX-104</span>
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-medium text-sm text-text-primary truncate group-hover:text-brand-terracotta transition-colors">Puxada Alta Pronada</span>
+</div>
+<div class="text-xs text-text-muted truncate mt-0.5">
+<span class="text-text-secondary">Grande Dorsal</span> · Redondo Maior, Bíceps
+</div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4 w-2/5 justify-between px-2 text-xs">
+<span class="w-24 text-text-muted truncate">Polia Alta</span>
+<span class="w-28 text-text-secondary truncate">Composto / Tração</span>
+<span class="w-20 text-center font-mono text-xs text-text-secondary">3-4 × 8-12</span>
+<span class="w-16 text-center font-mono text-xs text-brand-olive">85%</span>
+</div>
+<div class="flex items-center gap-1 shrink-0 w-20 justify-end">
+<button class="p-1 rounded text-text-muted hover:text-brand-terracotta hover:bg-surface transition-colors" onclick="event.stopPropagation(); addQuickExercise('Puxada Alta Pronada')" title="Inserir na Ficha">
+<span class="material-symbols-outlined text-[17px]">playlist_add</span>
+</button>
+<button class="p-1 rounded text-text-muted hover:text-text-primary transition-colors" title="Inspecionar">
+<span class="material-symbols-outlined text-[17px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Row 5: Leg Press 45° -->
+<div class="exercise-item group px-6 py-2.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-surface-subtle transition-colors border-l-2 border-transparent" data-desc="Extensão guiada de membros inferiores com alta estabilidade lombar e segurança articular sob alta sobrecarga." data-equip="Máquina" data-error="Retroversão pélvica ao final da descida e bloqueio articular abrupto na extensão total." data-group="quadriceps" data-id="EX-105" data-level="Iniciante / Intermediário" data-muscle="Quadríceps &amp; Glúteo Máximo" data-name="Leg Press 45° Inclinado" data-pattern="Composto Dominante Joelho" data-reps="10 a 12 reps" data-rest="90 a 120s" data-secondary="Vasto Lateral, Vasto Medial, Glúteo Máximo" data-sets="3 a 4 séries" data-step1="Apoie completamente o tronco e a pelve no encosto. Pés centralizados na plataforma na largura dos ombros." data-step2="Destrave a segurança e flexione joelhos de forma controlada sem descolar o sacro do estofado." data-step3="Empurre pela linha do calcanhar e mediopé, desacelerando antes do travamento articular." data-subs="Hack Squat 45°, Agachamento Smith, Cadeira Extensora" data-usage="82%" data-vars="3 variações">
+<div class="flex items-center gap-4 min-w-0 flex-1">
+<span class="w-16 font-mono text-xs text-text-muted">EX-105</span>
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-medium text-sm text-text-primary truncate group-hover:text-brand-terracotta transition-colors">Leg Press 45° Inclinado</span>
+</div>
+<div class="text-xs text-text-muted truncate mt-0.5">
+<span class="text-text-secondary">Quadríceps</span> · Vasto Lateral, Glúteo Máximo
+</div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4 w-2/5 justify-between px-2 text-xs">
+<span class="w-24 text-text-muted truncate">Máquina 45°</span>
+<span class="w-28 text-text-secondary truncate">Composto / Joelho</span>
+<span class="w-20 text-center font-mono text-xs text-text-secondary">3-4 × 10-12</span>
+<span class="w-16 text-center font-mono text-xs text-brand-olive">82%</span>
+</div>
+<div class="flex items-center gap-1 shrink-0 w-20 justify-end">
+<button class="p-1 rounded text-text-muted hover:text-brand-terracotta hover:bg-surface transition-colors" onclick="event.stopPropagation(); addQuickExercise('Leg Press 45° Inclinado')" title="Inserir na Ficha">
+<span class="material-symbols-outlined text-[17px]">playlist_add</span>
+</button>
+<button class="p-1 rounded text-text-muted hover:text-text-primary transition-colors" title="Inspecionar">
+<span class="material-symbols-outlined text-[17px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Row 6: RDL Stiff -->
+<div class="exercise-item group px-6 py-2.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-surface-subtle transition-colors border-l-2 border-transparent" data-desc="Flexão pura de quadril com alta sobrecarga excêntrica sobre a cadeia posterior e estabilização axial da coluna." data-equip="Halteres" data-error="Flexionar joelhos em excesso transformando em agachamento ou perder a neutralidade da coluna lombar." data-group="gluteos" data-id="EX-106" data-level="Intermediário" data-muscle="Isquiotibiais &amp; Glúteo Máximo" data-name="RDL (Stiff com Halteres)" data-pattern="Dominante Quadril" data-reps="8 a 12 reps" data-rest="90 a 120s" data-secondary="Glúteo Máximo, Adutor Magno, Lombar" data-sets="3 a 4 séries" data-step1="Posição ortostática com halteres encostados nas coxas e joelhos em semiflexão constante (10-15°)." data-step2="Projete o quadril para trás mantendo os pesos rentes às tíbias até o limite de flexibilidade isquiotibial." data-step3="Contraia os glúteos e estenda o quadril para retorno à vertical sem hiperextensão no topo." data-subs="Stiff com Barra, Mesa Flexora, Good Morning" data-usage="79%" data-vars="2 variações">
+<div class="flex items-center gap-4 min-w-0 flex-1">
+<span class="w-16 font-mono text-xs text-text-muted">EX-106</span>
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-medium text-sm text-text-primary truncate group-hover:text-brand-terracotta transition-colors">RDL (Stiff com Halteres)</span>
+</div>
+<div class="text-xs text-text-muted truncate mt-0.5">
+<span class="text-text-secondary">Isquiotibiais</span> · Glúteo Máximo, Paravertebrais
+</div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4 w-2/5 justify-between px-2 text-xs">
+<span class="w-24 text-text-muted truncate">Halteres</span>
+<span class="w-28 text-text-secondary truncate">Dominante Quadril</span>
+<span class="w-20 text-center font-mono text-xs text-text-secondary">3-4 × 8-12</span>
+<span class="w-16 text-center font-mono text-xs text-brand-olive">79%</span>
+</div>
+<div class="flex items-center gap-1 shrink-0 w-20 justify-end">
+<button class="p-1 rounded text-text-muted hover:text-brand-terracotta hover:bg-surface transition-colors" onclick="event.stopPropagation(); addQuickExercise('RDL (Stiff com Halteres)')" title="Inserir na Ficha">
+<span class="material-symbols-outlined text-[17px]">playlist_add</span>
+</button>
+<button class="p-1 rounded text-text-muted hover:text-text-primary transition-colors" title="Inspecionar">
+<span class="material-symbols-outlined text-[17px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Row 7: Elevação Lateral -->
+<div class="exercise-item group px-6 py-2.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-surface-subtle transition-colors border-l-2 border-transparent" data-desc="Isolamento anatômico do feixe lateral do deltoide mantendo tensão uniforme durante todo o curso angular." data-equip="Polia" data-error="Elevar o trapézio encolhendo os ombros antes da abdução e rotação interna forçada do braço." data-group="ombros" data-id="EX-107" data-level="Iniciante / Intermediário" data-muscle="Deltoide Lateral" data-name="Elevação Lateral na Polia" data-pattern="Isolador Abdução" data-reps="10 a 15 reps" data-rest="60 a 75s" data-secondary="Supraespinhal, Deltoide Anterior" data-sets="3 a 4 séries" data-step1="Polia na altura do maléolo lateral. Posicione o corpo em discreta inclinação lateral." data-step2="Conduza o movimento pelos cotovelos no plano da escápula (30° anterior ao tronco)." data-step3="Suba até 90° de abdução e controle a descida desacelerando por 2 segundos." data-subs="Elevação Lateral com Halteres, Elevação Lateral na Máquina" data-usage="89%" data-vars="2 variações">
+<div class="flex items-center gap-4 min-w-0 flex-1">
+<span class="w-16 font-mono text-xs text-text-muted">EX-107</span>
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-medium text-sm text-text-primary truncate group-hover:text-brand-terracotta transition-colors">Elevação Lateral na Polia</span>
+</div>
+<div class="text-xs text-text-muted truncate mt-0.5">
+<span class="text-text-secondary">Deltoide Lateral</span> · Supraespinhal, Trapézio
+</div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4 w-2/5 justify-between px-2 text-xs">
+<span class="w-24 text-text-muted truncate">Polia Baixa</span>
+<span class="w-28 text-text-secondary truncate">Isolador</span>
+<span class="w-20 text-center font-mono text-xs text-text-secondary">3-4 × 10-15</span>
+<span class="w-16 text-center font-mono text-xs text-brand-olive">89%</span>
+</div>
+<div class="flex items-center gap-1 shrink-0 w-20 justify-end">
+<button class="p-1 rounded text-text-muted hover:text-brand-terracotta hover:bg-surface transition-colors" onclick="event.stopPropagation(); addQuickExercise('Elevação Lateral na Polia')" title="Inserir na Ficha">
+<span class="material-symbols-outlined text-[17px]">playlist_add</span>
+</button>
+<button class="p-1 rounded text-text-muted hover:text-text-primary transition-colors" title="Inspecionar">
+<span class="material-symbols-outlined text-[17px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Row 8: Cadeira Extensora -->
+<div class="exercise-item group px-6 py-2.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-surface-subtle transition-colors border-l-2 border-transparent" data-desc="Isolamento monoarticular de extensão do joelho com contração focal no reto femoral e correção de assimetrias." data-equip="Máquina" data-error="Impulso balístico inicial e relaxamento excêntrico sem contenção muscular." data-group="quadriceps" data-id="EX-108" data-level="Iniciante" data-muscle="Reto Femoral &amp; Vasto Medial" data-name="Cadeira Extensora Unilateral" data-pattern="Isolador Extensão Joelho" data-reps="12 a 15 reps" data-rest="60s" data-secondary="Vasto Lateral, Vasto Intermédio" data-sets="3 séries" data-step1="Ajuste o eixo da máquina exatamente na linha articular do joelho e rolo sobre a tíbia distal." data-step2="Trave a pelve segurando as manoplas firmemente contra o assento." data-step3="Estenda até o alinhamento com 1s de contração voluntária de pico no topo." data-subs="Extensora Bilateral, Sissy Squat, Agachamento Búlgaro" data-usage="76%" data-vars="1 variação">
+<div class="flex items-center gap-4 min-w-0 flex-1">
+<span class="w-16 font-mono text-xs text-text-muted">EX-108</span>
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-2">
+<span class="font-medium text-sm text-text-primary truncate group-hover:text-brand-terracotta transition-colors">Cadeira Extensora Unilateral</span>
+</div>
+<div class="text-xs text-text-muted truncate mt-0.5">
+<span class="text-text-secondary">Reto Femoral</span> · Vasto Medial, Vasto Lateral
+</div>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-4 w-2/5 justify-between px-2 text-xs">
+<span class="w-24 text-text-muted truncate">Máquina</span>
+<span class="w-28 text-text-secondary truncate">Isolador</span>
+<span class="w-20 text-center font-mono text-xs text-text-secondary">3 × 12-15</span>
+<span class="w-16 text-center font-mono text-xs text-brand-olive">76%</span>
+</div>
+<div class="flex items-center gap-1 shrink-0 w-20 justify-end">
+<button class="p-1 rounded text-text-muted hover:text-brand-terracotta hover:bg-surface transition-colors" onclick="event.stopPropagation(); addQuickExercise('Cadeira Extensora Unilateral')" title="Inserir na Ficha">
+<span class="material-symbols-outlined text-[17px]">playlist_add</span>
+</button>
+<button class="p-1 rounded text-text-muted hover:text-text-primary transition-colors" title="Inspecionar">
+<span class="material-symbols-outlined text-[17px]">chevron_right</span>
+</button>
+</div>
+</div></div>
+<!-- Catalog Footer (Pagination & Live Status) -->
+<div class="px-6 py-2 border-t border-border-subtle bg-surface/50 flex items-center justify-between text-xs font-mono text-text-muted shrink-0">
+<div class="flex items-center gap-3">
+<span>PÁGINA 1 DE 15</span>
+<span class="text-border-subtle">|</span>
+<span class="text-[11px] text-brand-olive flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-olive"></span>
+              Sincronizado com o Banco Nacional ShapeUp
+            </span>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-2.5 py-1 rounded bg-surface border border-border-subtle text-text-secondary hover:text-text-primary disabled:opacity-40 transition-colors" disabled="">Anterior</button>
+<button class="px-2.5 py-1 rounded bg-brand-terracotta text-white font-medium">1</button>
+<button class="px-2.5 py-1 rounded bg-surface border border-border-subtle text-text-secondary hover:text-text-primary transition-colors">2</button>
+<button class="px-2.5 py-1 rounded bg-surface border border-border-subtle text-text-secondary hover:text-text-primary transition-colors">3</button>
+<button class="px-2.5 py-1 rounded bg-surface border border-border-subtle text-text-secondary hover:text-text-primary transition-colors">Próxima</button>
+</div>
+</div>
+</section>
+<!-- Integrated Operative Inspection Drawer (Slide-Over Panel) -->
+<aside class="w-[390px] xl:w-[440px] shrink-0 border-l border-border-subtle bg-surface flex flex-col h-full shadow-2xl transition-all duration-300 z-20" id="exerciseDrawer"><!-- Drawer Header -->
+<div class="p-4 border-b border-border-subtle bg-surface flex items-start justify-between">
+<div class="min-w-0 pr-3">
+<div class="flex items-center gap-2 mb-0.5">
+<span class="font-mono text-[10px] text-text-muted" id="drawerCode">EX-101</span>
+<span class="text-border-subtle">·</span>
+<span class="font-mono text-[10px] text-text-muted uppercase" id="drawerPattern">Composto Dominante Joelho</span>
+</div>
+<h2 class="font-condensed font-bold text-lg text-text-primary leading-tight truncate" id="drawerTitle">Agachamento Livre com Barra</h2>
+<p class="text-xs text-text-secondary mt-0.5" id="drawerPrimaryMuscle">Membros Inferiores (Quadríceps &amp; Glúteos)</p>
+</div>
+<button class="p-1 text-text-muted hover:text-text-primary transition-colors" onclick="toggleDrawer(false)" title="Fechar Painel">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Drawer Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-xs">
+<!-- Prescrição de Referência: Clean 3-column block with hairline dividers -->
+<div class="border border-border-subtle rounded divide-x divide-border-subtle grid grid-cols-3 bg-surface-muted py-2 text-center">
+<div>
+<span class="block font-mono text-[10px] uppercase text-text-muted">Séries</span>
+<span class="font-mono text-xs font-semibold text-text-primary" id="drawerSets">3 a 4 séries</span>
+</div>
+<div>
+<span class="block font-mono text-[10px] uppercase text-text-muted">Repetições</span>
+<span class="font-mono text-xs font-semibold text-text-primary" id="drawerReps">6 a 10 reps</span>
+</div>
+<div>
+<span class="block font-mono text-[10px] uppercase text-text-muted">Descanso</span>
+<span class="font-mono text-xs font-semibold text-text-primary" id="drawerRest">120 a 180s</span>
+</div>
+</div>
+<!-- Ativação Muscular (Clean and subtle) -->
+<div class="space-y-2 pt-1 border-t border-border-subtle">
+<div class="flex items-center justify-between text-text-secondary font-mono text-[10px] uppercase tracking-wider">
+<span>Ativação Primária &amp; Sinergistas</span>
+<span class="text-text-muted" id="drawerUsageBadge">94% adoção</span>
+</div>
+<div class="space-y-2.5">
+<div>
+<div class="flex justify-between text-[11px] mb-1">
+<span class="text-text-primary font-medium" id="drawerAgonist">Quadríceps &amp; Glúteos (Agonistas)</span>
+<span class="font-mono text-text-secondary">95%</span>
+</div>
+<div class="w-full bg-surface-muted h-1 rounded overflow-hidden">
+<div class="bg-brand-terracotta h-full rounded" style="width: 95%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-[11px] mb-1">
+<span class="text-text-muted" id="drawerSynergist">Eretores &amp; Core (Estabilização)</span>
+<span class="font-mono text-text-muted">75%</span>
+</div>
+<div class="w-full bg-surface-muted h-1 rounded overflow-hidden">
+<div class="bg-border-strong h-full rounded" style="width: 75%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Biomechanical Execution Protocol -->
+<div class="space-y-2 pt-2 border-t border-border-subtle">
+<h4 class="font-mono text-[10px] uppercase tracking-wider text-text-muted font-semibold">
+Diretrizes Técnicas de Execução
+</h4>
+<div class="space-y-2 text-text-secondary text-[11px] leading-relaxed">
+<div class="flex gap-2.5 items-start">
+<span class="font-mono text-text-muted shrink-0 text-[10px]">01.</span>
+<p id="drawerStep1">Barra apoiada sobre o trapézio médio. Pegada firme com cotovelos sob a barra e pés levemente abduzidos (15-30°).</p>
+</div>
+<div class="flex gap-2.5 items-start">
+<span class="font-mono text-text-muted shrink-0 text-[10px]">02.</span>
+<p id="drawerStep2">Inicie flexionando joelhos e quadris simultaneamente com coluna neutra, mantendo pressão uniforme nos 3 pontos dos pés.</p>
+</div>
+<div class="flex gap-2.5 items-start">
+<span class="font-mono text-text-muted shrink-0 text-[10px]">03.</span>
+<p id="drawerStep3">Desça até que a linha da coxa ultrapasse a paralela do joelho com controle. Empurre o chão com retorno contínuo.</p>
+</div>
+</div>
+</div>
+<!-- Pontos de Atenção & Cuidados Biomecânicos -->
+<div class="p-2.5 rounded bg-surface-muted border-l-2 border-brand-ochre space-y-1">
+<span class="font-mono text-[10px] uppercase tracking-wider text-brand-ochre font-semibold block">Ponto Crítico &amp; Compensações</span>
+<p class="text-text-secondary text-[11px] leading-relaxed" id="drawerError">
+Colapso em valgo dinâmico dos joelhos e retroversão pélvica precoce ('butt wink').
+</p>
+</div>
+<!-- Substituições Mecânicas Recomendadas -->
+<div class="pt-1 space-y-1">
+<span class="font-mono text-[10px] uppercase tracking-wider text-text-muted block">Substituições Mecânicas Equivalentes</span>
+<p class="text-text-secondary text-[11px]" id="drawerSubs">
+Agachamento no Smith, Leg Press 45°, Agachamento Frontal
+</p>
+</div>
+</div>
+<!-- Drawer Action Footer -->
+<div class="p-3 border-t border-border-subtle bg-surface flex items-center gap-2">
+<button class="flex-1 h-8 bg-brand-terracotta hover:bg-brand-terracotta-hover text-white rounded text-xs font-medium flex items-center justify-center gap-1.5 transition-colors" onclick="addCurrentDrawerExercise()">
+<span class="material-symbols-outlined text-[16px]">playlist_add</span>
+<span>Adicionar à Ficha do Aluno</span>
+</button>
+<button class="h-8 px-2.5 border border-border-subtle hover:border-border-strong text-text-secondary hover:text-text-primary rounded text-xs transition-colors flex items-center gap-1" onclick="copyExerciseDetails()" title="Copiar Parâmetros">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+<span>Copiar</span>
+</button>
+</div></aside>
+</div>
+</div>
+<!-- Micro-Notification Toast -->
+<div class="fixed bottom-5 right-5 bg-surface-subtle border border-border-strong text-text-primary px-4 py-2.5 rounded-lg shadow-2xl text-xs flex items-center gap-2.5 transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none z-50" id="toastNotification">
+<span class="material-symbols-outlined text-brand-olive text-[18px]">check_circle</span>
+<span id="toastMessage">Exercício adicionado à ficha com sucesso!</span>
+</div>
+<!-- Operational Interactive Script -->
+<script>
+    let activeExerciseName = "Agachamento Livre com Barra";
+
+    // Exercise Selection and Drawer Population
+    function selectExerciseRow(row) {
+      if (!row) return;
+
+      // Update row visual active state
+      document.querySelectorAll('.exercise-item').forEach(el => {
+        el.classList.remove('active-item', 'bg-surface-subtle', 'border-brand-terracotta');
+        el.classList.add('border-transparent');
+      });
+      row.classList.add('active-item', 'bg-surface-subtle', 'border-brand-terracotta');
+      row.classList.remove('border-transparent');
+
+      // Extract dataset
+      activeExerciseName = row.dataset.name || "Exercício";
+      document.getElementById('drawerCode').textContent = row.dataset.id || '#EX-000';
+      document.getElementById('drawerPattern').textContent = row.dataset.pattern || 'Padrão Geral';
+      document.getElementById('drawerTitle').textContent = row.dataset.name || '';
+      document.getElementById('drawerPrimaryMuscle').textContent = row.dataset.muscle || '';
+      document.getElementById('drawerSets').textContent = row.dataset.sets || '3 a 4 séries';
+      document.getElementById('drawerReps').textContent = row.dataset.reps || '8 a 12 reps';
+      document.getElementById('drawerRest').textContent = row.dataset.rest || '60 a 90s';
+      document.getElementById('drawerUsageBadge').textContent = (row.dataset.usage || '85%') + ' dos alunos';
+      document.getElementById('drawerAgonist').textContent = (row.dataset.muscle || 'Músculo Principal') + ' (Agonista)';
+      document.getElementById('drawerSynergist').textContent = (row.dataset.secondary || 'Músculos Auxiliares') + ' (Estabilizadores)';
+      document.getElementById('drawerStep1').textContent = row.dataset.step1 || '';
+      document.getElementById('drawerStep2').textContent = row.dataset.step2 || '';
+      document.getElementById('drawerStep3').textContent = row.dataset.step3 || '';
+      document.getElementById('drawerError').textContent = row.dataset.error || 'Manter técnica rigorosa sem compensações posturais.';
+      document.getElementById('drawerSubs').textContent = row.dataset.subs || 'Variações livres ou na polia.';
+
+      // Open drawer if closed
+      toggleDrawer(true);
+    }
+
+    function toggleDrawer(show) {
+      const drawer = document.getElementById('exerciseDrawer');
+      if (show) {
+        drawer.classList.remove('hidden');
+      } else {
+        drawer.classList.add('hidden');
+      }
+    }
+
+    function addQuickExercise(name) {
+      showToast(`"${name}" inserido na ficha ativa com sucesso!`);
+    }
+
+    function addCurrentDrawerExercise() {
+      showToast(`"${activeExerciseName}" prescrito na periodização do aluno!`);
+    }
+
+    function copyExerciseDetails() {
+      navigator.clipboard?.writeText(activeExerciseName);
+      showToast(`Parâmetros de "${activeExerciseName}" copiados.`);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      const toastMsg = document.getElementById('toastMessage');
+      toastMsg.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+
+    // Filter by Muscle Group
+    function filterByGroup(btn, group) {
+      document.querySelectorAll('.muscle-pill').forEach(p => {
+        p.className = "muscle-pill px-3 py-1 rounded-full text-xs font-medium bg-surface-subtle text-text-secondary hover:text-text-primary hover:border-border-strong border border-border-subtle transition-all shrink-0";
+      });
+      btn.className = "muscle-pill px-3 py-1 rounded-full text-xs font-medium bg-brand-terracotta text-white transition-all shrink-0 shadow-sm";
+
+      const rows = document.querySelectorAll('.exercise-item');
+      let count = 0;
+      rows.forEach(r => {
+        if (group === 'all' || r.dataset.group === group) {
+          r.style.display = '';
+          count++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+      document.getElementById('exerciseCountLabel').textContent = `Exibindo ${count} de 142 exercícios`;
+    }
+
+    // Filter by Equipment
+    function filterByEquip(btn, equip) {
+      document.querySelectorAll('.equip-btn').forEach(b => {
+        b.className = "equip-btn px-2.5 py-0.5 rounded text-[11px] text-text-muted hover:text-text-secondary border border-transparent hover:border-border-subtle";
+      });
+      btn.className = "equip-btn px-2.5 py-0.5 rounded text-[11px] bg-surface-subtle text-text-primary font-medium border border-border-subtle";
+
+      const rows = document.querySelectorAll('.exercise-item');
+      let count = 0;
+      rows.forEach(r => {
+        if (equip === 'all' || (r.dataset.equip && r.dataset.equip.includes(equip))) {
+          r.style.display = '';
+          count++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+      document.getElementById('exerciseCountLabel').textContent = `Exibindo ${count} de 142 exercícios`;
+    }
+
+    // Live search
+    const searchInput = document.getElementById('globalExerciseSearch');
+    searchInput.addEventListener('input', function(e) {
+      const q = e.target.value.toLowerCase().trim();
+      const rows = document.querySelectorAll('.exercise-item');
+      let count = 0;
+      rows.forEach(r => {
+        const text = (r.dataset.name + ' ' + r.dataset.muscle + ' ' + r.dataset.secondary + ' ' + r.dataset.equip + ' ' + r.dataset.id).toLowerCase();
+        if (text.includes(q)) {
+          r.style.display = '';
+          count++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+      document.getElementById('exerciseCountLabel').textContent = `Exibindo ${count} de 142 exercícios`;
+    });
+
+    // Keyboard shortcut / and Cmd+K for fast focus
+    window.addEventListener('keydown', function(e) {
+      if ((e.key === '/' || (e.metaKey && e.key === 'k') || (e.ctrlKey && e.key === 'k')) && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+        searchInput.select();
+      }
+    });
+
+    // View Mode Toggle (Lista vs Cards)
+    function setViewMode(mode) {
+      const btnList = document.getElementById('viewModeList');
+      const btnCards = document.getElementById('viewModeCards');
+      if (mode === 'cards') {
+        btnCards.classList.replace('text-text-muted', 'bg-surface-subtle');
+        btnCards.classList.add('text-text-primary', 'shadow-sm');
+        btnList.classList.replace('bg-surface-subtle', 'text-text-muted');
+        btnList.classList.remove('text-text-primary', 'shadow-sm');
+        showToast("Modo 'Cards Anatômicos' carregado.");
+      } else {
+        btnList.classList.replace('text-text-muted', 'bg-surface-subtle');
+        btnList.classList.add('text-text-primary', 'shadow-sm');
+        btnCards.classList.replace('bg-surface-subtle', 'text-text-muted');
+        btnCards.classList.remove('text-text-primary', 'shadow-sm');
+      }
+    }
+
+    // Attach click listeners to rows
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.exercise-item').forEach(item => {
+        item.addEventListener('click', () => {
+          selectExerciseRow(item);
+        });
+      });
+    });
+  </script>
+</body></html>

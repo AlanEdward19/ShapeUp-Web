@@ -1,0 +1,110 @@
+.su-body-map {
+    --map-skin: var(--text-main);
+    --map-idle: color-mix(in oklch, var(--text-muted) 42%, var(--bg-card));
+    --map-hit: var(--primary);
+    --map-gap: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.su-body-map-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.su-body-map-title {
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.su-body-map-toggle {
+    display: inline-flex;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.su-body-map-toggle button {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.65rem;
+    cursor: pointer;
+}
+
+.su-body-map-toggle button.is-active {
+    background: var(--text-main);
+    color: var(--bg-card);
+}
+
+.su-body-map-figure {
+    display: flex;
+    justify-content: center;
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 0.25rem;
+}
+
+.su-body-map-svg {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+}
+
+.su-body-map.is-compact .su-body-map-svg {
+    max-width: 160px;
+}
+
+.su-body-map-svg .silhouette path {
+    fill: var(--map-skin);
+    stroke: color-mix(in oklch, var(--bg-card) 55%, var(--text-main));
+    stroke-width: 0.8;
+    stroke-miterlimit: 10;
+}
+
+.su-body-map-svg .muscles path {
+    fill: var(--map-idle);
+    stroke: none;
+    transition: fill 180ms ease, fill-opacity 180ms ease;
+}
+
+.su-body-map-svg .muscles .is-hit path {
+    fill: var(--map-hit);
+    fill-opacity: calc(0.5 + (var(--hit, 1) * 0.5));
+}
+
+.su-body-map-hint {
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+}
+
+.su-session-detail-modal .su-body-map {
+    margin-bottom: 1.25rem;
+}
+
+.su-cp-plan-card .su-body-map,
+.su-independent-plan-card .su-body-map,
+.su-ledger-sheet .su-body-map {
+    margin-top: 1rem;
+}
+
+.su-session-engine .su-body-map {
+    margin: 0.75rem 0 1.25rem;
+    max-width: 22rem;
+}

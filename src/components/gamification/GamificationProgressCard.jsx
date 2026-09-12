@@ -1,5 +1,4 @@
 import React from 'react';
-import { Trophy, Zap, Coins, Target, Award, UtensilsCrossed } from 'lucide-react';
 import Card from '../Card';
 import './GamificationProgressCard.css';
 
@@ -38,7 +37,6 @@ const GamificationProgressCard = ({ profile }) => {
         <Card className="su-metric-card su-gamification-progress-card">
             <div className="su-metric-header">
                 <span className="su-metric-label">Gamificação</span>
-                <Trophy size={20} className="su-accent-text" />
             </div>
 
             {isZeroed ? (
@@ -49,7 +47,6 @@ const GamificationProgressCard = ({ profile }) => {
                 <>
                     <div className="su-gamification-xp-block">
                         <div className="su-gamification-xp-row">
-                            <Zap size={18} className="su-primary-text" aria-hidden="true" />
                             <span className="su-gamification-xp-value">{totalXp} XP</span>
                             <span className="su-gamification-level-badge">Nível {level}</span>
                         </div>
@@ -77,7 +74,6 @@ const GamificationProgressCard = ({ profile }) => {
                         <div className="su-gamification-stat" data-testid="workout-streak-stat">
                             <div className="su-gamification-stat-header">
                                 <span className="su-metric-label">Streak treino</span>
-                                <Award size={16} className="su-warning-text" aria-hidden="true" />
                             </div>
                             <div className="su-gamification-stat-value">{currentStreak}</div>
                         </div>
@@ -85,7 +81,6 @@ const GamificationProgressCard = ({ profile }) => {
                         <div className="su-gamification-stat" data-testid="nutrition-streak-stat">
                             <div className="su-gamification-stat-header">
                                 <span className="su-metric-label">Streak nutrição</span>
-                                <UtensilsCrossed size={16} className="su-success-text" aria-hidden="true" />
                             </div>
                             <div className="su-gamification-stat-value" data-testid="nutrition-streak-value">{nutritionStreak}</div>
                         </div>
@@ -93,7 +88,6 @@ const GamificationProgressCard = ({ profile }) => {
                         <div className="su-gamification-stat">
                             <div className="su-gamification-stat-header">
                                 <span className="su-metric-label">ShapeCoins</span>
-                                <Coins size={16} className="su-accent-text" aria-hidden="true" />
                             </div>
                             <div className="su-gamification-stat-value">{shapeCoins}</div>
                         </div>
@@ -101,7 +95,6 @@ const GamificationProgressCard = ({ profile }) => {
                         <div className="su-gamification-stat">
                             <div className="su-gamification-stat-header">
                                 <span className="su-metric-label">ShapeScore</span>
-                                <Target size={16} className="su-primary-text" aria-hidden="true" />
                             </div>
                             <div className="su-gamification-stat-value">{shapeScore}</div>
                         </div>

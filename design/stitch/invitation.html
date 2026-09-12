@@ -1,0 +1,182 @@
+<!DOCTYPE html><html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Source+Sans+3:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #171311;
+        color: #F3EAE5;
+        font-family: "Source Sans 3", sans-serif;
+      }
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: "#171311",
+              surface: "#211A17",
+              card: "#211A17",
+              border: "#3A2D27",
+              borderLight: "#4D3C34",
+              text: "#F3EAE5",
+              muted: "#B8AAA2",
+              dim: "#887A73",
+              terracotta: "#E06D44",
+              terracottaHover: "#D25E35"
+            }
+          },
+          fontFamily: {
+            headline: ["Barlow Condensed", "sans-serif"],
+            body: ["Source Sans 3", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-brand-bg text-brand-text min-h-screen flex flex-col justify-center items-center px-4 py-10 selection:bg-brand-terracotta selection:text-white">
+<main class="w-full max-w-[560px] mx-auto">
+<!-- Brand Title & Simple Mark -->
+<div class="flex items-center gap-3 mb-6">
+<img src="https://lh3.googleusercontent.com/aida/AEtjO1UEc9nRoR-8qbPC-MNsHRTEi9BLn6bgtcv2SW5cCTgsOlh4e0BkOpZRKMFbiaY80G3wZctGCfAp3UCrwBaJln9Fdqqy_1Tmy7Nq5WXWkxyJnX3t86ZEZyAoyAoBYmt7GSKrnKqjvJvfVjYpZ7622SGBdljRJw5Ipysr5ChFaG9KHVKOf1QwHjhsMg_3VrD1SiZXvpC74urs6fqq22sprYEof69AQ5hVARwBFtMs5AAh5W6a2mJSAqMdl8M" alt="ShapeUp Logo" class="w-8 h-8 rounded object-cover">
+<span class="font-headline text-2xl tracking-wide uppercase font-bold text-brand-text">ShapeUp</span>
+</div>
+<!-- Main Card -->
+<div class="bg-brand-surface border border-brand-border rounded-xl p-7 sm:p-9 shadow-sm">
+<!-- Trainer Invitation Context (Simple, Human, Warm) -->
+<div class="flex items-start gap-4 pb-6 border-b border-brand-border">
+<img alt="Foto do treinador Rodrigo Vasconcelos" class="w-12 h-12 rounded-full object-cover shrink-0 border border-brand-border" src="https://lh3.googleusercontent.com/aida/AEtjO1VcvgpwuiKK3hu_9KYWEBUt-1aZ49wRlSA9fG1EtilO7V9ZDiiFFEkVBgIoCzTxFBOB_OwzR4bVoXlT70LtBOGsIQWG3fN3Yq5-ICGZ4S71s7wt2LjVQBQBtj2jjY28UYwGK8oQqeS78lkVqXPMMEmnRXggU_6fuR7SD96PsABn-V5KP8huPLxEpLe9k4raV85qjTF2aPzTyaPHkj8WgbwfrOOemCKKxn1xZYcFt6oDCiIqNmEtN9Je4A">
+<div class="flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-medium text-brand-text text-base">Rodrigo Vasconcelos</span>
+<span class="text-xs text-brand-dim">• IronBox Club</span>
+</div>
+<p class="text-brand-muted text-sm mt-1 leading-relaxed">
+            Olá, Matheus! Preparei seu espaço de treinamento e acompanhamento aqui no ShapeUp. Complete seu cadastro para visualizar sua periodização ativa.
+          </p>
+</div>
+</div>
+<!-- Section Title -->
+<div class="pt-6 pb-5">
+<h1 class="font-headline text-2xl font-bold tracking-tight text-brand-text">
+          Ativação de Conta
+        </h1>
+<p class="text-sm text-brand-muted mt-0.5">
+          Defina suas credenciais para vincular seu perfil e acessar sua rotina.
+        </p>
+</div>
+<!-- Clean Form -->
+<form class="space-y-4" id="invite-form" onsubmit="event.preventDefault();">
+<!-- Full Name -->
+<div>
+<label class="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5" for="fullName">
+            Nome Completo
+          </label>
+<input class="w-full bg-[#1A1412] border border-brand-border rounded-md px-3.5 py-2.5 text-sm text-brand-text placeholder-brand-dim focus:border-brand-terracotta focus:ring-1 focus:ring-brand-terracotta transition-colors" id="fullName" name="fullName" required="" type="text" value="Matheus Silveira">
+</div>
+<!-- Email (Pre-set via Invite) -->
+<div>
+<label class="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5" for="email">
+            E-mail
+          </label>
+<input class="w-full bg-[#171311] border border-brand-border/70 rounded-md px-3.5 py-2.5 text-sm text-brand-muted cursor-not-allowed select-none focus:outline-none" id="email" name="email" readonly="" type="email" value="matheus.silveira@email.com">
+<span class="block text-xs text-brand-dim mt-1.5">
+            Convite exclusivo enviado para este endereço.
+          </span>
+</div>
+<!-- Phone / WhatsApp -->
+<div>
+<label class="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5" for="phone">
+            Celular / WhatsApp
+          </label>
+<input class="w-full bg-[#1A1412] border border-brand-border rounded-md px-3.5 py-2.5 text-sm text-brand-text placeholder-brand-dim focus:border-brand-terracotta focus:ring-1 focus:ring-brand-terracotta transition-colors" id="phone" name="phone" placeholder="(11) 90000-0000" type="tel" value="(11) 98421-9032">
+<span class="block text-xs text-brand-dim mt-1.5">
+            Usado para recados e avisos sobre sua periodização.
+          </span>
+</div>
+<!-- Passwords Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+<div>
+<label class="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5" for="password">
+              Senha
+            </label>
+<div class="relative">
+<input class="w-full bg-[#1A1412] border border-brand-border rounded-md px-3.5 py-2.5 text-sm text-brand-text placeholder-brand-dim focus:border-brand-terracotta focus:ring-1 focus:ring-brand-terracotta transition-colors pr-10" id="password" name="password" placeholder="Mínimo 8 caracteres" required="" type="password">
+<button aria-label="Alternar exibição da senha" class="absolute inset-y-0 right-0 pr-3 flex items-center text-brand-dim hover:text-brand-text" onclick="togglePassword('password', this)" type="button">
+<span class="material-symbols-outlined text-[1.125rem]">visibility</span>
+</button>
+</div>
+</div>
+<div>
+<label class="block text-xs font-semibold text-brand-muted uppercase tracking-wider mb-1.5" for="confirmPassword">
+              Confirmar Senha
+            </label>
+<div class="relative">
+<input class="w-full bg-[#1A1412] border border-brand-border rounded-md px-3.5 py-2.5 text-sm text-brand-text placeholder-brand-dim focus:border-brand-terracotta focus:ring-1 focus:ring-brand-terracotta transition-colors pr-10" id="confirmPassword" name="confirmPassword" placeholder="Repita a senha" required="" type="password">
+<button aria-label="Alternar exibição da confirmação de senha" class="absolute inset-y-0 right-0 pr-3 flex items-center text-brand-dim hover:text-brand-text" onclick="togglePassword('confirmPassword', this)" type="button">
+<span class="material-symbols-outlined text-[1.125rem]">visibility</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Terms Agreement -->
+<div class="pt-2">
+<label class="inline-flex items-start gap-2.5 cursor-pointer text-xs text-brand-muted select-none">
+<input checked="" class="rounded bg-[#1A1412] border-brand-border text-brand-terracotta focus:ring-brand-terracotta focus:ring-offset-0 mt-0.5" name="terms" required="" type="checkbox">
+<span class="leading-relaxed">
+              Li e concordo com os <a class="text-brand-text underline hover:text-brand-terracotta" href="#">Termos de Uso</a> e a <a class="text-brand-text underline hover:text-brand-terracotta" href="#">Política de Privacidade</a>.
+            </span>
+</label>
+</div>
+<!-- Submit Button -->
+<div class="pt-2">
+<button class="w-full py-3 px-4 bg-brand-terracotta hover:bg-brand-terracottaHover text-white font-medium rounded-md transition-colors text-sm flex items-center justify-center gap-2" id="submit-btn" type="submit">
+<span class="">Ativar conta e entrar</span>
+<span class="material-symbols-outlined text-[1.125rem]">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+<!-- Sober discreet subtext -->
+<div class="text-center mt-6 text-xs text-brand-dim">
+      Ao ativar, você terá acesso imediato às planilhas e orientações do seu treinador.
+    </div>
+</main>
+<script>
+    function togglePassword(inputId, triggerBtn) {
+      const field = document.getElementById(inputId);
+      const icon = triggerBtn.querySelector('.material-symbols-outlined');
+      if (field.type === 'password') {
+        field.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        field.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    }
+
+    document.getElementById('invite-form').addEventListener('submit', function(e) {
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[1.125rem]">progress_activity</span><span>Ativando...</span>';
+      setTimeout(function() {
+        btn.innerHTML = '<span class="material-symbols-outlined text-[1.125rem]">check</span><span>Conta ativada com sucesso</span>';
+        btn.classList.remove('bg-brand-terracotta');
+        btn.classList.add('bg-[#3E5C32]');
+      }, 1000);
+    });
+  </script>
+
+
+</body></html>

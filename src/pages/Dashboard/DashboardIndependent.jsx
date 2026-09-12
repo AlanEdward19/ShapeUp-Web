@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import Card from '../../components/Card';
 import RankingList from '../../components/gamification/RankingList';
 import GamificationProgressCard from '../../components/gamification/GamificationProgressCard';
-import { TrendingUp, Flame, CalendarDays, Award } from 'lucide-react';
 import { useGamificationApi } from '../../hooks/api/useGamificationApi';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
 import './DashboardClient.css';
+import UpcomingWorkout from '../../components/UpcomingWorkout';
 
 // --- Helper: normalize any date string to YYYY-MM-DD in LOCAL time ---
 const toLocalDateKey = (dateStr) => {
@@ -253,116 +252,86 @@ const DashboardIndependent = () => {
                 </div>
             </div>
 
-            <div className="su-metrics-grid su-mt-4" data-tour="idep-metrics">
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('client.dashboard.metric.weekly')}</span>
-                        <TrendingUp size={20} className="su-primary-text" />
+            <div className="su-metrics-grid" data-tour="idep-metrics">
+                <div className="su-dash-feature">
+                    <div>
+                        <p className="su-dash-label">{t('client.dashboard.metric.weekly')}</p>
+                        <p className="su-dash-feature-num">
+                            {hasData ? weeklyVolumeFormatted : '—'}
+                            {hasData && <span className="su-dash-feature-unit">{formatWeight(0).replace('0 ', '')}</span>}
+                        </p>
+                        <p className={`su-dash-feature-note su-metric-trend ${!weeklyDiff ? '' : weeklyDiff >= 0 ? 'positive' : 'negative'}`}>
+                            {!hasData ? t('client.dashboard.trend.weekly.nosessions') : weeklyDiff === null ? t('client.dashboard.trend.weekly.first') : weeklyDiff >= 0 ? `↑ ${weeklyDiff}%` : `↓ ${Math.abs(weeklyDiff)}%`}
+                        </p>
                     </div>
-                    <div className="su-metric-value">
-                        {hasData ? weeklyVolumeFormatted : '—'}
-                        {hasData && <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}> {formatWeight(0).replace('0 ', '')}</span>}
-                    </div>
-                    <span className={`su-metric-trend ${!weeklyDiff ? '' : weeklyDiff >= 0 ? 'positive' : 'negative'}`}>
-                        {!hasData ? t('client.dashboard.trend.weekly.nosessions') : weeklyDiff === null ? t('client.dashboard.trend.weekly.first') : weeklyDiff >= 0 ? `↑ ${weeklyDiff}%` : `↓ ${Math.abs(weeklyDiff)}%`}
-                    </span>
-                </Card>
-
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('client.dashboard.metric.streak')}</span>
-                        <Flame size={20} className="su-warning-text" />
-                    </div>
-                    <div className="su-metric-value">{streakDays}</div>
-                    <span className="su-metric-trend positive">
-                        {streakDays === 0 ? t('client.dashboard.trend.streak.start') : streakDays >= 7 ? t('client.dashboard.trend.streak.great') : t('client.dashboard.trend.streak.keep')}
-                    </span>
-                </Card>
-
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('client.dashboard.metric.sessions')}</span>
-                        <CalendarDays size={20} className="su-accent-text" />
-                    </div>
-                    <div className="su-metric-value">
-                        {plansData.plansWithSessions}
-                        <span style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>/{plansData.totalPlans}</span>
-                    </div>
-                    <span className="su-metric-trend">{plansData.totalPlans === 0 ? t('client.dashboard.trend.sessions.noplans') : t('client.dashboard.trend.sessions.plans')}</span>
-                </Card>
-
+                    <dl className="su-dash-ledger">
+                        <div className="su-dash-ledger-row">
+                            <dt>{t('client.dashboard.metric.streak')}</dt>
+                            <dd>{streakDays}</dd>
+                            <dd className="su-dash-ledger-note su-metric-trend positive">
+                                {streakDays === 0 ? t('client.dashboard.trend.streak.start') : streakDays >= 7 ? t('client.dashboard.trend.streak.great') : t('client.dashboard.trend.streak.keep')}
+                            </dd>
+                        </div>
+                        <div className="su-dash-ledger-row">
+                            <dt>{t('client.dashboard.metric.sessions')}</dt>
+                            <dd>{plansData.plansWithSessions}<span className="su-dash-feature-unit">/{plansData.totalPlans}</span></dd>
+                            <dd className="su-dash-ledger-note su-metric-trend">{plansData.totalPlans === 0 ? t('client.dashboard.trend.sessions.noplans') : t('client.dashboard.trend.sessions.plans')}</dd>
+                        </div>
+                    </dl>
+                </div>
                 <GamificationProgressCard profile={gamificationProfile} />
             </div>
 
+            <UpcomingWorkout />
             <div className="su-overview-layout">
-                <div className="su-main-chart-area">
-                    <Card className="su-chart-card">
-                        <h3 className="su-section-title">{t('client.dashboard.chart.title')}</h3>
-                        <div className="su-area-chart-container">
-                            {chartData.length >= 2 ? (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                        <defs>
-                                            <linearGradient id="colorVol" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                                                <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
-                                        <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                                        <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload?.date} />
-                                        <Area type="monotone" dataKey="volume" name={`Volume (${formatWeight(0).replace('0 ', '')})`} stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorVol)" />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem' }}>
-                                    {t('client.dashboard.chart.nodata')}
-                                </div>
-                            )}
-                        </div>
-                    </Card>
+                <div className="su-main-chart-area su-dash-sheet">
+                    <h3 className="su-section-title">{t('client.dashboard.chart.title')}</h3>
+                    <div className="su-area-chart-container">
+                        {chartData.length >= 2 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
+                                    <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                                    <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '2px' }} labelFormatter={(l, p) => p[0]?.payload?.date} />
+                                    <Area type="monotone" dataKey="volume" name={`Volume (${formatWeight(0).replace('0 ', '')})`} stroke="var(--primary)" strokeWidth={2} fill="var(--primary)" fillOpacity={0.12} />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div style={{ height: '100%', display: 'flex', alignItems: 'center', color: 'var(--text-muted)', padding: '1rem 0' }}>
+                                {t('client.dashboard.chart.nodata')}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="su-overview-sidebar" data-tour="idep-achievements">
-                    <Card className="su-achievements-card">
-                        <h3 className="su-section-title">
-                            <Award size={20} style={{ verticalAlign: 'text-bottom', marginRight: '8px', color: 'var(--warning)' }} />
-                            {t('client.dashboard.achievements.title')}
-                        </h3>
-                        <div className="su-pr-list">
-                            {recentImprovements.length > 0 ? (
-                                recentImprovements.map((imp) => (
-                                    <div key={imp.name} className="su-pr-item">
-                                        <div className="su-pr-icon-wrap">
-                                            <TrendingUp size={16} className="su-success-text" />
-                                        </div>
-                                        <div className="su-pr-details">
-                                            <div className="su-pr-name">{imp.name}</div>
-                                            <div className="su-pr-stats">{imp.from} <span className="su-text-muted">→ {imp.to}</span></div>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                                    {t('client.dashboard.achievements.nodata')}
+                    <h3 className="su-section-title">{t('client.dashboard.achievements.title')}</h3>
+                    <div className="su-pr-list">
+                        {recentImprovements.length > 0 ? (
+                            recentImprovements.map((imp) => (
+                                <div key={imp.name} className="su-pr-item">
+                                    <div className="su-pr-name">{imp.name}</div>
+                                    <div className="su-pr-stats">{imp.from} <span className="su-text-muted">→ {imp.to}</span></div>
                                 </div>
-                            )}
-                        </div>
-                    </Card>
+                            ))
+                        ) : (
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                                {t('client.dashboard.achievements.nodata')}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
-            <div className="su-mt-4">
-                <RankingList
-                    entries={rankingEntries}
-                    currentUserId={currentUserId}
-                    nextCursor={rankingCursor}
-                    onLoadMore={() => rankingCursor && fetchRanking(rankingCursor, true)}
-                    isLoading={rankingLoading}
-                    isLoadingMore={rankingLoadingMore}
-                />
-            </div>
+            <RankingList
+                entries={rankingEntries}
+                currentUserId={currentUserId}
+                nextCursor={rankingCursor}
+                onLoadMore={() => rankingCursor && fetchRanking(rankingCursor, true)}
+                isLoading={rankingLoading}
+                isLoadingMore={rankingLoadingMore}
+            />
         </div>
     );
 };

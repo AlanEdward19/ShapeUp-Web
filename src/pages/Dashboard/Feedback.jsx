@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Search, Filter, MessageSquare, Video, Reply, CheckCircle, Paperclip, X, FileText, Check, CheckCheck, Clock } from 'lucide-react';
+import { Search, Filter, Reply, CheckCircle, Paperclip, X, FileText, Check, CheckCheck, Clock } from 'lucide-react';
 import { useTour } from '@reactour/tour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -8,7 +8,7 @@ import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
 import './Feedback.css';
 
-const Feedback = () => {
+const Feedback = ({ renderView } = {}) => {
     const location = useLocation();
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
@@ -287,6 +287,7 @@ setTimeout(() => {
         }
     };
 
+    if (renderView) return renderView({ messages: activeThread?.messages || [], newMessage: replyText, setNewMessage: setReplyText, handleSend: handleReply, handleFileChange, fileInputRef, triggerFileInput, attachedFile, inboxFeed, selectedClientId, setSelectedClientId });
     return (
         <div className="su-feedback-dashboard">
             <div className="su-dashboard-header-flex" data-tour="fb-header">
@@ -493,7 +494,6 @@ setTimeout(() => {
                         </div>
                     ) : (
                         <div className="su-thread-empty">
-                            <MessageSquare size={48} className="su-empty-icon" />
                             <h3>{t('pro.feedback.empty.thread.title')}</h3>
                             <p>{t('pro.feedback.empty.thread.desc')}</p>
                         </div>

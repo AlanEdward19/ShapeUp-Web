@@ -4,7 +4,7 @@ import { addNotification } from '../utils/notifications';
 import { useLanguage } from '../contexts/LanguageContext';
 import './ChatDrawer.css';
 
-const ChatDrawer = ({ isOpen, onClose }) => {
+const ChatDrawer = ({ isOpen, onClose, embedded = false, coachName, renderView }) => {
     const { t } = useLanguage();
     // Get active client info
     const clientId = String(localStorage.getItem('shapeup_client_id') || '1');
@@ -15,7 +15,7 @@ const ChatDrawer = ({ isOpen, onClose }) => {
         let allMessages = stored ? JSON.parse(stored) : [];
         // Filter messages for this client only
         let clientMessages = allMessages.filter(m => m.clientId === clientId);
-        if (clientMessages.length === 0) {
+        if (clientMessages.length === 0 && !renderView) {
             // Initial mock message for demonstration if empty
             clientMessages = [
                 {
@@ -241,8 +241,9 @@ const ChatDrawer = ({ isOpen, onClose }) => {
         }
     };
 
+    if (renderView) return renderView({ messages, newMessage, setNewMessage, handleSend, handleFileChange, fileInputRef, triggerFileInput, attachedFile, handleDelete, handleEdit });
     return (
-        <div className="su-chat-overlay" onClick={onClose}>
+        <div className="su-chat-overlay" onClick={embedded ? undefined : onClose}>
             <div className="su-chat-drawer" onClick={e => e.stopPropagation()}>
                 <div className="su-chat-header">
                     <div className="su-chat-header-info">
@@ -250,11 +251,11 @@ const ChatDrawer = ({ isOpen, onClose }) => {
                             <User size={20} />
                         </div>
                         <div className="su-chat-user-details">
-                            <h3>{t('client.chat.title')}</h3>
+                            <h3>{coachName || t('client.chat.title')}</h3>
                             <span className="su-chat-status">{t('client.chat.status.online')}</span>
                         </div>
                     </div>
-                    <button className="su-chat-close-btn" onClick={onClose}>
+                    <button className="su-chat-close-btn" onClick={onClose} hidden={embedded} aria-label={t('common.close')}>
                         <X size={20} />
                     </button>
                 </div>

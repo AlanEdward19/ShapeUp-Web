@@ -1,6 +1,7 @@
 import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
+import { withLang } from '../../../../test/withLang';
 import MealPlanManager from '../MealPlanManager';
 
 const mockCreateMealPlan = vi.fn();
@@ -14,11 +15,13 @@ vi.mock('../../../../hooks/api/useNutritionApi', () => ({
 }));
 
 const renderManager = () =>
-    render(
-        <MemoryRouter>
-            <MealPlanManager />
-        </MemoryRouter>
-    );
+        render(
+            withLang(
+            <MemoryRouter>
+                <MealPlanManager />
+            </MemoryRouter>
+            )
+        );
 
 describe('MealPlanManager', () => {
     beforeEach(() => {

@@ -1,0 +1,130 @@
+{
+  "invitation": {
+    "source": "ativa_o_de_convite_design_s_brio_aut_ntico",
+    "bodyClass": "bg-brand-bg text-brand-text min-h-screen flex flex-col justify-center items-center px-4 py-10 selection:bg-brand-terracotta selection:text-white",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "exercises": {
+    "source": "biblioteca_de_exerc_cios_design_operacional_aut_ntico_anti_ai_slop",
+    "bodyClass": "bg-bg-base font-sans text-text-primary min-h-screen selection:bg-brand-terracotta selection:text-white antialiased flex overflow-hidden",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "gyms": {
+    "source": "buscar_academias_mapa_interativo_design_aut_ntico_pr_tico",
+    "bodyClass": "font-body text-on-surface bg-surface min-h-screen flex overflow-hidden antialiased selection:bg-primary selection:text-white",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "register": {
+    "source": "cadastro_configura_o_inicial_workspace_refinado",
+    "bodyClass": "bg-brand-bg font-body text-brand-text min-h-screen selection:bg-brand-terracotta/30 selection:text-brand-text flex flex-col justify-between py-8 px-4 sm:px-6",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    ]
+  },
+  "settings": {
+    "source": "configura_es_da_conta_design_profissional_aut_ntico",
+    "bodyClass": "bg-[#171311] font-body-md text-[#f3eae5] min-h-screen antialiased selection:bg-[#e06c43]/30 selection:text-[#f3eae5]",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "builder": {
+    "source": "criador_de_treino_periodiza_o_espa_amento_amplo_anti_ai_slop",
+    "bodyClass": "bg-espresso font-sans text-sm text-text-primary antialiased selection:bg-terracota/30 selection:text-text-primary min-h-screen",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "athlete": {
+    "source": "dashboard_do_aluno_design_pr_tico_aut_ntico",
+    "bodyClass": "bg-[#171311] text-[#eee0da] font-sans antialiased selection:bg-[#e06c43]/30 selection:text-[#eee0da]",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "nutrition": {
+    "source": "di_rio_de_nutri_o_gest_o_alimentar_design_pr_tico_aut_ntico",
+    "bodyClass": "bg-background font-body text-on-surface text-[14px] leading-normal selection:bg-primary-container selection:text-white min-h-screen",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "finance": {
+    "source": "gest_o_financeira_caixa_design_operacional_s_brio_anti_ai_slop",
+    "bodyClass": "min-h-screen bg-brand-bg text-brand-text flex",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "landing": {
+    "source": "landing_page_oficial_design_editorial_aut_ntico",
+    "bodyClass": "bg-surface-base font-body text-text-main antialiased selection:bg-terracotta selection:text-surface-base",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,600&family=JetBrains+Mono:wght@400;500;600&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "login": {
+    "source": "login_autentica_o_foco_em_seguran_a",
+    "bodyClass": "bg-brand-bg text-brand-text font-sans antialiased min-h-screen selection:bg-brand-primary selection:text-white flex flex-col justify-between",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "messages": {
+    "source": "mensagens_chat_com_alunos_design_pr_tico_aut_ntico",
+    "bodyClass": "bg-surface-base font-body text-text-primary min-h-screen antialiased flex",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    ]
+  },
+  "moderation": {
+    "source": "modera_o_de_alimentos_cat_logo_drawer_interativo_m_tricas_centralizadas",
+    "bodyClass": "bg-[#171311] text-[#f3eae5] antialiased text-sm h-screen overflow-hidden flex flex-col",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0"
+    ]
+  },
+  "onboarding": {
+    "source": "onboarding_completo_setup_guiado_shapeup_4_abas_integradas",
+    "bodyClass": "min-h-screen text-oxide-100 font-sans flex flex-col justify-center items-center p-3 sm:p-6 select-none",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    ]
+  },
+  "professional": {
+    "source": "painel_do_personal_trainer_workspace_refinado",
+    "bodyClass": "bg-brand-bg text-brand-text antialiased min-h-screen flex flex-col font-sans",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  },
+  "recovery": {
+    "source": "recupera_o_de_senha_acesso",
+    "bodyClass": "bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col justify-center selection:bg-primary-container selection:text-on-primary-container",
+    "fonts": [
+      "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200",
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    ]
+  }
+}

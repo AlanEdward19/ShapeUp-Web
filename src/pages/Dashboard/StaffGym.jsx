@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
-import { Search, Plus, MoreVertical, Shield, Dumbbell } from 'lucide-react';
+import { Search, Plus, MoreVertical } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import './Clients.css'; // Reuse table styles
@@ -113,12 +113,9 @@ const StaffGym = () => {
                                     </div>
                                 </td>
                                 <td>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                        {staff.role === 'admin' ? <Shield size={16} color="var(--primary)" /> : <Dumbbell size={16} color="#8b5cf6" />}
-                                        <span style={{ textTransform: 'capitalize' }}>
-                                            {staff.role === 'admin' ? (t('gym.staff.role.admin') || 'Admin') : (t('gym.staff.role.trainer') || 'Treinador')}
-                                        </span>
-                                    </div>
+                                    <span style={{ textTransform: 'capitalize' }}>
+                                        {staff.role === 'admin' ? (t('gym.staff.role.admin') || 'Admin') : (t('gym.staff.role.trainer') || 'Treinador')}
+                                    </span>
                                 </td>
                                 <td>
                                     <span className="badge neutral">{staff.clientsCount}</span>

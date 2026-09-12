@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
-import { Target, Scale, Trash2, TrendingUp, Check } from 'lucide-react';
+import { Trash2, Check } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
@@ -230,10 +230,7 @@ const ObjectivesClient = () => {
 
                     {/* Goals Card */}
                     <Card className="su-mb-4" data-tour="obj-target">
-                        <div className="su-card-header-icon su-mb-4">
-                            <Target size={20} className="su-text-muted" />
-                            <h3 className="su-section-title" style={{ margin: 0 }}>{t('client.objectives.target.title')}</h3>
-                        </div>
+                        <h3 className="su-section-title">{t('client.objectives.target.title')}</h3>
                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
                             <div style={{ flex: 1 }}>
                                 <Input
@@ -258,10 +255,7 @@ const ObjectivesClient = () => {
 
                     {/* Log Weight Card */}
                     <Card>
-                        <div className="su-card-header-icon su-mb-4">
-                            <Scale size={20} className="su-text-muted" />
-                            <h3 className="su-section-title" style={{ margin: 0 }}>{t('client.objectives.log.title')}</h3>
-                        </div>
+                        <h3 className="su-section-title">{t('client.objectives.log.title')}</h3>
                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
                             <div style={{ flex: 1 }}>
                                 <Input
@@ -281,7 +275,7 @@ const ObjectivesClient = () => {
                         ) : (
                             <div className="su-history-list">
                                 {objectives.history.map(entry => (
-                                    <div key={entry.id} className="su-history-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '8px', marginBottom: '0.5rem' }}>
+                                    <div key={entry.id} className="su-history-card">
                                         <div>
                                             <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{convertWeight(entry.weight, entry.unit || 'metric') % 1 === 0 ? convertWeight(entry.weight, entry.unit || 'metric').toString() : convertWeight(entry.weight, entry.unit || 'metric').toFixed(1)} {unitSystem === 'imperial' ? 'lbs' : 'kg'}</div>
                                             <div className="su-text-muted" style={{ fontSize: '0.85rem' }}>{entry.date}</div>
@@ -305,10 +299,7 @@ const ObjectivesClient = () => {
                 <div className="su-overview-sidebar" data-tour="obj-chart">
                     <Card className="su-metric-card-large" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
                         <div className="su-card-header-icon" style={{ justifyContent: 'space-between', display: 'flex', width: '100%', marginBottom: period === 'custom' ? '0.5rem' : '0' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <TrendingUp size={20} className="su-text-muted" />
-                                <h3 className="su-section-title" style={{ margin: 0 }}>{t('client.objectives.chart.title')}</h3>
-                            </div>
+                            <h3 className="su-section-title" style={{ margin: 0 }}>{t('client.objectives.chart.title')}</h3>
                             <div style={{ display: 'flex', gap: '0.5rem' }}>
                                 <select 
                                     className="su-input" 
@@ -333,17 +324,11 @@ const ObjectivesClient = () => {
                             {chartData.length >= 2 ? (
                                 <ResponsiveContainer width="100%" height="100%">
                                     <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                        <defs>
-                                            <linearGradient id="colorWeightClient" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="var(--success)" stopOpacity={0.3} />
-                                                <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                                         <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
                                         <YAxis domain={['dataMin - 2', 'dataMax + 2']} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
-                                        <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload.date} />
-                                        <Area type="monotone" dataKey="weight" name={t('client.objectives.chart.series.weight').replace('(kg)', `(${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)} stroke="var(--success)" strokeWidth={3} fillOpacity={1} fill="url(#colorWeightClient)" />
+                                        <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '2px' }} labelFormatter={(l, p) => p[0]?.payload.date} />
+                                        <Area type="monotone" dataKey="weight" name={t('client.objectives.chart.series.weight').replace('(kg)', `(${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)} stroke="var(--success)" strokeWidth={2} fill="var(--success)" fillOpacity={0.12} />
 
                                         {/* Optional Reference Line for Goal Weight */}
                                         {objectives.goalWeight && (

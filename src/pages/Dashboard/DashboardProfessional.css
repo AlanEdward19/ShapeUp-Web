@@ -1,65 +1,145 @@
+.su-pro-dashboard {
+    text-align: left;
+}
+
+.su-pro-dashboard .su-page-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5.5vw, 4.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 0.92;
+    text-transform: uppercase;
+}
+
+.su-pro-dashboard .su-page-subtitle {
+    margin-top: 0.75rem;
+    max-width: 48ch;
+    color: var(--text-muted);
+}
+
+.su-dashboard-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem;
+    padding-bottom: clamp(1.5rem, 4vw, 2.75rem);
+    border-bottom: 1px solid var(--border-color);
+}
+
 .su-metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
+    gap: clamp(1.75rem, 5vw, 4rem);
+    align-items: end;
+    padding: clamp(1.75rem, 4vw, 3.25rem) 0 clamp(2.5rem, 6vw, 4.5rem);
+    margin-bottom: 0;
 }
 
 .su-metric-card {
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
 }
 
 .su-metric-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
 }
 
 .su-metric-label {
-    font-size: 0.875rem;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--text-muted);
-    font-weight: 500;
 }
 
 .su-metric-value {
-    font-size: 2rem;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 9vw, 7rem);
+    font-weight: 800;
+    line-height: 0.85;
+    letter-spacing: -0.03em;
     color: var(--text-main);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.7rem;
+}
+
+.su-pro-stat-stack .su-metric-value {
+    font-size: 1.85rem;
+    margin-bottom: 0.15rem;
+}
+
+.su-pro-stat-stack {
+    border-top: 1px solid var(--border-color);
+}
+
+.su-pro-stat-stack .su-metric-card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.2rem 1rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.su-pro-stat-stack .su-metric-header {
+    grid-column: 1;
+    margin: 0;
+}
+
+.su-pro-stat-stack .su-metric-value {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+}
+
+.su-pro-stat-stack .su-metric-trend {
+    grid-column: 1;
 }
 
 .su-metric-trend {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 500;
 }
 
-.su-metric-trend.positive {
-    color: var(--success);
-}
-
-.su-metric-trend.negative {
-    color: var(--error);
-}
+.su-metric-trend.positive { color: var(--success); }
+.su-metric-trend.negative { color: var(--error); }
 
 .su-overview-layout {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1.5rem;
+    grid-template-columns: 1.45fr 0.85fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+}
+
+@media (max-width: 900px) {
+    .su-metrics-grid,
+    .su-overview-layout {
+        grid-template-columns: 1fr;
+    }
 }
 
 h3.su-section-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     margin-bottom: 1rem;
+}
+
+.su-feed-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
 }
 
 .su-feed-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
 }
 
 .su-search-wrapper,
@@ -80,140 +160,145 @@ h3.su-section-title {
 }
 
 .su-empty-feed {
-    padding: 3rem 1rem;
-    text-align: center;
-    background-color: var(--bg-card);
-    border-radius: var(--radius-lg);
-    border: 1px dashed var(--border-color);
-}
-
-.su-empty-feed p {
-    color: var(--text-muted);
+    padding: 2.5rem 0;
+    text-align: left;
+    border-top: 1px solid var(--border-color);
 }
 
 .su-feed-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1.25rem;
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: 0.75rem 1rem;
+    padding: 1.05rem 0;
+    border-bottom: 1px solid var(--border-color);
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
 }
 
-.su-feed-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--bg-main);
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.su-feed-item:first-child {
+    border-top: 1px solid var(--border-color);
+}
+
+.su-feed-rank {
+    font-family: var(--font-display);
     font-weight: 700;
-    font-size: 0.875rem;
-    color: var(--primary);
-    flex-shrink: 0;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    padding-top: 0.15rem;
 }
 
-.su-feed-content {
-    flex: 1;
-}
+.su-feed-content { min-width: 0; }
 
 .su-feed-meta {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.25rem;
+    gap: 1rem;
+    margin-bottom: 0.2rem;
 }
 
 .su-feed-name {
-    font-weight: 600;
-    color: var(--text-main);
+    font-weight: 700;
     font-size: 1rem;
 }
 
 .su-feed-time {
     font-size: 0.75rem;
     color: var(--text-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .su-feed-action {
-    font-size: 0.875rem;
-    color: var(--text-main);
-    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.35rem;
 }
 
 .su-feed-badges {
     display: flex;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
 }
 
 .su-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    display: inline;
+    padding: 0;
+    background: none;
     font-weight: 600;
-}
-
-.su-badge.pr {
-    background-color: rgba(16, 185, 129, 0.1);
-    color: var(--success);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
 }
 
 .su-feed-comment-bubble {
-    background-color: var(--bg-main);
-    padding: 0.75rem;
-    border-radius: var(--radius-md);
-    border-left: 3px solid var(--accent);
-    font-size: 0.875rem;
+    margin-top: 0.65rem;
+    padding: 0.35rem 0 0;
+    border-top: 1px dashed var(--border-color);
+    font-size: 0.9rem;
+    font-style: italic;
     color: var(--text-muted);
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
 }
 
 .su-card-title {
-    margin-bottom: 1.25rem !important;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem !important;
+}
+
+.su-attention-card {
+    background: transparent;
+    box-shadow: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
 }
 
 .su-alert-list {
     list-style: none;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
+    margin: 0;
 }
 
 .su-alert-list li {
-    font-size: 0.875rem;
-    color: var(--text-main);
-    padding: 0.75rem 0.75rem 0.75rem 1rem;
-    border-radius: var(--radius-md);
-    background-color: var(--bg-main);
-    border-left: 4px solid var(--primary);
-    position: relative;
-    transition: transform var(--transition-fast);
+    font-size: 0.9rem;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--border-color);
+    background: none;
+    border-radius: 0;
+}
+
+.su-alert-list li:first-child {
+    border-top: 1px solid var(--border-color);
 }
 
 .su-alert-list li:hover {
-    transform: translateX(4px);
-}
-
-.su-alert-list li.su-alert-status-warning {
-    border-left-color: var(--warning);
-}
-
-.su-alert-list li.su-alert-status-error {
-    border-left-color: var(--error);
-}
-
-.su-alert-list li.su-alert-status-success {
-    border-left-color: var(--success);
+    transform: none;
 }
 
 .su-alert-time {
     font-size: 0.7rem;
     color: var(--text-muted);
-    margin-top: 0.25rem;
+    margin-top: 0.3rem;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
 }
+
+.su-feed-pager {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.su-success-text { color: var(--success); }
+.su-error-text { color: var(--error); }
+.su-accent-text { color: var(--accent); }
+.su-primary-text { color: var(--primary); }
+.su-warning-text { color: var(--warning); }

@@ -1,6 +1,7 @@
 import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
+import { withLang } from '../../../../test/withLang';
 import FoodForm from '../FoodForm';
 
 const mockCreateFood = vi.fn();
@@ -23,7 +24,7 @@ describe('FoodForm', () => {
     });
 
     it('renders create form with macro fields', () => {
-        const { getByTestId } = render(<FoodForm />);
+        const { getByTestId } = render(withLang(<FoodForm />));
         expect(getByTestId('food-form')).toBeInTheDocument();
         expect(getByTestId('food-name-input')).toBeInTheDocument();
         expect(getByTestId('food-kcal-input')).toBeInTheDocument();
@@ -37,8 +38,8 @@ describe('FoodForm', () => {
             macrosPer100: { kcal: 130, proteinG: 2, carbG: 28, fatG: 0 },
         };
 
-        const { getByTestId } = render(<FoodForm food={food} />);
-        expect(getByTestId('version-flag')).toHaveTextContent('Sua versão');
+        const { getByTestId } = render(withLang(<FoodForm food={food} />));
+        expect(getByTestId('version-flag')).toHaveTextContent('Your version');
         expect(getByTestId('version-toggle')).toBeInTheDocument();
 
         fireEvent.click(getByTestId('version-toggle'));
@@ -49,7 +50,7 @@ describe('FoodForm', () => {
     });
 
     it('submits new food via createFood', async () => {
-        const { getByTestId } = render(<FoodForm initialBarcode="123" />);
+        const { getByTestId } = render(withLang(<FoodForm initialBarcode="123" />));
 
         fireEvent.change(getByTestId('food-name-input'), { target: { value: 'Banana' } });
         fireEvent.change(getByTestId('food-kcal-input'), { target: { value: '89' } });

@@ -1,0 +1,212 @@
+<!DOCTYPE html><html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Curadoria &amp; Moderação de Alimentos | ShapeUp Data Engine</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..600,0..1,0" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #171311;
+        color: #f3eae5;
+        font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: "tnum" 1, "zero" 1;
+    }
+    .font-condensed {
+      font-family: 'Barlow Condensed', sans-serif;
+    }
+    /* Scrollbar sutil e técnica */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #171311;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2b221d;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3c2f28;
+    }
+  </style>
+</head>
+<body class="bg-[#171311] text-[#f3eae5] antialiased text-sm h-screen overflow-hidden flex flex-col">
+<div class="flex flex-1 h-full w-full overflow-hidden">
+<!-- SIDEBAR RETOOL / LINEAR STYLE: LIMPA, DENSIDADE PROFISSIONAL -->
+<aside class="w-64 bg-[#1c1613] border-r border-[#2b221d] flex flex-col justify-between shrink-0 select-none z-30">
+<div class="flex flex-col">
+<!-- Brand Header -->
+<div class="h-14 px-4 border-b border-[#2b221d] flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<img alt="ShapeUp Logo" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VKsqbdKIDSICDo3GFIAjfQ0ajhFL6MDnpq5e8epickpv2ZzwEizF3GIH66zjAWaPY3GiFUoOt-LfHrcHQctrzJMDfzpvZew_gHepipiJplZGc5CYa2Evl-mnvwKZH2uJg1-DU9_z5RyZ2G50euN8LfMDVzomYsHLIGNdABpnJsOWUYpLEfsFIL4SpE-jqw9OucgF9ALJZFbIoT3kscQwyYt-gw1HJNGJm-Le4Kd9ajGI-U_WRVjAxWMWs">
+<div class="flex flex-col">
+<span class="font-condensed font-bold tracking-wider text-base text-[#f3eae5] leading-none">SHAPEUP</span>
+<span class="text-[10px] uppercase font-mono tracking-widest text-[#85766f]">DATA ENGINE</span>
+</div>
+</div>
+<span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#211a17] text-[#85766f] border border-[#2b221d]">v4.12</span>
+</div>
+<!-- Section Label -->
+<div class="px-4 pt-4 pb-1">
+<span class="text-[10px] font-semibold uppercase tracking-wider text-[#85766f]">Administração Central</span>
+</div>
+<!-- Navigation Menu -->
+<nav class="flex flex-col px-2 space-y-0.5 mt-1">
+<a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs text-[#85766f] hover:text-[#f3eae5] hover:bg-[#211a17] transition-colors" href="#">
+<span class="material-symbols-outlined text-base">dashboard</span>
+<span class="">Visão Geral &amp; Métricas</span>
+</a>
+<a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs text-[#85766f] hover:text-[#f3eae5] hover:bg-[#211a17] transition-colors" href="#">
+<span class="material-symbols-outlined text-base">toggle_on</span>
+<span class="">Feature Flags &amp; Rollouts</span>
+</a>
+<!-- Active Menu Item: Linha sutil terracota, sem pill arredondada saturada -->
+<a aria-current="page" class="flex items-center justify-between px-2.5 py-1.5 rounded text-xs font-medium text-[#f3eae5] bg-[#211a17] border-l-2 border-[#e06c43]" href="#">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-base text-[#e06c43]">restaurant</span>
+<span class="">Moderação de Alimentos</span>
+</div>
+<span class="text-[10px] font-mono px-1.5 rounded bg-[#e06c43]/15 text-[#e06c43] font-semibold">24</span>
+</a>
+<a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs text-[#85766f] hover:text-[#f3eae5] hover:bg-[#211a17] transition-colors" href="#">
+<span class="material-symbols-outlined text-base">shield</span>
+<span class="">Auditoria &amp; Logs</span>
+</a>
+<a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs text-[#85766f] hover:text-[#f3eae5] hover:bg-[#211a17] transition-colors" href="#">
+<span class="material-symbols-outlined text-base">corporate_fare</span>
+<span class="">Tenants &amp; Academias</span>
+</a>
+<a class="flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs text-[#85766f] hover:text-[#f3eae5] hover:bg-[#211a17] transition-colors" href="#">
+<span class="material-symbols-outlined text-base">settings</span>
+<span class="">Configurações</span>
+</a>
+</nav>
+</div>
+<!-- Footer Operator Status -->
+<div class="p-3 border-t border-[#2b221d] bg-[#1c1613]">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<img alt="Marcio Torres" class="w-7 h-7 rounded object-cover border border-[#2b221d]" src="https://lh3.googleusercontent.com/aida/AEtjO1VPYx0MwNnIBZPsF5o8mZ1skc9IleG9wpbzft5Js31vsM_JFwgmU7UJ1KfA6qZuixjH_E-XzDXlFH-YNXsVofG-lZNT0-Sv7e8RyEyXs907nAIZ2lZCmgaQmamViXzLegguxZuLnyyZamPq52esn1GdROx4E33vCby_mNCgY5h30xyTaLhrfmQK-SmJKfjEFXPAab3CwosOVhyODqf9bCf4ajsSrtNgoEh1fZN4hWGirMpwzBeQtZ5E-A">
+<div class="flex flex-col">
+<span class="text-xs font-medium text-[#f3eae5] leading-tight">Marcio Torres</span>
+<span class="text-[10px] text-[#85766f] font-mono leading-tight">Operações de Conteúdo &amp; Nutrição</span>
+</div>
+</div>
+<span class="w-2 h-2 rounded-full bg-[#7d986b]" title="Sessão Operacional Conectada"></span>
+</div>
+</div>
+</aside>
+<!-- MAIN WRAPPER -->
+<div class="flex-1 flex flex-col h-full overflow-hidden min-w-0 bg-[#171311]">
+<!-- TOPBAR CONTIDA E FUNCIONAL -->
+<header class="h-14 border-b border-[#2b221d] bg-[#1c1613] px-5 flex items-center justify-between shrink-0 z-20"><div class="flex items-center gap-2 text-xs font-mono"><span class="text-[#85766f]">Administração</span><span class="text-[#2b221d]">/</span><span class="text-[#f3eae5] font-medium">Moderação de Catálogo</span></div><div class="w-96 max-w-md hidden md:flex items-center relative"><span class="material-symbols-outlined absolute left-2.5 text-base text-[#85766f]">search</span><input class="w-full pl-8 pr-12 py-1.5 bg-[#171311] border border-[#2b221d] rounded text-xs text-[#f3eae5] placeholder-[#85766f] focus:outline-none focus:border-[#e06c43]" placeholder="Buscar por nome do produto, marca ou EAN..." type="text"><kbd class="absolute right-2.5 text-[10px] font-mono text-[#85766f] border border-[#2b221d] px-1 py-0.5 rounded bg-[#211a17]">/</kbd></div><div class="flex items-center gap-3"><div class="hidden sm:flex items-center gap-2 text-xs text-[#85766f] font-mono"><span class="text-[#e06c43] font-semibold font-mono-num">24</span><span class="">pendentes na fila</span></div><div class="h-4 w-px bg-[#2b221d] hidden sm:block"></div><button class="flex items-center gap-1.5 text-xs text-[#85766f] hover:text-[#f3eae5] transition-colors py-1 px-2 rounded hover:bg-[#211a17]"><span class="material-symbols-outlined text-sm">refresh</span><span class="font-mono text-[11px]">Atualizado agora</span></button></div></header>
+<!-- SUB-HEADER: TÍTULO SÓBRIO & KPI INLINE (SEM CARDS PESADOS) -->
+<section class="border-b border-[#2b221d] bg-[#171311] px-8 flex flex-col md:flex-row items-center justify-between gap-6 shrink-0 relative py-3.5"><div class="flex flex-col"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#e06c43] animate-pulse"></span><h1 class="font-condensed text-2xl font-bold tracking-wide text-[#f3eae5] leading-tight">Moderação de Alimentos &amp; Catálogo</h1></div><p class="text-xs text-[#85766f] mt-1">Curadoria de itens submetidos pela comunidade para inserção no banco oficial ShapeUp Data Engine.</p></div><div class="flex-1 flex justify-center w-full md:w-auto"><div class="flex items-center divide-x divide-[#2b221d] bg-[#1c1613] border border-[#2b221d] rounded-lg px-3 text-xs shadow-sm py-1"><div class="px-4 py-0.5 flex flex-col items-center sm:items-start"><span class="text-[10px] uppercase font-mono tracking-wider text-[#85766f]">Fila Pendente</span><div class="flex items-baseline gap-1.5 mt-0.5"><span class="font-mono-num text-base font-bold text-[#e06c43]">24</span><span class="text-[10px] text-[#85766f]">itens</span></div></div><div class="px-4 py-0.5 flex flex-col items-center sm:items-start"><span class="text-[10px] uppercase font-mono tracking-wider text-[#85766f]">Revisão com Alerta</span><div class="flex items-baseline gap-1.5 mt-0.5"><span class="font-mono-num text-base font-bold text-[#d4a359]">6</span><span class="text-[10px] text-[#85766f]">atenção</span></div></div><div class="px-4 py-0.5 flex flex-col items-center sm:items-start"><span class="text-[10px] uppercase font-mono tracking-wider text-[#85766f]">Aprovados Hoje</span><div class="flex items-baseline gap-1.5 mt-0.5"><span class="font-mono-num text-base font-bold text-[#7d986b]">148</span><span class="text-[10px] text-[#7d986b]">concluídos</span></div></div><div class="px-4 py-0.5 flex flex-col items-center sm:items-start"><span class="text-[10px] uppercase font-mono tracking-wider text-[#85766f]">Tempo Médio</span><div class="flex items-baseline gap-1.5 mt-0.5"><span class="font-mono-num text-base font-semibold text-[#f3eae5]">3m 48s</span><span class="text-[10px] text-[#85766f]">/ item</span></div></div></div></div><div class="hidden xl:flex items-center gap-2"><span class="text-xs text-[#85766f] font-mono">Moderador em turno:</span><span class="text-xs font-medium text-[#f3eae5] bg-[#211a17] border border-[#2b221d] px-2.5 py-1 rounded">Marcio Torres</span></div></section>
+<!-- WORKSPACE PRINCIPAL EM SPLIT SCREEN -->
+<div class="flex-1 flex flex-col overflow-hidden min-h-0 relative bg-[#171311]"><div class="flex-1 overflow-y-auto px-6 lg:px-10 py-6"><div class="max-w-6xl mx-auto flex flex-col space-y-5"><div class="border-b border-[#2b221d] flex flex-wrap items-center justify-between gap-4 pb-2"><div class="flex items-center gap-6 overflow-x-auto"><button class="pb-3 text-sm font-semibold text-[#f3eae5] border-b-2 border-[#e06c43] flex items-center gap-2 whitespace-nowrap"><span class="">Fila Pendente</span><span class="text-xs font-mono text-[#e06c43] bg-[#e06c43]/15 px-2 py-0.5 rounded font-bold">24</span></button><button class="pb-3 text-sm text-[#85766f] hover:text-[#f3eae5] transition-colors border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap"><span class="">Revisão com Divergência</span><span class="text-xs font-mono text-[#d4a359] bg-[#d4a359]/15 px-2 py-0.5 rounded">6</span></button><button class="pb-3 text-sm text-[#85766f] hover:text-[#f3eae5] transition-colors border-b-2 border-transparent flex items-center gap-2 whitespace-nowrap"><span class="">Aprovados Hoje</span><span class="text-xs font-mono text-[#7d986b] bg-[#7d986b]/15 px-2 py-0.5 rounded">148</span></button><button class="pb-3 text-sm text-[#85766f] hover:text-[#f3eae5] transition-colors border-b-2 border-transparent whitespace-nowrap">Rejeitados &amp; Devolvidos</button></div><div class="flex items-center gap-2"><span class="text-xs font-mono text-[#85766f] hidden sm:inline">Filtrar por:</span><button class="text-xs px-3 py-1.5 rounded-md bg-[#211a17] text-[#f3eae5] border border-[#2b221d] font-medium">Todos (24)</button><button class="text-xs px-3 py-1.5 rounded-md text-[#85766f] hover:text-[#f3eae5] hover:bg-[#1c1613] transition-colors">Suplementos (14)</button><button class="text-xs px-3 py-1.5 rounded-md text-[#85766f] hover:text-[#f3eae5] hover:bg-[#1c1613] transition-colors">Refeições &amp; Marmitas (7)</button><button class="text-xs px-3 py-1.5 rounded-md text-[#85766f] hover:text-[#f3eae5] hover:bg-[#1c1613] transition-colors">Padaria (3)</button></div></div><div class="flex items-center justify-between text-xs text-[#85766f] px-1"><span class="font-mono text-[11px] uppercase tracking-wider">Clique em um registro para abrir a mesa técnica de conferência e aprovação</span><div class="flex items-center gap-3 font-mono text-[11px]"><span class="">Ordenado por: <strong class="text-[#f3eae5]">Mais recentes</strong></span><span class="">•</span><span class="">Visualização ampla</span></div></div><div class="flex flex-col space-y-3.5"><div class="p-5 rounded-lg bg-[#1c1613] hover:bg-[#211a17] border border-[#2b221d] hover:border-[#e06c43]/60 transition-all cursor-pointer shadow-sm relative group" onclick="openInspectionDrawer(0)"><div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4"><div class="flex items-start gap-4 min-w-0"><div class="w-10 h-10 rounded bg-[#e06c43]/10 border border-[#e06c43]/30 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-[#e06c43] text-xl">nutrition</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-2.5 flex-wrap"><span class="text-[10px] font-mono uppercase text-[#e06c43] bg-[#e06c43]/15 px-2 py-0.5 rounded font-semibold">Suplemento</span><span class="text-xs text-[#85766f] font-mono">#ALM-92810</span><span class="text-xs text-[#85766f]">• EAN: 7898912340021</span><span class="text-[11px] text-[#7d986b] font-mono flex items-center gap-1"><span class="material-symbols-outlined text-xs">image</span> Rótulo anexado</span></div><h3 class="text-base font-semibold text-[#f3eae5] group-hover:text-[#ffb59d] transition-colors mt-1">Whey Protein Isolado 90% Cacau Puro — BioGourmet</h3><div class="flex items-center gap-2 text-xs text-[#85766f] mt-0.5"><span class="">Porção: 30g (1 dosador) • Pote 900g</span><span class="">•</span><span class="">Enviado por: <span class="text-[#f3eae5]">Rodrigo Silva (CREF 049281-G/SP)</span></span></div></div></div><div class="flex items-center gap-4 lg:self-center shrink-0"><div class="flex items-center gap-3 text-xs font-mono-num bg-[#171311] px-3.5 py-2 rounded-md border border-[#2b221d]"><div class=""><span class="text-[#85766f] text-[10px] block font-sans">Calorias</span><strong class="text-[#f3eae5] text-sm">112</strong> kcal</div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Proteína</span><strong class="text-[#7d986b] text-sm">27g</strong></div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Carbo</span><strong class="text-[#f3eae5] text-sm">1.2g</strong></div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Gordura</span><strong class="text-[#f3eae5] text-sm">0.4g</strong></div></div><div class="flex flex-col items-end gap-1"><span class="text-xs font-mono text-[#85766f]">12m atrás</span><button class="text-xs font-medium text-[#e06c43] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"><span class="">Inspecionar</span><span class="material-symbols-outlined text-sm">arrow_forward</span></button></div></div></div></div><div class="p-5 rounded-lg bg-[#1c1613] hover:bg-[#211a17] border border-[#2b221d] hover:border-[#d4a359]/60 transition-all cursor-pointer shadow-sm relative group" onclick="openInspectionDrawer(1)"><div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4"><div class="flex items-start gap-4 min-w-0"><div class="w-10 h-10 rounded bg-[#d4a359]/10 border border-[#d4a359]/30 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-[#d4a359] text-xl">warning</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-2.5 flex-wrap"><span class="text-[10px] font-mono uppercase text-[#d4a359] bg-[#d4a359]/15 px-2 py-0.5 rounded font-semibold">Alerta de Divergência</span><span class="text-xs text-[#85766f] font-mono">#ALM-92804</span><span class="text-xs text-[#85766f]">• EAN: 7891045239014</span><span class="text-[11px] text-[#d4a359] font-mono bg-[#d4a359]/10 px-1.5 py-0.5 rounded">Calorias divergem dos macros (+18%)</span></div><h3 class="text-base font-semibold text-[#f3eae5] group-hover:text-[#ffb59d] transition-colors mt-1">Pasta de Amendoim Crocante Stevia — NutriForce</h3><div class="flex items-center gap-2 text-xs text-[#85766f] mt-0.5"><span class="">Porção: 15g (1 colher de sopa) • Pote 500g</span><span class="">•</span><span class="">Enviado por: <span class="text-[#f3eae5]">Aline Castro (Aluna Premium)</span></span></div></div></div><div class="flex items-center gap-4 lg:self-center shrink-0"><div class="flex items-center gap-3 text-xs font-mono-num bg-[#171311] px-3.5 py-2 rounded-md border border-[#2b221d]"><div class=""><span class="text-[#85766f] text-[10px] block font-sans">Calorias</span><strong class="text-[#d4a359] text-sm">89</strong> kcal</div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Proteína</span><strong class="text-[#f3eae5] text-sm">4.5g</strong></div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Carbo</span><strong class="text-[#f3eae5] text-sm">3.0g</strong></div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Gordura</span><strong class="text-[#d4a359] text-sm">12g</strong></div></div><div class="flex flex-col items-end gap-1"><span class="text-xs font-mono text-[#85766f]">28m atrás</span><button class="text-xs font-medium text-[#d4a359] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"><span class="">Inspecionar</span><span class="material-symbols-outlined text-sm">arrow_forward</span></button></div></div></div></div><div class="p-5 rounded-lg bg-[#1c1613] hover:bg-[#211a17] border border-[#2b221d] hover:border-[#85766f]/60 transition-all cursor-pointer shadow-sm relative group" onclick="openInspectionDrawer(2)"><div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4"><div class="flex items-start gap-4 min-w-0"><div class="w-10 h-10 rounded bg-[#211a17] border border-[#2b221d] flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-[#85766f] text-xl">bakery_dining</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-2.5 flex-wrap"><span class="text-[10px] font-mono uppercase text-[#85766f] bg-[#211a17] px-2 py-0.5 rounded font-semibold">Padaria Artesanal</span><span class="text-xs text-[#85766f] font-mono">#ALM-92798</span><span class="text-xs text-[#85766f]">• Item duplicado provável (85% match)</span></div><h3 class="text-base font-semibold text-[#f3eae5] group-hover:text-[#ffb59d] transition-colors mt-1">Pão Artesanal 100% Integral Fermentação Lenta — Padaria do Bairro</h3><div class="flex items-center gap-2 text-xs text-[#85766f] mt-0.5"><span class="">Porção: 50g (2 fatias) • Embalagem 450g</span><span class="">•</span><span class="">Enviado por: <span class="text-[#f3eae5]">Camila Santos (Aluna)</span></span></div></div></div><div class="flex items-center gap-4 lg:self-center shrink-0"><div class="flex items-center gap-3 text-xs font-mono-num bg-[#171311] px-3.5 py-2 rounded-md border border-[#2b221d]"><div class=""><span class="text-[#85766f] text-[10px] block font-sans">Calorias</span><strong class="text-[#f3eae5] text-sm">142</strong> kcal</div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Proteína</span><strong class="text-[#f3eae5] text-sm">6.2g</strong></div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Carbo</span><strong class="text-[#f3eae5] text-sm">26g</strong></div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Gordura</span><strong class="text-[#f3eae5] text-sm">1.1g</strong></div></div><div class="flex flex-col items-end gap-1"><span class="text-xs font-mono text-[#85766f]">45m atrás</span><button class="text-xs font-medium text-[#85766f] group-hover:text-[#f3eae5] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"><span class="">Inspecionar</span><span class="material-symbols-outlined text-sm">arrow_forward</span></button></div></div></div></div><div class="p-5 rounded-lg bg-[#1c1613] hover:bg-[#211a17] border border-[#2b221d] hover:border-[#7d986b]/60 transition-all cursor-pointer shadow-sm relative group" onclick="openInspectionDrawer(3)"><div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4"><div class="flex items-start gap-4 min-w-0"><div class="w-10 h-10 rounded bg-[#7d986b]/10 border border-[#7d986b]/30 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-[#7d986b] text-xl">science</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-2.5 flex-wrap"><span class="text-[10px] font-mono uppercase text-[#7d986b] bg-[#7d986b]/15 px-2 py-0.5 rounded font-semibold">Suplemento Puro</span><span class="text-xs text-[#85766f] font-mono">#ALM-92791</span><span class="text-xs text-[#7d986b] font-mono">• Laudo Creapure anexado</span></div><h3 class="text-base font-semibold text-[#f3eae5] group-hover:text-[#ffb59d] transition-colors mt-1">Creatina Monohidratada 100% Creapure — MaxTitanium</h3><div class="flex items-center gap-2 text-xs text-[#85766f] mt-0.5"><span class="">Porção: 3g (1 dosador) • Pote 250g</span><span class="">•</span><span class="">Enviado por: <span class="text-[#f3eae5]">Marcos Vinícius (Personal Trainer)</span></span></div></div></div><div class="flex items-center gap-4 lg:self-center shrink-0"><div class="flex items-center gap-3 text-xs font-mono-num bg-[#171311] px-3.5 py-2 rounded-md border border-[#2b221d]"><div class=""><span class="text-[#85766f] text-[10px] block font-sans">Calorias</span><strong class="text-[#f3eae5] text-sm">0</strong> kcal</div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Creatina</span><strong class="text-[#7d986b] text-sm">3.0g</strong></div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Carbo</span><strong class="text-[#f3eae5] text-sm">0g</strong></div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Gordura</span><strong class="text-[#f3eae5] text-sm">0g</strong></div></div><div class="flex flex-col items-end gap-1"><span class="text-xs font-mono text-[#85766f]">1h 05m</span><button class="text-xs font-medium text-[#7d986b] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"><span class="">Inspecionar</span><span class="material-symbols-outlined text-sm">arrow_forward</span></button></div></div></div></div><div class="p-5 rounded-lg bg-[#1c1613] hover:bg-[#211a17] border border-[#2b221d] hover:border-[#7d986b]/60 transition-all cursor-pointer shadow-sm relative group" onclick="openInspectionDrawer(4)"><div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4"><div class="flex items-start gap-4 min-w-0"><div class="w-10 h-10 rounded bg-[#7d986b]/10 border border-[#7d986b]/30 flex items-center justify-center shrink-0 mt-0.5"><span class="material-symbols-outlined text-[#7d986b] text-xl">lunch_dining</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-2.5 flex-wrap"><span class="text-[10px] font-mono uppercase text-[#7d986b] bg-[#7d986b]/15 px-2 py-0.5 rounded font-semibold">Refeição Pronta</span><span class="text-xs text-[#85766f] font-mono">#ALM-92784</span><span class="text-xs text-[#7d986b] font-mono">• Cadastro por nutricionista validado</span></div><h3 class="text-base font-semibold text-[#f3eae5] group-hover:text-[#ffb59d] transition-colors mt-1">Marmita Fit Frango com Batata Doce 300g — Cozinha Funcional Bella</h3><div class="flex items-center gap-2 text-xs text-[#85766f] mt-0.5"><span class="">Porção: 300g • Embalagem selada a vácuo</span><span class="">•</span><span class="">Enviado por: <span class="text-[#f3eae5]">Dra. Beatriz N. (CRN-3 82711)</span></span></div></div></div><div class="flex items-center gap-4 lg:self-center shrink-0"><div class="flex items-center gap-3 text-xs font-mono-num bg-[#171311] px-3.5 py-2 rounded-md border border-[#2b221d]"><div class=""><span class="text-[#85766f] text-[10px] block font-sans">Calorias</span><strong class="text-[#f3eae5] text-sm">360</strong> kcal</div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Proteína</span><strong class="text-[#7d986b] text-sm">38g</strong></div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Carbo</span><strong class="text-[#f3eae5] text-sm">42g</strong></div><div class="w-px h-6 bg-[#2b221d]"></div><div><span class="text-[#85766f] text-[10px] block font-sans">Gordura</span><strong class="text-[#f3eae5] text-sm">4.5g</strong></div></div><div class="flex flex-col items-end gap-1"><span class="text-xs font-mono text-[#85766f]">1h 30m</span><button class="text-xs font-medium text-[#7d986b] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"><span class="">Inspecionar</span><span class="material-symbols-outlined text-sm">arrow_forward</span></button></div></div></div></div></div><div class="p-4 rounded-lg bg-[#1c1613] border border-[#2b221d] flex flex-col sm:flex-row items-center justify-between text-xs text-[#85766f] gap-4"><div class="flex items-center gap-2 font-mono"><span class="">Exibindo <strong class="text-[#f3eae5]">5</strong> de <strong class="text-[#f3eae5]">24</strong> cadastros pendentes</span><span class="text-[#2b221d]">•</span><span class="">Lote #2024-MOD-BR</span></div><div class="flex items-center gap-2 font-mono"><button class="px-3 py-1.5 rounded border border-[#2b221d] hover:text-[#f3eae5] hover:bg-[#211a17] transition-colors disabled:opacity-40" disabled="">← Anterior</button><span class="px-3 py-1 rounded bg-[#211a17] text-[#f3eae5] border border-[#2b221d]">Página 1 de 5</span><button class="px-3 py-1.5 rounded border border-[#2b221d] hover:text-[#f3eae5] hover:bg-[#211a17] transition-colors">Próxima →</button></div></div></div></div><div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 opacity-0 hidden" id="drawerBackdrop" onclick="closeInspectionDrawer()"></div><aside class="fixed top-0 right-0 h-full w-full sm:w-[620px] lg:w-[680px] bg-[#1c1613] border-l border-[#2b221d] shadow-2xl z-50 flex flex-col justify-between transform transition-transform duration-300 ease-in-out translate-x-full" id="inspectionDrawer"><div class="h-16 px-6 border-b border-[#2b221d] bg-[#211a17] flex items-center justify-between shrink-0"><div class="flex items-center gap-3"><span class="w-2.5 h-2.5 rounded-full bg-[#e06c43]"></span><div><h2 class="text-sm font-semibold text-[#f3eae5] font-condensed tracking-wide uppercase">Mesa de Análise &amp; Validação Técnica</h2><span class="text-[11px] font-mono text-[#85766f]" id="drawerItemCode">Código: #ALM-92810 • EAN: 7898912340021</span></div></div><button class="w-8 h-8 rounded-md border border-[#2b221d] hover:bg-[#171311] text-[#85766f] hover:text-[#f3eae5] flex items-center justify-center transition-colors" onclick="closeInspectionDrawer()" title="Fechar painel (Esc)"><span class="material-symbols-outlined text-lg">close</span></button></div><div class="flex-1 overflow-y-auto p-6 space-y-6 bg-[#171311]"><div class="p-4 rounded-lg bg-[#1c1613] border border-[#2b221d] flex flex-col gap-2"><div class="flex items-center justify-between"><span class="text-[10px] font-mono uppercase text-[#e06c43] bg-[#e06c43]/15 px-2 py-0.5 rounded font-semibold" id="drawerTag">Suplemento em Análise</span><button class="text-xs text-[#85766f] hover:text-[#f3eae5] px-2.5 py-1 rounded border border-[#2b221d] bg-[#211a17] flex items-center gap-1.5 transition-colors"><span class="material-symbols-outlined text-sm">edit</span><span class="">Editar Metadados</span></button></div><h3 class="font-condensed text-xl font-bold tracking-wide text-[#f3eae5] mt-1" id="drawerTitle">Whey Protein Isolado 90% Cacau Puro — BioGourmet</h3><div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#85766f]" id="drawerMeta">Porção: 30g (1 dosador) • Peso: 900g (30 porções) • Enviado por: Rodrigo Silva (CREF 049281-G/SP)</div></div><div class="bg-[#1c1613] border border-[#7d986b]/30 rounded-lg p-3.5 flex items-center justify-between text-xs" id="drawerAlertBox"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-lg text-[#7d986b]" id="drawerAlertIcon">check_circle</span><div><span class="font-semibold text-[#f3eae5]" id="drawerAlertTitle">Consistência calórica dos macronutrientes: Válida</span><span class="block text-[#85766f] text-[11px] mt-0.5" id="drawerAlertDesc">Soma calculada dos macros (116.4 kcal) é compatível com o valor declarado (112 kcal), tolerância de arredondamento aceitável.</span></div></div><span class="text-[11px] font-mono text-[#7d986b] bg-[#7d986b]/10 border border-[#7d986b]/20 px-2 py-1 rounded shrink-0" id="drawerAlertBadge">Diferença: +3.9%</span></div><div class="border border-[#2b221d] rounded-lg overflow-hidden bg-[#1c1613]"><div class="px-4 py-2.5 border-b border-[#2b221d] bg-[#211a17] flex items-center justify-between"><span class="text-xs font-semibold uppercase font-mono text-[#f3eae5]">Tabela Nutricional (Porção de 30g)</span><span class="text-[11px] text-[#85766f] font-mono">4 kcal/g Prot &amp; Carb • 9 kcal/g Gord</span></div><table class="w-full text-left border-collapse text-xs"><thead><tr class="border-b border-[#2b221d] text-[11px] font-mono uppercase text-[#85766f] bg-[#1c1613]"><th class="py-2.5 px-4 font-normal">Nutriente</th><th class="py-2.5 px-4 font-normal text-right">Declarado</th><th class="py-2.5 px-4 font-normal text-right">Cálculo</th><th class="py-2.5 px-4 font-normal text-right">Status</th></tr></thead><tbody class="divide-y divide-[#2b221d] font-mono-num" id="drawerTableBody"><tr class="hover:bg-[#211a17]/50 transition-colors"><td class="py-2 px-4 font-sans font-medium text-[#f3eae5]">Valor Energético</td><td class="py-2 px-4 text-right font-semibold text-[#f3eae5]">112 kcal</td><td class="py-2 px-4 text-right text-[#85766f]">116.4 kcal</td><td class="py-2 px-4 text-right"><span class="text-[11px] text-[#7d986b] font-mono">Compatível</span></td></tr><tr class="hover:bg-[#211a17]/50 transition-colors"><td class="py-2 px-4 font-sans font-medium text-[#f3eae5]">Proteínas</td><td class="py-2 px-4 text-right font-semibold text-[#7d986b]">27,0 g</td><td class="py-2 px-4 text-right text-[#85766f]">108 kcal (93%)</td><td class="py-2 px-4 text-right"><span class="text-[11px] text-[#7d986b] font-mono">Compatível</span></td></tr><tr class="hover:bg-[#211a17]/50 transition-colors"><td class="py-2 px-4 font-sans font-medium text-[#f3eae5]">Carboidratos</td><td class="py-2 px-4 text-right font-semibold text-[#f3eae5]">1,2 g</td><td class="py-2 px-4 text-right text-[#85766f]">4.8 kcal (4%)</td><td class="py-2 px-4 text-right"><span class="text-[11px] text-[#7d986b] font-mono">Compatível</span></td></tr><tr class="hover:bg-[#211a17]/50 transition-colors"><td class="py-2 px-4 font-sans font-medium text-[#f3eae5]">Gorduras Totais</td><td class="py-2 px-4 text-right font-semibold text-[#f3eae5]">0,4 g</td><td class="py-2 px-4 text-right text-[#85766f]">3.6 kcal (3%)</td><td class="py-2 px-4 text-right"><span class="text-[11px] text-[#7d986b] font-mono">Compatível</span></td></tr><tr class="hover:bg-[#211a17]/50 transition-colors"><td class="py-2 px-4 font-sans text-[#85766f] pl-8">Gorduras Saturadas</td><td class="py-2 px-4 text-right text-[#f3eae5]">0,1 g</td><td class="py-2 px-4 text-right text-[#85766f]">-</td><td class="py-2 px-4 text-right"><span class="text-[11px] text-[#7d986b] font-mono">No limite</span></td></tr><tr class="hover:bg-[#211a17]/50 transition-colors"><td class="py-2 px-4 font-sans text-[#85766f] pl-8">Fibras Alimentares</td><td class="py-2 px-4 text-right text-[#f3eae5]">0,8 g</td><td class="py-2 px-4 text-right text-[#85766f]">-</td><td class="py-2 px-4 text-right"><span class="text-[11px] text-[#7d986b] font-mono">Compatível</span></td></tr><tr class="hover:bg-[#211a17]/50 transition-colors"><td class="py-2 px-4 font-sans text-[#85766f] pl-8">Sódio</td><td class="py-2 px-4 text-right text-[#f3eae5]">45 mg</td><td class="py-2 px-4 text-right text-[#85766f]">-</td><td class="py-2 px-4 text-right"><span class="text-[11px] text-[#7d986b] font-mono">Normal</span></td></tr></tbody></table></div><div class="border border-[#2b221d] rounded-lg bg-[#1c1613] overflow-hidden"><div class="px-4 py-2.5 border-b border-[#2b221d] bg-[#211a17] flex items-center justify-between"><span class="text-xs font-semibold uppercase font-mono text-[#f3eae5]">Comprovante / Foto do Rótulo</span><span class="text-[11px] text-[#85766f]">Arquivo original</span></div><div class="p-4 flex flex-col gap-3 bg-[#171311]"><div class="relative border border-[#2b221d] rounded-lg overflow-hidden aspect-[16/9] bg-[#130d0a] flex items-center justify-center"><img alt="Rótulo nutricional" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuEzPkvoIPCw4JO1pM9KE_RJVTAmKn6FrQb7C6amV7BkN4pS5UyizAKy_pvzH3o6puYgwsApeKZg9DK9wPoYdR4iS24hHVvPFvST56Kk07In0zkz-ASMgl-8hgeS6rZuv5TMq2fD3JoGoFDXsuDTSpUspq7h_y0gruau1FOyy84VUAkNpz9LDCMW0M1-IhF-srUSsBP8jutcXqOrmJOf5rDS8upCwZHUuck42Pvp419YwlD1Ou0ibd"><div class="absolute top-2 right-2 px-2 py-0.5 rounded bg-[#171311]/90 border border-[#2b221d] text-[10px] font-mono text-[#f3eae5]">rotulo_tabela.jpg (Alta resolução)</div></div><div class="p-3 rounded bg-[#1c1613] border border-[#2b221d] text-xs text-[#f3eae5]"><span class="text-[10px] font-mono uppercase text-[#85766f] block mb-1">Ingredientes Declarados:</span>Proteína de soro do leite isolada (WPI), cacau em pó 100% alcalino, aroma idêntico ao natural de baunilha, espessante goma xantana, edulcorante estévia.</div></div></div><label class="flex items-center gap-3 p-3 rounded-lg border border-[#2b221d] bg-[#1c1613] cursor-pointer"><input checked="" class="w-4 h-4 rounded border-[#2b221d] bg-[#171311] text-[#e06c43] focus:ring-0" type="checkbox"><div class="flex flex-col"><span class="text-xs font-semibold text-[#f3eae5]">Validado oficialmente no banco oficial</span><span class="text-[11px] text-[#85766f]">Prioridade nas pesquisas e nos cardápios gerados por IA.</span></div></label></div><div class="p-4 border-t border-[#2b221d] bg-[#211a17] flex items-center justify-between shrink-0 gap-3"><div class="flex items-center gap-2"><button class="px-3 py-2 rounded border border-[#2b221d] text-xs font-medium text-[#f3eae5] hover:bg-[#171311] transition-colors flex items-center gap-1.5" onclick="closeInspectionDrawer()"><span class="material-symbols-outlined text-sm text-[#85766f]">close</span><span class="">Rejeitar</span></button><button class="px-3 py-2 rounded border border-[#2b221d] text-xs font-medium text-[#f3eae5] hover:bg-[#171311] transition-colors flex items-center gap-1.5"><span class="material-symbols-outlined text-sm text-[#85766f]">edit</span><span class="">Ajustar</span></button></div><button class="px-5 py-2 rounded bg-[#e06c43] hover:bg-[#d05d35] text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm" onclick="closeInspectionDrawer()"><span class="material-symbols-outlined text-base">check</span><span class="">Aprovar e Publicar</span><kbd class="text-[10px] font-mono text-white/80 border border-white/20 px-1 py-0.5 rounded bg-black/15">↵</kbd></button></div></aside></div>
+</div>
+</div>
+<script>
+const moderationData = [
+  {
+    code: 'Código: #ALM-92810 • EAN: 7898912340021',
+    tag: 'Suplemento em Análise',
+    title: 'Whey Protein Isolado 90% Cacau Puro — BioGourmet',
+    meta: 'Porção: 30g (1 dosador) • Peso: 900g (30 porções) • Enviado por: Rodrigo Silva (CREF 049281-G/SP)',
+    alertTitle: 'Consistência calórica dos macronutrientes: Válida',
+    alertDesc: 'Soma calculada dos macros (116.4 kcal) é compatível com o valor declarado (112 kcal), tolerância de arredondamento aceitável.',
+    alertBadge: 'Diferença: +3.9%',
+    alertType: 'success'
+  },
+  {
+    code: 'Código: #ALM-92804 • EAN: 7891045239014',
+    tag: 'Alerta de Divergência',
+    title: 'Pasta de Amendoim Crocante Stevia — NutriForce',
+    meta: 'Porção: 15g (1 colher) • Peso: 500g • Enviado por: Aline Castro (Aluna Premium)',
+    alertTitle: 'Divergência Crítica entre Gordura Declarada e Valor Energético',
+    alertDesc: 'Gordura informada (12g = 108 kcal) excede o total calórico rotulado (89 kcal). Necessário reajuste antes de aprovação.',
+    alertBadge: 'Erro: +18.4%',
+    alertType: 'warning'
+  },
+  {
+    code: 'Código: #ALM-92798 • EAN: 7893321456908',
+    tag: 'Possível Duplicidade',
+    title: 'Pão Artesanal 100% Integral — Padaria do Bairro',
+    meta: 'Porção: 50g (2 fatias) • Pacote 450g • Enviado por: Camila Santos (Aluna)',
+    alertTitle: 'Item com 85% de similaridade encontrado no catálogo',
+    alertDesc: 'Existe registro ativo similar cadastrado como "Pão de Forma 100% Integral Artesanal". Verifique se trata-se de nova formulação.',
+    alertBadge: 'Similaridade: 85%',
+    alertType: 'neutral'
+  },
+  {
+    code: 'Código: #ALM-92791 • EAN: 7898234190871',
+    tag: 'Suplemento com Certificação',
+    title: 'Creatina Monohidratada 100% Creapure — MaxTitanium',
+    meta: 'Porção: 3g (1 dosador) • Pote 250g • Enviado por: Marcos Vinícius (Personal Trainer)',
+    alertTitle: 'Certificado de Fabricação Creapure Verificado',
+    alertDesc: 'Laudo laboratorial em anexo comprova teor de pureza superior a 99.9%. Pronto para deferimento imediato.',
+    alertBadge: '100% Compatível',
+    alertType: 'success'
+  },
+  {
+    code: 'Código: #ALM-92784 • EAN: 7897712398412',
+    tag: 'Refeição Pronta Selada',
+    title: 'Marmita Fit Frango com Batata Doce 300g — Cozinha Funcional Bella',
+    meta: 'Porção: 300g • Enviado e assinado por: Dra. Beatriz N. (CRN-3 82711)',
+    alertTitle: 'Registro assinado por nutricionista responsável técnico',
+    alertDesc: 'Ficha técnica com carimbo profissional válido no Conselho Regional de Nutricionistas da 3ª Região.',
+    alertBadge: 'CRN Validado',
+    alertType: 'success'
+  }
+];
+
+function openInspectionDrawer(index) {
+  const data = moderationData[index] || moderationData[0];
+  const drawer = document.getElementById('inspectionDrawer');
+  const backdrop = document.getElementById('drawerBackdrop');
+  
+  document.getElementById('drawerItemCode').textContent = data.code;
+  document.getElementById('drawerTag').textContent = data.tag;
+  document.getElementById('drawerTitle').textContent = data.title;
+  document.getElementById('drawerMeta').innerHTML = data.meta;
+  document.getElementById('drawerAlertTitle').textContent = data.alertTitle;
+  document.getElementById('drawerAlertDesc').textContent = data.alertDesc;
+  document.getElementById('drawerAlertBadge').textContent = data.alertBadge;
+  
+  backdrop.classList.remove('hidden');
+  requestAnimationFrame(() => {
+    backdrop.classList.remove('opacity-0');
+    drawer.classList.remove('translate-x-full');
+  });
+}
+
+function closeInspectionDrawer() {
+  const drawer = document.getElementById('inspectionDrawer');
+  const backdrop = document.getElementById('drawerBackdrop');
+  if (!drawer || !backdrop) return;
+  drawer.classList.add('translate-x-full');
+  backdrop.classList.add('opacity-0');
+  setTimeout(() => {
+    backdrop.classList.add('hidden');
+  }, 300);
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeInspectionDrawer();
+  }
+});
+</script>
+
+</body></html>

@@ -1,0 +1,30 @@
+:root {
+    --reactour-accent: var(--primary);
+}
+
+.reactour__popover {
+    background: var(--bg-card) !important;
+    color: var(--text-main) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.reactour__popover button,
+.reactour__popover [data-tour-elem='controls'] button {
+    color: var(--primary) !important;
+}
+
+.reactour__popover [data-tour-elem='badge'] {
+    background: var(--primary) !important;
+    color: var(--text-on-primary) !important;
+}
+
+.reactour__dot {
+    background: var(--border-color) !important;
+}
+
+.reactour__dot--active,
+.reactour__dot[aria-pressed='true'] {
+    background: var(--primary) !important;
+}

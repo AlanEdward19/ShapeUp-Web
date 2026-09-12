@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, Users, Activity, TrendingUp, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { useTour } from '@reactour/tour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip,
-    BarChart, Bar, Legend
+    BarChart, Bar
 } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
 import './Analytics.css';
@@ -180,43 +180,40 @@ setTimeout(() => {
                 <Button variant="outline" icon={<Download size={16} />}>{t('pro.analytics.btn.export')}</Button>
             </div>
 
-            {/* Metrics Grid */}
-            <div className="su-analytics-metrics-grid su-mt-4" data-tour="an-metrics">
-                <Card className="su-metric-card">
+            <div className="su-analytics-metrics-grid" data-tour="an-metrics">
+                <Card className="su-metric-card su-analytics-feature">
                     <div className="su-metric-header">
                         <span className="su-metric-label">{t('pro.analytics.metric.mrr')}</span>
-                        <DollarSign size={20} className="su-success-text" />
                     </div>
                     <div className="su-metric-value">${metrics.mrr.toLocaleString()}</div>
                     <span className="su-metric-trend positive">{t('pro.analytics.metric.mrr.trend')}</span>
                 </Card>
 
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('pro.analytics.metric.clients')}</span>
-                        <Users size={20} className="su-primary-text" />
-                    </div>
-                    <div className="su-metric-value">{metrics.activeClients}</div>
-                    <span className="su-metric-trend positive">{t('pro.analytics.metric.clients.trend')}</span>
-                </Card>
+                <div className="su-analytics-stack">
+                    <Card className="su-metric-card">
+                        <div className="su-metric-header">
+                            <span className="su-metric-label">{t('pro.analytics.metric.clients')}</span>
+                        </div>
+                        <div className="su-metric-value">{metrics.activeClients}</div>
+                        <span className="su-metric-trend positive">{t('pro.analytics.metric.clients.trend')}</span>
+                    </Card>
 
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('pro.analytics.metric.adherence')}</span>
-                        <Activity size={20} className="su-accent-text" />
-                    </div>
-                    <div className="su-metric-value">{metrics.globalAdherence}%</div>
-                    <span className="su-metric-trend positive">{t('pro.analytics.metric.adherence.trend')}</span>
-                </Card>
+                    <Card className="su-metric-card">
+                        <div className="su-metric-header">
+                            <span className="su-metric-label">{t('pro.analytics.metric.adherence')}</span>
+                        </div>
+                        <div className="su-metric-value">{metrics.globalAdherence}%</div>
+                        <span className="su-metric-trend positive">{t('pro.analytics.metric.adherence.trend')}</span>
+                    </Card>
 
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('pro.analytics.metric.lifespan')}</span>
-                        <TrendingUp size={20} className="su-warning-text" />
-                    </div>
-                    <div className="su-metric-value">{metrics.avgLifespan} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>{t('pro.analytics.metric.lifespan.unit')}</span></div>
-                    <span className="su-metric-trend">{t('pro.analytics.metric.lifespan.trend')}</span>
-                </Card>
+                    <Card className="su-metric-card">
+                        <div className="su-metric-header">
+                            <span className="su-metric-label">{t('pro.analytics.metric.lifespan')}</span>
+                        </div>
+                        <div className="su-metric-value">{metrics.avgLifespan} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>{t('pro.analytics.metric.lifespan.unit')}</span></div>
+                        <span className="su-metric-trend">{t('pro.analytics.metric.lifespan.trend')}</span>
+                    </Card>
+                </div>
             </div>
 
             {/* Charts Area */}
@@ -228,17 +225,11 @@ setTimeout(() => {
                     <div className="su-chart-container-large">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={growthData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
                                 <XAxis dataKey="month" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
                                 <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                                <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} />
-                                <Area type="monotone" name={t('pro.analytics.chart.growth.active')} dataKey="active" stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorActive)" />
+                                <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '2px' }} />
+                                <Area type="monotone" name={t('pro.analytics.chart.growth.active')} dataKey="active" stroke="var(--primary)" strokeWidth={2} fill="var(--primary)" fillOpacity={0.12} />
                                 <Area type="monotone" name={t('pro.analytics.chart.growth.churned')} dataKey="churned" stroke="var(--error)" strokeWidth={2} fill="transparent" strokeDasharray="5 5" />
                             </AreaChart>
                         </ResponsiveContainer>

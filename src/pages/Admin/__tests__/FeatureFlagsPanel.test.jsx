@@ -1,6 +1,7 @@
 import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import FeatureFlagsPanel from '../FeatureFlagsPanel';
+import { withLang } from '../../../test/withLang';
 
 const mockGetFeatureFlags = vi.fn();
 const mockPutFeatureFlag = vi.fn();
@@ -22,17 +23,17 @@ describe('FeatureFlagsPanel', () => {
     });
 
     it('toggles a feature flag and persists', async () => {
-        const { getByTestId } = render(<FeatureFlagsPanel />);
+        const { getByTestId } = render(withLang(<FeatureFlagsPanel />));
 
         await waitFor(() => {
-            expect(getByTestId('flag-row-notifications.email-enabled')).toHaveTextContent('Ativa');
+            expect(getByTestId('flag-row-notifications.email-enabled')).toHaveTextContent('On');
         });
 
         fireEvent.click(getByTestId('flag-toggle-notifications.email-enabled'));
 
         await waitFor(() => {
             expect(mockPutFeatureFlag).toHaveBeenCalledWith('notifications.email-enabled', false);
-            expect(getByTestId('flag-row-notifications.email-enabled')).toHaveTextContent('Desativada');
+            expect(getByTestId('flag-row-notifications.email-enabled')).toHaveTextContent('Off');
         });
     });
 });

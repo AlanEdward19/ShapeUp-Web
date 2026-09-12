@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import Card from '../../../components/Card';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import './Nutrition.css';
 
 const FoodForm = ({
     food = null,
@@ -10,6 +11,7 @@ const FoodForm = ({
     onSaved,
     onCancel,
 }) => {
+    const { t } = useLanguage();
     const { createFood, createFoodOverride, setActiveFoodVersion } = useNutritionApi();
     const isEdit = Boolean(food?.id);
     const hasOverride = Boolean(food?.isPersonalOverride);
@@ -42,13 +44,13 @@ const FoodForm = ({
         setError('');
 
         if (!name.trim()) {
-            setError('Nome é obrigatório');
+            setError(t('nutrition.form.error.name'));
             return;
         }
 
         const macroPayload = buildMacroPayload();
         if (Object.values(macroPayload).some((v) => Number.isNaN(v) || v < 0)) {
-            setError('Preencha todos os macros com valores válidos');
+            setError(t('nutrition.form.error.macros'));
             return;
         }
 
@@ -69,7 +71,7 @@ const FoodForm = ({
             }
             onSaved?.(saved);
         } catch (err) {
-            setError(err.message || 'Falha ao salvar alimento');
+            setError(err.message || t('nutrition.form.error.save'));
         } finally {
             setSaving(false);
         }
@@ -86,25 +88,25 @@ const FoodForm = ({
             setUsePersonalVersion(updated.isPersonalOverride);
             onSaved?.(updated);
         } catch (err) {
-            setError(err.message || 'Falha ao alternar versão');
+            setError(err.message || t('nutrition.form.error.version'));
         } finally {
             setSaving(false);
         }
     };
 
     return (
-        <Card data-testid="food-form">
-            <h3 className="su-section-title su-mb-4">
-                {isEdit ? 'Editar alimento' : 'Cadastrar alimento'}
+        <section className="su-journal-sheet" data-testid="food-form">
+            <h3 className="su-ledger-heading">
+                {isEdit ? t('nutrition.form.edit') : t('nutrition.form.create')}
             </h3>
 
             {isEdit && (
-                <div className="su-mb-4" data-testid="version-flag">
+                <div className="su-mb-4 su-version-flag" data-testid="version-flag">
                     <span
                         className={usePersonalVersion ? 'su-warning-text' : 'su-primary-text'}
                         style={{ fontWeight: 600, marginRight: '0.75rem' }}
                     >
-                        {usePersonalVersion ? 'Sua versão' : 'Versão pública'}
+                        {usePersonalVersion ? t('nutrition.form.personal') : t('nutrition.form.public')}
                     </span>
                     {hasOverride && (
                         <Button
@@ -114,7 +116,7 @@ const FoodForm = ({
                             disabled={saving}
                             data-testid="version-toggle"
                         >
-                            {usePersonalVersion ? 'Usar versão pública' : 'Usar sua versão'}
+                            {usePersonalVersion ? t('nutrition.form.use_public') : t('nutrition.form.use_personal')}
                         </Button>
                     )}
                 </div>
@@ -122,42 +124,42 @@ const FoodForm = ({
 
             <form onSubmit={handleSubmit}>
                 <Input
-                    label="Nome"
+                    label={t('nutrition.form.name')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     data-testid="food-name-input"
                 />
                 <Input
-                    label="Código de barras (opcional)"
+                    label={t('nutrition.form.barcode')}
                     value={barcode}
                     onChange={(e) => setBarcode(e.target.value)}
                     disabled={isEdit}
                     data-testid="food-barcode-input"
                 />
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                <div className="su-macro-fields">
                     <Input
-                        label="Kcal / 100g"
+                        label={t('nutrition.form.kcal')}
                         type="number"
                         value={macros.kcal}
                         onChange={(e) => handleMacroChange('kcal', e.target.value)}
                         data-testid="food-kcal-input"
                     />
                     <Input
-                        label="Proteína (g)"
+                        label={t('nutrition.form.protein')}
                         type="number"
                         value={macros.proteinG}
                         onChange={(e) => handleMacroChange('proteinG', e.target.value)}
                         data-testid="food-protein-input"
                     />
                     <Input
-                        label="Carboidrato (g)"
+                        label={t('nutrition.form.carb')}
                         type="number"
                         value={macros.carbG}
                         onChange={(e) => handleMacroChange('carbG', e.target.value)}
                         data-testid="food-carb-input"
                     />
                     <Input
-                        label="Gordura (g)"
+                        label={t('nutrition.form.fat')}
                         type="number"
                         value={macros.fatG}
                         onChange={(e) => handleMacroChange('fatG', e.target.value)}
@@ -169,18 +171,18 @@ const FoodForm = ({
                     <p className="su-input-error-text su-mb-4" role="alert">{error}</p>
                 )}
 
-                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
+                <div className="su-form-actions" style={{ marginTop: '1rem' }}>
                     <Button type="submit" disabled={saving} data-testid="food-save-btn">
-                        {saving ? 'Salvando...' : 'Salvar'}
+                        {saving ? t('nutrition.form.saving') : t('nutrition.form.save')}
                     </Button>
                     {onCancel && (
                         <Button type="button" variant="secondary" onClick={onCancel}>
-                            Cancelar
+                            {t('nutrition.form.cancel')}
                         </Button>
                     )}
                 </div>
             </form>
-        </Card>
+        </section>
     );
 };
 

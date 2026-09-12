@@ -1,0 +1,489 @@
+<!DOCTYPE html><html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ShapeUp — Workspace do Atleta</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Source+Sans+3:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: "#171311",
+              surface: "#1f1815",
+              elevated: "#261e1a",
+              border: "#2e231e",
+              borderLight: "#3d302a",
+              text: "#eee0da",
+              secondary: "#bdaea6",
+              muted: "#82736b",
+              terracotta: "#e06c43",
+              terracottaHover: "#c85a33",
+              olive: "#7d986b",
+              ochre: "#d4a359"
+            }
+          },
+          fontFamily: {
+            headline: ["'Barlow Condensed'", "sans-serif"],
+            sans: ["'Source Sans 3'", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-[#171311] text-[#eee0da] font-sans antialiased selection:bg-[#e06c43]/30 selection:text-[#eee0da]">
+<!-- SIDEBAR (w-60, sóbria, sem containers desnecessários) -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-[#211A17] border-r border-[#3A2D27] z-50 flex flex-col justify-between">
+<div class="flex flex-col flex-1 min-h-0">
+<!-- Logo Header -->
+<div class="h-16 px-5 flex items-center gap-3 border-b border-[#3A2D27]"><img alt="ShapeUp Logo" class="h-6 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UEc9nRoR-8qbPC-MNsHRTEi9BLn6bgtcv2SW5cCTgsOlh4e0BkOpZRKMFbiaY80G3wZctGCfAp3UCrwBaJln9Fdqqy_1Tmy7Nq5WXWkxyJnX3t86ZEZyAoyAoBYmt7GSKrnKqjvJvfVjYpZ7622SGBdljRJw5Ipysr5ChFaG9KHVKOf1QwHjhsMg_3VrD1SiZXvpC74urs6fqq22sprYEof69AQ5hVARwBFtMs5AAh5W6a2mJSAqMdl8M"><div><span class="font-headline text-lg font-bold tracking-wider text-[#F3EAE5] uppercase leading-none block">SHAPEUP</span><span class="text-[9px] uppercase tracking-widest text-[#85766F] font-semibold">Atleta</span></div></div>
+<!-- Links de Navegação -->
+<nav class="flex-1 px-3 py-5 space-y-6 overflow-y-auto"><div><span class="px-3 text-[10px] uppercase tracking-wider font-semibold text-[#85766F] block mb-2">Rotina</span><div class="space-y-1"><a aria-current="page" class="flex items-center gap-2.5 px-3 py-2 rounded text-sm font-semibold bg-[#29211D] text-[#F3EAE5] border-l-2 border-[#E06c43]" href="#"><span class="material-symbols-outlined text-[18px] text-[#e06c43]">dashboard</span><span class="">Dashboard</span></a><a class="flex items-center gap-2.5 px-3 py-2 rounded text-sm text-[#B8AAA2] hover:text-[#F3EAE5] hover:bg-[#29211D] transition-colors" href="#"><span class="material-symbols-outlined text-[18px] text-[#85766F]">fitness_center</span><span class="">Treinos &amp; Planos</span></a><a class="flex items-center gap-2.5 px-3 py-2 rounded text-sm text-[#B8AAA2] hover:text-[#F3EAE5] hover:bg-[#29211D] transition-colors" href="#"><span class="material-symbols-outlined text-[18px] text-[#85766F]">restaurant</span><span class="">Diário de Nutrição</span></a><a class="flex items-center gap-2.5 px-3 py-2 rounded text-sm text-[#B8AAA2] hover:text-[#F3EAE5] hover:bg-[#29211D] transition-colors" href="#"><span class="material-symbols-outlined text-[18px] text-[#85766F]">apartment</span><span class="">Explorar Academias</span></a><a class="flex items-center justify-between px-3 py-2 rounded text-sm text-[#B8AAA2] hover:text-[#F3EAE5] hover:bg-[#29211D] transition-colors" href="#"><div class="flex items-center gap-2.5"><span class="material-symbols-outlined text-[18px] text-[#85766F]">chat</span><span class="">Mensagens</span></div><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#e06c43]/20 text-[#e06c43]">2</span></a></div></div><div><span class="px-3 text-[10px] uppercase tracking-wider font-semibold text-[#85766F] block mb-2">Sistema</span><div class="space-y-1"><a class="flex items-center gap-2.5 px-3 py-2 rounded text-sm text-[#B8AAA2] hover:text-[#F3EAE5] hover:bg-[#29211D] transition-colors" href="#"><span class="material-symbols-outlined text-[18px] text-[#85766F]">tune</span><span class="">Configurações</span></a></div></div></nav>
+</div>
+<!-- Perfil do Atleta (sem card elevado solto) -->
+<div class="p-3 border-t border-[#3A2D27] bg-[#211A17]"><div class="flex items-center justify-between px-2 py-1.5"><div class="flex items-center gap-2.5 min-w-0"><div class="w-7 h-7 rounded bg-[#29211D] border border-[#3A2D27] flex items-center justify-center font-bold text-xs text-[#e06c43] shrink-0">LV</div><div class="min-w-0 leading-tight"><p class="text-xs font-semibold text-[#F3EAE5] truncate">Lucas Vianna</p><p class="text-[10px] text-[#7d986b] font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-[#7d986b]"></span> Aluno Pro</p></div></div><button class="text-[#85766F] hover:text-[#F3EAE5] transition-colors p-1" title="Encerrar sessão" type="button"><span class="material-symbols-outlined text-[16px]">logout</span></button></div></div>
+</aside>
+<!-- WORKSPACE CONTENT (pl-60, contínuo, divisores limpos, sem AI-slop) -->
+<div class="pl-64 min-h-screen flex flex-col bg-[#171311]">
+<!-- TOPBAR / SESSÃO ATUAL (Contexto claro e objetivo) -->
+<header class="sticky top-0 z-40 h-16 bg-[#171311] border-b border-[#3A2D27] px-8 flex items-center justify-between">
+<div class="flex items-center gap-4 text-xs">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-[#eee0da]">Mesociclo de Hipertrofia</span>
+<span class="text-[#594941]">•</span>
+<span class="text-[#bdaea6]">Semana 3 de 6</span>
+</div>
+<div class="hidden sm:flex items-center gap-1.5 pl-4 border-l border-[#2a201b] text-[11px] text-[#82736b]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#7d986b]"></span>
+<span class="">Sincronizado: <strong class="text-[#eee0da] font-medium">Coach Rodrigo Silva</strong> (CREF 089124-G/SP)</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="text-right hidden md:block">
+<p class="text-xs font-medium text-[#eee0da]">Sábado, 24 de Maio</p>
+<p class="text-[10px] text-[#82736b]">Recuperação dos superiores: 48h</p>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 rounded bg-[#e06c43] hover:bg-[#c85a33] text-white text-xs font-semibold tracking-wide transition-all shadow-sm" id="topbarStartWorkout" type="button">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+<span class="">Iniciar Treino de Hoje</span>
+</button>
+</div>
+</header>
+<!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+<main class="flex-1 px-8 py-7 max-w-7xl w-full mx-auto space-y-8">
+<!-- CABEÇALHO DO ATLETA & FOCO DO DIA (Plano contínuo, tipografia assertiva) -->
+<section class="border-b border-[#2a201b] pb-6">
+<div class="flex flex-col md:flex-row md:items-baseline justify-between gap-3">
+<div>
+<div class="flex items-center gap-2 text-[11px] uppercase tracking-wider text-[#d4a359] font-semibold mb-1">
+<span class="">Sessão 18 • Fase de Sobrecarga</span>
+<span class="text-[#594941]">/</span>
+<span class="text-[#7d986b] font-normal lowercase tracking-normal flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> pronto para progressão
+              </span>
+</div>
+<h1 class="font-headline text-3xl md:text-4xl font-bold uppercase tracking-tight text-[#eee0da]">
+              Treino B — Puxada Alta, Trapézio &amp; Bíceps
+            </h1>
+<p class="text-xs text-[#82736b] mt-1 max-w-2xl">
+              Estimativa de 55 minutos • 5 exercícios programados com ênfase na fase excêntrica e retração escapular.
+            </p>
+</div>
+<!-- Ações Rápidas sem cartões intermediários -->
+<div class="flex items-center gap-3 shrink-0 pt-2 md:pt-0">
+<button class="px-3 py-1.5 rounded border border-[#382b24] hover:border-[#594941] text-xs text-[#bdaea6] hover:text-[#eee0da] transition-colors flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[15px]">history</span>
+<span class="">Histórico de Cargas</span>
+</button>
+<a class="px-3 py-1.5 rounded bg-[#221a16] border border-[#382b24] text-xs font-semibold text-[#eee0da] hover:bg-[#2a201b] transition-colors flex items-center gap-1.5" href="#tabela-exercicios">
+<span class="material-symbols-outlined text-[15px]">list_alt</span>
+<span class="">Ver Séries de Hoje</span>
+</a>
+</div>
+</div>
+</section>
+<!-- RESUMO OPERACIONAL DO DIA (Alinhado em grid plano com divisores sutis de 1px, sem 'cards dentro de cards') -->
+<section class="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-[#2a201b] border-y border-[#2a201b] py-4">
+<!-- 1. Frequência Semanal -->
+<div class="py-2 md:py-0 md:px-5 first:pl-0">
+<div class="flex items-center justify-between text-[11px] uppercase tracking-wider text-[#82736b] font-semibold mb-1">
+<span class="">Frequência</span>
+<span class="text-xs text-[#eee0da] font-normal lowercase">4 de 5 dias</span>
+</div>
+<div class="flex items-baseline gap-2 mb-2">
+<span class="font-headline text-2xl font-bold text-[#eee0da]">80%</span>
+<span class="text-[11px] text-[#7d986b]">meta no ritmo</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-5 h-5 rounded text-[10px] font-bold bg-[#7d986b]/15 text-[#7d986b] border border-[#7d986b]/30 flex items-center justify-center" title="Segunda">S</span>
+<span class="w-5 h-5 rounded text-[10px] font-bold bg-[#7d986b]/15 text-[#7d986b] border border-[#7d986b]/30 flex items-center justify-center" title="Terça">T</span>
+<span class="w-5 h-5 rounded text-[10px] text-[#594941] border border-[#2a201b] flex items-center justify-center" title="Quarta (Descanso)">—</span>
+<span class="w-5 h-5 rounded text-[10px] font-bold bg-[#7d986b]/15 text-[#7d986b] border border-[#7d986b]/30 flex items-center justify-center" title="Quinta">Q</span>
+<span class="w-5 h-5 rounded text-[10px] font-bold bg-[#7d986b]/15 text-[#7d986b] border border-[#7d986b]/30 flex items-center justify-center" title="Sexta">S</span>
+<span class="w-5 h-5 rounded text-[10px] font-bold bg-[#e06c43] text-white flex items-center justify-center" title="Sábado (Hoje)">S</span>
+<span class="w-5 h-5 rounded text-[10px] text-[#594941] border border-[#2a201b] flex items-center justify-center" title="Domingo">D</span>
+</div>
+</div>
+<!-- 2. Carga & Tonelagem -->
+<div class="py-2 md:py-0 md:px-5">
+<div class="flex items-center justify-between text-[11px] uppercase tracking-wider text-[#82736b] font-semibold mb-1">
+<span class="">Volume Semanal</span>
+<span class="text-[11px] text-[#7d986b] font-medium">+8% vs ant.</span>
+</div>
+<div class="flex items-baseline gap-1.5 mb-1.5">
+<span class="font-headline text-2xl font-bold text-[#eee0da]">24.800</span>
+<span class="text-xs text-[#82736b]">kg tonelagem</span>
+</div>
+<div class="text-[11px] text-[#82736b] flex items-center justify-between">
+<span class="">Meta: 28.000 kg</span>
+<span class="text-[#eee0da] font-medium">88% atingido</span>
+</div>
+</div>
+<!-- 3. Nutrição Diária -->
+<div class="py-2 md:py-0 md:px-5">
+<div class="flex items-center justify-between text-[11px] uppercase tracking-wider text-[#82736b] font-semibold mb-1">
+<span class="">Nutrição Diária</span>
+<span class="text-xs text-[#eee0da] font-medium">1.840 <span class="text-[#82736b] font-normal">/ 2.600 kcal</span></span>
+</div>
+<div class="w-full bg-[#241c18] h-1.5 rounded-full overflow-hidden my-2">
+<div class="bg-[#7d986b] h-full rounded-full" style="width: 71%;"></div>
+</div>
+<div class="text-[11px] text-[#bdaea6] flex items-center justify-between">
+<span class="">Proteína: <strong class="text-[#eee0da]">145g</strong> <span class="text-[#82736b]">/ 210g</span></span>
+<span class="text-[#7d986b] font-medium">71%</span>
+</div>
+</div>
+<!-- 4. Hidratação com Ação Tátil Direta -->
+<div class="py-2 md:py-0 md:px-5 last:pr-0">
+<div class="flex items-center justify-between text-[11px] uppercase tracking-wider text-[#82736b] font-semibold mb-1">
+<span class="">Hidratação</span>
+<span class="text-[11px] text-[#82736b]" id="waterPct">63%</span>
+</div>
+<div class="flex items-baseline justify-between mb-1">
+<div class="flex items-baseline gap-1">
+<span class="font-headline text-2xl font-bold text-[#eee0da]" id="waterDisplay">2.2</span>
+<span class="text-xs text-[#82736b]">/ 3.5 Litros</span>
+</div>
+<button class="text-[11px] px-2 py-0.5 rounded border border-[#382b24] hover:border-[#7d986b] text-[#7d986b] font-semibold transition-colors bg-[#1c1512]" id="addWaterQuickBtn" type="button">
+              +250ml
+            </button>
+</div>
+<div class="text-[11px] text-[#82736b]">
+            Restam 1.3L até o encerramento do dia
+          </div>
+</div>
+</section>
+<!-- LAYOUT PRINCIPAL: 2 COLUNAS (TREINO DE HOJE + COLUNA OPERACIONAL) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- COLUNA PRINCIPAL: FICHA DO TREINO + PROGRESSÃO (8 cols) -->
+<div class="lg:col-span-8 space-y-8" id="tabela-exercicios">
+<!-- FICHA DO TREINO: TABULAR E LIMPA -->
+<div>
+<div class="flex items-center justify-between pb-3 border-b border-[#2a201b]">
+<div>
+<h2 class="font-headline text-xl font-bold uppercase tracking-tight text-[#eee0da]">
+                  Exercícios Prescritos para Hoje
+                </h2>
+<p class="text-xs text-[#82736b]">Siga a ordem prescrita para preservar sinergia neuromuscular.</p>
+</div>
+<span class="text-xs text-[#bdaea6]">5 de 5 pendentes</span>
+</div>
+<!-- Tabela Estruturada sem cards aninhados -->
+<div class="divide-y divide-[#2a201b]">
+<!-- Exercício 1 -->
+<div class="py-4 flex items-center justify-between gap-4 group">
+<div class="flex items-start gap-3.5 min-w-0">
+<span class="text-xs font-mono font-bold text-[#82736b] pt-0.5">01</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<h3 class="text-sm font-semibold text-[#eee0da]">Puxada Alta Pronada</h3>
+<span class="text-[10px] font-semibold px-1.5 py-0.2 rounded bg-[#d4a359]/15 text-[#d4a359] border border-[#d4a359]/30">+2.5kg sugerido</span>
+</div>
+<p class="text-xs text-[#82736b] mt-0.5">Pegada aberta bilateral • Foco na retração escapular e controle excêntrico de 3s</p>
+</div>
+</div>
+<div class="flex items-center gap-5 shrink-0 text-right">
+<div>
+<p class="text-xs font-bold text-[#eee0da]">4 séries × 8–10 reps</p>
+<p class="text-xs text-[#d4a359] font-medium">Carga: 70 kg</p>
+</div>
+<input class="w-4 h-4 rounded bg-[#171311] border-[#382b24] text-[#e06c43] focus:ring-0 cursor-pointer" title="Marcar como concluído" type="checkbox">
+</div>
+</div>
+<!-- Exercício 2 -->
+<div class="py-4 flex items-center justify-between gap-4 group">
+<div class="flex items-start gap-3.5 min-w-0">
+<span class="text-xs font-mono font-bold text-[#82736b] pt-0.5">02</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<h3 class="text-sm font-semibold text-[#eee0da]">Remada Curvada com Barra</h3>
+</div>
+<p class="text-xs text-[#82736b] mt-0.5">Tronco inclinado a 45º • Barra olímpica com anilhas calibradas, puxada até o umbigo</p>
+</div>
+</div>
+<div class="flex items-center gap-5 shrink-0 text-right">
+<div>
+<p class="text-xs font-bold text-[#eee0da]">4 séries × 8 reps</p>
+<p class="text-xs text-[#bdaea6]">Carga: 80 kg</p>
+</div>
+<input class="w-4 h-4 rounded bg-[#171311] border-[#382b24] text-[#e06c43] focus:ring-0 cursor-pointer" title="Marcar como concluído" type="checkbox">
+</div>
+</div>
+<!-- Exercício 3 -->
+<div class="py-4 flex items-center justify-between gap-4 group">
+<div class="flex items-start gap-3.5 min-w-0">
+<span class="text-xs font-mono font-bold text-[#82736b] pt-0.5">03</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<h3 class="text-sm font-semibold text-[#eee0da]">Remada Baixa no Triângulo</h3>
+<span class="text-[10px] text-[#82736b] border border-[#2a201b] px-1 rounded">Pausa 1.5s</span>
+</div>
+<p class="text-xs text-[#82736b] mt-0.5">Manter postura lombar estável sem hiperextensão do tronco no ponto máximo</p>
+</div>
+</div>
+<div class="flex items-center gap-5 shrink-0 text-right">
+<div>
+<p class="text-xs font-bold text-[#eee0da]">3 séries × 12 reps</p>
+<p class="text-xs text-[#bdaea6]">Carga: 65 kg</p>
+</div>
+<input class="w-4 h-4 rounded bg-[#171311] border-[#382b24] text-[#e06c43] focus:ring-0 cursor-pointer" title="Marcar como concluído" type="checkbox">
+</div>
+</div>
+<!-- Exercício 4 -->
+<div class="py-4 flex items-center justify-between gap-4 group">
+<div class="flex items-start gap-3.5 min-w-0">
+<span class="text-xs font-mono font-bold text-[#82736b] pt-0.5">04</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<h3 class="text-sm font-semibold text-[#eee0da]">Rosca Direta com Barra W</h3>
+</div>
+<p class="text-xs text-[#82736b] mt-0.5">Pegada média anatômica • Cotovelos estabilizados ao lado das costelas</p>
+</div>
+</div>
+<div class="flex items-center gap-5 shrink-0 text-right">
+<div>
+<p class="text-xs font-bold text-[#eee0da]">3 séries × 10 reps</p>
+<p class="text-xs text-[#bdaea6]">Carga: 32 kg</p>
+</div>
+<input class="w-4 h-4 rounded bg-[#171311] border-[#382b24] text-[#e06c43] focus:ring-0 cursor-pointer" title="Marcar como concluído" type="checkbox">
+</div>
+</div>
+<!-- Exercício 5 -->
+<div class="py-4 flex items-center justify-between gap-4 group">
+<div class="flex items-start gap-3.5 min-w-0">
+<span class="text-xs font-mono font-bold text-[#82736b] pt-0.5">05</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<h3 class="text-sm font-semibold text-[#eee0da]">Rosca Martelo com Halteres</h3>
+</div>
+<p class="text-xs text-[#82736b] mt-0.5">Pegada neutra simultânea • Foco em braquial e braquiorradial</p>
+</div>
+</div>
+<div class="flex items-center gap-5 shrink-0 text-right">
+<div>
+<p class="text-xs font-bold text-[#eee0da]">3 séries × 12 reps</p>
+<p class="text-xs text-[#bdaea6]">Carga: 16 kg / lado</p>
+</div>
+<input class="w-4 h-4 rounded bg-[#171311] border-[#382b24] text-[#e06c43] focus:ring-0 cursor-pointer" title="Marcar como concluído" type="checkbox">
+</div>
+</div>
+</div>
+<!-- Rodapé Técnico da Tabela -->
+<div class="pt-3 flex items-center justify-between text-xs text-[#82736b] border-t border-[#2a201b]">
+<span class="">Baseado no teste de 1RM do ciclo • RPE alvo médio: 8.5</span>
+<button class="text-[#e06c43] hover:underline font-semibold text-xs" type="button">
+                Pedir substituição ao treinador
+              </button>
+</div>
+</div>
+<!-- HISTÓRICO REAL DE PROGRESSÃO (Gráfico limpo, sem curvas senoidais falsas ou bloat) -->
+<div class="pt-4 border-t border-[#2a201b]">
+<div class="flex items-baseline justify-between pb-3">
+<div>
+<p class="text-[10px] uppercase tracking-wider text-[#82736b] font-semibold">Sobrecarga Progressiva Real</p>
+<h3 class="font-headline text-lg font-bold uppercase tracking-tight text-[#eee0da]">
+                  Evolução na Puxada Alta Pronada (Semanas 1 a 6)
+                </h3>
+</div>
+<span class="text-xs text-[#7d986b] font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">trending_up</span> +15 kg no ciclo
+              </span>
+</div>
+<!-- Gráfico Linear Objetivo -->
+<div class="py-2">
+<div class="w-full h-32 relative">
+<svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 600 100">
+<!-- Grid horizontal sutil -->
+<line stroke="#2a201b" stroke-dasharray="2 2" stroke-width="1" x1="0" x2="600" y1="20" y2="20"></line>
+<line stroke="#2a201b" stroke-dasharray="2 2" stroke-width="1" x1="0" x2="600" y1="55" y2="55"></line>
+<line stroke="#2a201b" stroke-dasharray="2 2" stroke-width="1" x1="0" x2="600" y1="90" y2="90"></line>
+<!-- Linha de progressão de carga -->
+<polyline fill="none" points="25,90 140,82 255,65 370,48 485,32 575,18" stroke="#e06c43" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></polyline>
+<!-- Marcadores de carga por semana -->
+<circle cx="25" cy="90" fill="#171311" r="3.5" stroke="#e06c43" stroke-width="2"></circle>
+<circle cx="140" cy="82" fill="#171311" r="3.5" stroke="#e06c43" stroke-width="2"></circle>
+<circle cx="255" cy="65" fill="#171311" r="3.5" stroke="#e06c43" stroke-width="2"></circle>
+<circle cx="370" cy="48" fill="#171311" r="3.5" stroke="#e06c43" stroke-width="2"></circle>
+<circle cx="485" cy="32" fill="#171311" r="3.5" stroke="#e06c43" stroke-width="2"></circle>
+<circle cx="575" cy="18" fill="#e06c43" r="4.5" stroke="#eee0da" stroke-width="2"></circle>
+</svg>
+</div>
+<!-- Eixo de Semanas -->
+<div class="flex items-center justify-between text-[11px] text-[#82736b] pt-2 border-t border-[#2a201b]">
+<span class="">Sem 1: 55kg</span>
+<span class="">Sem 2: 57.5kg</span>
+<span class="">Sem 3: 62.5kg</span>
+<span class="">Sem 4: 65kg</span>
+<span class="">Sem 5: 67.5kg</span>
+<span class="text-[#e06c43] font-bold">Hoje: 70kg</span>
+</div>
+</div>
+<div class="mt-2 text-[11px] text-[#82736b] flex items-center justify-between">
+<span class="">Cadência padronizada: <strong>3-0-1-1</strong> • Amplitude articular monitorada</span>
+<span class="text-[#7d986b]">Evolução consistente sem falha precoce</span>
+</div>
+</div>
+</div>
+<!-- COLUNA LATERAL: FEEDBACK DO COACH & ROTINA DE SUPORTE (4 cols) -->
+<div class="lg:col-span-4 space-y-6">
+<!-- 1. FEEDBACK TÉCNICO DO COACH (Sem card inflado, mensagem sóbria e direta) -->
+<div class="border-b border-[#2a201b] pb-5">
+<div class="flex items-center justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[17px] text-[#e06c43]">record_voice_over</span>
+<span class="text-xs font-bold uppercase tracking-wider text-[#eee0da]">Feedback do Treinador</span>
+</div>
+<span class="text-[10px] text-[#7d986b] font-semibold">Ontem às 21:15</span>
+</div>
+<div class="flex items-center gap-2.5 mb-3">
+<div class="w-8 h-8 rounded bg-[#251d19] border border-[#382b24] flex items-center justify-center font-bold text-xs text-[#e06c43] shrink-0">
+                RS
+              </div>
+<div class="min-w-0 leading-tight">
+<p class="text-xs font-semibold text-[#eee0da]">Rodrigo Silva</p>
+<p class="text-[11px] text-[#82736b]">Treinador Responsável</p>
+</div>
+</div>
+<!-- Parecer técnico autêntico -->
+<p class="text-xs text-[#bdaea6] leading-relaxed bg-[#1b1411] p-3 rounded border border-[#2a201b]">
+              "Execução do terra na terça esteve muito consistente, mantendo alinhamento lombar impecável. Para o Treino B de hoje, quero que você priorize <strong class="text-[#eee0da]">segurar 2 segundos na máxima contração da puxada alta</strong> antes de iniciar a descida. Não aumente a carga se perder essa pausa."
+            </p>
+<div class="mt-3 flex items-center justify-between text-xs">
+<button class="text-xs text-[#e06c43] hover:underline font-semibold flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[15px]">chat_bubble</span>
+<span class="">Responder ao Rodrigo</span>
+</button>
+<span class="text-[11px] text-[#82736b]">Visto pelo atleta</span>
+</div>
+</div>
+<!-- 2. PRÓXIMA REFEIÇÃO PROGRAMADA -->
+<div class="border-b border-[#2a201b] pb-5">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[17px] text-[#7d986b]">restaurant_menu</span>
+<span class="text-xs font-bold uppercase tracking-wider text-[#eee0da]">Refeição Programada</span>
+</div>
+<span class="text-[10px] text-[#82736b]">16:00 (em 45 min)</span>
+</div>
+<div class="space-y-2">
+<div>
+<p class="text-xs font-semibold text-[#eee0da]">Lanche Pré-Treino</p>
+<p class="text-xs text-[#82736b] mt-0.5">Shake: 35g Whey Isolado + 2 bananas nanicas + 40g farelo de aveia fina.</p>
+</div>
+<div class="text-[11px] text-[#bdaea6] flex items-center gap-3 pt-1">
+<span class="">480 kcal</span>
+<span class="">•</span>
+<span class="">42g Proteína</span>
+<span class="">•</span>
+<span class="">64g Carboidrato</span>
+</div>
+<div class="pt-2 flex items-center justify-between">
+<span class="text-[10px] text-[#82736b]">Refeição anterior (Almoço): Registrada</span>
+<button class="px-3 py-1 rounded bg-[#221a16] hover:bg-[#2a201b] border border-[#382b24] text-xs font-semibold text-[#eee0da] transition-colors" id="confirmMealBtn" type="button">
+                  Confirmar Ingestão
+                </button>
+</div>
+</div>
+</div>
+<!-- 3. ORIENTAÇÃO PREVENTIVA DE SEGURANÇA -->
+<div class="p-3 rounded border border-[#382b24] bg-[#1a1310] flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[18px] text-[#d4a359] shrink-0">report</span>
+<div class="text-xs space-y-0.5">
+<p class="font-semibold text-[#eee0da]">Cuidado com a Articulação do Ombro</p>
+<p class="text-[#82736b] leading-relaxed">
+                Mantenha a barra sempre na linha do queixo/esterno superior. Jamais faça puxadas atrás da nuca para evitar pinçamento subacromial.
+              </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- SCRIPT DE INTERAÇÃO DIRETA -->
+<script>
+    (function() {
+      // Hidratação
+      let currentWater = 2.2;
+      const maxWater = 3.5;
+      const addWaterBtn = document.getElementById('addWaterQuickBtn');
+      const waterDisplay = document.getElementById('waterDisplay');
+      const waterPct = document.getElementById('waterPct');
+
+      if (addWaterBtn && waterDisplay && waterPct) {
+        addWaterBtn.addEventListener('click', function() {
+          if (currentWater < maxWater) {
+            currentWater = Math.min(maxWater, +(currentWater + 0.25).toFixed(2));
+            waterDisplay.textContent = currentWater.toFixed(1);
+            const pct = Math.round((currentWater / maxWater) * 100);
+            waterPct.textContent = pct + '%';
+          }
+        });
+      }
+
+      // Iniciar Treino
+      const topbarBtn = document.getElementById('topbarStartWorkout');
+      if (topbarBtn) {
+        topbarBtn.addEventListener('click', function() {
+          const span = this.querySelector('span:last-child');
+          if (span) {
+            if (span.textContent === 'Iniciar Treino de Hoje') {
+              span.textContent = 'Treino em Andamento';
+              this.classList.remove('bg-[#e06c43]', 'hover:bg-[#c85a33]');
+              this.classList.add('bg-[#7d986b]', 'hover:bg-[#6b845c]');
+            } else {
+              span.textContent = 'Iniciar Treino de Hoje';
+              this.classList.remove('bg-[#7d986b]', 'hover:bg-[#6b845c]');
+              this.classList.add('bg-[#e06c43]', 'hover:bg-[#c85a33]');
+            }
+          }
+        });
+      }
+
+      // Confirmar Ingestão de refeição
+      const mealBtn = document.getElementById('confirmMealBtn');
+      if (mealBtn) {
+        mealBtn.addEventListener('click', function() {
+          this.textContent = 'Ingestão Confirmada';
+          this.classList.remove('bg-[#221a16]', 'hover:bg-[#2a201b]', 'text-[#eee0da]');
+          this.classList.add('bg-[#7d986b]/20', 'text-[#7d986b]', 'border-[#7d986b]/40');
+          this.disabled = true;
+        });
+      }
+    })();
+  </script>
+
+
+</body></html>

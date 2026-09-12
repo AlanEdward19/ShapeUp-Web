@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import Card from '../../components/Card';
 import RankingList from '../../components/gamification/RankingList';
 import GamificationProgressCard from '../../components/gamification/GamificationProgressCard';
-import { TrendingUp, Flame, CalendarDays, Award, Target } from 'lucide-react';
 import { useGamificationApi } from '../../hooks/api/useGamificationApi';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -10,6 +8,7 @@ import { useTour } from '@reactour/tour';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
 import { exercisesDB } from '../../data/mockExercises';
 import './DashboardClient.css';
+import AthleteDailyPanel from '../../components/AthleteDailyPanel';
 
 // ─── Helper: normalize any date string to YYYY-MM-DD in LOCAL time ───
 const toLocalDateKey = (dateStr) => {
@@ -31,13 +30,14 @@ const getWeekKey = (date) => {
     return `${d.getFullYear()}-W${weekNo}`;
 };
 
-const DashboardClient = () => {
+const DashboardClient = ({ renderView } = {}) => {
     const { t, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const { getGamificationProfile, getRanking } = useGamificationApi();
 
     const storedName = localStorage.getItem('shapeup_user_name') || 'Athlete';
     const firstName = storedName.split(' ')[0];
+    const nextPlanName = (() => { try { return JSON.parse(localStorage.getItem(`shapeup_client_plans_${localStorage.getItem('shapeup_client_id') || 1}`) || '[]')[0]?.name; } catch { return null; } })();
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
     const currentUserId = parseInt(localStorage.getItem('shapeup_client_id'), 10) || 1;
 
@@ -205,7 +205,7 @@ const DashboardClient = () => {
     // ─── Muscle Activation ───────────────────────────────────────────
     const [muscleTimeFilter, setMuscleTimeFilter] = useState('30');
     const [muscleCustomRange, setMuscleCustomRange] = useState({ start: '', end: '' });
-    
+
     const muscleVolumeData = useMemo(() => {
         let historyToUse = allHistory;
         if (muscleTimeFilter !== 'all') {
@@ -309,11 +309,12 @@ const DashboardClient = () => {
     const hasData = allHistory.length > 0;
     const { plansWithSessions, totalPlans } = plansData;
 
+    if (renderView) return renderView({ weeklyVolumeFormatted, weeklyDiff, streakDays, chartData, allHistory, plansData, nextPlanName });
     return (
         <div className="su-dashboard-client">
             <div className="su-dashboard-header-flex" data-tour="client-header">
                 <div>
-                    <h1 className="su-page-title">{t('client.dashboard.welcome')} {firstName}</h1>
+                    <span className="su-nutrition-kicker">{firstName} · Sua sessão de hoje</span><h1 className="su-page-title">{nextPlanName || 'Sua rotina de treinamento'}</h1>
                     <p className="su-page-subtitle">
                         {hasData
                             ? `${plansWithSessions} / ${totalPlans} ${t('client.dashboard.trend.sessions.plans')}`
@@ -322,186 +323,144 @@ const DashboardClient = () => {
                 </div>
             </div>
 
-            {/* Aggregate Metrics */}
-            <div className="su-metrics-grid su-mt-4" data-tour="client-metrics">
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('client.dashboard.metric.weekly')}</span>
-                        <TrendingUp size={20} className="su-primary-text" />
+            <AthleteDailyPanel volume={weeklyVolumeFormatted} streak={streakDays} sessions={plansWithSessions} totalPlans={totalPlans} chartData={chartData} />
+            <details className="su-athlete-additional"><summary>Estatísticas completas, conquistas e ranking</summary>
+            <div className="su-metrics-grid" data-tour="client-metrics">
+                <div className="su-dash-feature">
+                    <div>
+                        <p className="su-dash-label">{t('client.dashboard.metric.weekly')}</p>
+                        <p className="su-dash-feature-num">
+                            {hasData ? weeklyVolumeFormatted : '—'}
+                            {hasData && <span className="su-dash-feature-unit">{formatWeight(0).replace('0 ', '')}</span>}
+                        </p>
+                        <p className={`su-dash-feature-note su-metric-trend ${!weeklyDiff ? '' : weeklyDiff >= 0 ? 'positive' : 'negative'}`}>
+                            {!hasData ? t('client.dashboard.trend.weekly.nosessions') : weeklyDiff === null ? t('client.dashboard.trend.weekly.first') : weeklyDiff >= 0 ? `↑ ${weeklyDiff}%` : `↓ ${Math.abs(weeklyDiff)}%`}
+                        </p>
                     </div>
-                    <div className="su-metric-value">
-                        {hasData ? weeklyVolumeFormatted : '—'}
-                        {hasData && <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}> {formatWeight(0).replace('0 ', '')}</span>}
-                    </div>
-                    <span className={`su-metric-trend ${!weeklyDiff ? '' : weeklyDiff >= 0 ? 'positive' : 'negative'}`}>
-                        {!hasData ? t('client.dashboard.trend.weekly.nosessions') : weeklyDiff === null ? t('client.dashboard.trend.weekly.first') : weeklyDiff >= 0 ? `↑ ${weeklyDiff}%` : `↓ ${Math.abs(weeklyDiff)}%`}
-                    </span>
-                </Card>
-
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('client.dashboard.metric.streak')}</span>
-                        <Flame size={20} className="su-warning-text" />
-                    </div>
-                    <div className="su-metric-value">
-                        {streakDays}
-                    </div>
-                    <span className="su-metric-trend positive">
-                        {streakDays === 0 ? t('client.dashboard.trend.streak.start') : streakDays >= 7 ? t('client.dashboard.trend.streak.great') : t('client.dashboard.trend.streak.keep')}
-                    </span>
-                </Card>
-
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('client.dashboard.metric.sessions')}</span>
-                        <CalendarDays size={20} className="su-accent-text" />
-                    </div>
-                    <div className="su-metric-value">
-                        {plansWithSessions}
-                        <span style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>/{totalPlans}</span>
-                    </div>
-                    <span className="su-metric-trend">{totalPlans === 0 ? t('client.dashboard.trend.sessions.noplans') : t('client.dashboard.trend.sessions.plans')}</span>
-                </Card>
-
+                    <dl className="su-dash-ledger">
+                        <div className="su-dash-ledger-row">
+                            <dt>{t('client.dashboard.metric.streak')}</dt>
+                            <dd>{streakDays}</dd>
+                            <dd className="su-dash-ledger-note su-metric-trend positive">
+                                {streakDays === 0 ? t('client.dashboard.trend.streak.start') : streakDays >= 7 ? t('client.dashboard.trend.streak.great') : t('client.dashboard.trend.streak.keep')}
+                            </dd>
+                        </div>
+                        <div className="su-dash-ledger-row">
+                            <dt>{t('client.dashboard.metric.sessions')}</dt>
+                            <dd>{plansWithSessions}<span className="su-dash-feature-unit">/{totalPlans}</span></dd>
+                            <dd className="su-dash-ledger-note su-metric-trend">{totalPlans === 0 ? t('client.dashboard.trend.sessions.noplans') : t('client.dashboard.trend.sessions.plans')}</dd>
+                        </div>
+                    </dl>
+                </div>
                 <GamificationProgressCard profile={gamificationProfile} />
             </div>
 
             <div className="su-overview-layout">
-
-                {/* Main Chart Area */}
-                <div className="su-main-chart-area">
-                    <Card className="su-chart-card">
-                        <h3 className="su-section-title">{t('client.dashboard.chart.title')}</h3>
-                        <div className="su-area-chart-container">
-                            {chartData.length >= 2 ? (
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                        <defs>
-                                            <linearGradient id="colorVol" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                                                <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                                            </linearGradient>
-                                        </defs>
-                                        <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
-                                        <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                                        <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} labelFormatter={(l, p) => p[0]?.payload?.date} />
-                                        <Area type="monotone" dataKey="volume" name={`Volume (${formatWeight(0).replace('0 ', '')})`} stroke="var(--primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorVol)" />
-                                    </AreaChart>
-                                </ResponsiveContainer>
-                            ) : (
-                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem' }}>
-                                    {t('client.dashboard.chart.nodata')}
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                </div>
-
-                {/* Sidebar Info */}
-                <div className="su-overview-sidebar" data-tour="client-achievements">
-                    <Card className="su-achievements-card">
-                        <h3 className="su-section-title">
-                            <Award size={20} style={{ verticalAlign: 'text-bottom', marginRight: '8px', color: 'var(--warning)' }} />
-                            {t('client.dashboard.achievements.title')}
-                        </h3>
-
-                        <div className="su-pr-list">
-                            {recentImprovements.length > 0 ? (
-                                recentImprovements.map((imp) => (
-                                    <div key={imp.name} className="su-pr-item">
-                                        <div className="su-pr-icon-wrap">
-                                            <TrendingUp size={16} className="su-success-text" />
-                                        </div>
-                                        <div className="su-pr-details">
-                                            <div className="su-pr-name">{imp.name}</div>
-                                            <div className="su-pr-stats">{imp.from} <span className="su-text-muted">→ {imp.to}</span></div>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                                    {t('client.dashboard.achievements.nodata')}
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                    {/* Muscle Distribution Chart */}
-                    <Card className="su-chart-card su-mt-4">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '8px' }}>
-                            <h3 className="su-section-title" style={{ margin: 0 }}>{t('client.dashboard.chart.muscles') || 'Muscle Volume (Sets)'}</h3>
-                            <select 
-                                className="su-select" 
-                                style={{ width: 'auto', padding: '4px 24px 4px 8px', fontSize: '0.8rem', minHeight: 'unset', height: '28px' }}
-                                value={muscleTimeFilter}
-                                onChange={(e) => setMuscleTimeFilter(e.target.value)}
-                            >
-                                <option value="7">{t('reports.range.7days') || '7 Days'}</option>
-                                <option value="14">{t('reports.range.14days') || '14 Days'}</option>
-                                <option value="30">{t('reports.range.30days') || '30 Days'}</option>
-                                <option value="90">{t('reports.range.90days') || '90 Days'}</option>
-                                <option value="custom">{t('reports.range.custom') || 'Custom Range'}</option>
-                                <option value="all">{t('reports.range.all') || 'All Time'}</option>
-                            </select>
-                        </div>
-                        {muscleTimeFilter === 'custom' && (
-                            <div style={{ display: 'flex', gap: '8px', padding: '0.5rem 0', alignItems: 'center', justifyContent: 'flex-start', width: '100%', fontSize: '0.8rem' }}>
-                                <input type="date" value={muscleCustomRange.start} onChange={e => setMuscleCustomRange(p => ({ ...p, start: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
-                                <span className="su-text-muted">→</span>
-                                <input type="date" value={muscleCustomRange.end} onChange={e => setMuscleCustomRange(p => ({ ...p, end: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
+                <div className="su-main-chart-area su-dash-sheet">
+                    <h3 className="su-section-title">{t('client.dashboard.chart.title')}</h3>
+                    <div className="su-area-chart-container">
+                        {chartData.length >= 2 ? (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <XAxis dataKey="session" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
+                                    <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                                    <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '2px' }} labelFormatter={(l, p) => p[0]?.payload?.date} />
+                                    <Area type="monotone" dataKey="volume" name={`Volume (${formatWeight(0).replace('0 ', '')})`} stroke="var(--primary)" strokeWidth={2} fill="var(--primary)" fillOpacity={0.12} />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <div style={{ height: '100%', display: 'flex', alignItems: 'center', color: 'var(--text-muted)', padding: '1rem 0' }}>
+                                {t('client.dashboard.chart.nodata')}
                             </div>
                         )}
-                        <div className="su-area-chart-container" style={{ minHeight: '300px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '1rem', width: '100%' }}>
-                            {muscleVolumeData.length > 0 ? (
-                                <>
-                                    <div style={{ flex: '1 1 250px', height: '300px', minWidth: '250px' }}>
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={muscleVolumeData}>
-                                                <PolarGrid stroke="var(--border-color)" />
-                                                <PolarAngleAxis dataKey="muscle" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
-                                                <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
-                                                <Radar name="Sets" dataKey="sets" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.6} />
-                                                <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '8px' }} />
-                                            </RadarChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                    <div style={{ flex: '1 1 180px', display: 'flex', flexDirection: 'column', gap: '0.6rem', padding: '1rem', background: 'var(--bg-main)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-                                        <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', color: 'var(--text-main)' }}>Detalhamento</h4>
-                                        {muscleVolumeData.map((m) => (
-                                            <div key={m.muscle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
-                                                <span style={{ color: 'var(--text-muted)' }}>{m.muscle}</span>
-                                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{m.sets} <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>séries</span></span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </>
-                            ) : (
-                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', textAlign: 'center', padding: '1rem' }}>
-                                    {t('client.dashboard.chart.nodata')}
-                                </div>
-                            )}
-                        </div>
-                    </Card>
+                    </div>
                 </div>
 
+                <div className="su-overview-sidebar" data-tour="client-achievements">
+                    <h3 className="su-section-title">{t('client.dashboard.achievements.title')}</h3>
+                    <div className="su-pr-list">
+                        {recentImprovements.length > 0 ? (
+                            recentImprovements.map((imp) => (
+                                <div key={imp.name} className="su-pr-item">
+                                    <div className="su-pr-name">{imp.name}</div>
+                                    <div className="su-pr-stats">{imp.from} <span className="su-text-muted">→ {imp.to}</span></div>
+                                </div>
+                            ))
+                        ) : (
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                                {t('client.dashboard.achievements.nodata')}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="su-muscle-toolbar">
+                        <h3 className="su-section-title" style={{ margin: 0 }}>{t('client.dashboard.chart.muscles') || 'Muscle Volume (Sets)'}</h3>
+                        <select
+                            className="su-select"
+                            style={{ width: 'auto', padding: '4px 24px 4px 8px', fontSize: '0.8rem', minHeight: 'unset', height: '28px' }}
+                            value={muscleTimeFilter}
+                            onChange={(e) => setMuscleTimeFilter(e.target.value)}
+                        >
+                            <option value="7">{t('reports.range.7days') || '7 Days'}</option>
+                            <option value="14">{t('reports.range.14days') || '14 Days'}</option>
+                            <option value="30">{t('reports.range.30days') || '30 Days'}</option>
+                            <option value="90">{t('reports.range.90days') || '90 Days'}</option>
+                            <option value="custom">{t('reports.range.custom') || 'Custom Range'}</option>
+                            <option value="all">{t('reports.range.all') || 'All Time'}</option>
+                        </select>
+                    </div>
+                    {muscleTimeFilter === 'custom' && (
+                        <div style={{ display: 'flex', gap: '8px', padding: '0.5rem 0', alignItems: 'center', width: '100%', fontSize: '0.8rem' }}>
+                            <input type="date" value={muscleCustomRange.start} onChange={e => setMuscleCustomRange(p => ({ ...p, start: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
+                            <span className="su-text-muted">→</span>
+                            <input type="date" value={muscleCustomRange.end} onChange={e => setMuscleCustomRange(p => ({ ...p, end: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
+                        </div>
+                    )}
+                    <div className="su-area-chart-container" style={{ minHeight: '280px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1.5rem', width: '100%' }}>
+                        {muscleVolumeData.length > 0 ? (
+                            <>
+                                <div style={{ flex: '1 1 250px', height: '280px', minWidth: '220px' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={muscleVolumeData}>
+                                            <PolarGrid stroke="var(--border-color)" />
+                                            <PolarAngleAxis dataKey="muscle" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} />
+                                            <PolarRadiusAxis angle={30} domain={[0, 'auto']} tick={false} axisLine={false} />
+                                            <Radar name="Sets" dataKey="sets" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.35} />
+                                            <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '2px' }} />
+                                        </RadarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                                <div className="su-muscle-breakdown" style={{ flex: '1 1 180px' }}>
+                                    <h4 className="su-dash-label">Detalhamento</h4>
+                                    {muscleVolumeData.map((m) => (
+                                        <div key={m.muscle} className="su-muscle-row">
+                                            <span>{m.muscle}</span>
+                                            <span>{m.sets} <span className="su-text-muted">{t('common.sets')}</span></span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        ) : (
+                            <div style={{ color: 'var(--text-muted)', padding: '1rem 0' }}>
+                                {t('client.dashboard.chart.nodata')}
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
 
-            <div className="su-mt-4">
-                <RankingList
-                    entries={rankingEntries}
-                    currentUserId={currentUserId}
-                    nextCursor={rankingCursor}
-                    onLoadMore={() => rankingCursor && fetchRanking(rankingCursor, true)}
-                    isLoading={rankingLoading}
-                    isLoadingMore={rankingLoadingMore}
-                />
-            </div>
-
+            <RankingList
+                entries={rankingEntries}
+                currentUserId={currentUserId}
+                nextCursor={rankingCursor}
+                onLoadMore={() => rankingCursor && fetchRanking(rankingCursor, true)}
+                isLoading={rankingLoading}
+                isLoadingMore={rankingLoadingMore}
+            />
+            </details>
         </div>
     );
 };
 
 export default DashboardClient;
-

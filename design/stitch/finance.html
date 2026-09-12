@@ -1,0 +1,774 @@
+<!DOCTYPE html><html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Source+Sans+3:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'brand-bg': '#171311',
+        'brand-surface': '#211A17',
+        'brand-surface-high': '#2A211D',
+        'brand-border': '#2D231F',
+        'brand-border-subtle': '#3A2E29',
+        'brand-text': '#F3ECE7',
+        'brand-muted': '#9C8880',
+        'brand-terracotta': '#E36F45',
+        'brand-terracotta-hover': '#cf5e35',
+        'brand-terracotta-soft': '#452317',
+        'brand-terracotta-text': '#FFB59D',
+        'brand-olive': '#B0D098',
+        'brand-olive-soft': '#223418',
+        'brand-olive-text': '#B0D098',
+        'brand-ochre': '#F2BE71',
+        'brand-ochre-soft': '#382A12',
+        'brand-ochre-text': '#F2BE71',
+      },
+      fontFamily: {
+        headline: ['"Barlow Condensed"', 'sans-serif'],
+        sans: ['"Source Sans 3"', 'sans-serif'],
+      }
+    }
+  }
+};
+</script>
+<style>
+  body {
+    background-color: #171311;
+    color: #F3ECE7;
+    font-family: "Source Sans 3", sans-serif;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #171311;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2D231F;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3A2E29;
+  }
+</style>
+</head>
+<body class="min-h-screen bg-brand-bg text-brand-text flex">
+<!-- Sidebar Navegação ShapeUp -->
+<aside class="fixed left-0 top-0 h-full w-60 bg-brand-surface border-r border-brand-border z-50 flex flex-col justify-between">
+<div>
+<!-- Brand Header -->
+<div class="h-16 flex items-center px-5 gap-3 border-b border-brand-border">
+<img alt="ShapeUp Pro" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VKsqbdKIDSICDo3GFIAjfQ0ajhFL6MDnpq5e8epickpv2ZzwEizF3GIH66zjAWaPY3GiFUoOt-LfHrcHQctrzJMDfzpvZew_gHepipiJplZGc5CYa2Evl-mnvwKZH2uJg1-DU9_z5RyZ2G50euN8LfMDVzomYsHLIGNdABpnJsOWUYpLEfsFIL4SpE-jqw9OucgF9ALJZFbIoT3kscQwyYt-gw1HJNGJm-Le4Kd9ajGI-U_WRVjAxWMWs">
+<div class="flex flex-col">
+<span class="font-headline font-bold text-lg uppercase tracking-tight text-brand-text leading-none">ShapeUp</span>
+<span class="text-[11px] font-medium text-brand-muted uppercase tracking-widest leading-none mt-0.5">Unidade Jardins</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="py-4 px-3 flex flex-col gap-6">
+<div>
+<span class="px-3 text-[10px] uppercase font-semibold tracking-wider text-brand-muted">Gestão da Academia</span>
+<nav class="mt-1.5 flex flex-col gap-0.5">
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-brand-muted hover:text-brand-text hover:bg-brand-surface-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">dashboard</span>
+              Visão Geral
+            </a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-brand-muted hover:text-brand-text hover:bg-brand-surface-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">group</span>
+              Alunos &amp; Matrículas
+            </a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-brand-muted hover:text-brand-text hover:bg-brand-surface-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">calendar_today</span>
+              Grade de Aulas
+            </a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-brand-muted hover:text-brand-text hover:bg-brand-surface-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">badge</span>
+              Professores &amp; Staff
+            </a>
+</nav>
+</div>
+<div>
+<span class="px-3 text-[10px] uppercase font-semibold tracking-wider text-brand-muted">Financeiro &amp; Controladoria</span>
+<nav class="mt-1.5 flex flex-col gap-0.5">
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm bg-brand-terracotta text-white font-semibold shadow-sm" href="#">
+<span class="material-symbols-outlined text-[19px]">account_balance_wallet</span>
+              Fluxo &amp; Cobranças
+            </a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-brand-muted hover:text-brand-text hover:bg-brand-surface-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">description</span>
+              DRE Gerencial
+            </a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-brand-muted hover:text-brand-text hover:bg-brand-surface-high transition-colors" href="#">
+<span class="material-symbols-outlined text-[19px]">credit_card</span>
+              Planos &amp; Contratos
+            </a>
+</nav>
+</div>
+</div>
+</div>
+<!-- User Mini Profile -->
+<div class="p-3 border-t border-brand-border">
+<div class="flex items-center gap-2.5 p-2 rounded-md bg-brand-surface-high/50 border border-brand-border/60">
+<img alt="Gerente de Unidade" class="w-8 h-8 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida/AEtjO1VPYx0MwNnIBZPsF5o8mZ1skc9IleG9wpbzft5Js31vsM_JFwgmU7UJ1KfA6qZuixjH_E-XzDXlFH-YNXsVofG-lZNT0-Sv7e8RyEyXs907nAIZ2lZCmgaQmamViXzLegguxZuLnyyZamPq52esn1GdROx4E33vCby_mNCgY5h30xyTaLhrfmQK-SmJKfjEFXPAab3CwosOVhyODqf9bCf4ajsSrtNgoEh1fZN4hWGirMpwzBeQtZ5E-A">
+<div class="flex flex-col min-w-0">
+<span class="text-xs font-semibold text-brand-text truncate leading-tight">Marcus Vance</span>
+<span class="text-[11px] text-brand-muted truncate leading-tight">Gerente Geral</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="pl-60 flex-1 flex flex-col min-h-screen">
+<!-- Top Bar -->
+<header class="h-16 border-b border-brand-border bg-brand-bg px-8 flex items-center justify-between sticky top-0 z-40">
+<div class="flex items-center gap-2 text-xs text-brand-muted">
+<span>Financeiro</span>
+<span class="material-symbols-outlined text-xs text-brand-muted">chevron_right</span>
+<span class="text-brand-text font-medium">Fluxo de Caixa &amp; Recebíveis</span>
+</div>
+<div class="flex items-center gap-3">
+<!-- Date Selector -->
+<div class="flex items-center border border-brand-border bg-brand-surface rounded-md text-xs font-medium text-brand-text">
+<button class="px-2 py-1.5 hover:bg-brand-surface-high text-brand-muted hover:text-brand-text transition-colors" title="Mês Anterior">
+<span class="material-symbols-outlined text-sm leading-none">chevron_left</span>
+</button>
+<div class="px-3 py-1.5 flex items-center gap-1.5 border-x border-brand-border">
+<span class="material-symbols-outlined text-sm text-brand-terracotta leading-none">calendar_today</span>
+<span>Outubro 2024</span>
+</div>
+<button class="px-2 py-1.5 hover:bg-brand-surface-high text-brand-muted hover:text-brand-text transition-colors" title="Próximo Mês">
+<span class="material-symbols-outlined text-sm leading-none">chevron_right</span>
+</button>
+</div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-brand-border bg-brand-surface hover:bg-brand-surface-high text-xs font-medium text-brand-text transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">download</span>
+<span>Exportar DRE / Relatório</span>
+</button>
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-md bg-brand-terracotta hover:bg-brand-terracotta-hover text-white text-xs font-semibold shadow-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">add</span>
+<span>Nova Cobrança Avulsa</span>
+</button>
+</div>
+</header>
+<!-- Page Body -->
+<main class="p-8 max-w-[1480px] w-full mx-auto flex flex-col gap-6">
+<!-- Header Title -->
+<div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-brand-border pb-4">
+<div>
+<h1 class="font-headline font-bold text-3xl uppercase tracking-tight text-brand-text">
+            Gestão Financeira — Unidade Jardins
+          </h1>
+<p class="text-sm text-brand-muted mt-0.5">
+            Fechamento em andamento • Período fiscal de 01 a 31 de Outubro de 2024
+          </p>
+</div>
+<div class="flex items-center gap-2 text-xs font-medium text-brand-muted">
+<span class="w-2 h-2 rounded-full bg-brand-olive inline-block"></span>
+<span>Gateway de pagamento conectado e operando normalmente</span>
+</div>
+</div>
+<!-- 5 KPIs Financeiros Principais -->
+<div class="bg-brand-surface border border-brand-border rounded-md px-6 py-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-y sm:divide-y-0 lg:divide-x divide-brand-border">
+<div class="flex flex-col justify-between pr-0 lg:pr-6 py-2 sm:py-0">
+<span class="text-xs font-normal text-brand-muted tracking-wide">Receita Recorrente (MRR)</span>
+<div class="my-1.5 flex items-baseline gap-2">
+<span class="font-headline text-2xl lg:text-3xl font-bold text-brand-text tracking-tight tabular-nums">R$ 148.500</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-brand-muted">
+<span class="text-brand-olive font-medium">+6,4%</span>
+<span>vs mês ant.</span>
+<span class="text-brand-muted/60">•</span>
+<span>691 membros</span>
+</div>
+</div>
+<div class="flex flex-col justify-between px-0 lg:px-6 py-2 sm:py-0">
+<span class="text-xs font-normal text-brand-muted tracking-wide">Inadimplência do Mês</span>
+<div class="my-1.5 flex items-baseline gap-2">
+<span class="font-headline text-2xl lg:text-3xl font-bold text-brand-text tracking-tight tabular-nums">2,8%</span>
+<span class="text-xs text-brand-muted">(meta &lt; 3,5%)</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs">
+<span class="text-brand-olive font-medium">Controlada</span>
+<span class="text-brand-muted/60">•</span>
+<span class="text-brand-ochre">19 alunos em aberto</span>
+</div>
+</div>
+<div class="flex flex-col justify-between px-0 lg:px-6 py-2 sm:py-0">
+<span class="text-xs font-normal text-brand-muted tracking-wide">Ticket Médio / Aluno</span>
+<div class="my-1.5 flex items-baseline gap-1">
+<span class="font-headline text-2xl lg:text-3xl font-bold text-brand-text tracking-tight tabular-nums">R$ 215</span>
+<span class="text-xs font-normal text-brand-muted">/mês</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-brand-muted">
+<span class="text-brand-olive font-medium">+R$ 12</span>
+<span>vs mês ant.</span>
+</div>
+</div>
+<div class="flex flex-col justify-between px-0 lg:px-6 py-2 sm:py-0">
+<span class="text-xs font-normal text-brand-muted tracking-wide">Despesas Operacionais</span>
+<div class="my-1.5 flex items-baseline gap-2">
+<span class="font-headline text-2xl lg:text-3xl font-bold text-brand-text tracking-tight tabular-nums">R$ 39.160</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs text-brand-muted">
+<span>Folha &amp; manutenções</span>
+<span class="text-brand-muted/60">•</span>
+<span>27% rec.</span>
+</div>
+</div>
+<div class="flex flex-col justify-between pl-0 lg:pl-6 py-2 sm:py-0">
+<span class="text-xs font-normal text-brand-muted tracking-wide">Resultado Líquido do Mês</span>
+<div class="my-1.5 flex items-baseline gap-2">
+<span class="font-headline text-2xl lg:text-3xl font-bold text-brand-olive tracking-tight tabular-nums">R$ 105.860</span>
+</div>
+<div class="flex items-center gap-1.5 text-xs">
+<span class="text-brand-olive font-medium">Margem Líquida 61%</span>
+<span class="text-brand-muted/60">•</span>
+<span class="text-brand-muted">Saudável</span>
+</div>
+</div>
+</div>
+<!-- Main Operational Area: Table (Left) + Actions Panel (Right) -->
+<div class="flex flex-col gap-6">
+<!-- Secondary Sub-Menu / Tabs Bar -->
+<div class="flex flex-wrap items-center justify-between gap-4 border-b border-brand-border">
+<div class="flex items-center gap-6 overflow-x-auto -mb-px" id="finance-tabs" role="tablist">
+<button class="finance-tab-btn flex items-center gap-2 py-3 border-b-2 border-brand-terracotta text-brand-text font-headline font-semibold text-sm tracking-wide transition-colors" id="tab-btn-overview" onclick="switchFinanceTab('overview')">
+<span class="material-symbols-outlined text-[18px] text-brand-terracotta">payments</span>
+<span>Visão Geral &amp; Fluxo</span>
+</button>
+<button class="finance-tab-btn flex items-center gap-2 py-3 border-b-2 border-transparent text-brand-muted hover:text-brand-text font-headline font-semibold text-sm tracking-wide transition-colors" id="tab-btn-pending" onclick="switchFinanceTab('pending')">
+<span class="material-symbols-outlined text-[18px]">credit_card_off</span>
+<span>Cobranças Pendentes</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-terracotta-soft text-brand-terracotta-text border border-brand-terracotta/30 leading-none">3</span>
+</button>
+<button class="finance-tab-btn flex items-center gap-2 py-3 border-b-2 border-transparent text-brand-muted hover:text-brand-text font-headline font-semibold text-sm tracking-wide transition-colors" id="tab-btn-renewals" onclick="switchFinanceTab('renewals')">
+<span class="material-symbols-outlined text-[18px]">autorenew</span>
+<span>Renovações da Semana</span>
+<span class="w-1.5 h-1.5 rounded-full bg-brand-olive inline-block"></span>
+</button>
+<button class="finance-tab-btn flex items-center gap-2 py-3 border-b-2 border-transparent text-brand-muted hover:text-brand-text font-headline font-semibold text-sm tracking-wide transition-colors" id="tab-btn-distribution" onclick="switchFinanceTab('distribution')">
+<span class="material-symbols-outlined text-[18px]">pie_chart</span>
+<span>Distribuição de Pagamentos</span>
+</button>
+</div>
+<div class="flex items-center gap-2 text-xs text-brand-muted py-2">
+<span class="material-symbols-outlined text-sm text-brand-olive">sync</span>
+<span>Sincronizado há 4 min</span>
+</div>
+</div>
+<!-- Tab Panel 1: Visão Geral & Fluxo (Tabela Ampla e Descomprimida) -->
+<div class="finance-tab-panel flex flex-col gap-4" id="tab-panel-overview">
+<div class="bg-brand-surface border border-brand-border rounded-lg flex flex-col overflow-hidden">
+<!-- Header e Filtros -->
+<div class="p-4 border-b border-brand-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<h2 class="text-base font-semibold text-brand-text tracking-wide uppercase font-headline">
+            Fluxo de Cobranças e Transações Recentes
+          </h2>
+<p class="text-xs text-brand-muted">Histórico completo consolidado de cobranças em cartão, PIX e boletos da unidade</p>
+</div>
+<div class="flex items-center gap-2.5">
+<div class="flex items-center bg-brand-bg rounded-md p-0.5 border border-brand-border text-xs">
+<button class="px-2.5 py-1 rounded bg-brand-surface font-semibold text-brand-text">Todas</button>
+<button class="px-2.5 py-1 rounded text-brand-muted hover:text-brand-text" onclick="switchFinanceTab('pending')">Pendentes</button>
+<button class="px-2.5 py-1 rounded text-brand-muted hover:text-brand-text" onclick="switchFinanceTab('pending')">Falhas (3)</button>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-brand-muted text-sm leading-none">search</span>
+<input class="bg-brand-bg border border-brand-border text-xs text-brand-text placeholder:text-brand-muted rounded-md pl-8 pr-3 py-1.5 focus:outline-none focus:border-brand-terracotta w-56" placeholder="Buscar aluno, CPF ou matrícula..." type="text">
+</div>
+</div>
+</div>
+<!-- Tabela em Largura Total -->
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left text-xs border-collapse">
+<thead>
+<tr class="border-b border-brand-border bg-brand-surface-high/30 text-brand-muted font-medium uppercase tracking-wider text-[11px]">
+<th class="py-3 px-5">Aluno / Matrícula</th>
+<th class="py-3 px-4">Plano / Contrato</th>
+<th class="py-3 px-4">Data &amp; Hora</th>
+<th class="py-3 px-4">Método de Pagamento</th>
+<th class="py-3 px-4 text-right">Valor Líquido</th>
+<th class="py-3 px-5 text-center">Status</th>
+<th class="py-3 px-5 text-right">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-brand-border text-brand-text"><!-- Row 1 -->
+<tr class="hover:bg-brand-surface-high/30 transition-colors">
+<td class="py-3 px-5">
+<div class="flex flex-col">
+<span class="font-semibold text-brand-text text-sm">Rodrigo Alcântara</span>
+<span class="text-[11px] text-brand-muted">MAT-89241 • CPF ***.502.818-**</span>
+</div>
+</td>
+<td class="py-3 px-4 text-brand-text font-medium">Black Anual Recorrente</td>
+<td class="py-3 px-4 text-brand-muted">Hoje, 14:22</td>
+<td class="py-3 px-4">
+<span class="text-brand-text font-medium">Cartão de Crédito</span>
+<span class="text-brand-muted text-[11px] block">Mastercard • 4019</span>
+</td>
+<td class="py-3 px-4 text-right font-semibold text-brand-text font-headline text-base tabular-nums">
+    R$ 219,00
+  </td>
+<td class="py-3 px-5 text-center">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-olive">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-olive"></span>
+      Confirmado
+    </span>
+</td>
+<td class="py-3 px-5 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="text-brand-muted hover:text-brand-text p-1.5 rounded hover:bg-brand-surface-high transition-colors" title="Visualizar recibo">
+<span class="material-symbols-outlined text-base leading-none">receipt_long</span>
+</button>
+<button class="text-brand-muted hover:text-brand-text p-1.5 rounded hover:bg-brand-surface-high transition-colors" title="Mais opções">
+<span class="material-symbols-outlined text-base leading-none">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 (Pendente/Falha) -->
+<tr class="hover:bg-brand-surface-high/30 transition-colors bg-brand-terracotta-soft/10">
+<td class="py-3 px-5">
+<div class="flex flex-col">
+<span class="font-semibold text-brand-text text-sm">Beatriz Vasconcelos</span>
+<span class="text-[11px] text-brand-muted">MAT-77319 • CPF ***.914.338-**</span>
+</div>
+</td>
+<td class="py-3 px-4 text-brand-text font-medium">Prime Mensal</td>
+<td class="py-3 px-4 text-brand-muted">Hoje, 09:15</td>
+<td class="py-3 px-4">
+<span class="text-brand-terracotta-text font-medium">Cartão Não Autorizado</span>
+<span class="text-brand-muted text-[11px] block">Visa • 8841 (Saldo insuficiente)</span>
+</td>
+<td class="py-3 px-4 text-right font-semibold text-brand-terracotta-text font-headline text-base tabular-nums">
+    R$ 249,00
+  </td>
+<td class="py-3 px-5 text-center">
+<span class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-terracotta-text">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-terracotta"></span>
+      Falha no Cartão
+    </span>
+</td>
+<td class="py-3 px-5 text-right">
+<button class="px-2.5 py-1 rounded border border-brand-terracotta/40 hover:bg-brand-terracotta/20 text-brand-terracotta-text text-xs font-medium inline-flex items-center gap-1 transition-colors" onclick="switchFinanceTab('pending')" title="Resolver cobrança pendente">
+<span>Tratar falha</span>
+<span class="material-symbols-outlined text-xs">arrow_forward</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-brand-surface-high/30 transition-colors">
+<td class="py-3 px-5">
+<div class="flex flex-col">
+<span class="font-semibold text-brand-text text-sm">Lucas Mendonça</span>
+<span class="text-[11px] text-brand-muted">MAT-94112 • CPF ***.109.478-**</span>
+</div>
+</td>
+<td class="py-3 px-4 text-brand-text font-medium">Personal VIP (10x)</td>
+<td class="py-3 px-4 text-brand-muted">Hoje, 11:40</td>
+<td class="py-3 px-4">
+<span class="text-brand-text font-medium">PIX Instantâneo</span>
+<span class="text-brand-muted text-[11px] block">QR Code emitido e aguardando</span>
+</td>
+<td class="py-3 px-4 text-right font-semibold text-brand-text font-headline text-base tabular-nums">
+    R$ 890,00
+  </td>
+<td class="py-3 px-5 text-center">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-ochre">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-ochre"></span>
+      Aguardando PIX
+    </span>
+</td>
+<td class="py-3 px-5 text-right">
+<button class="text-brand-muted hover:text-brand-text p-1.5 rounded hover:bg-brand-surface-high transition-colors" title="Copiar código PIX">
+<span class="material-symbols-outlined text-base leading-none">content_copy</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-brand-surface-high/30 transition-colors">
+<td class="py-3 px-5">
+<div class="flex flex-col">
+<span class="font-semibold text-brand-text text-sm">Camila Duarte</span>
+<span class="text-[11px] text-brand-muted">MAT-65008 • CPF ***.223.708-**</span>
+</div>
+</td>
+<td class="py-3 px-4 text-brand-text font-medium">Black Anual (À vista)</td>
+<td class="py-3 px-4 text-brand-muted">Ontem, 16:50</td>
+<td class="py-3 px-4">
+<span class="text-brand-text font-medium">Boleto Bancário</span>
+<span class="text-brand-muted text-[11px] block">Compensação D+1 Liquidado</span>
+</td>
+<td class="py-3 px-4 text-right font-semibold text-brand-text font-headline text-base tabular-nums">
+    R$ 2.450,00
+  </td>
+<td class="py-3 px-5 text-center">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-olive">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-olive"></span>
+      Confirmado
+    </span>
+</td>
+<td class="py-3 px-5 text-right">
+<button class="text-brand-muted hover:text-brand-text p-1.5 rounded hover:bg-brand-surface-high transition-colors" title="Visualizar recibo">
+<span class="material-symbols-outlined text-base leading-none">receipt_long</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-brand-surface-high/30 transition-colors">
+<td class="py-3 px-5">
+<div class="flex flex-col">
+<span class="font-semibold text-brand-text text-sm">Thiago Ribeiro</span>
+<span class="text-[11px] text-brand-muted">MAT-39182 • CPF ***.481.998-**</span>
+</div>
+</td>
+<td class="py-3 px-4 text-brand-text font-medium">Black Anual</td>
+<td class="py-3 px-4 text-brand-muted">Ontem, 10:14</td>
+<td class="py-3 px-4">
+<span class="text-brand-text font-medium">Cartão Recorrente</span>
+<span class="text-brand-muted text-[11px] block">Elo • 7320</span>
+</td>
+<td class="py-3 px-4 text-right font-semibold text-brand-text font-headline text-base tabular-nums">
+    R$ 219,00
+  </td>
+<td class="py-3 px-5 text-center">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-olive">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-olive"></span>
+      Confirmado
+    </span>
+</td>
+<td class="py-3 px-5 text-right">
+<button class="text-brand-muted hover:text-brand-text p-1.5 rounded hover:bg-brand-surface-high transition-colors" title="Visualizar recibo">
+<span class="material-symbols-outlined text-base leading-none">receipt_long</span>
+</button>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-brand-surface-high/30 transition-colors">
+<td class="py-3 px-5">
+<div class="flex flex-col">
+<span class="font-semibold text-brand-text text-sm">Mariana Nogueira</span>
+<span class="text-[11px] text-brand-muted">MAT-55421 • CPF ***.664.128-**</span>
+</div>
+</td>
+<td class="py-3 px-4 text-brand-text font-medium">Prime Semestral</td>
+<td class="py-3 px-4 text-brand-muted">21 Out, 18:30</td>
+<td class="py-3 px-4">
+<span class="text-brand-text font-medium">PIX Instantâneo</span>
+<span class="text-brand-muted text-[11px] block">Liquidado via PSP</span>
+</td>
+<td class="py-3 px-4 text-right font-semibold text-brand-text font-headline text-base tabular-nums">
+    R$ 1.350,00
+  </td>
+<td class="py-3 px-5 text-center">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium text-brand-olive">
+<span class="w-1.5 h-1.5 rounded-full bg-brand-olive"></span>
+      Confirmado
+    </span>
+</td>
+<td class="py-3 px-5 text-right">
+<button class="text-brand-muted hover:text-brand-text p-1.5 rounded hover:bg-brand-surface-high transition-colors" title="Visualizar recibo">
+<span class="material-symbols-outlined text-base leading-none">receipt_long</span>
+</button>
+</td>
+</tr></tbody>
+</table>
+</div>
+<!-- Table Footer -->
+<div class="p-4 border-t border-brand-border flex items-center justify-between text-xs text-brand-muted bg-brand-surface-high/20">
+<span>Mostrando 6 de 691 cobranças registradas neste mês fiscal</span>
+<div class="flex items-center gap-1.5">
+<button class="px-3 py-1 rounded border border-brand-border bg-brand-bg text-brand-muted opacity-50 cursor-not-allowed">Anterior</button>
+<button class="px-3 py-1 rounded border border-brand-border bg-brand-surface-high text-brand-text font-medium hover:bg-brand-surface">1</button>
+<button class="px-3 py-1 rounded border border-brand-border bg-brand-surface text-brand-muted hover:text-brand-text">2</button>
+<button class="px-3 py-1 rounded border border-brand-border bg-brand-surface text-brand-muted hover:text-brand-text">3</button>
+<button class="px-3 py-1 rounded border border-brand-border bg-brand-surface-high text-brand-text hover:bg-brand-surface">Próxima</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Tab Panel 2: Cobranças Pendentes - Falhas de Cartão (Espaçoso e Operacional) -->
+<div class="finance-tab-panel flex flex-col gap-5 hidden" id="tab-panel-pending">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-brand-surface border border-brand-border rounded-lg p-4">
+<div>
+<div class="flex items-center gap-2">
+<h3 class="text-base uppercase font-semibold tracking-wider font-headline text-brand-text">
+            Cobrança Pendente • Falhas de Cartão e Inadimplência
+          </h3>
+<span class="px-2 py-0.5 rounded bg-brand-terracotta-soft text-brand-terracotta-text border border-brand-terracotta/30 text-xs font-bold">
+            3 pendências críticas
+          </span>
+</div>
+<p class="text-xs text-brand-muted mt-0.5">Alunos com transações não autorizadas ou estornadas requerendo contato ativo e regularização imediata</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-brand-terracotta hover:bg-brand-terracotta-hover text-white text-xs font-semibold shadow-sm transition-colors">
+<span class="material-symbols-outlined text-xs">forward_to_inbox</span>
+<span>Disparar Régua de Cobrança em Massa</span>
+</button>
+</div>
+</div>
+<!-- Cards Grid de Cobranças Pendentes -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Item 1 -->
+<div class="p-4 rounded-lg bg-brand-surface border border-brand-border flex flex-col justify-between gap-4">
+<div class="flex flex-col gap-2.5">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-full bg-brand-terracotta-soft border border-brand-terracotta/40 flex items-center justify-center font-bold text-xs text-brand-terracotta-text">
+                BV
+              </div>
+<div>
+<div class="text-sm font-semibold text-brand-text">Beatriz Vasconcelos</div>
+<div class="text-[11px] text-brand-muted">MAT-77319 • (11) 98721-4309</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-brand-terracotta-soft text-brand-terracotta-text text-[11px] font-semibold border border-brand-terracotta/30">Cartão Recusado</span>
+</div>
+<div class="bg-brand-surface-high/40 rounded p-2.5 border border-brand-border/60 flex flex-col gap-1 text-xs">
+<div class="flex justify-between"><span class="text-brand-muted">Plano:</span><span class="text-brand-text font-medium">Prime Mensal</span></div>
+<div class="flex justify-between"><span class="text-brand-muted">Valor Pendente:</span><span class="text-brand-terracotta-text font-bold font-headline text-base">R$ 249,00</span></div>
+<div class="flex justify-between"><span class="text-brand-muted">Motivo:</span><span class="text-brand-muted">Saldo insuficiente (Visa final 8841)</span></div>
+<div class="flex justify-between"><span class="text-brand-muted">Atraso:</span><span class="text-brand-ochre font-medium">Venceu há 2 dias</span></div>
+</div>
+</div>
+<div class="flex items-center gap-2 pt-2 border-t border-brand-border/60">
+<button class="flex-1 py-1.5 px-2.5 rounded bg-brand-terracotta/20 hover:bg-brand-terracotta/30 text-brand-terracotta-text border border-brand-terracotta/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-xs">send_to_mobile</span>
+            Reenviar PIX
+          </button>
+<button class="flex-1 py-1.5 px-2.5 rounded bg-brand-surface-high hover:bg-brand-border text-brand-text border border-brand-border text-xs font-medium flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-xs">chat</span>
+            WhatsApp
+          </button>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="p-4 rounded-lg bg-brand-surface border border-brand-border flex flex-col justify-between gap-4">
+<div class="flex flex-col gap-2.5">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-full bg-brand-terracotta-soft border border-brand-terracotta/40 flex items-center justify-center font-bold text-xs text-brand-terracotta-text">
+                CP
+              </div>
+<div>
+<div class="text-sm font-semibold text-brand-text">Carlos Eduardo Prado</div>
+<div class="text-[11px] text-brand-muted">MAT-61022 • (11) 97110-8255</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-brand-terracotta-soft text-brand-terracotta-text text-[11px] font-semibold border border-brand-terracotta/30">Cartão Expirado</span>
+</div>
+<div class="bg-brand-surface-high/40 rounded p-2.5 border border-brand-border/60 flex flex-col gap-1 text-xs">
+<div class="flex justify-between"><span class="text-brand-muted">Plano:</span><span class="text-brand-text font-medium">Black Anual</span></div>
+<div class="flex justify-between"><span class="text-brand-muted">Valor Pendente:</span><span class="text-brand-terracotta-text font-bold font-headline text-base">R$ 219,00</span></div>
+<div class="flex justify-between"><span class="text-brand-muted">Motivo:</span><span class="text-brand-muted">Validade do cartão expirada (Mastercard)</span></div>
+<div class="flex justify-between"><span class="text-brand-muted">Atraso:</span><span class="text-brand-ochre font-medium">Venceu ontem</span></div>
+</div>
+</div>
+<div class="flex items-center gap-2 pt-2 border-t border-brand-border/60">
+<button class="flex-1 py-1.5 px-2.5 rounded bg-brand-terracotta/20 hover:bg-brand-terracotta/30 text-brand-terracotta-text border border-brand-terracotta/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-xs">send_to_mobile</span>
+            Reenviar PIX
+          </button>
+<button class="flex-1 py-1.5 px-2.5 rounded bg-brand-surface-high hover:bg-brand-border text-brand-text border border-brand-border text-xs font-medium flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-xs">chat</span>
+            WhatsApp
+          </button>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="p-4 rounded-lg bg-brand-surface border border-brand-border flex flex-col justify-between gap-4">
+<div class="flex flex-col gap-2.5">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-full bg-brand-terracotta-soft border border-brand-terracotta/40 flex items-center justify-center font-bold text-xs text-brand-terracotta-text">
+                JM
+              </div>
+<div>
+<div class="text-sm font-semibold text-brand-text">Juliana Moraes</div>
+<div class="text-[11px] text-brand-muted">MAT-52914 • (11) 99402-1811</div>
+</div>
+</div>
+<span class="px-2 py-0.5 rounded bg-brand-terracotta-soft text-brand-terracotta-text text-[11px] font-semibold border border-brand-terracotta/30">Erro no Banco</span>
+</div>
+<div class="bg-brand-surface-high/40 rounded p-2.5 border border-brand-border/60 flex flex-col gap-1 text-xs">
+<div class="flex justify-between"><span class="text-brand-muted">Plano:</span><span class="text-brand-text font-medium">Prime Mensal</span></div>
+<div class="flex justify-between"><span class="text-brand-muted">Valor Pendente:</span><span class="text-brand-terracotta-text font-bold font-headline text-base">R$ 249,00</span></div>
+<div class="flex justify-between"><span class="text-brand-muted">Motivo:</span><span class="text-brand-muted">Bloqueio temporário de segurança emissor</span></div>
+<div class="flex justify-between"><span class="text-brand-muted">Atraso:</span><span class="text-brand-ochre font-medium">Venceu há 3 dias</span></div>
+</div>
+</div>
+<div class="flex items-center gap-2 pt-2 border-t border-brand-border/60">
+<button class="flex-1 py-1.5 px-2.5 rounded bg-brand-terracotta/20 hover:bg-brand-terracotta/30 text-brand-terracotta-text border border-brand-terracotta/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-xs">send_to_mobile</span>
+            Reenviar PIX
+          </button>
+<button class="flex-1 py-1.5 px-2.5 rounded bg-brand-surface-high hover:bg-brand-border text-brand-text border border-brand-border text-xs font-medium flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-xs">chat</span>
+            WhatsApp
+          </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Tab Panel 3: Renovações da Semana -->
+<div class="finance-tab-panel flex flex-col gap-5 hidden" id="tab-panel-renewals">
+<div class="bg-brand-surface border border-brand-border rounded-lg p-5 flex flex-col gap-4">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-brand-border">
+<div>
+<h3 class="text-base uppercase font-semibold tracking-wider font-headline text-brand-text">
+            Renovações e Vencimentos da Semana
+          </h3>
+<p class="text-xs text-brand-muted">Contratos anuais e semestrais expirando nos próximos 7 dias com oportunidade de retenção comercial</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded bg-brand-surface-high text-xs text-brand-muted border border-brand-border font-medium">3 renovações ativas</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="p-4 rounded-lg bg-brand-surface-high/40 border border-brand-border flex flex-col justify-between gap-3">
+<div>
+<div class="flex items-center justify-between">
+<span class="text-sm font-semibold text-brand-text">Marcelo Ferreira</span>
+<span class="px-2 py-0.5 rounded bg-brand-olive-soft text-brand-olive text-[11px] font-semibold border border-brand-olive/20">Vence 28/10</span>
+</div>
+<p class="text-xs text-brand-muted mt-1">Plano Black Anual • MAT-10294</p>
+<p class="text-xs text-brand-muted mt-0.5">Frequência média: <strong class="text-brand-text">4,2x/semana</strong> (Alta adesão)</p>
+</div>
+<div class="pt-2 border-t border-brand-border/60 flex items-center justify-between">
+<span class="text-xs font-bold font-headline text-brand-text text-base">R$ 2.628 / ano</span>
+<button class="px-3 py-1.5 rounded bg-brand-surface-high hover:bg-brand-border text-brand-text text-xs font-semibold transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">contact_phone</span>
+<span>Contatar Aluno</span>
+</button>
+</div>
+</div>
+<div class="p-4 rounded-lg bg-brand-surface-high/40 border border-brand-border flex flex-col justify-between gap-3">
+<div>
+<div class="flex items-center justify-between">
+<span class="text-sm font-semibold text-brand-text">Fernanda Lima</span>
+<span class="px-2 py-0.5 rounded bg-brand-olive-soft text-brand-olive text-[11px] font-semibold border border-brand-olive/20">Vence 29/10</span>
+</div>
+<p class="text-xs text-brand-muted mt-1">Plano Semestral VIP • MAT-33418</p>
+<p class="text-xs text-brand-muted mt-0.5">Frequência média: <strong class="text-brand-text">3,5x/semana</strong> (Boa adesão)</p>
+</div>
+<div class="pt-2 border-t border-brand-border/60 flex items-center justify-between">
+<span class="text-xs font-bold font-headline text-brand-text text-base">R$ 1.740 / semestre</span>
+<button class="px-3 py-1.5 rounded bg-brand-surface-high hover:bg-brand-border text-brand-text text-xs font-semibold transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">contact_phone</span>
+<span>Contatar Aluno</span>
+</button>
+</div>
+</div>
+<div class="p-4 rounded-lg bg-brand-surface-high/40 border border-brand-border flex flex-col justify-between gap-3">
+<div>
+<div class="flex items-center justify-between">
+<span class="text-sm font-semibold text-brand-text">Gustavo Paiva</span>
+<span class="px-2 py-0.5 rounded bg-brand-ochre-soft text-brand-ochre text-[11px] font-semibold border border-brand-ochre/25">Vence 31/10</span>
+</div>
+<p class="text-xs text-brand-muted mt-1">Black Anual • MAT-49021</p>
+<p class="text-xs text-brand-muted mt-0.5">Frequência média: <strong class="text-brand-text">1,8x/semana</strong> (Risco de churn)</p>
+</div>
+<div class="pt-2 border-t border-brand-border/60 flex items-center justify-between">
+<span class="text-xs font-bold font-headline text-brand-text text-base">R$ 2.628 / ano</span>
+<button class="px-3 py-1.5 rounded bg-brand-terracotta hover:bg-brand-terracotta-hover text-white text-xs font-semibold transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">loyalty</span>
+<span>Oferta Retenção</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Tab Panel 4: Distribuição de Pagamentos -->
+<div class="finance-tab-panel flex flex-col gap-5 hidden" id="tab-panel-distribution">
+<div class="bg-brand-surface border border-brand-border rounded-lg p-5 flex flex-col gap-5">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-brand-border">
+<div>
+<h3 class="text-base uppercase font-semibold tracking-wider font-headline text-brand-text">
+            Distribuição &amp; Métodos de Pagamento
+          </h3>
+<p class="text-xs text-brand-muted">Composição das 691 mensalidades ativas e taxas médias de gateway por canal</p>
+</div>
+<span class="text-xs text-brand-olive font-semibold flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-brand-olive inline-block"></span>
+          Split de recebíveis ativo
+        </span>
+</div>
+<!-- Visual Progress Bar Grande -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between text-xs text-brand-muted">
+<span>Composição Percentual</span>
+<span>100% da carteira faturada</span>
+</div>
+<div class="w-full h-3 rounded bg-brand-bg flex overflow-hidden border border-brand-border">
+<div class="h-full bg-brand-olive" style="width: 72%;" title="Cartão Recorrente: 72%"></div>
+<div class="h-full bg-brand-ochre" style="width: 21%;" title="PIX: 21%"></div>
+<div class="h-full bg-brand-muted" style="width: 7%;" title="Boleto: 7%"></div>
+</div>
+</div>
+<!-- Grid de Detalhamento por Modalidade -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+<div class="p-4 rounded-lg bg-brand-surface-high/40 border border-brand-border flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-sm bg-brand-olive inline-block"></span>
+<span class="text-sm font-semibold text-brand-text">Cartão de Crédito</span>
+</div>
+<span class="font-headline text-xl font-bold text-brand-olive">72%</span>
+</div>
+<p class="text-xs text-brand-muted">498 alunos recorrentes • Menor taxa de inadimplência (1,2%). Cobrança automatizada no token do gateway.</p>
+</div>
+<div class="p-4 rounded-lg bg-brand-surface-high/40 border border-brand-border flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-sm bg-brand-ochre inline-block"></span>
+<span class="text-sm font-semibold text-brand-text">PIX Instantâneo</span>
+</div>
+<span class="font-headline text-xl font-bold text-brand-ochre">21%</span>
+</div>
+<p class="text-xs text-brand-muted">145 alunos • Liquidação imediata com taxa zero de chargeback. Notificação via webhook instantânea.</p>
+</div>
+<div class="p-4 rounded-lg bg-brand-surface-high/40 border border-brand-border flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-sm bg-brand-muted inline-block"></span>
+<span class="text-sm font-semibold text-brand-text">Boleto Bancário</span>
+</div>
+<span class="font-headline text-xl font-bold text-brand-text">7%</span>
+</div>
+<p class="text-xs text-brand-muted">48 alunos • Compensação em D+1 útil. Utilizado preferencialmente em planos anuais à vista.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+function switchFinanceTab(tabId) {
+  const tabs = ['overview', 'pending', 'renewals', 'distribution'];
+  tabs.forEach(t => {
+    const panel = document.getElementById('tab-panel-' + t);
+    const btn = document.getElementById('tab-btn-' + t);
+    if (panel && btn) {
+      if (t === tabId) {
+        panel.classList.remove('hidden');
+        btn.className = 'finance-tab-btn flex items-center gap-2 px-3.5 py-2 rounded-md font-headline font-semibold text-sm tracking-wide transition-colors bg-brand-terracotta text-white shadow-sm';
+      } else {
+        panel.classList.add('hidden');
+        btn.className = 'finance-tab-btn flex items-center gap-2 px-3.5 py-2 rounded-md font-headline font-semibold text-sm tracking-wide transition-colors bg-brand-surface text-brand-muted hover:text-brand-text hover:bg-brand-surface-high border border-brand-border';
+      }
+    }
+  });
+}
+</script></body></html>

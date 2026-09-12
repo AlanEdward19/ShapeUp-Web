@@ -1,6 +1,7 @@
 import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
+import { withLang } from '../../../../test/withLang';
 import GoalOnboarding from '../GoalOnboarding';
 
 const mockCompleteOnboarding = vi.fn();
@@ -14,11 +15,13 @@ vi.mock('../../../../hooks/api/useNutritionApi', () => ({
 }));
 
 const renderOnboarding = () =>
-    render(
-        <MemoryRouter>
-            <GoalOnboarding />
-        </MemoryRouter>
-    );
+        render(
+            withLang(
+            <MemoryRouter>
+                <GoalOnboarding />
+            </MemoryRouter>
+            )
+        );
 
 describe('GoalOnboarding', () => {
     beforeEach(() => {

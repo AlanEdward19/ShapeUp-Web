@@ -1,14 +1,13 @@
 import React from 'react';
-import { X, PlayCircle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import './ExerciseModal.css';
 
-const ExerciseModal = ({ exercise, onClose }) => {
+const ExerciseModal = ({ exercise, onClose, embedded = false }) => {
     const { t } = useLanguage();
     if (!exercise) return null;
 
     return (
-        <div className="su-modal-overlay" onClick={onClose}>
+        <div className={embedded ? 'su-exercise-inspector' : 'su-modal-overlay'} onClick={embedded ? undefined : onClose}>
             <div className="su-modal-content" onClick={(e) => e.stopPropagation()}>
 
                 {/* Header */}
@@ -24,21 +23,19 @@ const ExerciseModal = ({ exercise, onClose }) => {
                             )}
                         </div>
                     </div>
-                    <button className="su-modal-close" onClick={onClose}>
-                        <X size={24} />
-                    </button>
+                    <button className="su-modal-close" onClick={onClose} aria-label="Close">×</button>
                 </div>
 
                 {/* Body */}
                 <div className="su-modal-body">
 
                     {/* Left Col: Video Placeholder */}
-                    <div className="su-modal-video-section">
+                    {!embedded && <div className="su-modal-video-section">
                         <div className="su-video-placeholder">
-                            <PlayCircle size={48} className="su-video-play-btn" />
+                            <span className="su-video-play-btn" aria-hidden="true">▶</span>
                             <span className="su-video-hint">{t('client.exercise_modal.video')}</span>
                         </div>
-                    </div>
+                    </div>}
 
                     {/* Right Col: Info & Anatomy */}
                     <div className="su-modal-info-section">

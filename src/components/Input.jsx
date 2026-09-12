@@ -6,8 +6,21 @@ const Input = ({
     id,
     type = 'text',
     error,
+    trailing,
     ...props
 }) => {
+    const field = (
+        <input
+            id={id}
+            name={props.name || id}
+            type={type}
+            className={`su-input ${error ? 'su-input-error' : ''}`}
+            aria-invalid={error ? 'true' : 'false'}
+            aria-describedby={error ? `${id}-error` : undefined}
+            {...props}
+        />
+    );
+
     return (
         <div className="su-input-group">
             {label && (
@@ -15,13 +28,15 @@ const Input = ({
                     {label}
                 </label>
             )}
-            <input
-                id={id}
-                type={type}
-                className={`su-input ${error ? 'su-input-error' : ''}`}
-                {...props}
-            />
-            {error && <span className="su-input-error-text">{error}</span>}
+            {trailing ? (
+                <div className={`su-input-row ${error ? 'is-error' : ''}`}>
+                    {field}
+                    {trailing}
+                </div>
+            ) : (
+                field
+            )}
+            {error && <span id={`${id}-error`} className="su-input-error-text">{error}</span>}
         </div>
     );
 };

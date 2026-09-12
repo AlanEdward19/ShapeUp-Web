@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
-import { Search, Filter, MessageCircle, TrendingUp, MoreVertical, Edit3, Trash2, Calendar, CheckCircle, Activity, SkipForward, Play, Pause, DollarSign, X, Power, AlertCircle, PauseCircle } from 'lucide-react';
+import { Search, Filter, Trash2, CheckCircle, DollarSign, Power, AlertCircle, PauseCircle } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';

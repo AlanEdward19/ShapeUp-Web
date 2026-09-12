@@ -7,15 +7,40 @@
 }
 
 .su-layout-main {
+    margin-left: 256px;
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     min-width: 0;
+    border-left: 1px solid var(--border-color);
 }
 
 .su-layout-content {
     flex: 1;
     overflow-y: auto;
-    padding: 2rem;
+    padding:
+        clamp(1.75rem, 4vw, 3.25rem)
+        clamp(1.5rem, 6vw, 5.5rem)
+        clamp(3rem, 8vw, 5.5rem);
+}
+
+.su-layout-folio {
+    width: 100%;
+    max-width: 76rem;
+    margin-inline: auto;
+}
+
+.su-layout-folio > * {
+    min-width: 0;
+}
+
+@media (max-width: 720px) {
+    .su-layout-content {
+        padding: 1.25rem 1rem 3rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .su-layout-main { margin-left: 0; }
 }

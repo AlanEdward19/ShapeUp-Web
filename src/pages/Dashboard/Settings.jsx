@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
-import { User, Bell, CreditCard, Link as LinkIcon, Smartphone, Shield, Moon, Sun, Camera, Trash2 } from 'lucide-react';
+import { User, Camera, Trash2, Moon, Sun } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
@@ -25,6 +25,9 @@ const Settings = () => {
     const { updateUserPassword } = useAuth();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [activeTab, setActiveTab] = useState('profile');
+    const profileDetailsKey = `shapeup_profile_details_${localStorage.getItem('shapeup_user_id') || 'current'}`;
+    const [profileDetails, setProfileDetails] = useState(() => { try { return JSON.parse(localStorage.getItem(profileDetailsKey)) || {}; } catch { return {}; } });
+    const [saved, setSaved] = useState(false);
 
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
     const [newPassword, setNewPassword] = useState('');
@@ -69,14 +72,14 @@ const Settings = () => {
         } catch (error) {
             if (error.message === 'auth/requires-recent-login-password') {
                 setNeedsCurrentPassword(true);
-                setPasswordError('Sessão expirada. Digite sua senha atual para continuar.');
+                setPasswordError(t('settings.password.error.session'));
             } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
                 setNeedsCurrentPassword(true);
-                setPasswordError('Senha atual incorreta.');
+                setPasswordError(t('settings.password.error.wrong'));
             } else if (error.code === 'auth/requires-recent-login' || error.message?.includes('CREDENTIAL_TOO_OLD_LOGIN_AGAIN')) {
-                setPasswordError('Ocorreu um erro ao reautenticar. Tente fazer logout e login novamente.');
+                setPasswordError(t('settings.password.error.reauth'));
             } else {
-                setPasswordError(error.message || 'Falha ao atualizar a senha.');
+                setPasswordError(error.message || t('settings.password.error.generic'));
             }
         } finally {
             setPasswordLoading(false);
@@ -161,6 +164,8 @@ const Settings = () => {
     };
 
     const handleSaveChanges = () => {
+        localStorage.setItem(profileDetailsKey, JSON.stringify(profileDetails));
+        setSaved(true);
         // Save name to localStorage
         localStorage.setItem('shapeup_user_name', activeProfile.name);
 
@@ -197,6 +202,7 @@ const Settings = () => {
     const lastName = activeProfile.name.split(' ').slice(1).join(' ') || '';
 
     const handleNameChange = (first, last) => {
+        setSaved(false);
         updateActiveProfile({ name: `${first} ${last}`.trim() });
     };
 
@@ -283,25 +289,25 @@ const Settings = () => {
     });
 
     const tabsProfessional = [
-        { id: 'profile', label: t('settings.tabs.profile'), icon: <User size={18} /> },
-        { id: 'notifications', label: t('settings.tabs.notifications'), icon: <Bell size={18} /> },
-        { id: 'preferences', label: t('settings.tabs.preferences'), icon: <Smartphone size={18} /> },
-        { id: 'billing', label: t('settings.tabs.billing'), icon: <CreditCard size={18} /> },
-        { id: 'integrations', label: t('settings.tabs.integrations'), icon: <LinkIcon size={18} /> }
+        { id: 'profile', label: t('settings.tabs.profile') },
+        { id: 'notifications', label: t('settings.tabs.notifications') },
+        { id: 'preferences', label: t('settings.tabs.preferences') },
+        { id: 'billing', label: t('settings.tabs.billing') },
+        { id: 'integrations', label: t('settings.tabs.integrations') }
     ];
 
     const tabsClient = [
-        { id: 'profile', label: t('settings.tabs.profile_client'), icon: <User size={18} /> },
-        { id: 'notifications', label: t('settings.tabs.notifications'), icon: <Bell size={18} /> },
-        { id: 'preferences', label: t('settings.tabs.preferences'), icon: <Smartphone size={18} /> },
-        { id: 'billing', label: t('settings.tabs.billing'), icon: <CreditCard size={18} /> },
-        ...(isIndependent ? [] : [{ id: 'coach', label: t('settings.tabs.coach'), icon: <Shield size={18} /> }])
+        { id: 'profile', label: t('settings.tabs.profile_client') },
+        { id: 'notifications', label: t('settings.tabs.notifications') },
+        { id: 'preferences', label: t('settings.tabs.preferences') },
+        { id: 'billing', label: t('settings.tabs.billing') },
+        ...(isIndependent ? [] : [{ id: 'coach', label: t('settings.tabs.coach') }])
     ];
 
     const tabsGym = [
-        { id: 'profile', label: 'Perfil da Academia', icon: <User size={18} /> },
-        { id: 'notifications', label: t('settings.tabs.notifications'), icon: <Bell size={18} /> },
-        { id: 'preferences', label: t('settings.tabs.preferences'), icon: <Smartphone size={18} /> }
+        { id: 'profile', label: 'Perfil da Academia' },
+        { id: 'notifications', label: t('settings.tabs.notifications') },
+        { id: 'preferences', label: t('settings.tabs.preferences') }
     ];
 
     const activeTabsList = isProfessional ? tabsProfessional : (isGym ? tabsGym : tabsClient);
@@ -310,14 +316,14 @@ const Settings = () => {
         <div className="su-settings-dashboard">
             <div className="su-dashboard-header-flex">
                 <div>
-                    <h1 className="su-page-title">{t('settings.title')}</h1>
+                    <h1 className="su-page-title">{language === 'pt-BR' ? 'Configurações da conta' : t('settings.title')}</h1>
                     <p className="su-page-subtitle">
                         {isProfessional ? t('settings.subtitle.pro') :
                          isGym ? 'Gerencie as configurações da sua academia e preferências.' :
                          t('settings.subtitle.client')}
                     </p>
                 </div>
-                <Button onClick={handleSaveChanges}>{t('settings.btn.save')}</Button>
+                <div className="su-settings-save-actions">{saved && <span role="status">Alterações salvas</span>}<Button onClick={handleSaveChanges}>{t('settings.btn.save')}</Button></div>
             </div>
 
             <div className="su-settings-layout su-mt-4">
@@ -331,8 +337,7 @@ const Settings = () => {
                                 className={`su-settings-tab ${activeTab === tab.id ? 'active' : ''}`}
                                 onClick={() => setActiveTab(tab.id)}
                             >
-                                {tab.icon}
-                                <span>{tab.label}</span>
+                                {tab.label}
                             </button>
                         ))}
                     </nav>
@@ -343,10 +348,10 @@ const Settings = () => {
 
                     {/* -- SHARED (Profile-ish) SECTION -- */}
                     {activeTab === 'profile' && (
-                        <Card className="su-settings-card">
-                            <h2 className="su-settings-section-title">
+                        <Card className="su-settings-card su-profile-settings-row">
+                            <div className="su-settings-explanation"><h2 className="su-settings-section-title">
                                 {isProfessional ? t('settings.profile.title.pro') : t('settings.profile.title.client')}
-                            </h2>
+                            </h2><p className="su-text-muted">Sua identificação e informações de contato no workspace.</p></div><div>
 
                             <div className="su-settings-avatar-upload" data-tour="profile-avatar">
                                 <div className="su-settings-avatar-preview">
@@ -398,31 +403,33 @@ const Settings = () => {
                                 </div>
                                 <div className="su-form-group su-col-span-2">
                                     <label>{t('settings.profile.form.email')}</label>
-                                    <Input type="email" disabled value={isProfessional ? "alex@shapeup.fit" : userEmail} />
+                                    <Input type="email" disabled value={userEmail} />
                                 </div>
+                                <Input label="Telefone / WhatsApp" type="tel" value={profileDetails.phone || ''} onChange={event => { setSaved(false); setProfileDetails(previous => ({ ...previous, phone: event.target.value })); }} />
+                                {isProfessional && <Input label="Registro profissional (CREF)" value={profileDetails.cref || ''} onChange={event => { setSaved(false); setProfileDetails(previous => ({ ...previous, cref: event.target.value })); }} />}
                                 {isProfessional && (
                                     <div className="su-form-group su-col-span-2">
                                         <label>{t('settings.profile.form.bio')}</label>
                                         <textarea
                                             className="su-bare-textarea"
-                                            defaultValue="Strength & Conditioning Specialist. Helping athletes reach peak performance."
+                                            value={profileDetails.bio || ''} onChange={event => { setSaved(false); setProfileDetails(previous => ({ ...previous, bio: event.target.value })); }} placeholder="Descreva suas especialidades e sua abordagem de trabalho."
                                             rows={4}
                                         />
                                     </div>
                                 )}
                                 <div className="su-form-group su-col-span-2">
-                                    <label>Segurança</label>
+                                    <label>{t('settings.security')}</label>
                                     <div>
                                         <Button type="button" variant="outline" onClick={handleOpenPasswordModal}>
-                                            Redefinir Senha
+                                            {t('settings.security.reset')}
                                         </Button>
                                     </div>
                                     <p className="su-text-muted su-text-sm su-mt-2">
-                                        Se você acessou via Google, defina uma senha aqui para vincular esta conta e permitir login com e-mail e senha no futuro.
+                                        {t('settings.security.hint')}
                                     </p>
                                 </div>
                             </div>
-                        </Card>
+                            </div></Card>
                     )}
 
                     {/* -- PROFESSIONAL SPECIFIC SECTIONS -- */}
@@ -503,8 +510,8 @@ const Settings = () => {
                         </Card>
                     )}
 
-                    {activeTab === 'preferences' && (
-                        <Card className="su-settings-card">
+                    {(activeTab === 'preferences' || activeTab === 'profile') && (
+                        <Card className="su-settings-card su-preferences-settings-row">
                             <h2 className="su-settings-section-title">{t('preferences.title')}</h2>
                             <div className="su-settings-list">
                                 <div className="su-settings-list-item">
@@ -695,7 +702,6 @@ const Settings = () => {
                     {(activeTab === 'integrations' || activeTab === 'coach') && (
                         <Card className="su-settings-card su-flex-center">
                             <div className="su-empty-state-large">
-                                <Shield size={48} className="su-text-muted su-mb-4" />
                                 <h3>{t('client.settings.placeholder.title')} {activeTabsList.find(t => t.id === activeTab)?.label}</h3>
                                 <p className="su-text-muted">{t('client.settings.placeholder.desc')}</p>
                             </div>
@@ -724,7 +730,7 @@ const Settings = () => {
                                 style={{ background: '#ef4444', borderColor: '#ef4444' }}
                                 onClick={confirmDeletePlan}
                             >
-                                Delete Plan
+                                {t('settings.plan.delete')}
                             </Button>
                         </div>
                     </div>
@@ -735,51 +741,50 @@ const Settings = () => {
             {isPasswordModalOpen && (
                 <div className="su-modal-overlay" onClick={() => !passwordLoading && setIsPasswordModalOpen(false)}>
                     <div className="su-modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
-                        <h3 className="su-page-title su-mb-4" style={{ fontSize: '1.25rem' }}>Redefinir Senha</h3>
-                        
+                        <h3 className="su-page-title su-mb-4" style={{ fontSize: '1.25rem' }}>{t('settings.password.title')}</h3>
+
                         {passwordSuccess ? (
                             <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-                                <Shield size={48} style={{ color: 'var(--primary)', margin: '0 auto 1rem' }} />
-                                <h4>Senha atualizada com sucesso!</h4>
+                                <h4>{t('settings.password.success')}</h4>
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {needsCurrentPassword && (
-                                    <Input 
-                                        type="password" 
-                                        label="Senha Atual" 
-                                        placeholder="••••••••" 
+                                    <Input
+                                        type="password"
+                                        label={t('settings.password.current')}
+                                        placeholder="••••••••"
                                         value={currentPassword}
                                         onChange={(e) => setCurrentPassword(e.target.value)}
                                     />
                                 )}
-                                <Input 
-                                    type="password" 
-                                    label="Nova Senha" 
-                                    placeholder="••••••••" 
+                                <Input
+                                    type="password"
+                                    label={t('settings.password.new')}
+                                    placeholder="••••••••"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                 />
-                                <Input 
-                                    type="password" 
-                                    label="Confirmar Nova Senha" 
-                                    placeholder="••••••••" 
+                                <Input
+                                    type="password"
+                                    label={t('settings.password.confirm')}
+                                    placeholder="••••••••"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                 />
-                                
+
                                 {passwordError && (
                                     <p style={{ color: 'var(--danger)', fontSize: '0.875rem', margin: 0 }}>
                                         {passwordError}
                                     </p>
                                 )}
-                                
+
                                 <div className="su-confirm-actions su-mt-2">
                                     <Button variant="outline" onClick={() => setIsPasswordModalOpen(false)} disabled={passwordLoading}>
-                                        Cancelar
+                                        {t('common.cancel')}
                                     </Button>
                                     <Button onClick={handlePasswordSubmit} disabled={passwordLoading}>
-                                        {passwordLoading ? 'Atualizando...' : 'Confirmar'}
+                                        {passwordLoading ? t('settings.password.updating') : t('settings.password.submit')}
                                     </Button>
                                 </div>
                             </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { Search, Activity, UserCheck, Clock, Settings2, Unlock, Power, PowerOff, AlertTriangle, Plus, HardDrive, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Unlock, Power, PowerOff, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { addNotification } from '../../utils/notifications';
@@ -89,73 +89,44 @@ const TurnstileGym = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', alignItems: 'flex-start' }}>
-                {/* Main Content Column: Metrics + Access History */}
-                <div style={{ flex: '1 1 600px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    <div className="su-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
-                        <Card style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <UserCheck size={24} color="var(--primary)" />
-                                <span style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                                    {t('gym.turnstile.metric.today') || 'Acessos Hoje'}
-                                </span>
-                            </div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--text-main)' }}>342</div>
-                        </Card>
-                        <Card style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <Activity size={24} color="#ef4444" />
-                                <span style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                                    {t('gym.turnstile.metric.blocked') || 'Bloqueados'}
-                                </span>
-                            </div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--text-main)' }}>12</div>
-                        </Card>
-                        <Card style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <HardDrive size={24} color="#8b5cf6" />
-                                <span style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                                    {t('gym.turnstile.metric.active') || 'Catracas Ativas'}
-                                </span>
-                            </div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--text-main)' }}>{activeDevices}/{turnstiles.length}</div>
-                        </Card>
-                        <Card style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                <TrendingUp size={24} color="#10b981" />
-                                <span style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                                    {t('gym.turnstile.metric.peak') || 'Horário de Pico'}
-                                </span>
-                            </div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 700, color: 'var(--text-main)' }}>18:00</div>
-                        </Card>
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem' }}>
-                        <div>
-                            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <Clock size={20} /> {t('gym.turnstile.history.title') || 'Histórico de Acessos'}
-                            </h2>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-                                {t('gym.turnstile.history.subtitle') || 'Acompanhe as passagens na catraca em tempo real.'}
-                            </p>
+            <div className="su-turnstile-layout">
+                <div>
+                    <div className="su-journal-kpis">
+                        <div className="su-journal-kpi">
+                            <span className="su-journal-kpi-label">{t('gym.turnstile.metric.today') || 'Acessos Hoje'}</span>
+                            <span className="su-journal-kpi-value">342</span>
+                        </div>
+                        <div className="su-journal-kpi">
+                            <span className="su-journal-kpi-label">{t('gym.turnstile.metric.blocked') || 'Bloqueados'}</span>
+                            <span className="su-journal-kpi-value">12</span>
+                        </div>
+                        <div className="su-journal-kpi">
+                            <span className="su-journal-kpi-label">{t('gym.turnstile.metric.active') || 'Catracas Ativas'}</span>
+                            <span className="su-journal-kpi-value">{activeDevices}/{turnstiles.length}</span>
+                        </div>
+                        <div className="su-journal-kpi">
+                            <span className="su-journal-kpi-label">{t('gym.turnstile.metric.peak') || 'Horário de Pico'}</span>
+                            <span className="su-journal-kpi-value">18:00</span>
                         </div>
                     </div>
 
-                    <Card className="su-clients-container" style={{ background: 'transparent', boxShadow: 'none', padding: 0 }}>
-                        <div className="su-clients-toolbar" style={{ borderBottom: 'none', padding: '0', background: 'var(--bg-card)', borderRadius: '12px' }}>
-                            <div className="su-search-box" style={{ flex: 1, maxWidth: '100%', border: '1px solid var(--border)' }}>
-                                <Search size={18} className="su-text-muted" />
-                                <input
-                                    type="text"
-                                    placeholder={t('gym.turnstile.search') || 'Buscar usuário...'}
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="su-bare-input"
-                                />
-                            </div>
+                    <div style={{ marginTop: '1.75rem' }}>
+                        <h2 className="su-journal-kicker">{t('gym.turnstile.history.title') || 'Histórico de Acessos'}</h2>
+                        <p className="su-journal-lede">{t('gym.turnstile.history.subtitle') || 'Acompanhe as passagens na catraca em tempo real.'}</p>
+                    </div>
+
+                    <div className="su-clients-toolbar">
+                        <div className="su-search-box" style={{ flex: 1, maxWidth: '100%' }}>
+                            <Search size={16} className="su-text-muted" />
+                            <input
+                                type="text"
+                                placeholder={t('gym.turnstile.search') || 'Buscar usuário...'}
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="su-bare-input"
+                            />
                         </div>
-                    </Card>
+                    </div>
 
                     <Card className="su-clients-container">
                         <div className="su-table-responsive">
@@ -180,11 +151,7 @@ const TurnstileGym = () => {
                                                 </div>
                                             </td>
                                             <td>{access.type === 'Trainer' ? (t('gym.turnstile.table.type.trainer') || 'Treinador') : (t('gym.turnstile.table.type.client') || 'Cliente')}</td>
-                                            <td>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
-                                                    <Clock size={16} /> {access.time}
-                                                </div>
-                                            </td>
+                                            <td className="su-text-muted">{access.time}</td>
                                             <td>
                                                 {access.status === 'Allowed' ? (
                                                     <span className="su-status-badge active">{t('gym.turnstile.status.allowed') || 'Liberado'}</span>
@@ -206,136 +173,83 @@ const TurnstileGym = () => {
                         </div>
 
                         {totalPages > 1 && (
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '1.5rem', borderTop: '1px solid var(--border)', gap: '0.5rem' }}>
-                                <button 
+                            <div className="su-ledger-pager">
+                                <button
+                                    className="su-ledger-page"
                                     onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                                     disabled={currentPage === 1}
-                                    style={{ 
-                                        background: 'transparent', border: 'none', borderRadius: '8px', 
-                                        padding: '0.5rem', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', opacity: currentPage === 1 ? 0.3 : 1,
-                                        color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                    }}
                                 >
-                                    <ChevronLeft size={20} />
+                                    <ChevronLeft size={18} />
                                 </button>
-                                
                                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                                     <button
                                         key={page}
+                                        className={`su-ledger-page ${page === currentPage ? 'is-current' : ''}`}
                                         onClick={() => setCurrentPage(page)}
-                                        style={{
-                                            width: '36px', height: '36px',
-                                            borderRadius: '8px',
-                                            border: page === currentPage ? 'none' : '1px solid var(--border)',
-                                            background: page === currentPage ? 'var(--primary)' : 'var(--bg-card-hover)',
-                                            color: page === currentPage ? '#fff' : 'var(--text-main)',
-                                            fontWeight: page === currentPage ? 600 : 400,
-                                            cursor: 'pointer',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            transition: 'all 0.2s',
-                                            fontSize: '0.95rem'
-                                        }}
                                     >
                                         {page}
                                     </button>
                                 ))}
-
-                                <button 
+                                <button
+                                    className="su-ledger-page"
                                     onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                                     disabled={currentPage === totalPages}
-                                    style={{ 
-                                        background: 'transparent', border: 'none', borderRadius: '8px', 
-                                        padding: '0.5rem', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', opacity: currentPage === totalPages ? 0.3 : 1,
-                                        color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                    }}
                                 >
-                                    <ChevronRight size={20} />
+                                    <ChevronRight size={18} />
                                 </button>
                             </div>
                         )}
                     </Card>
                 </div>
 
-                {/* Right Column: Hardware Management Sidebar */}
-                <div style={{ flex: '1 1 350px', maxWidth: '450px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <aside>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '0.75rem' }}>
                         <div>
-                            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <Settings2 size={20} /> {t('gym.turnstile.hardware.title') || 'Gerenciador de Dispositivos'}
-                            </h2>
-                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.25rem' }}>
-                                {t('gym.turnstile.hardware.subtitle') || 'Controle e adicione pontos de acesso.'}
-                            </p>
+                            <h2 className="su-journal-kicker">{t('gym.turnstile.hardware.title') || 'Gerenciador de Dispositivos'}</h2>
+                            <p className="su-journal-lede">{t('gym.turnstile.hardware.subtitle') || 'Controle e adicione pontos de acesso.'}</p>
                         </div>
                         <Button onClick={handleAddTurnstile} style={{ padding: '0.5rem' }}>
                             <Plus size={18} />
                         </Button>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className="su-device-list">
                         {turnstiles.map(turnstile => (
-                            <Card key={turnstile.id} style={{ 
-                                padding: '1.5rem', 
-                                border: turnstile.hasError ? '1px solid #ef4444' : '1px solid var(--border)',
-                                position: 'relative',
-                                overflow: 'hidden'
-                            }}>
+                            <div key={turnstile.id} className={`su-device-entry ${turnstile.hasError ? 'is-error' : ''}`}>
                                 {turnstile.hasError && (
-                                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', padding: '0.25rem', background: '#ef4444', color: 'white', textAlign: 'center', fontSize: '0.75rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-                                        <AlertTriangle size={14} /> {t('gym.turnstile.hardware.maintenance') || 'REQUER MANUTENÇÃO'}
-                                    </div>
+                                    <div className="su-device-flag">{t('gym.turnstile.hardware.maintenance') || 'REQUER MANUTENÇÃO'}</div>
                                 )}
-                                
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: turnstile.hasError ? '1rem' : '0' }}>
-                                    <div>
-                                        <h3 style={{ fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.25rem' }}>{turnstile.name}</h3>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <div style={{ 
-                                                width: '8px', height: '8px', borderRadius: '50%', 
-                                                background: turnstile.hasError ? '#ef4444' : (turnstile.status === 'active' ? 'var(--primary)' : 'var(--text-muted)') 
-                                            }}></div>
-                                            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>
-                                                {turnstile.hasError 
-                                                    ? (t('gym.turnstile.hardware.error') || 'Erro de Hardware') 
-                                                    : (turnstile.status === 'active' ? (t('gym.turnstile.hardware.online') || 'Online e Operante') : (t('gym.turnstile.hardware.offline') || 'Desativada'))}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '1.5rem' }}>
-                                    <Button 
-                                        variant={turnstile.status === 'active' && !turnstile.hasError ? "primary" : "outline"} 
-                                        style={{ flex: 1, padding: '0.5rem', minWidth: '100px' }}
+                                <h3 className="su-device-name">{turnstile.name}</h3>
+                                <p className="su-device-meta">
+                                    {turnstile.hasError
+                                        ? (t('gym.turnstile.hardware.error') || 'Erro de Hardware')
+                                        : (turnstile.status === 'active' ? (t('gym.turnstile.hardware.online') || 'Online e Operante') : (t('gym.turnstile.hardware.offline') || 'Desativada'))}
+                                </p>
+                                <div className="su-device-actions">
+                                    <Button
+                                        variant={turnstile.status === 'active' && !turnstile.hasError ? "primary" : "outline"}
                                         onClick={() => handleUnlock(turnstile.id)}
                                         disabled={turnstile.status !== 'active' || turnstile.hasError}
                                     >
                                         <Unlock size={16} /> {t('gym.turnstile.hardware.unlock') || 'Liberar'}
                                     </Button>
-                                    
-                                    <Button 
-                                        variant="outline" 
-                                        style={{ flex: 1, padding: '0.5rem', minWidth: '100px', color: turnstile.status === 'active' ? '#f59e0b' : 'var(--primary)', borderColor: turnstile.status === 'active' ? '#f59e0b' : 'var(--border)' }}
-                                        onClick={() => toggleStatus(turnstile.id)}
-                                    >
-                                        {turnstile.status === 'active' 
-                                            ? <><PowerOff size={16} /> {t('gym.turnstile.hardware.disable') || 'Desativar'}</> 
+                                    <Button variant="outline" onClick={() => toggleStatus(turnstile.id)}>
+                                        {turnstile.status === 'active'
+                                            ? <><PowerOff size={16} /> {t('gym.turnstile.hardware.disable') || 'Desativar'}</>
                                             : <><Power size={16} /> {t('gym.turnstile.hardware.enable') || 'Ativar'}</>}
                                     </Button>
                                 </div>
-
-                                <div style={{ borderTop: '1px dashed var(--border)', marginTop: '1rem', paddingTop: '1rem', textAlign: 'center' }}>
-                                    <button 
-                                        onClick={() => simulateError(turnstile.id)}
-                                        style={{ background: 'none', border: 'none', fontSize: '0.8rem', color: '#ef4444', cursor: 'pointer', textDecoration: 'underline' }}
-                                    >
-                                        {turnstile.hasError ? (t('gym.turnstile.hardware.resolve') || 'Resolver Erro (Dev)') : (t('gym.turnstile.hardware.simulate') || 'Simular Erro (Dev)')}
-                                    </button>
-                                </div>
-                            </Card>
+                                <button
+                                    type="button"
+                                    className="su-dev-link"
+                                    onClick={() => simulateError(turnstile.id)}
+                                >
+                                    {turnstile.hasError ? (t('gym.turnstile.hardware.resolve') || 'Resolver Erro (Dev)') : (t('gym.turnstile.hardware.simulate') || 'Simular Erro (Dev)')}
+                                </button>
+                            </div>
                         ))}
                     </div>
-                </div>
+                </aside>
             </div>
         </div>
     );

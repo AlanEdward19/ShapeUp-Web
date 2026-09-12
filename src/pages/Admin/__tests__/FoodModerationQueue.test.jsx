@@ -1,6 +1,7 @@
 import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import FoodModerationQueue from '../FoodModerationQueue';
+import { withLang } from '../../../test/withLang';
 
 const mockGetPendingModerations = vi.fn();
 const mockDecideModeration = vi.fn();
@@ -30,7 +31,7 @@ describe('FoodModerationQueue', () => {
     });
 
     it('approves a pending moderation', async () => {
-        const { getByTestId, queryByTestId } = render(<FoodModerationQueue />);
+        const { getByTestId, queryByTestId } = render(withLang(<FoodModerationQueue />));
 
         await waitFor(() => {
             expect(getByTestId('moderation-req-1')).toBeInTheDocument();
@@ -46,7 +47,7 @@ describe('FoodModerationQueue', () => {
 
     it('rejects a pending moderation', async () => {
         mockDecideModeration.mockResolvedValue({ requestId: 'req-1', status: 'Rejected' });
-        const { getByTestId, queryByTestId } = render(<FoodModerationQueue />);
+        const { getByTestId, queryByTestId } = render(withLang(<FoodModerationQueue />));
 
         await waitFor(() => {
             expect(getByTestId('moderation-req-1')).toBeInTheDocument();

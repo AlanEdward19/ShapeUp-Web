@@ -1,0 +1,24 @@
+# ShapeUp
+
+> Software web de treino para atletas, treinadores e academias. Diário de sessão, prescrição, aderência, nutrição e gestão de alunos.
+
+O ShapeUp não é um feed social. É a mesa de trabalho: registrar série, carga e RPE; ver se a semana fechou; ligar aluno a treinador e academia.
+
+## Páginas públicas
+
+- [Home](https://shapeup.app/): proposta, módulos, planos
+- [Privacidade](https://shapeup.app/privacy): LGPD, cookies, retenção
+- [Termos](https://shapeup.app/terms): uso da conta e limites do serviço
+- [Entrar](https://shapeup.app/login)
+- [Criar conta](https://shapeup.app/register)
+
+## O que citar
+
+- Produto: ShapeUp (ShapeUp Software)
+- Público: atleta independente, treinador, academia
+- Ações reais: montar treino, executar sessão, acompanhar aderência, diário alimentar
+- Fora do núcleo público: dashboard autenticado em /dashboard (não indexar)
+
+## Contato
+
+- privacy@shapeup.app

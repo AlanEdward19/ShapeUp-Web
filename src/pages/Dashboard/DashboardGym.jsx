@@ -3,7 +3,6 @@ import { useTour } from '@reactour/tour';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../contexts/LanguageContext';
 import Card from '../../components/Card';
-import { Users, DollarSign, UserCheck, TrendingUp, ArrowRight, Shield, CheckCircle, XCircle } from 'lucide-react';
 import './DashboardProfessional.css';
 import './DashboardGym.css';
 
@@ -47,19 +46,16 @@ const DashboardGym = () => {
         }
     }, [setIsOpen, setSteps, t]);
 
-    const metrics = [
+    const featureMetric = {
+        label: t('gym.metric.active_clients') || 'Active Clients',
+        value: '1,245',
+        trend: '+56',
+        trendLabel: t('gym.metric.this_month') || 'this month',
+        trendClass: 'positive',
+    };
+
+    const stackMetrics = [
         {
-            icon: <Users size={22} color="var(--primary)" />,
-            iconBg: 'rgba(59, 130, 246, 0.1)',
-            label: t('gym.metric.active_clients') || 'Active Clients',
-            value: '1,245',
-            trend: '+56',
-            trendLabel: t('gym.metric.this_month') || 'this month',
-            trendClass: 'positive',
-        },
-        {
-            icon: <DollarSign size={22} color="#10b981" />,
-            iconBg: 'rgba(16, 185, 129, 0.1)',
             label: t('gym.metric.revenue') || 'Gross Monthly Revenue',
             value: 'R$ 145.890',
             trend: '+8.4%',
@@ -67,8 +63,6 @@ const DashboardGym = () => {
             trendClass: 'positive',
         },
         {
-            icon: <UserCheck size={22} color="#8b5cf6" />,
-            iconBg: 'rgba(139, 92, 246, 0.1)',
             label: t('gym.metric.active_staff') || 'Active Staff',
             value: '18',
             trend: '12 trainers · 6 admins',
@@ -76,8 +70,6 @@ const DashboardGym = () => {
             trendClass: 'neutral',
         },
         {
-            icon: <TrendingUp size={22} color="#f59e0b" />,
-            iconBg: 'rgba(245, 158, 11, 0.1)',
             label: t('gym.metric.peak_hour') || 'Peak Hour Today',
             value: '07:00',
             trend: '312 accesses',
@@ -88,21 +80,18 @@ const DashboardGym = () => {
 
     const quickLinks = [
         {
-            icon: <Users size={20} color="#10b981" />,
             label: t('nav.clients') || 'Clients',
             desc: t('gym.clients.subtitle') || 'All enrolled students',
             path: '/dashboard/clients',
             className: '',
         },
         {
-            icon: <Shield size={20} color="#8b5cf6" />,
             label: t('nav.staff') || 'Staff',
             desc: t('gym.staff.subtitle') || 'Trainers and administrators',
             path: '/dashboard/staff',
             className: 'gym-feature-staff',
         },
         {
-            icon: <DollarSign size={20} color="#f59e0b" />,
             label: t('nav.financial') || 'Financial',
             desc: t('gym.financial.subtitle') || 'Revenue, expenses and plans',
             path: '/dashboard/financial',
@@ -112,7 +101,6 @@ const DashboardGym = () => {
 
     return (
         <div className="su-clients-dashboard">
-            {/* Header */}
             <div className="gym-dashboard-header gym-feature-metrics">
                 <div>
                     <h1 className="su-page-title">{t('gym.dashboard.title') || 'Gym Overview'}</h1>
@@ -120,49 +108,48 @@ const DashboardGym = () => {
                 </div>
             </div>
 
-            {/* Metrics Grid */}
             <div className="gym-metrics-grid">
-                {metrics.map((m, i) => (
-                    <Card key={i} className="gym-metric-card">
-                        <div className="gym-metric-icon-wrap" style={{ background: m.iconBg }}>
-                            {m.icon}
-                        </div>
-                        <div className="gym-metric-body">
+                <Card className="gym-metric-card is-feature">
+                    <div className="gym-metric-body">
+                        <span className="gym-metric-label">{featureMetric.label}</span>
+                        <span className="gym-metric-value">{featureMetric.value}</span>
+                        <span className={`gym-metric-trend ${featureMetric.trendClass}`}>
+                            {featureMetric.trend} {featureMetric.trendLabel}
+                        </span>
+                    </div>
+                </Card>
+                <div className="gym-metric-stack">
+                    {stackMetrics.map((m) => (
+                        <Card key={m.label} className="gym-metric-card">
                             <span className="gym-metric-label">{m.label}</span>
                             <span className="gym-metric-value">{m.value}</span>
                             <span className={`gym-metric-trend ${m.trendClass}`}>
                                 {m.trend} {m.trendLabel}
                             </span>
-                        </div>
-                    </Card>
-                ))}
+                        </Card>
+                    ))}
+                </div>
             </div>
 
-            {/* Bottom two-col layout */}
             <div className="gym-bottom-grid gym-bottom-stretch">
-                {/* Quick Access */}
                 <div className="gym-quicklinks">
                     <h2 className="gym-section-title">{t('gym.dashboard.quick_access') || 'Quick Access'}</h2>
                     <div className="gym-quicklinks-col">
-                        {quickLinks.map((link, i) => (
+                        {quickLinks.map((link) => (
                             <Card
-                                key={i}
+                                key={link.path}
                                 className={`gym-quicklink-card ${link.className}`}
                                 onClick={() => navigate(link.path)}
                             >
-                                <div className="gym-quicklink-icon">{link.icon}</div>
-                                <div className="gym-quicklink-info">
-                                    <span className="gym-quicklink-label">{link.label}</span>
-                                    <span className="gym-quicklink-desc">{link.desc}</span>
-                                </div>
-                                <ArrowRight size={18} className="gym-quicklink-arrow" />
+                                <span className="gym-quicklink-label">{link.label}</span>
+                                <span className="gym-quicklink-arrow">→</span>
+                                <span className="gym-quicklink-desc">{link.desc}</span>
                             </Card>
                         ))}
                     </div>
                 </div>
 
-                {/* Recent Turnstile Activity */}
-                <div>
+                <div className="gym-feature-turnstile">
                     <h2 className="gym-section-title">{t('gym.dashboard.recent_activity') || 'Recent Activity (Turnstile)'}</h2>
                     <Card className="gym-recent-card">
                         <div className="gym-recent-table-wrap">
@@ -179,23 +166,18 @@ const DashboardGym = () => {
                                 {mockRecent.map(row => (
                                     <tr key={row.id}>
                                         <td>
-                                            <div className="gym-recent-user">
-                                                <div className="gym-recent-avatar">{row.name.charAt(0)}</div>
-                                                {row.name}
-                                            </div>
+                                            <div className="gym-recent-user">{row.name}</div>
                                         </td>
                                         <td>
-                                            <span className="badge neutral">
-                                                {row.type === 'trainer'
-                                                    ? (t('gym.turnstile.table.type.trainer') || 'Trainer')
-                                                    : (t('gym.turnstile.table.type.client') || 'Client')}
-                                            </span>
+                                            {row.type === 'trainer'
+                                                ? (t('gym.turnstile.table.type.trainer') || 'Trainer')
+                                                : (t('gym.turnstile.table.type.client') || 'Client')}
                                         </td>
-                                        <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{row.time}</td>
+                                        <td>{row.time}</td>
                                         <td>
                                             {row.status === 'allowed'
-                                                ? <span className="gym-recent-status allowed"><CheckCircle size={14} />{t('gym.turnstile.status.allowed') || 'Allowed'}</span>
-                                                : <span className="gym-recent-status blocked"><XCircle size={14} />{t('gym.turnstile.status.blocked') || 'Blocked'}</span>
+                                                ? <span className="gym-recent-status allowed">{t('gym.turnstile.status.allowed') || 'Allowed'}</span>
+                                                : <span className="gym-recent-status blocked">{t('gym.turnstile.status.blocked') || 'Blocked'}</span>
                                             }
                                         </td>
                                     </tr>
@@ -204,7 +186,7 @@ const DashboardGym = () => {
                         </table>
                         </div>
                         <button className="gym-recent-viewall" onClick={() => navigate('/dashboard/turnstile')}>
-                            {t('nav.turnstile') || 'View all in Turnstile'} <ArrowRight size={14} />
+                            {t('nav.turnstile') || 'View all in Turnstile'} →
                         </button>
                     </Card>
                 </div>

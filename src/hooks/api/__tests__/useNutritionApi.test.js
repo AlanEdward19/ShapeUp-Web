@@ -271,6 +271,13 @@ describe('useNutritionApi', () => {
     });
 
     describe('completeOnboarding', () => {
+        it('normalizes legacy activity names to the backend contract', async () => {
+            await runApiClientHappy(api => api.completeOnboarding({ heightCm: 175, age: 30, biologicalSex: 'Male', activityLevel: 'ModeratelyActive' }));
+            expect(apiClient).toHaveBeenCalledWith('/api/nutrition/profile/onboarding', {
+                method: 'POST',
+                body: JSON.stringify({ heightCm: 175, age: 30, biologicalSex: 'Male', activityLevel: 'Moderate' }),
+            });
+        });
         const command = { heightCm: 175, age: 30, biologicalSex: 'male', activityLevel: 'moderate' };
         it('happy path', async () => {
             await runApiClientHappy((api) => api.completeOnboarding(command));

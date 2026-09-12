@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { X, Search, Filter, ChevronRight } from 'lucide-react';
 import { useExercises } from '../hooks/useExercises';
 import './ExerciseLibraryModal.css';
 
@@ -27,13 +26,12 @@ const ExerciseLibraryModal = ({ onClose, onSelect }) => {
                         <h2 className="su-elm-title">Select Exercise</h2>
                         <p className="su-elm-subtitle">Choose an exercise to add to the training plan.</p>
                     </div>
-                    <button className="su-modal-close" onClick={onClose}><X size={20} /></button>
+                    <button className="su-modal-close" onClick={onClose} aria-label="Close">×</button>
                 </div>
 
                 {/* Toolbar: Search + Filter */}
                 <div className="su-elm-toolbar">
                     <div className="su-elm-search">
-                        <Search size={18} className="su-text-muted" />
                         <input
                             type="text"
                             placeholder="Search by name..."
@@ -48,7 +46,6 @@ const ExerciseLibraryModal = ({ onClose, onSelect }) => {
                             className={`su-elm-filter-btn ${selectedMuscles.length > 0 ? 'active' : ''}`}
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                         >
-                            <Filter size={15} />
                             Muscle Groups
                             {selectedMuscles.length > 0 && (
                                 <span className="su-elm-filter-badge">{selectedMuscles.length}</span>
@@ -110,7 +107,6 @@ const ExerciseLibraryModal = ({ onClose, onSelect }) => {
                                             {ex.muscles.slice(0, 3).map(m => <span key={m} className="su-elm-tag muscle">{m}</span>)}
                                         </div>
                                     </div>
-                                    <ChevronRight size={18} className="su-elm-item-arrow" />
                                 </div>
                             ))}
                             {filteredExercises.length === 0 && (

@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, PlayCircle, Plus, Lightbulb } from 'lucide-react';
 import { useTour } from '@reactour/tour';
-import Card from '../../components/Card';
 import Button from '../../components/Button';
-import Input from '../../components/Input';
 import ExerciseModal from '../../components/ExerciseModal';
 import SuggestExerciseModal from '../../components/SuggestExerciseModal';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -17,8 +14,9 @@ const Exercises = () => {
     
     // UI Local States
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [selectedExercise, setSelectedExercise] = useState(null);
+    const [selectedExercise, setSelectedExercise] = useState(undefined);
     const [showSuggest, setShowSuggest] = useState(false);
+    const [viewMode, setViewMode] = useState('list');
     
     // Business Logic moved to Custom Hook
     const {
@@ -31,6 +29,8 @@ const Exercises = () => {
         clearFilters,
         availableMuscles
     } = useExercises();
+
+    const activeExercise = selectedExercise === undefined ? filteredExercises[0] : selectedExercise;
 
     // ─── Exercise Library Tour Trigger ───────────────────────────────
     useEffect(() => {
@@ -66,14 +66,12 @@ setTimeout(() => {
                     <h1 className="su-page-title">{t('pro.exercises.title')}</h1>
                     <p className="su-page-subtitle">{t('pro.exercises.subtitle')}</p>
                 </div>
-                <Button icon={<Lightbulb size={16} />} onClick={() => setShowSuggest(true)}>{t('pro.exercises.btn.suggest')}</Button>
+                <Button onClick={() => setShowSuggest(true)}>{t('pro.exercises.btn.suggest')}</Button>
             </div>
 
-            <Card className="su-exercises-container su-mt-4">
-                {/* Toolbar */}
+            <div className="su-exercises-ledger">
                 <div className="su-exercises-toolbar" data-tour="ex-toolbar">
                     <div className="su-search-box">
-                        <Search size={18} className="su-text-muted" />
                         <input
                             type="text"
                             placeholder={t('pro.exercises.search')}
@@ -86,7 +84,6 @@ setTimeout(() => {
                     <div className="su-filter-dropdown-container">
                         <Button
                             variant={selectedMuscles.length > 0 ? 'primary' : 'outline'}
-                            icon={<Filter size={16} />}
                             onClick={() => setIsFilterOpen(!isFilterOpen)}
                         >
                             {t('pro.exercises.filter')} {selectedMuscles.length > 0 && `(${selectedMuscles.length})`}
@@ -117,23 +114,30 @@ setTimeout(() => {
                     </div>
                 </div>
 
+                <div className="su-library-filters">
+                    <div className="su-library-muscles"><button type="button" className={!selectedMuscles.length ? 'active' : ''} onClick={clearFilters}>{t('pro.dashboard.filter.all')}</button>{availableMuscles.map(muscle => <button type="button" key={muscle} className={selectedMuscles.includes(muscle) ? 'active' : ''} onClick={() => toggleMuscle(muscle)} aria-pressed={selectedMuscles.includes(muscle)}>{muscle}</button>)}</div>
+                    <div className="su-library-views"><button type="button" onClick={() => setViewMode('list')} aria-pressed={viewMode === 'list'}>Lista</button><button type="button" onClick={() => setViewMode('cards')} aria-pressed={viewMode === 'cards'}>Cards</button></div>
+                </div>
+                <div className={`su-library-layout ${activeExercise ? 'has-inspector' : ''}`}>
                 {/* Directory Grid */}
-                <div className="su-exercises-grid">
+                <div className="su-library-directory">
+                <div className="su-library-directory-heading"><span>Exibindo {filteredExercises.length} exercícios</span><small>Selecione uma linha para inspecionar o guia biomecânico</small></div>
+                {viewMode === 'list' && <div className="su-library-column-labels"><span>Código</span><span>Exercício & músculo alvo</span><span>Equipamento</span><span>Padrão motor</span><span>Ações</span></div>}
+                <div className={`su-exercises-grid su-library-${viewMode}`}>
                     {loading ? (
-                        <div className="su-empty-state" style={{ gridColumn: '1 / -1' }}>Carregando exercícios...</div>
+                        <div className="su-empty-state" style={{ gridColumn: '1 / -1' }}>{t('pro.exercises.loading')}</div>
                     ) : filteredExercises.length === 0 ? (
                         <div className="su-empty-state">{t('pro.exercises.empty')}</div>
                     ) : (
                         filteredExercises.map((ex, idx) => (
-                            <div
+                            <button type="button"
                                 key={ex.id}
-                                className="su-exercise-thumb-card"
+                                className={`su-exercise-thumb-card ${activeExercise?.id === ex.id ? 'is-selected' : ''}`}
+                                aria-pressed={activeExercise?.id === ex.id}
                                 onClick={() => setSelectedExercise(ex)}
                                 {...(idx === 0 ? { 'data-tour': 'ex-card' } : {})}
                             >
-                                <div className="su-ex-thumb-visual">
-                                    <PlayCircle size={32} className="su-ex-play-icon" />
-                                </div>
+                                <div className="su-ex-thumb-visual">EX-{String(ex.id).slice(-4).padStart(3, '0')}</div>
                                 <div className="su-ex-thumb-content">
                                     <h4 className="su-ex-thumb-title">{ex.name}</h4>
                                     <div className="su-ex-thumb-tags">
@@ -144,16 +148,17 @@ setTimeout(() => {
                                         {ex.muscles.length > 2 && <span className="su-ex-tag-muscle">+{ex.muscles.length - 2}</span>}
                                     </div>
                                 </div>
-                            </div>
+                                <span className="su-library-equipment">{ex.equipment || ex.equipments?.[0]?.equipmentNamePt || '—'}</span>
+                                <span className="su-library-pattern">{ex.type || '—'}</span>
+                                <span className="su-library-arrow" aria-hidden="true">›</span>
+                            </button>
                         ))
                     )}
                 </div>
-            </Card>
-
-            {/* Detail Modal */}
-            {selectedExercise && (
-                <ExerciseModal exercise={selectedExercise} onClose={() => setSelectedExercise(null)} />
-            )}
+                </div>
+                {activeExercise && <ExerciseModal embedded exercise={activeExercise} onClose={() => setSelectedExercise(null)} />}
+                </div>
+            </div>
 
             {/* Suggest Exercise Modal */}
             {showSuggest && (

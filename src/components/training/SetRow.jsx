@@ -1,5 +1,4 @@
 import Input from '../Input';
-import { Trash2 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { SET_TYPES, TECHNIQUES } from '../../pages/Dashboard/ClientDetail';
 
@@ -54,7 +53,7 @@ const SetRow = ({ set, index, blockType, onChange, onRemove }) => {
                 />
                 <div className="su-set-actions">
                     <button className="su-icon-btn su-error-text" onClick={onRemove}>
-                        <Trash2 size={16} />
+                        ×
                     </button>
                 </div>
             </div>

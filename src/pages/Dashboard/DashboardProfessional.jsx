@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
-import { UserPlus, Calendar, Activity, CheckCircle, FileText, ArrowRight, MessageCircle, AlertTriangle, Users, Settings, Plus, XCircle, Search, Filter, MessageSquare, ExternalLink, Bell, TrendingUp, Award, ChevronLeft, ChevronRight } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, BarChart, Bar } from 'recharts';
+import { Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import InviteClientModal from '../../components/InviteClientModal';
+import ClientPortfolio from '../../components/ClientPortfolio';
 import { useNotifications } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
 import './DashboardProfessional.css';
@@ -273,6 +273,10 @@ const DashboardProfessional = () => {
         setCurrentPage(1);
     }, [searchQuery, filterType]);
 
+    const todaySessions = globalHistory.filter(event => new Date(event.date).toDateString() === new Date().toDateString());
+    const pendingPlans = clients.filter(client => !client.activePlan || client.activePlan === '-').length;
+    const nextSession = clients.filter(client => new Date(client.nextSessionAt).getTime() > Date.now()).sort((a,b) => new Date(a.nextSessionAt) - new Date(b.nextSessionAt))[0];
+    const openMessages = (() => { try { return JSON.parse(localStorage.getItem('shapeup_messages') || '[]').filter(message => message.sender === 'client' && message.status !== 'read').slice(-2); } catch { return []; } })();
     return (
         <div className="su-pro-dashboard">
             {showInvite && <InviteClientModal onClose={() => setShowInvite(false)} />}
@@ -280,56 +284,53 @@ const DashboardProfessional = () => {
             <div className="su-dashboard-header-flex" data-tour="pro-header">
                 <div>
                     <h1 className="su-page-title">{t('pro.dashboard.title')}</h1>
-                    <p className="su-page-subtitle">{t('pro.dashboard.subtitle')}</p>
+                    <p className="su-page-subtitle">{clients.length} alunos ativos · <span className="su-warning-text">{clients.filter(client => !client.activePlan || client.activePlan === "-").length} prescrições pendentes</span> · {alerts.length} alertas para revisar</p>
                 </div>
                 <Button onClick={() => setShowInvite(true)}>{t('pro.dashboard.invite')}</Button>
             </div>
 
-            {/* Aggregate Metrics Grid */}
-            <div className="su-metrics-grid su-mt-4" data-tour="pro-metrics">
+            <div className="su-metrics-grid" data-tour="pro-metrics">
                 <Card className="su-metric-card">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">{t('pro.dashboard.metric.active')}</span>
-                        <Users size={20} className="su-text-muted" />
+                        <span className="su-metric-label">Treinamento hoje</span>
                     </div>
-                    <div className="su-metric-value">{stats.activeClients}</div>
-                    <span className="su-metric-trend positive">{t('pro.dashboard.metric.active.sub')}</span>
+                    <div className="su-metric-value">{todaySessions.length} sessões</div>
+                    <span className="su-metric-trend positive">Sessões registradas pelos alunos</span>
                 </Card>
 
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('pro.dashboard.metric.completed')}</span>
-                        <CheckCircle size={20} className="su-success-text" />
-                    </div>
-                    <div className="su-metric-value">{stats.workoutsCompleted}</div>
-                    <span className="su-metric-trend positive">{t('pro.dashboard.metric.completed.sub')}</span>
-                </Card>
-
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('pro.dashboard.metric.skipped')}</span>
-                        <XCircle size={20} className="su-error-text" />
-                    </div>
-                    <div className="su-metric-value">{stats.workoutsSkipped}</div>
-                    <span className="su-metric-trend negative">{t('pro.dashboard.metric.skipped.sub')}</span>
-                </Card>
-
-                <Card className="su-metric-card">
-                    <div className="su-metric-header">
-                        <span className="su-metric-label">{t('pro.dashboard.metric.engagement')}</span>
-                        <Activity size={20} className="su-accent-text" />
-                    </div>
-                    <div className="su-metric-value">{stats.engagement}%</div>
-                    <span className="su-metric-trend">{t('pro.dashboard.metric.engagement.sub')}</span>
-                </Card>
+                <div className="su-pro-stat-stack">
+                    <Card className="su-metric-card">
+                        <div className="su-metric-header">
+                            <span className="su-metric-label">Revisões pendentes</span>
+                        </div>
+                        <div className="su-metric-value">{pendingPlans} fichas</div>
+                        <span className="su-metric-trend positive">Alunos aguardando prescrição</span>
+                    </Card>
+                    <Card className="su-metric-card">
+                        <div className="su-metric-header">
+                            <span className="su-metric-label">Adesão semanal</span>
+                        </div>
+                        <div className="su-metric-value">{stats.engagement}%</div>
+                        <span className="su-metric-trend negative">Consistência dos alunos ativos</span>
+                    </Card>
+                    <Card className="su-metric-card">
+                        <div className="su-metric-header">
+                            <span className="su-metric-label">Próxima sessão</span>
+                        </div>
+                        <div className="su-metric-value">{nextSession ? new Date(nextSession.nextSessionAt).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '—'}</div>
+                        <span className="su-metric-trend">{nextSession?.name || 'Nenhuma sessão agendada'}</span>
+                    </Card>
+                </div>
             </div>
 
             {/* Main Content Area */}
             <div className="su-overview-layout">
 
                 {/* Recent Client Logs Column */}
-                <div className="su-client-feed" data-tour="pro-feed">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <div>
+                <ClientPortfolio clients={clients} />
+                <details className="su-client-feed su-pro-history" data-tour="pro-feed"><summary>Histórico de atividades dos alunos</summary>
+                    <div className="su-feed-toolbar">
                         <h3 className="su-section-title" style={{ marginBottom: 0 }}>{t('pro.dashboard.feed.title')}</h3>
                         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                             <div className="su-search-wrapper" style={{ width: '200px' }}>
@@ -394,8 +395,8 @@ const DashboardProfessional = () => {
                                         }
                                     }}
                                 >
-                                    <div className="su-feed-avatar">
-                                        {item.clientName !== 'System' ? item.clientName.split(' ').map(n => n[0]).join('').substring(0, 2) : <Activity size={18} />}
+                                    <div className="su-feed-rank">
+                                        {item.clientName !== 'System' ? item.clientName.split(' ').map(n => n[0]).join('').substring(0, 2) : '—'}
                                     </div>
                                     <div className="su-feed-content">
                                         <div className="su-feed-meta">
@@ -406,48 +407,38 @@ const DashboardProfessional = () => {
                                             {item.title}: <strong>{item.subtitle}</strong>
                                         </div>
 
-                                        {/* Workout Specific Render */}
                                         {item.category === 'workout' && item.type === 'workout' && (() => {
                                             const h = item.raw;
                                             return (
                                                 <>
                                                     {(h.exercises || []).some(ex => !ex.skipped) && (
                                                         <div className="su-feed-badges">
-                                                            <span className="su-badge workout-stat">
-                                                                <Activity size={12} /> {h.totalVol}
-                                                            </span>
-                                                            <span className="su-badge duration-stat">
-                                                                <CheckCircle size={12} /> {h.duration}
-                                                            </span>
+                                                            <span className="su-badge workout-stat">{h.totalVol}</span>
+                                                            <span className="su-badge duration-stat">{h.duration}</span>
                                                         </div>
                                                     )}
                                                     {h.comments && (
                                                         <div className="su-feed-comment-bubble">
-                                                            <MessageSquare size={14} />
-                                                            "{h.comments}"
+                                                            “{h.comments}”
                                                         </div>
                                                     )}
                                                 </>
                                             );
                                         })()}
 
-                                        {/* Skipped Workout Render */}
                                         {item.category === 'workout' && item.type === 'skipped' && (
                                             <div className="su-feed-badges">
-                                                <span className="su-badge" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)' }}>
-                                                    <XCircle size={12} /> Missed Session
+                                                <span className="su-badge" style={{ color: 'var(--error)' }}>
+                                                    Missed Session
                                                 </span>
                                             </div>
                                         )}
 
-                                        {/* Message/Alert Render */}
                                         {item.category !== 'workout' && (
                                             <div className="su-feed-badges">
-                                                <span className={`su-badge`} style={{
-                                                    backgroundColor: item.category === 'alert' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(37, 99, 235, 0.1)',
+                                                <span className="su-badge" style={{
                                                     color: item.category === 'alert' ? 'var(--warning)' : 'var(--primary)'
                                                 }}>
-                                                    {item.category === 'alert' ? <AlertTriangle size={12} /> : item.category === 'message' ? <MessageSquare size={12} /> : <UserPlus size={12} />}
                                                     {item.category.charAt(0).toUpperCase() + item.category.slice(1)}
                                                 </span>
                                             </div>
@@ -464,7 +455,7 @@ const DashboardProfessional = () => {
 
                     {/* Pagination Controls */}
                     {totalPages > 1 && (
-                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1.5rem' }}>
+                        <div className="su-feed-pager">
                             <Button
                                 variant="secondary"
                                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
@@ -486,15 +477,17 @@ const DashboardProfessional = () => {
                             </Button>
                         </div>
                     )}
-                </div>
+                </details>
 
                 {/* Sidebar Summary Area */}
+                </div>
                 <div className="su-overview-sidebar" data-tour="pro-alerts">
+                    <section className="su-agenda-card"><header><div><h3>Atividade de hoje</h3><p>Sessões registradas pelos seus alunos</p></div><span>{globalHistory.filter(event => new Date(event.date).toDateString() === new Date().toDateString()).length} sessões</span></header>{globalHistory.filter(event => new Date(event.date).toDateString() === new Date().toDateString()).slice(0, 3).map((event, index) => <div className="su-agenda-row" key={event.id || index}><time>{new Date(event.date).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"})}</time><div><strong>{event.clientName}</strong><p>{event.planName}</p></div></div>)}{!globalHistory.some(event => new Date(event.date).toDateString() === new Date().toDateString()) && <p className="su-agenda-empty">Nenhuma sessão registrada hoje.</p>}<button type="button" onClick={() => navigate("/dashboard/clients")}>Abrir acompanhamento dos alunos →</button></section>
                     <Card className="su-attention-card">
                         <h3 className="su-card-title">
-                            <Bell size={18} style={{ verticalAlign: 'middle', marginRight: '8px' }} />
-                            {t('pro.dashboard.alerts.title')}
+                            Feedbacks em aberto
                         </h3>
+                        {openMessages.map(message => <article className="su-trainer-feedback" key={message.id}><strong>{message.clientName || clients.find(client => String(client.id) === String(message.clientId))?.name || 'Aluno'}</strong><blockquote>{message.text}</blockquote><button type="button" onClick={() => navigate('/dashboard/feedback')}>Responder aluno →</button></article>)}
                         {alerts.length > 0 ? (
                             <ul className="su-alert-list">
                                 {alerts.map(alert => (

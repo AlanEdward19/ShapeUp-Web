@@ -1,0 +1,98 @@
+<main class="w-full flex-1 flex items-center justify-center p-gutter-sm sm:p-gutter"><div class="flex flex-col w-full items-center justify-center py-margin-sm sm:py-margin-lg">
+<div class="w-full max-w-[460px] flex flex-col items-center">
+<!-- Top Identity Branding -->
+<div class="flex items-center gap-space-sm mb-space-lg select-none">
+<img alt="ShapeUp Logo" class="w-8 h-8 object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1UEc9nRoR-8qbPC-MNsHRTEi9BLn6bgtcv2SW5cCTgsOlh4e0BkOpZRKMFbiaY80G3wZctGCfAp3UCrwBaJln9Fdqqy_1Tmy7Nq5WXWkxyJnX3t86ZEZyAoyAoBYmt7GSKrnKqjvJvfVjYpZ7622SGBdljRJw5Ipysr5ChFaG9KHVKOf1QwHjhsMg_3VrD1SiZXvpC74urs6fqq22sprYEof69AQ5hVARwBFtMs5AAh5W6a2mJSAqMdl8M">
+<span class="font-headline text-headline-sm tracking-wider uppercase text-on-surface">ShapeUp <span class="font-body text-body-sm tracking-normal text-on-surface-variant font-semibold">Workspace</span></span>
+</div>
+<!-- Elevated Form Container -->
+<div class="w-full bg-surface-container-low rounded-xl shadow-xl p-gutter sm:p-space-xl relative overflow-hidden">
+<!-- Subtle internal ambient warm bloom -->
+<div class="absolute -top-16 -right-16 w-36 h-36 bg-primary-container/10 rounded-full blur-2xl pointer-events-none"></div>
+<!-- State: Form (Default) -->
+<div class="flex flex-col" id="recovery-state-form">
+<header class="flex flex-col mb-space-lg">
+<div class="flex items-center gap-space-xs text-primary mb-space-xs">
+<span class="material-symbols-outlined text-[18px]">lock_reset</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary">Autenticação • Proteção de Credenciais</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface tracking-tight font-bold">
+            Recuperação de Acesso
+          </h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-space-xs leading-relaxed">
+            Informe o e-mail associado à sua conta institucional ou pessoal. Enviaremos um link seguro para redefinição de senha com validade de 30 minutos.
+          </p>
+</header>
+<form class="flex flex-col gap-space-md" id="recovery-form" data-source-onsubmit="event.preventDefault(); submitRecovery();">
+<div class="flex flex-col gap-space-xs">
+<div class="flex justify-between items-center">
+<label class="font-label-lg text-label-lg text-on-surface font-semibold" for="recovery-email">
+                E-mail cadastrado
+              </label>
+<span class="hidden font-label-sm text-label-sm text-error flex items-center gap-1" id="email-error">
+<span class="material-symbols-outlined text-[14px]">error</span> Formato inválido
+              </span>
+</div>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-space-md text-outline pointer-events-none text-[20px] transition-colors duration-150" id="mail-icon">
+                mail
+              </span>
+<input autocomplete="email" class="w-full bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline/70 pl-11 pr-space-md py-space-sm rounded-lg outline-none transition-all duration-200 focus:bg-surface-container focus:ring-1 focus:ring-primary-container" id="recovery-email" name="email" placeholder="ex: atleta@shapeup.com" required="" type="email">
+</div>
+</div>
+<button class="mt-space-xs w-full bg-primary-container hover:bg-primary text-on-primary-container font-label-lg text-label-lg font-bold py-space-sm px-space-lg rounded-lg transition-all duration-200 flex items-center justify-center gap-space-sm shadow-md active:scale-[0.99] cursor-pointer" id="submit-btn" type="submit">
+<span>Enviar Link de Redefinição</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</form>
+<!-- Discreet Support Segment -->
+<div class="mt-space-lg pt-space-md bg-surface-container-highest/20 rounded-lg p-space-md">
+<div class="flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[20px] mt-0.5 shrink-0">help_center</span>
+<div class="flex flex-col">
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">
+                Dúvidas ou perda de acesso ao e-mail? Fale com a equipe de suporte ou com a administração da sua academia.
+              </p>
+</div>
+</div>
+</div>
+</div>
+<!-- State: Success Feedback (Hidden initially) -->
+<div class="hidden flex flex-col items-center text-center py-space-sm" id="recovery-state-success">
+<div class="w-12 h-12 rounded-full bg-secondary-container text-secondary flex items-center justify-center mb-space-md">
+<span class="material-symbols-outlined text-[26px]">mark_email_read</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">
+          E-mail de verificação despachado
+        </h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-space-xs leading-relaxed max-w-sm">
+          Se o endereço <span class="text-on-surface font-semibold" id="sent-target-email"></span> existir em nossa base, as instruções de redefinição foram entregues com token unívoco.
+        </p>
+<div class="w-full bg-surface-container-lowest p-space-md rounded-lg my-space-md text-left flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-tertiary text-[18px] mt-0.5">timer</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-normal">
+            O link expira impreterivelmente em <strong class="text-on-surface">30 minutos</strong> por razões de conformidade institucional.
+          </p>
+</div>
+<button class="w-full bg-surface-container hover:bg-surface-container-high text-on-surface font-label-lg text-label-lg py-space-sm px-space-md rounded-lg transition-colors cursor-pointer" data-source-onclick="resetRecoveryForm()" type="button">
+          Tentar outro e-mail
+        </button>
+</div>
+<!-- Navigation Link -->
+<div class="mt-space-lg flex justify-center">
+<a class="inline-flex items-center gap-space-xs font-label-lg text-label-lg text-on-surface-variant hover:text-primary transition-colors duration-150 group cursor-pointer" href="#login">
+<span class="material-symbols-outlined text-[16px] transition-transform duration-150 group-hover:-translate-x-0.5">arrow_back</span>
+<span>Voltar para o login</span>
+</a>
+</div>
+</div>
+<!-- Technical Protocol Footer -->
+<div class="mt-space-lg flex items-center justify-center gap-space-xs text-on-surface-variant/70 select-none">
+<span class="material-symbols-outlined text-[14px]">encrypted</span>
+<span class="font-label-sm text-label-sm tracking-wide uppercase">
+        ShapeUp Security Protocol • Criptografia ponta a ponta
+      </span>
+</div>
+</div>
+</div>
+</main>

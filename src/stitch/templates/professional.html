@@ -1,0 +1,513 @@
+
+<!-- Main Grid App Layout: Fixed Sidebar (w-64) + Content -->
+<div class="flex min-h-screen">
+<!-- SIDEBAR: Padronizada Coach Pro (w-64, #18120f) -->
+<aside class="w-64 bg-[#18120F] border-r border-brand-border flex flex-col justify-between fixed inset-y-0 left-0 z-50 select-none">
+<div class="flex flex-col flex-1 min-h-0">
+<!-- Brand Header -->
+<div class="h-16 px-5 border-b border-brand-border flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<img alt="ShapeUp Logo" class="h-7 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgE4ytcV4Qa_eUhI-L5JnH4220fpFNYPLX9OCvE0aEZyiXWiU7uP18mQU3yOJ2SfshY-UYN6X2iQjJpNPq74cId3ZknanZY8vKIAqm1Ly7E0NuJIoGvQUTWPu3pTug8febnHl1_wK6USd4QcLFs-5YLO8HFwvFp4gkx0zYyq42c2pnOL9fx6Jkb0uprpYPMLceVnwcLGKerV7_DtDjO_NLsIxjBXooKbd1_2tn3SNXQ4m_wx4GVKpJ">
+<span class="font-condensed font-bold text-xl tracking-wider uppercase text-brand-text">ShapeUp</span>
+</div>
+<span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-brand-surface border border-brand-border text-brand-ochre">
+            Coach Pro
+          </span>
+</div>
+<!-- Navigation Menu -->
+<div class="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+<div>
+<p class="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-brand-muted">Gestão Atlética</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-semibold bg-brand-surface text-brand-text border-l-2 border-brand-terracotta" href="#">
+<span class="material-symbols-outlined text-[20px] text-brand-terracotta">dashboard</span>
+<span>Painel do Treinador</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-brand-secondary hover:text-brand-text hover:bg-brand-surface/70 transition-colors" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px] text-brand-muted">group</span>
+<span>Meus Alunos</span>
+</div>
+<span class="text-xs font-semibold px-1.5 py-0.2 rounded bg-brand-border/60 text-brand-secondary">14</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-brand-secondary hover:text-brand-text hover:bg-brand-surface/70 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px] text-brand-muted">event_repeat</span>
+<span>Criador &amp; Periodização</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-brand-secondary hover:text-brand-text hover:bg-brand-surface/70 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px] text-brand-muted">fitness_center</span>
+<span>Biblioteca de Exercícios</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-brand-secondary hover:text-brand-text hover:bg-brand-surface/70 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px] text-brand-muted">nutrition</span>
+<span>Painel Nutricional</span>
+</a>
+</nav>
+</div>
+<div>
+<p class="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-brand-muted">Atendimento &amp; Sistema</p>
+<nav class="space-y-1">
+<a class="flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium text-brand-secondary hover:text-brand-text hover:bg-brand-surface/70 transition-colors" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[20px] text-brand-muted">chat_bubble</span>
+<span>Mensagens &amp; Consultoria</span>
+</div>
+<span class="text-xs font-bold px-1.5 py-0.5 rounded bg-brand-terracotta text-white leading-none">3</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-brand-secondary hover:text-brand-text hover:bg-brand-surface/70 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px] text-brand-muted">settings</span>
+<span>Configurações</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+<!-- Coach Profile (Bottom Sidebar) -->
+<div class="p-3 border-t border-brand-border bg-[#18120F]">
+<div class="flex items-center justify-between p-2 rounded-md bg-brand-surface border border-brand-border">
+<div class="flex items-center gap-2.5 min-w-0">
+<img alt="Rodrigo Silva" class="w-8 h-8 rounded-md object-cover shrink-0 border border-brand-border" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2ztTtCwaRB-9gY6ru0K6yRVXtbbPCa7LM2iVkJHY4GcZNo9Xo0PWpHyvr15QunVSgzjEtiJ3Y0Jf7dIP_WEXe3snyKCoPUi3r1tiiJqyhE6F-pLsvNZn4uBbQbx5GiKtbOUc3oOM9lKrSEbb2O-sp1aSkmC6qAWoPoFxoRpWvEJWM7nmPuV65GuEe1-ZFlLXQQL1uUq0EcypqLTUxMbk9kmLuP9UXFmNJZRDH_LcMCj3rdk_0gscl">
+<div class="min-w-0">
+<p class="text-xs font-semibold text-brand-text truncate leading-snug">Rodrigo Silva</p>
+<p class="text-[11px] text-brand-muted truncate">Personal Trainer Master</p>
+</div>
+</div>
+<button class="text-brand-muted hover:text-brand-text transition-colors p-1" title="Encerrar Sessão" type="button">
+<span class="material-symbols-outlined text-base">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- MAIN BODY AREA (Padded left by 64 = 256px) -->
+<div class="pl-64 flex-1 flex flex-col min-w-0">
+<!-- TOPBAR: Clean breadcrumb + Search + Quick Operational CTAs -->
+<header class="h-16 bg-brand-bg/95 backdrop-blur border-b border-brand-border sticky top-0 z-40 px-8 flex items-center justify-between gap-4">
+<!-- Breadcrumb / Hierarchy Context -->
+<nav class="flex items-center gap-2 text-xs font-medium text-brand-muted shrink-0">
+<span>Treinadores</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Rodrigo Silva</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-brand-text font-semibold">Visão Operacional</span>
+</nav>
+<!-- Search Bar -->
+<div class="flex-1 max-w-lg mx-4">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-brand-muted text-lg pointer-events-none">search</span>
+<input class="w-full bg-brand-surface border border-brand-border rounded-md pl-9 pr-12 py-1.5 text-xs text-brand-text placeholder-brand-muted focus:outline-none focus:border-brand-terracotta transition-colors" placeholder="Buscar aluno por nome, CPF ou objetivo..." type="text">
+<kbd class="absolute right-2.5 px-1.5 py-0.5 rounded border border-brand-border bg-brand-elevated text-[10px] text-brand-muted font-sans font-medium">⌘K</kbd>
+</div>
+</div>
+<!-- Header Actions -->
+<div class="flex items-center gap-2.5 shrink-0">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-brand-border bg-brand-surface text-brand-text hover:bg-brand-elevated text-xs font-semibold transition-colors" type="button">
+<span class="material-symbols-outlined text-base">person_add</span>
+<span>+ Matricular Aluno</span>
+</button>
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-brand-terracotta text-white hover:bg-brand-terracottaHover text-xs font-semibold shadow-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-base">add</span>
+<span>+ Novo Treino</span>
+</button>
+</div>
+</header>
+<!-- MAIN OPERATIONAL WORKSPACE -->
+<main class="p-8 space-y-6 flex-1 max-w-7xl w-full mx-auto">
+<!-- A. HEADER OPERACIONAL -->
+<div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 pb-1 border-b border-brand-border/60">
+<div>
+<h1 class="font-condensed font-bold text-3xl text-brand-text uppercase tracking-wide">
+              Painel do Treinador
+            </h1>
+<p class="text-xs text-brand-secondary mt-0.5">
+              14 alunos ativos <span class="text-brand-border mx-1.5">•</span>
+<span class="text-brand-ochre font-medium">2 periodizações vencendo esta semana</span> <span class="text-brand-border mx-1.5">•</span>
+<span class="text-brand-terracotta font-medium">3 feedbacks aguardando revisão</span>
+</p>
+</div>
+<div class="flex items-center gap-2 text-xs text-brand-muted">
+<span class="w-2 h-2 rounded-full bg-brand-olive inline-block"></span>
+<span>Sincronização em tempo real ativa</span>
+</div>
+</div>
+<!-- B. MÉTRICAS OPERACIONAIS CONCISAS (Clean horizontal strip, subtle dividers, zero fluff) -->
+<section class="bg-brand-surface border border-brand-border rounded-lg grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-brand-border">
+<!-- Metric 1: Alunos em Treinamento Hoje -->
+<div class="p-4 flex flex-col justify-between">
+<span class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">Treinamento Hoje</span>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-2xl font-bold font-condensed tracking-wide text-brand-text">8 alunos</span>
+<span class="text-[11px] text-brand-olive font-medium">6 concluídos</span>
+</div>
+<p class="text-xs text-brand-secondary mt-1">2 sessões ainda em andamento</p>
+</div>
+<!-- Metric 2: Fichas / Revisões Pendentes -->
+<div class="p-4 flex flex-col justify-between">
+<span class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">Revisões Pendentes</span>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-2xl font-bold font-condensed tracking-wide text-brand-ochre">3 fichas</span>
+<span class="text-[11px] text-brand-ochre font-medium">Atenção</span>
+</div>
+<p class="text-xs text-brand-secondary mt-1">Necessitam ajuste de ciclo ou volume</p>
+</div>
+<!-- Metric 3: Adesão Média Semanal -->
+<div class="p-4 flex flex-col justify-between">
+<span class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">Adesão Semanal</span>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-2xl font-bold font-condensed tracking-wide text-brand-olive">94%</span>
+<span class="text-[11px] text-brand-olive font-medium flex items-center">
+<span class="material-symbols-outlined text-xs">trending_up</span> +3%
+              </span>
+</div>
+<p class="text-xs text-brand-secondary mt-1">Acima da meta mínima estabelecida (85%)</p>
+</div>
+<!-- Metric 4: Próxima Sessão Presencial -->
+<div class="p-4 flex flex-col justify-between">
+<span class="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">Próxima Sessão</span>
+<div class="mt-2 flex items-baseline gap-2">
+<span class="text-2xl font-bold font-condensed tracking-wide text-brand-text">09:00</span>
+<span class="text-[11px] text-brand-terracotta font-semibold">Juliana M.</span>
+</div>
+<p class="text-xs text-brand-secondary mt-1">Presencial • Treino de Hipertrofia</p>
+</div>
+</section>
+<!-- C. WORKSPACE PRINCIPAL DIVIDIDO: DUAS COLUNAS OPERACIONAIS -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- COLUNA ESQUERDA (MAIOR: 8 colunas) - CARTEIRA DE ALUNOS & STATUS SEMANAL -->
+<section class="lg:col-span-8 bg-brand-surface border border-brand-border rounded-lg flex flex-col">
+<!-- Table Header Bar -->
+<div class="p-4 border-b border-brand-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div>
+<h2 class="text-sm font-bold uppercase tracking-wider text-brand-text">
+                  Carteira de Alunos &amp; Status Semanal
+                </h2>
+<p class="text-xs text-brand-secondary mt-0.5">Visão rápida de execução, consistência e ciclo vigente</p>
+</div>
+<!-- Filter tabs -->
+<div class="flex items-center gap-1 bg-brand-bg p-0.5 rounded border border-brand-border">
+<button class="px-2.5 py-1 text-xs font-semibold rounded bg-brand-surface text-brand-text" type="button">
+                  Todos (14)
+                </button>
+<button class="px-2.5 py-1 text-xs font-medium rounded text-brand-muted hover:text-brand-text" type="button">
+                  Atrasados (1)
+                </button>
+<button class="px-2.5 py-1 text-xs font-medium rounded text-brand-muted hover:text-brand-text" type="button">
+                  Revisão (2)
+                </button>
+</div>
+</div>
+<!-- Smart Table - High Operational Density -->
+<div class="overflow-x-auto">
+<table class="w-full text-left text-xs">
+<thead>
+<tr class="border-b border-brand-border bg-brand-bg/60 text-brand-muted uppercase text-[10px] tracking-wider font-semibold">
+<th class="py-2.5 px-4 font-semibold">Aluno &amp; Objetivo</th>
+<th class="py-2.5 px-3 font-semibold">Último Treino</th>
+<th class="py-2.5 px-3 font-semibold">Freq. Semanal</th>
+<th class="py-2.5 px-3 font-semibold">Periodização</th>
+<th class="py-2.5 px-4 font-semibold text-right">Ações Rápidas</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-brand-border/70">
+<!-- Student 1: Juliana Mendes -->
+<tr class="hover:bg-brand-elevated/50 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img alt="Juliana Mendes" class="w-9 h-9 rounded-md object-cover border border-brand-border shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1VPYx0MwNnIBZPsF5o8mZ1skc9IleG9wpbzft5Js31vsM_JFwgmU7UJ1KfA6qZuixjH_E-XzDXlFH-YNXsVofG-lZNT0-Sv7e8RyEyXs907nAIZ2lZCmgaQmamViXzLegguxZuLnyyZamPq52esn1GdROx4E33vCby_mNCgY5h30xyTaLhrfmQK-SmJKfjEFXPAab3CwosOVhyODqf9bCf4ajsSrtNgoEh1fZN4hWGirMpwzBeQtZ5E-A">
+<div class="min-w-0">
+<p class="font-semibold text-brand-text truncate">Juliana Mendes</p>
+<p class="text-[11px] text-brand-muted truncate">Hipertrofia Glúteos &amp; Posteriores</p>
+</div>
+</div>
+</td>
+<td class="py-3 px-3 text-brand-secondary">
+<span class="text-brand-text font-medium block">Hoje, 08:30</span>
+<span class="text-[11px] text-brand-olive">Treino A concluído</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-brand-olive">4/4</span>
+<div class="w-14 h-1.5 bg-brand-bg rounded-full overflow-hidden">
+<div class="h-full bg-brand-olive rounded-full" style="width: 100%;"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-medium text-brand-text block">Semana 5 de 12</span>
+<span class="text-[11px] text-brand-muted">Fase Acúmulo de Volume</span>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="inline-flex items-center gap-1.5">
+<button class="px-2.5 py-1 rounded bg-brand-elevated hover:bg-brand-border border border-brand-border text-brand-text text-xs font-medium transition-colors" title="Abrir Ficha de Treino" type="button">
+                          Abrir Ficha
+                        </button>
+<button class="p-1 rounded text-brand-muted hover:text-brand-terracotta transition-colors" title="Ajustar Cargas" type="button">
+<span class="material-symbols-outlined text-base">tune</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Student 2: Lucas Pinheiro -->
+<tr class="hover:bg-brand-elevated/50 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img alt="Lucas Pinheiro" class="w-9 h-9 rounded-md object-cover border border-brand-border shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1VKsqbdKIDSICDo3GFIAjfQ0ajhFL6MDnpq5e8epickpv2ZzwEizF3GIH66zjAWaPY3GiFUoOt-LfHrcHQctrzJMDfzpvZew_gHepipiJplZGc5CYa2Evl-mnvwKZH2uJg1-DU9_z5RyZ2G50euN8LfMDVzomYsHLIGNdABpnJsOWUYpLEfsFIL4SpE-jqw9OucgF9ALJZFbIoT3kscQwyYt-gw1HJNGJm-Le4Kd9ajGI-U_WRVjAxWMWs">
+<div class="min-w-0">
+<p class="font-semibold text-brand-text truncate">Lucas Pinheiro</p>
+<p class="text-[11px] text-brand-muted truncate">Recomposição &amp; Força Funcional</p>
+</div>
+</div>
+</td>
+<td class="py-3 px-3 text-brand-secondary">
+<span class="text-brand-text font-medium block">Ontem, 19:15</span>
+<span class="text-[11px] text-brand-muted">Treino C concluído</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-brand-olive">3/3</span>
+<div class="w-14 h-1.5 bg-brand-bg rounded-full overflow-hidden">
+<div class="h-full bg-brand-olive rounded-full" style="width: 100%;"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-medium text-brand-text block">Semana 8 de 8</span>
+<span class="text-[11px] text-brand-ochre font-medium">Ciclo vencendo (renovar)</span>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="inline-flex items-center gap-1.5">
+<button class="px-2.5 py-1 rounded bg-brand-elevated hover:bg-brand-border border border-brand-border text-brand-text text-xs font-medium transition-colors" title="Abrir Ficha de Treino" type="button">
+                          Abrir Ficha
+                        </button>
+<button class="p-1 rounded text-brand-muted hover:text-brand-ochre transition-colors" title="Periodizar Próximo Ciclo" type="button">
+<span class="material-symbols-outlined text-base">update</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Student 3: Rafael Vasconcelos (Status de Alerta) -->
+<tr class="hover:bg-brand-elevated/50 transition-colors bg-brand-error/5">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-md bg-brand-elevated border border-brand-border text-brand-ochre flex items-center justify-center font-bold text-xs shrink-0">
+                          RV
+                        </div>
+<div class="min-w-0">
+<p class="font-semibold text-brand-text truncate">Rafael Vasconcelos</p>
+<p class="text-[11px] text-brand-muted truncate">Condicionamento Cardiorrespiratório</p>
+</div>
+</div>
+</td>
+<td class="py-3 px-3 text-brand-secondary">
+<span class="text-brand-error font-medium block">Há 4 dias sem log</span>
+<span class="text-[11px] text-brand-muted">Último: Terça-feira</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-brand-error">1/3</span>
+<div class="w-14 h-1.5 bg-brand-bg rounded-full overflow-hidden">
+<div class="h-full bg-brand-error rounded-full" style="width: 33%;"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-medium text-brand-text block">Semana 2 de 6</span>
+<span class="text-[11px] text-brand-error">Risco de evasão detectado</span>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="inline-flex items-center gap-1.5">
+<button class="px-2.5 py-1 rounded bg-brand-terracotta/20 hover:bg-brand-terracotta/30 border border-brand-terracotta/40 text-brand-terracotta text-xs font-semibold transition-colors" title="Cobrar no WhatsApp" type="button">
+                          Contatar
+                        </button>
+<button class="p-1 rounded text-brand-muted hover:text-brand-text transition-colors" title="Ver Histórico" type="button">
+<span class="material-symbols-outlined text-base">visibility</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Student 4: Mariana Costa -->
+<tr class="hover:bg-brand-elevated/50 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-md bg-brand-elevated border border-brand-border text-brand-secondary flex items-center justify-center font-bold text-xs shrink-0">
+                          MC
+                        </div>
+<div class="min-w-0">
+<p class="font-semibold text-brand-text truncate">Mariana Costa</p>
+<p class="text-[11px] text-brand-muted truncate">Hipertrofia &amp; Mobilidade Torácica</p>
+</div>
+</div>
+</td>
+<td class="py-3 px-3 text-brand-secondary">
+<span class="text-brand-text font-medium block">Ontem, 07:10</span>
+<span class="text-[11px] text-brand-olive">Treino B concluído</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-2">
+<span class="font-semibold text-brand-olive">3/4</span>
+<div class="w-14 h-1.5 bg-brand-bg rounded-full overflow-hidden">
+<div class="h-full bg-brand-olive rounded-full" style="width: 75%;"></div>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-medium text-brand-text block">Semana 3 de 10</span>
+<span class="text-[11px] text-brand-muted">Deload na Semana 5</span>
+</td>
+<td class="py-3 px-4 text-right">
+<div class="inline-flex items-center gap-1.5">
+<button class="px-2.5 py-1 rounded bg-brand-elevated hover:bg-brand-border border border-brand-border text-brand-text text-xs font-medium transition-colors" type="button">
+                          Abrir Ficha
+                        </button>
+<button class="p-1 rounded text-brand-muted hover:text-brand-terracotta transition-colors" type="button">
+<span class="material-symbols-outlined text-base">tune</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Footer -->
+<div class="p-3 bg-brand-bg/40 border-t border-brand-border flex items-center justify-between text-xs text-brand-muted">
+<span>Exibindo 4 de 14 alunos em acompanhamento contínuo</span>
+<a class="text-brand-terracotta hover:underline font-semibold flex items-center gap-1" href="#">
+<span>Ver listagem completa da carteira</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</section>
+<!-- COLUNA DIREITA (MENOR: 4 colunas) - AGENDA & FEEDBACKS -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<!-- Agenda & Compromissos de Hoje -->
+<section class="bg-brand-surface border border-brand-border rounded-lg flex flex-col">
+<div class="p-4 border-b border-brand-border flex items-center justify-between">
+<div>
+<h3 class="text-sm font-bold uppercase tracking-wider text-brand-text">Agenda de Hoje</h3>
+<p class="text-xs text-brand-muted mt-0.5">Sexta-feira • 3 sessões agendadas</p>
+</div>
+<span class="text-xs font-semibold px-2 py-0.5 rounded bg-brand-elevated border border-brand-border text-brand-secondary">
+                  3 Sessões
+                </span>
+</div>
+<!-- List of Schedule Items -->
+<div class="divide-y divide-brand-border">
+<!-- Session 1 -->
+<div class="p-3.5 hover:bg-brand-elevated/40 transition-colors flex items-start gap-3">
+<div class="px-2 py-1.5 rounded bg-brand-bg border border-brand-border text-center min-w-[50px] shrink-0">
+<span class="font-condensed font-bold text-sm text-brand-terracotta block leading-none">09:00</span>
+<span class="text-[10px] text-brand-muted mt-0.5 block">50 min</span>
+</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-semibold text-brand-text truncate">Juliana Mendes</h4>
+<span class="text-[10px] font-semibold text-brand-olive uppercase">Presencial</span>
+</div>
+<p class="text-xs text-brand-secondary truncate">Treino de Hipertrofia Inferiores</p>
+<p class="text-[11px] text-brand-muted flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-xs">location_on</span>
+<span>Academia Iron Box — Sala 02</span>
+</p>
+</div>
+</div>
+<!-- Session 2 -->
+<div class="p-3.5 hover:bg-brand-elevated/40 transition-colors flex items-start gap-3">
+<div class="px-2 py-1.5 rounded bg-brand-bg border border-brand-border text-center min-w-[50px] shrink-0">
+<span class="font-condensed font-bold text-sm text-brand-text block leading-none">11:30</span>
+<span class="text-[10px] text-brand-muted mt-0.5 block">40 min</span>
+</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-semibold text-brand-text truncate">Lucas Pinheiro</h4>
+<span class="text-[10px] font-semibold text-brand-ochre uppercase">Avaliação</span>
+</div>
+<p class="text-xs text-brand-secondary truncate">Bioimpedância &amp; Dobras Cutâneas</p>
+<p class="text-[11px] text-brand-muted flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-xs">vital_signs</span>
+<span>Consultório ShapeUp</span>
+</p>
+</div>
+</div>
+<!-- Session 3 -->
+<div class="p-3.5 hover:bg-brand-elevated/40 transition-colors flex items-start gap-3">
+<div class="px-2 py-1.5 rounded bg-brand-bg border border-brand-border text-center min-w-[50px] shrink-0">
+<span class="font-condensed font-bold text-sm text-brand-text block leading-none">15:00</span>
+<span class="text-[10px] text-brand-muted mt-0.5 block">30 min</span>
+</div>
+<div class="min-w-0 flex-1">
+<div class="flex items-center justify-between">
+<h4 class="text-xs font-semibold text-brand-text truncate">Onboarding Novo Aluno</h4>
+<span class="text-[10px] font-semibold text-brand-muted uppercase">Online</span>
+</div>
+<p class="text-xs text-brand-secondary truncate">Alinhamento de metas &amp; Protocolo inicial</p>
+<a class="text-[11px] text-brand-terracotta hover:underline flex items-center gap-1 mt-0.5" href="#">
+<span class="material-symbols-outlined text-xs">videocam</span>
+<span>Link da chamada Google Meet</span>
+</a>
+</div>
+</div>
+</div>
+<div class="p-2.5 border-t border-brand-border bg-brand-bg/30 text-center">
+<a class="text-xs font-semibold text-brand-secondary hover:text-brand-text" href="#">
+                  Abrir grade semanal completa
+                </a>
+</div>
+</section>
+<!-- Feedbacks Recentes que Requerem Intervenção -->
+<section class="bg-brand-surface border border-brand-border rounded-lg flex flex-col">
+<div class="p-4 border-b border-brand-border flex items-center justify-between">
+<div>
+<h3 class="text-sm font-bold uppercase tracking-wider text-brand-text">Feedbacks em Aberto</h3>
+<p class="text-xs text-brand-muted mt-0.5">Comentários registrados após sessões</p>
+</div>
+<span class="text-xs font-semibold px-2 py-0.5 rounded bg-brand-terracotta/20 text-brand-terracotta border border-brand-terracotta/30">
+                  2 Pendentes
+                </span>
+</div>
+<div class="divide-y divide-brand-border">
+<!-- Feedback 1: Juliana Mendes -->
+<div class="p-4 space-y-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<img alt="Juliana Mendes" class="w-6 h-6 rounded-md object-cover border border-brand-border" src="https://lh3.googleusercontent.com/aida/AEtjO1VPYx0MwNnIBZPsF5o8mZ1skc9IleG9wpbzft5Js31vsM_JFwgmU7UJ1KfA6qZuixjH_E-XzDXlFH-YNXsVofG-lZNT0-Sv7e8RyEyXs907nAIZ2lZCmgaQmamViXzLegguxZuLnyyZamPq52esn1GdROx4E33vCby_mNCgY5h30xyTaLhrfmQK-SmJKfjEFXPAab3CwosOVhyODqf9bCf4ajsSrtNgoEh1fZN4hWGirMpwzBeQtZ5E-A">
+<span class="text-xs font-semibold text-brand-text">Juliana Mendes</span>
+</div>
+<span class="text-[11px] text-brand-muted">Hoje, 09:15</span>
+</div>
+<div class="bg-brand-bg border border-brand-border rounded p-2.5 text-xs text-brand-secondary italic">
+                    “Aumentei 5kg na elevação pélvica! Senti que a ativação foi perfeita, dorzinha boa no dia seguinte.”
+                  </div>
+<div class="flex items-center justify-between text-xs pt-0.5">
+<span class="text-brand-olive text-[11px] font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">thumb_up</span> +5kg registrados
+                    </span>
+<button class="text-xs font-semibold text-brand-terracotta hover:underline" type="button">
+                      Responder Aluno
+                    </button>
+</div>
+</div>
+<!-- Feedback 2: Lucas Pinheiro -->
+<div class="p-4 space-y-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<img alt="Lucas Pinheiro" class="w-6 h-6 rounded-md object-cover border border-brand-border" src="https://lh3.googleusercontent.com/aida/AEtjO1VKsqbdKIDSICDo3GFIAjfQ0ajhFL6MDnpq5e8epickpv2ZzwEizF3GIH66zjAWaPY3GiFUoOt-LfHrcHQctrzJMDfzpvZew_gHepipiJplZGc5CYa2Evl-mnvwKZH2uJg1-DU9_z5RyZ2G50euN8LfMDVzomYsHLIGNdABpnJsOWUYpLEfsFIL4SpE-jqw9OucgF9ALJZFbIoT3kscQwyYt-gw1HJNGJm-Le4Kd9ajGI-U_WRVjAxWMWs">
+<span class="text-xs font-semibold text-brand-text">Lucas Pinheiro</span>
+</div>
+<span class="text-[11px] text-brand-ochre font-medium">Atenção</span>
+</div>
+<div class="bg-brand-bg border border-brand-border rounded p-2.5 text-xs text-brand-secondary italic">
+                    “Senti um leve desconforto no ombro direito no desenvolvimento com halteres na última série. Vale trocar o exercício?”
+                  </div>
+<div class="pt-1">
+<button class="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded bg-brand-terracotta text-white hover:bg-brand-terracottaHover text-xs font-semibold transition-colors" type="button">
+<span class="material-symbols-outlined text-sm">edit_note</span>
+<span>Responder &amp; Ajustar Treino</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</div>

@@ -1,0 +1,475 @@
+/* Editorial gym journal — food ledger, not calorie cards. */
+
+.su-nutrition-page {
+    container-type: inline-size;
+    container-name: nutrition;
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 0 0 3.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.35rem;
+}
+
+.su-nutrition-masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.25rem;
+    padding-bottom: 0.25rem;
+}
+
+.su-nutrition-kicker {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 0.35rem;
+}
+
+.su-nutrition-page .su-page-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.85rem, 3.6vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: 0;
+    line-height: 1.05;
+    text-transform: none;
+    margin: 0;
+}
+
+.su-nutrition-date {
+    width: auto;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    padding: 0.45rem 0.65rem;
+}
+
+.su-nutrition-nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    padding: 0.45rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.su-nutrition-nav a {
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    text-decoration: none;
+    padding: 0.7rem 1.05rem;
+    color: var(--text-muted);
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-sm);
+}
+
+.su-nutrition-nav a:hover {
+    color: var(--text-main);
+    background: color-mix(in oklch, var(--bg-main) 70%, var(--bg-card));
+}
+
+.su-nutrition-nav a.su-btn-primary,
+.su-nutrition-nav a[aria-current='page'] {
+    color: var(--text-on-primary);
+    background: var(--primary);
+    box-shadow: none;
+}
+
+.su-journal-sheet {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    padding: 1.25rem 1.35rem 1.4rem;
+}
+
+.su-journal-sheet .su-section-title,
+.su-ledger-heading {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    margin: 0 0 1rem;
+    color: var(--text-main);
+}
+
+.su-macro-ledger {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem 1.25rem;
+    padding: 0.35rem 0 0.85rem;
+}
+
+.su-macro-cell {
+    min-width: 0;
+}
+
+.su-macro-cell[data-testid] {
+    margin-bottom: 0;
+}
+
+.su-macro-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    margin-bottom: 0.35rem;
+}
+
+.su-macro-label {
+    font-family: var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
+    font-weight: 600;
+}
+
+.su-macro-nums {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+}
+
+.su-macro-track {
+    height: 6px;
+    background: color-mix(in oklch, var(--border-color) 80%, var(--bg-main));
+    overflow: hidden;
+    border-radius: 999px;
+}
+
+.su-macro-fill {
+    height: 100%;
+    transform-origin: left center;
+    transition: transform var(--transition-normal);
+}
+
+.su-goal-banner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.85rem 1rem;
+    align-items: baseline;
+    padding: 1rem 1.15rem;
+    border: 1px solid color-mix(in oklch, var(--success) 45%, var(--border-color));
+    border-radius: var(--radius-md);
+    background: color-mix(in oklch, var(--success) 10%, var(--bg-card));
+}
+
+.su-goal-stamp {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--success);
+}
+
+.su-goal-banner p {
+    margin: 0.2rem 0 0;
+}
+
+.su-ledger-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.su-ledger-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem 1rem;
+    align-items: center;
+    padding: 0.75rem 0.35rem;
+    border-bottom: 0;
+    border-radius: var(--radius-sm);
+}
+
+.su-ledger-row:nth-child(even) {
+    background: color-mix(in oklch, var(--bg-main) 55%, var(--bg-card));
+}
+
+.su-ledger-row:first-child {
+    border-top: 0;
+}
+
+.su-ledger-food {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.65rem;
+}
+
+.su-ledger-qty,
+.su-ledger-macros {
+    font-variant-numeric: tabular-nums;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.su-ledger-actions {
+    display: flex;
+    gap: 0.15rem;
+}
+
+.su-ledger-actions .su-btn {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    letter-spacing: 0;
+    text-transform: none;
+    padding: 0.35rem 0.65rem;
+    background: transparent;
+    color: var(--text-muted);
+    border: 0;
+    border-radius: var(--radius-sm);
+    box-shadow: none;
+}
+
+.su-ledger-actions .su-btn:hover {
+    color: var(--primary);
+    background: transparent;
+}
+
+.su-empty-ledger {
+    padding: 1.5rem 0 2rem;
+    border-top: 1px dashed var(--border-color);
+    font-style: italic;
+}
+
+.su-search-row,
+.su-barcode-row,
+.su-plan-item-row,
+.su-form-actions,
+.su-mode-switch {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.su-search-row > :first-child,
+.su-barcode-row > :first-child {
+    flex: 1;
+    min-width: 12rem;
+}
+
+.su-food-index {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.su-food-index-item {
+    margin: 0;
+}
+
+.su-food-index-btn {
+    width: 100%;
+    text-align: left;
+    padding: 0.7rem 0;
+    border: 0;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 0;
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+}
+
+.su-food-index-btn:hover {
+    color: var(--primary);
+}
+
+.su-food-index li:first-child .su-food-index-btn {
+    border-top: 1px solid var(--border-color);
+}
+
+.su-food-kcal {
+    display: block;
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.su-plan-item-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+    align-items: end;
+}
+
+.su-mode-switch {
+    gap: 0.5rem;
+    margin-bottom: 0;
+    padding: 0.45rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.su-mode-switch .su-btn {
+    font-family: var(--font-sans);
+    letter-spacing: 0;
+    text-transform: none;
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-sm);
+    box-shadow: none;
+    color: var(--text-muted);
+    margin-bottom: 0;
+    padding: 0.65rem 1rem;
+}
+
+.su-mode-switch .su-btn-primary {
+    color: var(--text-on-primary);
+    background: var(--primary);
+    border-bottom-color: transparent;
+}
+
+.su-macro-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+}
+
+.su-version-flag {
+    font-family: var(--font-display);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.su-substitute-overlay {
+    position: fixed;
+    inset: 0;
+    background: color-mix(in oklch, var(--text-main) 42%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.su-substitute-sheet {
+    width: min(100%, 28rem);
+    max-height: min(88vh, 40rem);
+    overflow: auto;
+    background: var(--bg-card);
+    padding: 1.35rem 1.35rem 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.su-substitute-sheet h4 {
+    font-family: var(--font-display);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    margin: 0 0 0.5rem;
+}
+
+.su-sub-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+}
+
+.su-sub-list li {
+    margin: 0;
+}
+
+.su-sub-list .su-btn {
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 0;
+    color: var(--text-main);
+    padding: 0.55rem 0;
+}
+
+.su-sub-list .su-btn:hover {
+    color: var(--primary);
+    background: transparent;
+}
+
+.su-nutrition-page .su-btn-secondary {
+    background: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    box-shadow: none;
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+}
+
+.su-nutrition-page .su-btn-secondary:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: transparent;
+}
+
+.su-nutrition-page .su-journal-sheet,
+.su-nutrition-page .su-ledger-row,
+.su-nutrition-page .su-macro-cell {
+    animation: su-ledger-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.su-nutrition-page .su-macro-cell:nth-child(2) { animation-delay: 40ms; }
+.su-nutrition-page .su-macro-cell:nth-child(3) { animation-delay: 80ms; }
+.su-nutrition-page .su-macro-cell:nth-child(4) { animation-delay: 120ms; }
+
+@keyframes su-ledger-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@container nutrition (max-width: 640px) {
+    .su-macro-ledger,
+    .su-plan-item-row,
+    .su-macro-fields {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .su-nutrition-masthead {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .su-ledger-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@container nutrition (max-width: 420px) {
+    .su-macro-ledger,
+    .su-plan-item-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .su-nutrition-page .su-journal-sheet,
+    .su-nutrition-page .su-ledger-row,
+    .su-nutrition-page .su-macro-cell {
+        animation: none;
+    }
+}

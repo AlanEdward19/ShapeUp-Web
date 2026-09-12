@@ -1,0 +1,45 @@
+.su-404 {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem 8vw;
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+
+.su-404-code {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 12vw, 8rem);
+  line-height: 0.85;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.su-404 h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  max-width: 16ch;
+  margin-bottom: 0.75rem;
+}
+
+.su-404 p {
+  max-width: 42ch;
+  color: var(--text-muted);
+  margin-bottom: 1.75rem;
+}
+
+.su-404-cta {
+  align-self: flex-start;
+  background: var(--primary);
+  color: var(--text-on-primary);
+  padding: 0.85rem 1.25rem;
+  font-weight: 700;
+}
+
+.su-404-cta:hover {
+  color: var(--text-on-primary);
+  background: var(--primary-hover);
+}

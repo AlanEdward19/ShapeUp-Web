@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Card from '../../components/Card';
 import { usePlatformFeatureFlags } from '../../hooks/api/usePlatformFeatureFlags';
+import { useLanguage } from '../../contexts/LanguageContext';
+import './AdminLedger.css';
 
 const FeatureFlagsPanel = () => {
+    const { t } = useLanguage();
     const { getFeatureFlags, putFeatureFlag } = usePlatformFeatureFlags();
     const [flags, setFlags] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -16,12 +18,12 @@ const FeatureFlagsPanel = () => {
             const data = await getFeatureFlags();
             setFlags(Array.isArray(data) ? data : []);
         } catch (err) {
-            setError(err.message || 'Falha ao carregar flags');
+            setError(err.message || t('admin.flags.error.load'));
             setFlags([]);
         } finally {
             setLoading(false);
         }
-    }, [getFeatureFlags]);
+    }, [getFeatureFlags, t]);
 
     useEffect(() => {
         loadFlags();
@@ -34,39 +36,40 @@ const FeatureFlagsPanel = () => {
             const updated = await putFeatureFlag(key, !currentEnabled);
             setFlags((prev) => prev.map((f) => (f.key === key ? { ...f, enabled: updated.enabled } : f)));
         } catch (err) {
-            setError(err.message || 'Falha ao atualizar flag');
+            setError(err.message || t('admin.flags.error.save'));
         } finally {
             setToggling(null);
         }
     };
 
     return (
-        <div>
-            <h1 className="su-page-title su-mb-6">Feature flags</h1>
+        <div className="su-admin-ledger">
+            <span className="su-admin-kicker">{t('admin.flags.kicker')}</span>
+            <h1 className="su-page-title su-mb-6">{t('admin.flags.title')}</h1>
 
             {error && <p className="su-input-error-text su-mb-4" role="alert">{error}</p>}
 
             {loading ? (
-                <p className="su-text-muted">Carregando...</p>
+                <p className="su-text-muted">{t('admin.flags.loading')}</p>
             ) : (
-                <Card data-testid="flags-panel">
+                <section className="su-flag-panel" data-testid="flags-panel">
                     {flags.length === 0 ? (
-                        <p className="su-text-muted">Nenhuma flag configurada.</p>
+                        <p className="su-text-muted">{t('admin.flags.empty')}</p>
                     ) : (
-                        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                        <ul className="su-flag-list">
                             {flags.map((flag) => (
                                 <li
                                     key={flag.key}
-                                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 0', borderBottom: '1px solid var(--border-color)' }}
+                                    className="su-flag-row"
                                     data-testid={`flag-row-${flag.key}`}
                                 >
                                     <div>
-                                        <strong>{flag.key}</strong>
-                                        <span className="su-text-muted" style={{ marginLeft: '0.5rem', fontSize: '0.85rem' }}>
-                                            {flag.enabled ? 'Ativa' : 'Desativada'}
+                                        <strong className="su-flag-key">{flag.key}</strong>
+                                        <span className="su-flag-status">
+                                            {flag.enabled ? t('admin.flags.on') : t('admin.flags.off')}
                                         </span>
                                     </div>
-                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                    <label className="su-flag-toggle">
                                         <input
                                             type="checkbox"
                                             checked={flag.enabled}
@@ -74,13 +77,13 @@ const FeatureFlagsPanel = () => {
                                             disabled={toggling === flag.key}
                                             data-testid={`flag-toggle-${flag.key}`}
                                         />
-                                        <span style={{ fontSize: '0.85rem' }}>Ligada</span>
+                                        <span>{t('admin.flags.toggle')}</span>
                                     </label>
                                 </li>
                             ))}
                         </ul>
                     )}
-                </Card>
+                </section>
             )}
         </div>
     );

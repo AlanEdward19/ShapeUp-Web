@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Copy, Dumbbell, X, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -10,6 +10,7 @@ import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
 import { normalizeTemplate, flattenBlockExercises, countBlockSets } from '../../utils/trainingNormalization';
+import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import './TrainingPlansProfessional.css';
 
 // Shared by handleSaveTemplate and the offline-safe path of duplicateTemplate below --
@@ -47,6 +48,8 @@ const buildTemplateBody = (plan) => ({
 
 
 const TrainingPlansProfessional = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const { getWorkoutTemplates } = useTrainingApi();
@@ -125,16 +128,16 @@ const TrainingPlansProfessional = () => {
         return stored ? JSON.parse(stored) : [];
     });
 
-    const openNewTemplate = () => {
+    const openNewTemplate = useCallback(() => {
         setActiveTemplate({
             id: `tmpl_${Date.now()}`,
             name: 'New Training Template',
             phase: 'Hypertrophy',
             difficulty: 'Intermediate',
             weeks: 4,
-            blocks: []
+            blocks: location.state?.exercise ? [{ id: 'b-' + Date.now(), type: 'straight', exercises: [{ ...location.state.exercise, exerciseId: location.state.exercise.id, id: 'e-' + Date.now(), notes: '', sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '', intensityType: 'rpe', intensityValue: '8', rest: '90' }] }] }] : []
         });
-    };
+    }, [location.state?.exercise]);
 
 
     // Offline-safe by construction: `tmpl` already has the full local copy of the template
@@ -238,15 +241,19 @@ const TrainingPlansProfessional = () => {
         setShowSuccessModal(true);
     };
 
+    useEffect(() => {
+        if (location.state?.create) { openNewTemplate(); navigate(location.pathname, { replace: true, state: null }); }
+    }, [location.key, location.pathname, location.state?.create, navigate, openNewTemplate]);
+
     return (
         <div className="su-pro-dashboard">
-            <div className="su-dashboard-header-flex" data-tour="tpp-header">
+            <div className={`su-dashboard-header-flex ${activeTemplate ? 'su-builder-page-toolbar' : ''}`} data-tour="tpp-header">
                 <div>
                     <h1 className="su-page-title">{activeTemplate ? t('pro.training.title.builder') : t('pro.training.title.library')}</h1>
                     <p className="su-page-subtitle">{activeTemplate ? t('pro.training.subtitle.builder') : t('pro.training.subtitle.library')}</p>
                 </div>
                 {!activeTemplate && (
-                    <Button icon={<Plus size={16} />} onClick={openNewTemplate}>{t('pro.training.btn.create')}</Button>
+                    <Button onClick={openNewTemplate}>{t('pro.training.btn.create')}</Button>
                 )}
                 {activeTemplate && (
                     <Button variant="outline" onClick={() => setActiveTemplate(null)}>{t('pro.training.btn.back')}</Button>
@@ -264,14 +271,11 @@ const TrainingPlansProfessional = () => {
                 <div className="su-training-library">
                     {templates.length === 0 ? (
                         <div className="su-empty-library">
-                            <div className="su-empty-icon-wrap">
-                                <Dumbbell size={32} />
-                            </div>
                             <h2 className="su-empty-title">{t('pro.training.empty.title')}</h2>
                             <p className="su-empty-desc">
                                 {t('pro.training.empty.desc')}
                             </p>
-                            <Button icon={<Plus size={16} />} onClick={openNewTemplate}>{t('pro.training.empty.btn')}</Button>
+                            <Button onClick={openNewTemplate}>{t('pro.training.empty.btn')}</Button>
                         </div>
                     ) : (
                         <div className="su-grid-cards">
@@ -288,8 +292,8 @@ const TrainingPlansProfessional = () => {
                                             <div className="su-template-header-row" style={{ alignItems: 'flex-start' }}>
                                                 <h3 className="su-template-title-clean" style={{ marginBottom: 0, paddingRight: '1rem' }}>{tmpl.name}</h3>
                                                 <div className="su-template-top-actions">
-                                                    <button className="su-icon-btn su-text-muted" title="Duplicate" onClick={() => duplicateTemplate(tmpl)}><Copy size={16} /></button>
-                                                    <button className="su-icon-btn su-error-text" title="Delete" onClick={() => deleteTemplate(tmpl)}><Trash2 size={16} /></button>
+                                                    <button className="su-icon-btn su-text-muted" title="Duplicate" onClick={() => duplicateTemplate(tmpl)}>Copy</button>
+                                                    <button className="su-icon-btn su-error-text" title="Delete" onClick={() => deleteTemplate(tmpl)}>Del</button>
                                                 </div>
                                             </div>
                                             <div className="su-template-subtitle-clean" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -313,6 +317,7 @@ const TrainingPlansProfessional = () => {
                                                     <span className="su-metric-clean-lbl">{t('pro.training.card.time')}</span>
                                                 </div>
                                             </div>
+                                            <WorkoutBodyMap exercises={tmplExercises} compact />
                                         </div>
                                         <div className="su-template-footer-actions" data-tour="tpp-card-actions">
                                             <Button variant="outline" fullWidth onClick={() => setActiveTemplate(tmpl)}>{t('pro.training.card.btn.edit')}</Button>
@@ -329,7 +334,7 @@ const TrainingPlansProfessional = () => {
             {assigningTemplate && (
                 <div className="su-modal-overlay" onClick={() => setAssigningTemplate(null)} style={{ zIndex: 9999 }}>
                     <div className="su-modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
-                        <button className="su-modal-close" onClick={() => setAssigningTemplate(null)}><X size={20} /></button>
+                        <button className="su-modal-close" onClick={() => setAssigningTemplate(null)} aria-label="Close">×</button>
                         <h2 className="su-modal-title" style={{ textAlign: 'left', marginBottom: '1rem' }}>{t('pro.training.assign.modal.title')}</h2>
                         <p className="su-text-muted su-mb-4" style={{ fontSize: '0.9rem' }}>
                             {t('pro.training.assign.modal.desc')} <strong>{assigningTemplate.name}</strong>:
@@ -357,9 +362,6 @@ const TrainingPlansProfessional = () => {
             {showSuccessModal && (
                 <div className="su-modal-overlay su-alert-modal-overlay" onClick={() => setShowSuccessModal(false)}>
                     <div className="su-modal-box su-alert-modal-box" onClick={e => e.stopPropagation()}>
-                        <div className="su-alert-icon-wrap" style={{ backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'var(--success)' }}>
-                            <CheckCircle2 size={32} />
-                        </div>
                         <h2 className="su-modal-title">{t('pro.training.assign.success.title')}</h2>
                         <p className="su-modal-subtitle">
                             {t('pro.training.assign.success.message')}
@@ -377,24 +379,21 @@ const TrainingPlansProfessional = () => {
             {showDeleteConfirm && (
                 <div className="su-modal-overlay su-delete-confirm-overlay" onClick={() => setShowDeleteConfirm(false)}>
                     <div className="su-modal-box su-delete-confirm-content su-alert-modal-box" onClick={e => e.stopPropagation()}>
-                        <div className="su-alert-icon-wrap" style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--error)' }}>
-                            <Trash2 size={32} />
-                        </div>
                         <h2 className="su-modal-title">{t('pro.training.delete.confirm.title') || 'Excluir Template?'}</h2>
                         <p className="su-modal-subtitle">
-                            {t('pro.training.delete.confirm.desc') || 'Tem certeza que deseja excluir o template'} 
-                            <strong> {templateToDelete?.name}</strong>? 
+                            {t('pro.training.delete.confirm.desc') || 'Tem certeza que deseja excluir o template'}
+                            <strong> {templateToDelete?.name}</strong>?
                             <br/>{t('pro.training.delete.confirm.warning') || 'Essa ação não pode ser desfeita.'}
                         </p>
                         <div className="su-modal-actions" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                            <Button 
-                                variant="outline" 
+                            <Button
+                                variant="outline"
                                 onClick={() => { setShowDeleteConfirm(false); setTemplateToDelete(null); }}
                                 style={{ minWidth: '120px' }}
                             >
                                 {t('common.cancel') || 'Cancelar'}
                             </Button>
-                            <Button 
+                            <Button
                                 onClick={confirmDelete}
                                 style={{ minWidth: '120px', backgroundColor: 'var(--error)', color: 'white' }}
                             >

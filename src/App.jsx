@@ -1,32 +1,41 @@
 import React from 'react';
+import RouteMetadata from './components/RouteMetadata';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TourProvider } from '@reactour/tour';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
+import './styles/Tour.css';
+import { StitchLogin as Login, StitchLanding as LandingPage, StitchRecovery as ForgotPassword } from './stitch/PublicPages';
+import Register from './stitch/Registration';
+
 import ResetPassword from './pages/ResetPassword';
-import LandingPage from './pages/LandingPage';
+
+import LegalDocument from './pages/LegalDocument';
+import NotFound from './pages/NotFound';
+import CookieConsent from './components/CookieConsent';
 import Layout from './components/Layout';
 import { useAuth } from './contexts/AuthContext';
 import Dashboard from './pages/Dashboard';
 import TrainingPlans from './pages/TrainingPlans';
 import Clients from './pages/Dashboard/Clients';
 import ClientDetail from './pages/Dashboard/ClientDetail';
-import Exercises from './pages/Dashboard/Exercises';
-import Feedback from './pages/Dashboard/Feedback';
+import Exercises from './stitch/Exercises';
+import Feedback from './stitch/Messages';
 import Analytics from './pages/Dashboard/Analytics';
 import Reports from './pages/Dashboard/Reports';
-import Settings from './pages/Dashboard/Settings';
+import Settings from './stitch/Settings';
 import ObjectivesClient from './pages/Dashboard/ObjectivesClient';
 import StaffGym from './pages/Dashboard/StaffGym';
 import TurnstileGym from './pages/Dashboard/TurnstileGym';
-import FinancialGym from './pages/Dashboard/FinancialGym';
-import DiaryDay from './pages/Dashboard/Nutrition/DiaryDay';
+import { StitchFinance as FinancialGym } from './stitch/OperationalPages';
+import DiaryDay from './stitch/Nutrition';
 import FoodSearch from './pages/Dashboard/Nutrition/FoodSearch';
 import MealPlanManager from './pages/Dashboard/Nutrition/MealPlanManager';
 import GoalOnboarding from './pages/Dashboard/Nutrition/GoalOnboarding';
-import FoodModerationQueue from './pages/Admin/FoodModerationQueue';
+import FoodModerationQueue from './stitch/Moderation';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
+import Messages from './stitch/Messages';
+import ExploreGyms from './stitch/Gyms';
+import Onboarding from './stitch/Onboarding';
+import useStitchLanguage from './stitch/useStitchLanguage';
 
 // Wrapper for the Login page
 const LoginWrapper = () => {
@@ -41,26 +50,56 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
+  useStitchLanguage(document.getElementById('root'));
   return (
-    <TourProvider steps={[]}
+    <TourProvider
+      steps={[]}
+      accentColor="#c45c38"
       styles={{
         popover: (base) => ({
           ...base,
           borderRadius: 12,
-          backgroundColor: 'var(--bg-card, #ffffff)',
-          color: 'var(--text-main, #1a1a1a)',
+          backgroundColor: 'var(--bg-card)',
+          color: 'var(--text-main)',
+          border: '1px solid var(--border-color)',
         }),
-        close: (base) => ({ ...base, color: 'var(--primary, #3b82f6)' }),
+        maskWrapper: (base) => ({
+          ...base,
+          color: 'oklch(28% 0.02 45 / 0.52)',
+        }),
+        maskArea: (base) => ({ ...base, rx: 10 }),
+        badge: (base) => ({
+          ...base,
+          backgroundColor: 'var(--primary)',
+          background: 'var(--primary)',
+          color: 'var(--text-on-primary)',
+        }),
+        button: (base) => ({
+          ...base,
+          color: 'var(--primary)',
+        }),
+        dot: (base, state) => ({
+          ...base,
+          background: state?.current ? 'var(--primary)' : 'var(--border-color)',
+          color: state?.current ? 'var(--primary)' : 'var(--border-color)',
+        }),
+        close: (base) => ({ ...base, color: 'var(--text-muted)' }),
+        arrow: (base) => ({ ...base, color: 'var(--text-main)' }),
       }}
     >
       <BrowserRouter>
+        <RouteMetadata />
+        <CookieConsent />
         <Routes>
           <Route path="/" element={<LandingPage />} />
+          <Route path="/privacy" element={<LegalDocument kind="privacy" />} />
+          <Route path="/terms" element={<LegalDocument kind="terms" />} />
           <Route path="/login" element={<LoginWrapper />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/__/auth/action" element={<ResetPassword />} /> 
+          <Route path="/__/auth/action" element={<ResetPassword />} />
+          <Route path="/dashboard/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="training" element={<TrainingPlans />} />
@@ -82,8 +121,11 @@ function App() {
             <Route path="turnstile" element={<TurnstileGym />} />
             <Route path="financial" element={<FinancialGym />} />
             {/* Mock nested routes below */}
-            <Route path="messages" element={<div style={{ padding: '2rem' }}>Messages Placeholder</div>} />
+            <Route path="messages" element={<Messages />} />
+            <Route path="gyms" element={<ExploreGyms />} />
+
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TourProvider>

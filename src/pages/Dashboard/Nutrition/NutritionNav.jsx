@@ -1,26 +1,30 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import './Nutrition.css';
 
 const tabs = [
-    { to: '/dashboard/nutrition/diary', label: 'Diário' },
-    { to: '/dashboard/nutrition/foods', label: 'Alimentos' },
-    { to: '/dashboard/nutrition/meal-plans', label: 'Cardápio' },
-    { to: '/dashboard/nutrition/goal', label: 'Meta' },
+    { to: '/dashboard/nutrition/diary', key: 'nutrition.nav.diary' },
+    { to: '/dashboard/nutrition/foods', key: 'nutrition.nav.foods' },
+    { to: '/dashboard/nutrition/meal-plans', key: 'nutrition.nav.plans' },
+    { to: '/dashboard/nutrition/goal', key: 'nutrition.nav.goal' },
 ];
 
-const NutritionNav = () => (
-    <nav className="su-nutrition-nav su-mb-4" data-testid="nutrition-nav" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-        {tabs.map((tab) => (
-            <NavLink
-                key={tab.to}
-                to={tab.to}
-                className={({ isActive }) => `su-btn su-btn-${isActive ? 'primary' : 'secondary'}`}
-                style={{ textDecoration: 'none' }}
-            >
-                {tab.label}
-            </NavLink>
-        ))}
-    </nav>
-);
+const NutritionNav = () => {
+    const { t } = useLanguage();
+    return (
+        <nav className="su-nutrition-nav" data-testid="nutrition-nav">
+            {tabs.map((tab) => (
+                <NavLink
+                    key={tab.to}
+                    to={tab.to}
+                    className={({ isActive }) => `su-btn su-btn-${isActive ? 'primary' : 'secondary'}`}
+                >
+                    {t(tab.key)}
+                </NavLink>
+            ))}
+        </nav>
+    );
+};
 
 export default NutritionNav;

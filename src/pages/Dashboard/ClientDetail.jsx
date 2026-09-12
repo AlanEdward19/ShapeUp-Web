@@ -1,10 +1,10 @@
+import StitchBuilder from '../../stitch/Builder';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
 import {
-    ArrowLeft, TrendingUp, Activity, Scale, CheckCircle2,
-    Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp, AlertTriangle,
-    X, Save, Settings2, BarChart2, Dumbbell, ClipboardList, History, Play
+    ArrowLeft, Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp, AlertTriangle,
+    X, Save, Settings2, History, Play
 } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -28,6 +28,7 @@ import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
+import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 
 // Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
 // from a plan object shaped like normalizePlan()'s output (PlanEditor's internal shape) and
@@ -143,7 +144,7 @@ export const DIFFICULTIES = ['Easy', 'Intermediate', 'Hard', 'Advanced'];
 // eslint-disable-next-line react-refresh/only-export-components -- shared constant co-located with the components that use it
 export const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
-export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false }) => {
+export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false, stitch = true }) => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [name, setName] = useState(plan.name);
@@ -190,6 +191,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             id: `e${Date.now()}`,
             exerciseId: ex.id,
             name: ex.name,
+            muscles: Array.isArray(ex.muscles) ? ex.muscles : [],
             tags: tagsParts.join(' • '),
             notes: '',
             sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '75', intensityType: 'rpe', intensityValue: '8', rest: '90' }]
@@ -299,11 +301,13 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             }));
     })();
 
+    if (stitch) return <StitchBuilder state={{ plan, onSave, onAssign, onCancel, name, setName, phase, setPhase, difficulty, setDiff, weeks, setWeeks, planNotes, setPlanNotes, currentBlocks, setCurrentBlocks, totalSets, avgRpe, addExercise, addExerciseToBlock, showExerciseLibrary, setShowExerciseLibrary, handleSelectExercise, alertModal, setAlertModal }} />;
     return (
-        <div className="su-builder-layout">
+        <div className="su-builder-layout su-prescription-editor">
+            <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">Prescrição & periodização</span><h1>{name || t('pro.builder.name')}</h1><p>{phase} · {weeks} semanas · {difficulty}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> exercícios</span><span><b>{totalSets}</b> séries</span><span><b>{estMins}</b> duração estimada</span></div><Button icon={<Save size={16} />} onClick={() => onSave({ ...plan, name, phase, difficulty, weeks, notes: planNotes, blocks: currentBlocks })}>{t('pro.builder.btn.save')}</Button></header>
             {/* LEFT: Plan builder */}
             <div className="su-plan-builder">
-                <Card className="su-plan-header-card" data-tour="pe-settings">
+                <details className="su-plan-header-card su-prescription-settings" data-tour="pe-settings" open={!plan.name}><summary>Parâmetros do plano <span>Nome, objetivo, duração e orientações</span></summary>
                     <div className="su-plan-meta-grid">
                         <Input label={t('pro.builder.name')} value={name} onChange={e => setName(e.target.value)} />
                         <Input label={t('pro.builder.weeks')} type="number" min="1" max="52" value={weeks} onChange={e => setWeeks(e.target.value)} />
@@ -327,11 +331,12 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                             onChange={e => setPlanNotes(e.target.value)}
                             placeholder={t('pro.builder.notes.ph')} />
                     </div>
-                </Card>
+                </details>
 
+                <div className="su-plan-session-strip"><span aria-current="true"><b>Treino</b><strong>{name}</strong><small>{totalSets} séries · {phase}</small></span></div>
                 <div className="su-exercise-stack" data-tour="pe-stack">
                     <div className="su-stack-header">
-                        <h2>{t('pro.builder.stack')}</h2>
+                        <h2>Exercícios prescritos <small>{allExercises.length} exercícios · {estMins}</small></h2>
                         <Button icon={<Plus size={16} />} onClick={addExercise}>{t('pro.builder.add.ex')}</Button>
                     </div>
 
@@ -354,14 +359,15 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             </div>
 
             {/* RIGHT: Sticky summary sidebar */}
-            <div className="su-structural-analytics" data-tour="pe-summary">
+            <details className="su-structural-analytics su-prescription-analytics" data-tour="pe-summary"><summary>Análise da prescrição e distribuição muscular</summary>
                 <Card className="su-sticky-card">
                     <div className="su-card-header-flex">
                         <h3 className="su-card-title">
-                            <Dumbbell size={18} style={{ marginRight: '8px', verticalAlign: 'text-bottom' }} />
                             {t('pro.builder.summary.title')}
                         </h3>
                     </div>
+
+                    <WorkoutBodyMap exercises={allExercises} compact />
 
                     <div className="su-intelligence-metrics">
                         <div className="su-metric-item">
@@ -445,7 +451,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                         {t('pro.builder.btn.cancel')}
                     </Button>
                 </Card>
-            </div>
+            </details>
             {showExerciseLibrary && (
                 <ExerciseLibraryModal
                     onClose={() => setShowExerciseLibrary(false)}
@@ -475,11 +481,16 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     );
 };
 
-export const SessionDetailModal = ({ session, planName, onClose }) => {
+export const SessionDetailModal = ({ session, planName, onClose, planExercises = [] }) => {
     const { t, unitSystem, convertWeight } = useLanguage();
 
     // Inflate original unit based on string
     const originUnit = (session.totalVol || '').includes('lbs') ? 'imperial' : 'metric';
+    const mapExercises = (session.exercises || []).map(ex => {
+        if ((ex.muscles && ex.muscles.length) || ex.target) return ex;
+        const match = planExercises.find(p => p.name === ex.name);
+        return match ? { ...ex, muscles: match.muscles || [] } : ex;
+    });
 
     return (
         <div className="su-modal-overlay" onClick={onClose}>
@@ -489,6 +500,7 @@ export const SessionDetailModal = ({ session, planName, onClose }) => {
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem', lineHeight: '1.4' }}>
                     {session.date} &middot; {session.duration} &middot; {session.totalVol} {t('pro.plan.history.vol')} &middot; {t('pro.builder.summary.avg_rpe')} {session.rpe}
                 </p>
+                <WorkoutBodyMap exercises={mapExercises} compact />
                 <div className="su-sd-exercises">
                     {session.exercises.map((ex, i) => (
                         <div key={i} className="su-sd-ex-block">
@@ -579,6 +591,7 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
                         <span className="su-cp-ex-empty">{t('pro.client.plan.empty.ex')}</span>
                     )}
                 </div>
+                <WorkoutBodyMap exercises={flattenBlockExercises(plan.blocks)} compact />
 
                 {/* History toggle */}
                 {plan.history && plan.history.length > 0 && (
@@ -634,19 +647,19 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
                         </div>
                         <h3 className="su-modal-title">{t('pro.client.plan.delete.title')}</h3>
                         <p className="su-modal-subtitle">
-                            {t('pro.client.plan.delete.desc') || 'Tem certeza que deseja excluir o plano'} 
-                            <strong> {plan.name}</strong>? 
+                            {t('pro.client.plan.delete.desc') || 'Tem certeza que deseja excluir o plano'}
+                            <strong> {plan.name}</strong>?
                             <br/>{t('pro.client.plan.delete.warning') || 'Essa ação não pode ser desfeita.'}
                         </p>
                         <div className="su-modal-actions" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                            <Button 
-                                variant="outline" 
+                            <Button
+                                variant="outline"
                                 onClick={() => setConfirmDelete(false)}
                                 style={{ minWidth: '120px' }}
                             >
                                 {t('common.cancel') || 'Cancelar'}
                             </Button>
-                            <Button 
+                            <Button
                                 onClick={() => { onDelete(plan.id); setConfirmDelete(false); }}
                                 style={{ minWidth: '120px', backgroundColor: 'var(--error)', color: 'white' }}
                             >
@@ -662,6 +675,7 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
                 <SessionDetailModal
                     session={selectedSession}
                     planName={plan.name}
+                    planExercises={flattenBlockExercises(plan.blocks)}
                     onClose={() => setSelectedSession(null)}
                 />
             )}
@@ -696,7 +710,7 @@ const ClientDetail = () => {
                 const raw = Array.isArray(response)
                     ? response
                     : (response?.data || response?.items || []);
-                
+
                 // Normalizar planos da API para o formato interno do PlanEditor
                 const data = raw.map(p => normalizePlan(p));
                 setPlans(data);
@@ -1045,8 +1059,8 @@ const ClientDetail = () => {
     };
 
     const tabs = [
-        { id: 'analytics', label: t('pro.client.tabs.analytics'), icon: <BarChart2 size={16} /> },
-        { id: 'plans', label: t('pro.client.tabs.plans'), icon: <Dumbbell size={16} /> },
+        { id: 'analytics', label: t('pro.client.tabs.analytics') },
+        { id: 'plans', label: t('pro.client.tabs.plans') },
     ];
 
     return (
@@ -1084,7 +1098,7 @@ const ClientDetail = () => {
                         className={`su-cp-tab ${activeTab === t.id ? 'active' : ''}`}
                         onClick={() => { setActiveTab(t.id); setEditingPlan(null); }}
                     >
-                        {t.icon} {t.label}
+                        {t.label}
                     </button>
                 ))}
             </div>
@@ -1092,7 +1106,6 @@ const ClientDetail = () => {
             {/* ── Tab: Analytics ──────────────────────────────────── */}
             {activeTab === 'analytics' && !hasRealData && (
                 <div className="su-client-empty-state su-mt-4" style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--text-muted)' }}>
-                    <BarChart2 size={48} style={{ opacity: 0.2, marginBottom: '1rem' }} />
                     <h3 style={{ color: 'var(--text-main)', marginBottom: '0.5rem' }}>{t('pro.client.empty.analytics.title')}</h3>
                     <p>{t('pro.client.empty.analytics.desc')}</p>
                 </div>
@@ -1102,7 +1115,6 @@ const ClientDetail = () => {
                 <div className="su-client-metrics-grid su-mt-4" data-tour="cd-charts">
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
-                            <TrendingUp size={20} className="su-text-muted" />
                             <h3 className="su-section-title">{t('pro.client.chart.volume')}</h3>
                         </div>
                         <div className="su-chart-wrapper-med">
@@ -1127,11 +1139,10 @@ const ClientDetail = () => {
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Activity size={20} className="su-text-muted" />
                                 <h3 className="su-section-title" style={{ margin: 0 }}>{t('pro.client.chart.muscles') || 'Muscle Volume (Sets)'}</h3>
                             </div>
-                            <select 
-                                className="su-select" 
+                            <select
+                                className="su-select"
                                 style={{ width: 'auto', padding: '4px 24px 4px 8px', fontSize: '0.8rem', minHeight: 'unset', height: '28px' }}
                                 value={muscleTimeFilter}
                                 onChange={(e) => setMuscleTimeFilter(e.target.value)}
@@ -1170,7 +1181,7 @@ const ClientDetail = () => {
                                         {dynamicMuscleVolume.map((m) => (
                                             <div key={m.muscle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem' }}>
                                                 <span style={{ color: 'var(--text-muted)' }}>{m.muscle}</span>
-                                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{m.sets} <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>séries</span></span>
+                                                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{m.sets} <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{t('common.sets')}</span></span>
                                             </div>
                                         ))}
                                     </div>
@@ -1185,7 +1196,6 @@ const ClientDetail = () => {
 
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
-                            <Activity size={20} className="su-text-muted" />
                             <h3 className="su-section-title">{t('pro.client.chart.rpe')}</h3>
                         </div>
                         <div className="su-chart-wrapper-med">
@@ -1203,7 +1213,6 @@ const ClientDetail = () => {
 
                     <Card className="su-metric-card-large" style={{ display: 'flex', flexDirection: 'column' }}>
                         <div className="su-card-header-icon">
-                            <TrendingUp size={20} className="su-text-muted" />
                             <h3 className="su-section-title">{t('pro.client.chart.weight')}</h3>
                         </div>
                         <div style={{ flex: 1, minHeight: 0, marginTop: '1rem' }}>
@@ -1237,7 +1246,6 @@ const ClientDetail = () => {
 
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
-                            <CheckCircle2 size={20} className="su-text-muted" />
                             <h3 className="su-section-title">{t('pro.client.chart.adherence')}</h3>
                         </div>
                         <div className="su-adherence-stats">
@@ -1258,7 +1266,6 @@ const ClientDetail = () => {
 
                     <Card className="su-metric-card-large">
                         <div className="su-card-header-icon">
-                            <TrendingUp size={20} className="su-text-muted" />
                             <h3 className="su-section-title">{t('pro.client.chart.prs')}</h3>
                         </div>
                         <div className="su-improvements-list su-mt-2">
@@ -1307,7 +1314,7 @@ const ClientDetail = () => {
                             {/* Previous Session Panel */}
                             <div style={{ backgroundColor: 'var(--bg-main)', padding: '1rem', borderRadius: '12px' }}>
                                 <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-                                    <History size={16} /> {t('pro.client.prs.modal.prev')}
+                                    {t('pro.client.prs.modal.prev')}
                                 </h4>
                                 <div style={{ marginBottom: '1rem' }}>
                                     <p style={{ margin: 0, fontWeight: 600 }}>{selectedPRComparison.fromSession.planName}</p>
@@ -1339,7 +1346,7 @@ const ClientDetail = () => {
                                     {t('pro.client.prs.modal.tag')}
                                 </div>
                                 <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', color: 'var(--accent)' }}>
-                                    <TrendingUp size={16} /> {t('pro.client.prs.modal.new')}
+                                    {t('pro.client.prs.modal.new')}
                                 </h4>
                                 <div style={{ marginBottom: '1rem' }}>
                                     <p style={{ margin: 0, fontWeight: 600 }}>{selectedPRComparison.toSession.planName}</p>
@@ -1398,7 +1405,6 @@ const ClientDetail = () => {
                             </div>
                             {plans.length === 0 && (
                                 <div className="su-cp-empty">
-                                    <Dumbbell size={40} />
                                     <p>{t('pro.client.plans.empty')}</p>
                                 </div>
                             )}

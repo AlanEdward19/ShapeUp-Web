@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import Card from '../../../components/Card';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import NutritionNav from './NutritionNav';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import './Nutrition.css';
 
 const MEAL_SLOTS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
@@ -15,6 +16,7 @@ const toDateKey = () => {
 };
 
 const MealPlanManager = () => {
+    const { t } = useLanguage();
     const { createMealPlan, activateMealPlan } = useNutritionApi();
     const [name, setName] = useState('');
     const [items, setItems] = useState([emptyItem()]);
@@ -46,7 +48,7 @@ const MealPlanManager = () => {
             setCreatedPlan(plan);
             setActivationResult(null);
         } catch (err) {
-            setError(err.message || 'Falha ao criar cardápio');
+            setError(err.message || t('nutrition.plan.error.create'));
         } finally {
             setLoading(false);
         }
@@ -60,7 +62,7 @@ const MealPlanManager = () => {
             const result = await activateMealPlan(createdPlan.id, toDateKey());
             setActivationResult(result);
         } catch (err) {
-            setError(err.message || 'Falha ao ativar cardápio');
+            setError(err.message || t('nutrition.plan.error.activate'));
         } finally {
             setLoading(false);
         }
@@ -69,20 +71,25 @@ const MealPlanManager = () => {
     return (
         <div className="su-nutrition-page">
             <NutritionNav />
-            <h1 className="su-page-title su-mb-6">Cardápio fixo</h1>
+            <header className="su-nutrition-masthead">
+                <div>
+                    <span className="su-nutrition-kicker">{t('nutrition.plan.kicker')}</span>
+                    <h1 className="su-page-title">{t('nutrition.plan.title')}</h1>
+                </div>
+            </header>
 
-            <Card className="su-mb-4" data-testid="meal-plan-form">
-                <h3 className="su-section-title su-mb-4">Criar cardápio</h3>
+            <section className="su-journal-sheet" data-testid="meal-plan-form">
+                <h3 className="su-ledger-heading">{t('nutrition.plan.create')}</h3>
                 <form onSubmit={handleCreate}>
                     <Input
-                        label="Nome do cardápio"
+                        label={t('nutrition.plan.name')}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         data-testid="plan-name-input"
                     />
 
                     {items.map((item, index) => (
-                        <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                        <div key={index} className="su-plan-item-row">
                             <select
                                 className="su-input"
                                 value={item.mealSlot}
@@ -90,17 +97,17 @@ const MealPlanManager = () => {
                                 data-testid={`plan-item-slot-${index}`}
                             >
                                 {MEAL_SLOTS.map((slot) => (
-                                    <option key={slot} value={slot}>{slot}</option>
+                                    <option key={slot} value={slot}>{t(`nutrition.meal.${slot}`)}</option>
                                 ))}
                             </select>
                             <Input
-                                label="Food ID"
+                                label={t('nutrition.plan.food_id')}
                                 value={item.foodId}
                                 onChange={(e) => updateItem(index, 'foodId', e.target.value)}
                                 data-testid={`plan-item-food-${index}`}
                             />
                             <Input
-                                label="Qtd (g)"
+                                label={t('nutrition.plan.qty')}
                                 type="number"
                                 value={item.quantityGramsOrMl}
                                 onChange={(e) => updateItem(index, 'quantityGramsOrMl', e.target.value)}
@@ -110,42 +117,44 @@ const MealPlanManager = () => {
                     ))}
 
                     <Button type="button" variant="secondary" onClick={addItem} className="su-mb-4">
-                        + Adicionar item
+                        {t('nutrition.plan.add')}
                     </Button>
 
                     {error && <p className="su-input-error-text" role="alert">{error}</p>}
 
                     <Button type="submit" disabled={loading || !name.trim()} data-testid="create-plan-btn">
-                        {loading ? 'Salvando...' : 'Criar cardápio'}
+                        {loading ? t('nutrition.form.saving') : t('nutrition.plan.submit')}
                     </Button>
                 </form>
-            </Card>
+            </section>
 
             {createdPlan && (
-                <Card data-testid="created-plan-card">
-                    <h3 className="su-section-title su-mb-4">Cardápio criado: {createdPlan.name}</h3>
+                <section className="su-journal-sheet" data-testid="created-plan-card">
+                    <h3 className="su-ledger-heading">{t('nutrition.plan.created', { name: createdPlan.name })}</h3>
                     <p className="su-text-muted su-mb-4" style={{ fontSize: '0.875rem' }}>
-                        {createdPlan.items?.length ?? 0} itens · ID: {createdPlan.id}
+                        {t('nutrition.plan.items_count', { n: createdPlan.items?.length ?? 0, id: createdPlan.id })}
                     </p>
                     <Button onClick={handleActivate} disabled={loading} data-testid="activate-plan-btn">
-                        Ativar para hoje
+                        {t('nutrition.plan.activate')}
                     </Button>
-                </Card>
+                </section>
             )}
 
             {activationResult && (
-                <Card className="su-mt-4" data-testid="activation-result">
-                    <h3 className="su-section-title su-mb-4">Diário preenchido</h3>
+                <section className="su-journal-sheet" data-testid="activation-result">
+                    <h3 className="su-ledger-heading">{t('nutrition.plan.filled')}</h3>
                     <p className="su-text-muted">
-                        Totais do dia: {activationResult.diaryDay?.totals?.kcal ?? 0} kcal,
-                        P {activationResult.diaryDay?.totals?.proteinG ?? 0}g
+                        {t('nutrition.plan.totals', {
+                            kcal: activationResult.diaryDay?.totals?.kcal ?? 0,
+                            protein: activationResult.diaryDay?.totals?.proteinG ?? 0,
+                        })}
                     </p>
                     {(activationResult.unavailableItems?.length ?? 0) > 0 && (
                         <p className="su-warning-text" style={{ fontSize: '0.875rem' }}>
-                            {activationResult.unavailableItems.length} item(ns) indisponível(is) — use substituição no diário.
+                            {t('nutrition.plan.unavailable', { n: activationResult.unavailableItems.length })}
                         </p>
                     )}
-                </Card>
+                </section>
             )}
         </div>
     );
