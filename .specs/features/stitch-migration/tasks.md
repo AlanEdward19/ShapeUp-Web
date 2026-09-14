@@ -106,7 +106,7 @@ de teste, já ajustados incrementalmente).
 
   | Símbolo | Importadores de produção (fora `src/stitch/`) | Mantido? |
   | --- | --- | --- |
-  | `sourceRuntime` | `MessagesShell`, `SettingsShell`, `ModerationShell`, `NutritionDiaryShell`, `OperationalDashboardsShell`, `onboardingShadowBindings.ts` | **sim** — bindings DOM |
+  | `sourceRuntime` | `StitchTemplate.jsx`, `Workspace.jsx`, `Builder.jsx` (só `src/stitch/`); `StitchTemplates.test.jsx` | **sim** — Builder + sidebar template host até T19 |
   | `StitchTemplate` | só via `Workspace.jsx` (usado pelas shells acima) + `Builder.jsx` | **sim** |
   | `manifest.json` | `PublicStitchHost.tsx`, `DashboardStitchHost.tsx`, `StitchTemplate.jsx` (testes) | **sim** |
   | `copy` / `copy.tsv` | `copy.js` → shells/markup (`NutritionDiaryShell`, `OperationalDashboardsShell`, `RegisterPublicMarkup`, `InvitationPublicMarkup`) + `useStitchLanguage` | **sim** |
@@ -135,6 +135,8 @@ de teste, já ajustados incrementalmente).
   **Re-exports finos mantidos:** `PublicPages.jsx`, `Settings.jsx`, `Exercises.jsx`, `Gyms.jsx`,
   `Nutrition.jsx`, `Moderation.jsx`, `Onboarding.jsx`, `AthleteScoreboard.jsx`, `HistoryChart.jsx`,
   `useHydration.js`.
+
+  **Pixel-parity evidence (messages, nutrition, onboarding):** PNGs em `{before,after}-{messages,nutrition,onboarding}-{1440,390}.png` arquivados a partir de `.specs/source-*.png` (before, captura legada) e `.specs/verified-*-{1440,390}.png` (after); where live before/after capture was blocked, `before-*-390` reuses verified at 390px (archived reference, not a fresh diff pair).
 
   Gate T18: `npm run build && npm run lint` (warnings pré-existentes aceitos).
 - [ ] **T19** — **BLOQUEADA até `workout-editor` (Fase 2, `ShapeUpApi/.specs/features/
