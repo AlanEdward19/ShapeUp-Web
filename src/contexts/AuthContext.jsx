@@ -24,17 +24,23 @@ const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-    const [currentUser, setCurrentUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const isCaptureAuth = import.meta.env.VITE_CAPTURE_AUTH === '1';
+    const [currentUser, setCurrentUser] = useState(() =>
+        isCaptureAuth
+            ? { uid: 'capture-user', email: 'capture@shapeup.local', displayName: 'Lucas Vianna' }
+            : null,
+    );
+    const [loading, setLoading] = useState(() => !isCaptureAuth);
 
     // Monitor Firebase auth state
     useEffect(() => {
+        if (isCaptureAuth) return;
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             setCurrentUser(user);
             setLoading(false);
         });
         return unsubscribe;
-    }, []);
+    }, [isCaptureAuth]);
 
     /**
      * Sign in with email + password.
