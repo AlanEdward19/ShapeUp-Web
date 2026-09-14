@@ -51,7 +51,7 @@ telas complexas.
   delas pro novo caminho nesta mesma task (decidir na hora conforme o que reduzir mais risco).
 - [ ] **T6** — `HistoryChart.jsx` → `components/charts/HistoryChart.tsx`.
 - [ ] **T7** — `useHydration.js` → `hooks/useHydration.ts`.
-- [ ] **T8** — `AthleteScoreboard.jsx` (+ `.test.jsx`) → `components/gamification/
+- [x] **T8** — `AthleteScoreboard.jsx` (+ `.test.jsx`) → `components/gamification/
   AthleteScoreboard.tsx`; ajustar teste.
 - [ ] **T9** — `Exercises.jsx` (+ `.test.jsx`) → `pages/Dashboard/ExercisesShell.tsx`; atualizar
   `App.jsx` + teste.
