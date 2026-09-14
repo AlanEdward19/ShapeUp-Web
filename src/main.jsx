@@ -5,6 +5,7 @@ import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { ThemeProvider } from './ThemeContext.jsx';
 import { LanguageProvider } from './contexts/LanguageContext.jsx';
 import { AuthProvider } from './contexts/AuthContext.jsx';
+import { UserProfileProvider } from './contexts/UserProfileContext.jsx';
 import './index.css';
 import './styles/workspace.css';
 import { redirectToHttpsIfNeeded } from './utils/forceHttps';
@@ -19,7 +20,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <LanguageProvider>
           <AuthProvider>
-            <App />
+            <UserProfileProvider>
+              <App />
+            </UserProfileProvider>
           </AuthProvider>
         </LanguageProvider>
       </ThemeProvider>
