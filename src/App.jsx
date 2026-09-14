@@ -18,7 +18,7 @@ import TrainingPlans from './pages/TrainingPlans';
 import Clients from './pages/Dashboard/Clients';
 import ClientDetail from './pages/Dashboard/ClientDetail';
 import Exercises from './stitch/Exercises';
-import Feedback from './stitch/Messages';
+import StitchMessages, { StitchFeedback as Feedback } from './pages/Dashboard/MessagesShell';
 import Analytics from './pages/Dashboard/Analytics';
 import Reports from './pages/Dashboard/Reports';
 import Settings from './stitch/Settings';
@@ -33,7 +33,6 @@ import MealPlanManager from './pages/Dashboard/Nutrition/MealPlanManager';
 import GoalOnboarding from './pages/Dashboard/Nutrition/GoalOnboarding';
 import FoodModerationQueue from './stitch/Moderation';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
-import Messages from './stitch/Messages';
 import ExploreGyms from './stitch/Gyms';
 import Onboarding from './stitch/Onboarding';
 import useStitchLanguage from './stitch/useStitchLanguage';
@@ -122,7 +121,7 @@ function App() {
             <Route path="turnstile" element={<TurnstileGym />} />
             <Route path="financial" element={<FinancialGym />} />
             {/* Mock nested routes below */}
-            <Route path="messages" element={<Messages />} />
+            <Route path="messages" element={<StitchMessages />} />
             <Route path="gyms" element={<ExploreGyms />} />
 
           </Route>
