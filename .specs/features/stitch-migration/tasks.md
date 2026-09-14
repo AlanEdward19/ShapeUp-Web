@@ -59,7 +59,7 @@ telas complexas.
 - [ ] **T11** — `Messages.jsx` → `pages/Dashboard/MessagesShell.tsx`; atualizar `App.jsx`.
 - [ ] **T12** — `Moderation.jsx` (+ `.test.jsx`) → `pages/Admin/ModerationShell.tsx`; atualizar
   `App.jsx` + teste.
-- [ ] **T13** — `Nutrition.jsx` → `pages/Dashboard/Nutrition/NutritionDiaryShell.tsx`; atualizar
+- [x] **T13** — `Nutrition.jsx` → `pages/Dashboard/Nutrition/NutritionDiaryShell.tsx`; atualizar
   `App.jsx`.
 - [ ] **T14** — `Onboarding.jsx` (+ `.test.jsx`) → `pages/Dashboard/OnboardingShell.tsx`;
   atualizar `App.jsx` + teste.

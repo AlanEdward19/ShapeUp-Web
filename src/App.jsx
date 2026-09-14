@@ -27,7 +27,7 @@ import StaffGym from './pages/Dashboard/StaffGym';
 import TurnstileGym from './pages/Dashboard/TurnstileGym';
 import GymManagement from './pages/Dashboard/GymManagement';
 const FinancialGym = () => <GymManagement mode="plans" />;
-import DiaryDay from './stitch/Nutrition';
+import NutritionDiaryShell from './pages/Dashboard/Nutrition/NutritionDiaryShell';
 import FoodSearch from './pages/Dashboard/Nutrition/FoodSearch';
 import MealPlanManager from './pages/Dashboard/Nutrition/MealPlanManager';
 import GoalOnboarding from './pages/Dashboard/Nutrition/GoalOnboarding';
@@ -112,7 +112,7 @@ function App() {
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
             <Route path="objectives" element={<ObjectivesClient />} />
-            <Route path="nutrition/diary" element={<DiaryDay />} />
+            <Route path="nutrition/diary" element={<NutritionDiaryShell />} />
             <Route path="nutrition/foods" element={<FoodSearch />} />
             <Route path="nutrition/meal-plans" element={<MealPlanManager />} />
             <Route path="nutrition/goal" element={<GoalOnboarding />} />
