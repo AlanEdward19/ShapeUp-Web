@@ -63,7 +63,7 @@ telas complexas.
   `App.jsx`.
 - [ ] **T14** — `Onboarding.jsx` (+ `.test.jsx`) → `pages/Dashboard/OnboardingShell.tsx`;
   atualizar `App.jsx` + teste.
-- [ ] **T15** — `OperationalPages.jsx` → `pages/Dashboard/OperationalDashboardsShell.tsx`;
+- [x] **T15** — `OperationalPages.jsx` → `pages/Dashboard/OperationalDashboardsShell.tsx`;
   atualizar `Dashboard.jsx`.
 - [ ] **T16** — `Settings.jsx` → `pages/Dashboard/SettingsShell.tsx`; atualizar `App.jsx`.
 

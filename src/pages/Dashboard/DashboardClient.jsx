@@ -41,6 +41,8 @@ const DashboardClient = ({ renderView } = {}) => {
     const clientId = localStorage.getItem('shapeup_client_id') || 1;
     const currentUserId = parseInt(localStorage.getItem('shapeup_client_id'), 10) || 1;
 
+    const [gamificationError, setGamificationError] = useState(false);
+    const [rankingError, setRankingError] = useState(false);
     const [gamificationProfile, setGamificationProfile] = useState(null);
     const [rankingEntries, setRankingEntries] = useState([]);
     const [rankingCursor, setRankingCursor] = useState(null);
@@ -55,6 +57,7 @@ const DashboardClient = ({ renderView } = {}) => {
         }
 
         try {
+            setRankingError(false);
             const response = await getRanking(cursor, 10);
             const items = response?.items ?? [];
             const nextCursor = response?.nextCursor ?? null;
@@ -62,6 +65,7 @@ const DashboardClient = ({ renderView } = {}) => {
             setRankingEntries((prev) => (append ? [...prev, ...items] : items));
             setRankingCursor(nextCursor);
         } catch (error) {
+            setRankingError(true);
             console.error('Failed to fetch ranking:', error);
             if (!append) {
                 setRankingEntries([]);
@@ -75,17 +79,13 @@ const DashboardClient = ({ renderView } = {}) => {
 
     const fetchGamificationProfile = useCallback(async () => {
         try {
+            setGamificationError(false);
             const profile = await getGamificationProfile();
             setGamificationProfile(profile);
         } catch (error) {
             console.error('Failed to fetch gamification profile:', error);
-            setGamificationProfile({
-                totalXp: 0,
-                currentStreak: 0,
-                shapeCoins: 0,
-                shapeScore: 0,
-                level: 1,
-            });
+            setGamificationError(true);
+            setGamificationProfile(null);
         }
     }, [getGamificationProfile]);
 
@@ -309,7 +309,7 @@ const DashboardClient = ({ renderView } = {}) => {
     const hasData = allHistory.length > 0;
     const { plansWithSessions, totalPlans } = plansData;
 
-    if (renderView) return renderView({ weeklyVolumeFormatted, weeklyDiff, streakDays, chartData, allHistory, plansData, nextPlanName });
+    if (renderView) return renderView({ gamificationProfile, gamificationError, rankingError, rankingEntries, rankingCursor, rankingLoading, rankingLoadingMore, fetchRanking, reloadGamification: fetchGamificationProfile, weeklyVolumeFormatted, weeklyDiff, streakDays, chartData, allHistory, plansData, nextPlanName });
     return (
         <div className="su-dashboard-client">
             <div className="su-dashboard-header-flex" data-tour="client-header">
