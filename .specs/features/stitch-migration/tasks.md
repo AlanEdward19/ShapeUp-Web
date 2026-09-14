@@ -65,7 +65,7 @@ telas complexas.
   atualizar `App.jsx` + teste.
 - [ ] **T15** — `OperationalPages.jsx` → `pages/Dashboard/OperationalDashboardsShell.tsx`;
   atualizar `Dashboard.jsx`.
-- [ ] **T16** — `Settings.jsx` → `pages/Dashboard/SettingsShell.tsx`; atualizar `App.jsx`.
+- [x] **T16** — `Settings.jsx` → `pages/Dashboard/SettingsShell.tsx`; atualizar `App.jsx` (re-export em `stitch/Settings.jsx`, ver `IMPORT_PATCH.md`).
 
 Gate por task (T2-T16): pixel-parity (before/after screenshot, 1440+390px, zero diff) +
 `npm run build && npm run lint && npx tsc --noEmit`. Gate ao fim da Fase B: `npm test` (6 arquivos
