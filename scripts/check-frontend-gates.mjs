@@ -54,7 +54,12 @@ for (const name of Object.keys(stitchManifest)) {
   if (/<script|\son(?:click|submit)=/i.test(html)) fail.push(`Stitch ${name} has executable prototype scripts`)
   if (css.includes('.font-.stitch-body')) fail.push(`Stitch ${name} has corrupted font selectors`)
 }
-if (!app.includes("from './stitch/PublicPages'")) fail.push('Public routes must use the exported Stitch views')
+if (
+  !app.includes("from './pages/PublicAuthShell'") &&
+  !app.includes("from './stitch/PublicPages'")
+) {
+  fail.push('Public routes must use the exported Stitch views')
+}
 for (const route of ['/privacy', '/terms', 'NotFound']) {
   if (!app.includes(route === 'NotFound' ? 'NotFound' : `path="${route}"`)) {
     fail.push(`App.jsx missing ${route}`)
