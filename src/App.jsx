@@ -31,7 +31,7 @@ import DiaryDay from './stitch/Nutrition';
 import FoodSearch from './pages/Dashboard/Nutrition/FoodSearch';
 import MealPlanManager from './pages/Dashboard/Nutrition/MealPlanManager';
 import GoalOnboarding from './pages/Dashboard/Nutrition/GoalOnboarding';
-import FoodModerationQueue from './stitch/Moderation';
+import FoodModerationQueue from './pages/Admin/ModerationShell';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
 import ExploreGyms from './stitch/Gyms';
 import Onboarding from './stitch/Onboarding';
