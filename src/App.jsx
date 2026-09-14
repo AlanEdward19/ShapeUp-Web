@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TourProvider } from '@reactour/tour';
 import './styles/Tour.css';
 import { StitchLogin as Login, StitchLanding as LandingPage, StitchRecovery as ForgotPassword } from './pages/PublicAuthShell';
-import Register from './stitch/Registration';
+import StitchRegistration from './pages/RegistrationShell';
 
 import ResetPassword from './pages/ResetPassword';
 
@@ -96,7 +96,7 @@ function App() {
           <Route path="/privacy" element={<LegalDocument kind="privacy" />} />
           <Route path="/terms" element={<LegalDocument kind="terms" />} />
           <Route path="/login" element={<LoginWrapper />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<StitchRegistration />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/__/auth/action" element={<ResetPassword />} />

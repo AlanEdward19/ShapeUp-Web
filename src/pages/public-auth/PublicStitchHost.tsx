@@ -17,7 +17,7 @@ const manifestEntries = manifest as Record<string, ManifestEntry>;
 const hostBaseCss = `.st-language-picker select,.st-language-picker option{background-color:#211a17!important;color:#f3eae5!important;color-scheme:dark}.st-language-picker select{cursor:pointer}:host{all:initial;display:block;color-scheme:dark}.stitch-body{min-height:100dvh;width:100%;box-sizing:border-box}.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased}button,a,input,select,textarea{touch-action:manipulation}[hidden]{display:none!important}button:disabled{opacity:.5;cursor:not-allowed} :focus-visible{outline:2px solid #e06c43;outline-offset:3px}`;
 
 type PublicStitchHostProps = {
-  name: 'landing' | 'login' | 'recovery';
+  name: 'landing' | 'login' | 'recovery' | 'register' | 'invitation';
   children: ReactNode;
   css?: string;
   bodyClass?: string;
@@ -111,6 +111,7 @@ export default function PublicStitchHost({
               <style>{`${hostBaseCss}${css}`}</style>
               <div
                 className={`stitch-body dark ${bodyClass ?? entry.bodyClass ?? ''}`}
+                data-auth-register={name === 'register' ? '' : undefined}
                 onClick={click}
                 onSubmit={onBodySubmit}
               >
