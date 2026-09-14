@@ -1,3 +1,4 @@
+import DatePicker from '../../../components/DatePicker';
 import HistoryChart from '../../../components/charts/HistoryChart';
 import WorkspaceStitchPage from '../../../components/Workspace/WorkspaceStitchPage';
 import { useLanguage } from '../../../contexts/LanguageContext';
@@ -308,9 +309,8 @@ function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement {
                 className="relative p-1.5 text-text-muted hover:text-on-surface hover:bg-[#29211D] rounded border border-[#3A2D27] transition-colors cursor-pointer inline-flex"
                 title={tr('Selecionar outra data')}
               >
-                <span className="material-symbols-outlined text-[17px] pointer-events-none">event</span>
-                <input
-                  type="date"
+                <DatePicker
+                  iconOnly
                   className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
                   value={state.date}
                   onChange={(event: ChangeEvent<HTMLInputElement>) => state.setDate(event.target.value)}
