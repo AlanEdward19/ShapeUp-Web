@@ -45,7 +45,7 @@ telas complexas.
 - [x] **T3** — `PublicPages.jsx` → `pages/PublicAuthShell.tsx` (Login/Landing/Recovery); atualizar
   `App.jsx`.
 - [x] **T4** — `Registration.jsx` → `pages/RegistrationShell.tsx`; atualizar `App.jsx`.
-- [ ] **T5** — `Workspace.jsx` → `components/Workspace/WorkspaceNavigation.tsx`; atualizar
+- [x] **T5** — `Workspace.jsx` → `components/Workspace/WorkspaceNavigation.tsx`; atualizar
   `Layout.jsx` — CUIDADO: outras telas `stitch/*.jsx` ainda não convertidas importam
   `./Workspace`; manter as duas versões coexistindo até todas migrarem, ou atualizar o import
   delas pro novo caminho nesta mesma task (decidir na hora conforme o que reduzir mais risco).

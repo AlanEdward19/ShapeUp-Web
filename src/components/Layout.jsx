@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { WorkspaceNavigation as Sidebar } from '../stitch/Workspace';
+import { WorkspaceNavigation as Sidebar } from './Workspace/WorkspaceNavigation';
 import Header from './Header';
 import OfflineQueueIndicator from './OfflineQueueIndicator';
 import ErrorBoundary from './ErrorBoundary';
