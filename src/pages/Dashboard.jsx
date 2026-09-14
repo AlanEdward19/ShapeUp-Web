@@ -1,7 +1,10 @@
 import DashboardGym from './Dashboard/DashboardGym';
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { StitchProfessional as DashboardProfessional, StitchAthlete as DashboardClient } from '../stitch/OperationalPages';
+import {
+  StitchProfessional as DashboardProfessional,
+  StitchAthlete as DashboardClient,
+} from './Dashboard/OperationalDashboardsShell';
 
 
 
