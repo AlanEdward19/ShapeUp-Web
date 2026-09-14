@@ -50,7 +50,7 @@ telas complexas.
   `./Workspace`; manter as duas versões coexistindo até todas migrarem, ou atualizar o import
   delas pro novo caminho nesta mesma task (decidir na hora conforme o que reduzir mais risco).
 - [x] **T6** — `HistoryChart.jsx` → `components/charts/HistoryChart.tsx`.
-- [ ] **T7** — `useHydration.js` → `hooks/useHydration.ts`.
+- [x] **T7** — `useHydration.js` → `hooks/useHydration.ts`.
 - [ ] **T8** — `AthleteScoreboard.jsx` (+ `.test.jsx`) → `components/gamification/
   AthleteScoreboard.tsx`; ajustar teste.
 - [ ] **T9** — `Exercises.jsx` (+ `.test.jsx`) → `pages/Dashboard/ExercisesShell.tsx`; atualizar
