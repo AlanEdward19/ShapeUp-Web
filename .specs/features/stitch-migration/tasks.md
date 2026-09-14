@@ -94,19 +94,19 @@ de teste, já ajustados incrementalmente).
 ### Fase D — Motor genérico + Fase E — bloqueada
 
 - [x] **T18** — **Limpeza parcial (motor ainda necessário até T19).** Telas convertidas usam markup
-  TSX + `PublicStitchHost`/`DashboardStitchHost` para CSS/fonts (`manifest.json`), mas várias shells
-  ainda importam `sourceRuntime`/`Workspace` para bindings de sombra e `copy` para i18n estático.
-  `linkBinding` removido com `Registration.jsx` morto. Gate: `npm run build && npm run lint`.
+  TSX + `PublicStitchHost`/`DashboardStitchHost` para CSS/fonts (`manifest.json`); produção fora de
+  `src/stitch/` não importa mais `sourceRuntime` (onboarding usa shadow bindings nativos). `copy` segue
+  para i18n estático. `linkBinding` removido com `Registration.jsx` morto. Gate: `npm run build && npm run lint`.
 
   #### T18 — EVIDENCE (2026-09-14)
 
-  **Expectativa original vs realidade:** não é verdade que só `Builder.jsx` importa o motor — hosts e
-  shells migrados ainda dependem de partes do engine (ver tabela abaixo). T18 remove apenas assets
-  com zero importadores de runtime em produção.
+  **Expectativa original vs realidade:** produção fora de `src/stitch/` não importa mais
+  `sourceRuntime`; o motor restante serve `Builder.jsx`, `Workspace.jsx`/`StitchTemplate` e testes
+  (ver tabela). T18 remove apenas assets com zero importadores de runtime em produção.
 
-  | Símbolo | Importadores de produção (fora `src/stitch/`) | Mantido? |
+  | Símbolo | Importadores de produção | Mantido? |
   | --- | --- | --- |
-  | `sourceRuntime` | `StitchTemplate.jsx`, `Workspace.jsx`, `Builder.jsx` (só `src/stitch/`); `StitchTemplates.test.jsx` | **sim** — Builder + sidebar template host até T19 |
+  | `sourceRuntime` | `StitchTemplate.jsx`, `Workspace.jsx`, `Builder.jsx` em `src/stitch/`; `StitchTemplates.test.jsx` | **sim** — Builder + sidebar template host até T19 |
   | `StitchTemplate` | só via `Workspace.jsx` (usado pelas shells acima) + `Builder.jsx` | **sim** |
   | `manifest.json` | `PublicStitchHost.tsx`, `DashboardStitchHost.tsx`, `StitchTemplate.jsx` (testes) | **sim** |
   | `copy` / `copy.tsv` | `copy.js` → shells/markup (`NutritionDiaryShell`, `OperationalDashboardsShell`, `RegisterPublicMarkup`, `InvitationPublicMarkup`) + `useStitchLanguage` | **sim** |
