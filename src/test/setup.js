@@ -1,6 +1,4 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
-import { afterEach } from 'vitest';
 
 if (!window.matchMedia) {
     window.matchMedia = () => ({
@@ -13,11 +11,3 @@ if (!window.matchMedia) {
         dispatchEvent() { return false },
     })
 }
-
-afterEach(() => {
-    cleanup();
-});
-
-afterEach(() => {
-    cleanup();
-});

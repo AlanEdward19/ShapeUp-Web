@@ -1,13 +1,16 @@
 import { render, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { expect, it, vi } from 'vitest';
-import { LanguageProvider } from '../contexts/LanguageContext';
-import Exercises from './Exercises';
-vi.mock('../contexts/AuthContext', () => ({useAuth:()=>({currentUser:{uid:'test'},signOut:vi.fn()})}));
-vi.mock('../hooks/useExercises', () => ({useExercises:()=>({exercises:[{id:7,name:'Exercício real',muscles:['Peitoral'],equipments:[],steps:['Instrução da API'],muscleDetails:[{muscleGroup:1,muscleNamePt:'Peitoral',activationPercent:62}]}],loading:false,searchTerm:'',setSearchTerm:vi.fn()})}));
+import { describe, expect, it, vi } from 'vitest';
+vi.mock('../../../stitch/styles/exercises.css?inline', () => ({ default: '' }));
+vi.mock('../../../contexts/AuthContext', () => ({useAuth:()=>({currentUser:{uid:'test'},signOut:vi.fn()})}));
+vi.mock('../../../contexts/UserProfileContext', () => ({useUserProfile:()=>({name:'Test',initials:'T',photo:''})}));
+vi.mock('../../../hooks/useExercises', () => ({useExercises:()=>({exercises:[{id:7,name:'Exercício real',muscles:['Peitoral'],equipments:[],steps:['Instrução da API'],muscleDetails:[{muscleGroup:1,muscleNamePt:'Peitoral',activationPercent:62}]}],loading:false,searchTerm:'',setSearchTerm:vi.fn()})}));
+import Exercises from '../ExercisesShell';
+
+describe('ExercisesShell', () => {
 it('opens details only on inspection, uses real data, and closes with Escape',()=>{
  localStorage.setItem('shapeup_language','pt-BR');
- const {container}=render(<LanguageProvider><MemoryRouter><Exercises /></MemoryRouter></LanguageProvider>);
+ const {container}=render(<MemoryRouter><Exercises /></MemoryRouter>);
  const root=container.querySelector('[data-stitch]').shadowRoot;
  const drawer=root.getElementById('exerciseDrawer');
  expect(drawer).toHaveAttribute('aria-hidden','true');
@@ -22,4 +25,5 @@ it('opens details only on inspection, uses real data, and closes with Escape',()
  fireEvent.keyDown(within(drawer).getByTitle('Fechar Painel'),{key:'Escape'});
  expect(drawer).toHaveAttribute('aria-hidden','true');
  expect(root.activeElement).toBe(row);
+});
 });
