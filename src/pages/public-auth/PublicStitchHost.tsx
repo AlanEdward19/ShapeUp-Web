@@ -17,13 +17,14 @@ const manifestEntries = manifest as Record<string, ManifestEntry>;
 const hostBaseCss = `.st-language-picker select,.st-language-picker option{background-color:#211a17!important;color:#f3eae5!important;color-scheme:dark}.st-language-picker select{cursor:pointer}:host{all:initial;display:block;color-scheme:dark}.stitch-body{min-height:100dvh;width:100%;box-sizing:border-box}.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased}button,a,input,select,textarea{touch-action:manipulation}[hidden]{display:none!important}button:disabled{opacity:.5;cursor:not-allowed} :focus-visible{outline:2px solid #e06c43;outline-offset:3px}`;
 
 type PublicStitchHostProps = {
-  name: 'landing' | 'login' | 'recovery' | 'register' | 'invitation';
+  name: 'landing' | 'login' | 'recovery' | 'register' | 'invitation' | 'onboarding';
   children: ReactNode;
   css?: string;
   bodyClass?: string;
   reveal?: boolean;
   onBodyClick?: (event: MouseEvent<HTMLDivElement>) => void;
   onBodySubmit?: (event: FormEvent<HTMLDivElement>) => void;
+  onShadowRoot?: (root: ShadowRoot | null) => void;
 };
 
 export default function PublicStitchHost({
@@ -34,6 +35,7 @@ export default function PublicStitchHost({
   reveal = false,
   onBodyClick,
   onBodySubmit,
+  onShadowRoot,
 }: PublicStitchHostProps) {
   const navigate = useNavigate();
   const auth = useAuth() as unknown as { currentUser?: unknown } | undefined;
@@ -43,6 +45,11 @@ export default function PublicStitchHost({
   const attach = useCallback((node: HTMLDivElement | null) => {
     if (node) setRoot(node.shadowRoot || node.attachShadow({ mode: 'open' }));
   }, []);
+
+  useEffect(() => {
+    onShadowRoot?.(root);
+    return () => onShadowRoot?.(null);
+  }, [root, onShadowRoot]);
 
   const entry = manifestEntries[name];
 

@@ -61,7 +61,7 @@ telas complexas.
   `App.jsx` + teste.
 - [x] **T13** — `Nutrition.jsx` → `pages/Dashboard/Nutrition/NutritionDiaryShell.tsx`; atualizar
   `App.jsx`.
-- [ ] **T14** — `Onboarding.jsx` (+ `.test.jsx`) → `pages/Dashboard/OnboardingShell.tsx`;
+- [x] **T14** — `Onboarding.jsx` (+ `.test.jsx`) → `pages/Dashboard/OnboardingShell.tsx`;
   atualizar `App.jsx` + teste.
 - [ ] **T15** — `OperationalPages.jsx` → `pages/Dashboard/OperationalDashboardsShell.tsx`;
   atualizar `Dashboard.jsx`.

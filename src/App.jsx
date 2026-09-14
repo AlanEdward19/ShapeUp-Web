@@ -34,7 +34,7 @@ import GoalOnboarding from './pages/Dashboard/Nutrition/GoalOnboarding';
 import FoodModerationQueue from './pages/Admin/ModerationShell';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
 import ExploreGyms from './stitch/Gyms';
-import Onboarding from './stitch/Onboarding';
+import Onboarding from './pages/Dashboard/OnboardingShell';
 import useStitchLanguage from './stitch/useStitchLanguage';
 
 // Wrapper for the Login page

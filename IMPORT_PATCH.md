@@ -1,20 +1,10 @@
-# T5 — Layout import patch (Workspace navigation)
+# Import patch — T14 Onboarding
 
-## `src/components/Layout.jsx`
+Apply in `src/App.jsx`:
 
-**Before**
-
-```javascript
-import { WorkspaceNavigation as Sidebar } from '../stitch/Workspace';
+```diff
+-import Onboarding from './stitch/Onboarding';
++import Onboarding from './pages/Dashboard/OnboardingShell';
 ```
 
-**After**
-
-```javascript
-import { WorkspaceNavigation as Sidebar } from './Workspace/WorkspaceNavigation';
-```
-
-## Notes
-
-- `WorkspaceNavigation` is implemented in `src/components/Workspace/WorkspaceNavigation.tsx` (native TSX, no `sourceRuntime` / `StitchTemplate`).
-- `src/stitch/Workspace.jsx` remains as a thin re-export (`export { WorkspaceNavigation }`) plus the default `Workspace` shell for unconverted `stitch/*.jsx` screens.
+Route unchanged: `/dashboard/onboarding` still renders `<Onboarding />` inside `ProtectedRoute`.
