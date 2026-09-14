@@ -17,7 +17,3 @@ if (!window.matchMedia) {
 afterEach(() => {
     cleanup();
 });
-
-afterEach(() => {
-    cleanup();
-});
