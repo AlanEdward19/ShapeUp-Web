@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PublicStitchHost from '../public-auth/PublicStitchHost';
 import { useNutritionApi } from '../../hooks/api/useNutritionApi';
@@ -85,40 +85,48 @@ export default function OnboardingShell() {
     shadowRef.current = root;
   }, []);
 
-  useLayoutEffect(() => {
+  const bindShadow = useCallback(
+    (root: ShadowRoot) => {
+      shadowRef.current = root;
+      applyOnboardingShadowBindings(root, shadowApi);
+    },
+    [shadowApi],
+  );
+
+  useEffect(() => {
     const root = shadowRef.current;
-    if (!root) return;
-    applyOnboardingShadowBindings(root, shadowApi);
+    if (root) applyOnboardingShadowBindings(root, shadowApi);
   }, [shadowApi]);
 
   useEffect(() => () => teardownOnboardingShadowBindings(), []);
 
   return (
-    <PublicStitchHost
-      name="onboarding"
-      css={choiceCss}
-      onShadowRoot={handleShadowRoot}
-      after={
-        error ? (
-          <p
-            role="alert"
-            style={{
-              position: 'fixed',
-              bottom: 60,
-              left: 24,
-              right: 24,
-              padding: 16,
-              background: '#211a17',
-              color: '#ffb4ab',
-              zIndex: 90,
-            }}
-          >
-            {error}
-          </p>
-        ) : null
-      }
-    >
-      <OnboardingStaticMarkup />
-    </PublicStitchHost>
+    <>
+      <PublicStitchHost
+        name="onboarding"
+        css={choiceCss}
+        onShadowRoot={handleShadowRoot}
+        bindShadow={bindShadow}
+      >
+        <OnboardingStaticMarkup />
+      </PublicStitchHost>
+      {error ? (
+        <p
+          role="alert"
+          style={{
+            position: 'fixed',
+            bottom: 60,
+            left: 24,
+            right: 24,
+            padding: 16,
+            background: '#211a17',
+            color: '#ffb4ab',
+            zIndex: 90,
+          }}
+        >
+          {error}
+        </p>
+      ) : null}
+    </>
   );
 }

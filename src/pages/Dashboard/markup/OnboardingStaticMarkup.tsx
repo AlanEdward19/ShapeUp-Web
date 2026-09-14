@@ -701,7 +701,7 @@ Desenvolvimento de taxa de produção de força (RFD) e capacidade de trabalho m
 
                   <button
       className="opacity-30 cursor-not-allowed px-4 py-2 text-xs font-semibold text-oxide-400 border border-oxide-700/60 rounded-md"
-      disabled="true"
+      disabled
       type="button"
                   >
 
@@ -971,17 +971,17 @@ Desenvolvimento de taxa de produção de força (RFD) e capacidade de trabalho m
 
                     <div
       className="bg-brand h-full"
-      style="width: 40%"
+      style={{ width: '40%' }}
                     ></div>
 
                     <div
       className="bg-amber-600 h-full"
-      style="width: 35%"
+      style={{ width: '35%' }}
                     ></div>
 
                     <div
       className="bg-emerald-600 h-full"
-      style="width: 25%"
+      style={{ width: '25%' }}
                     ></div>
 
                   </div>

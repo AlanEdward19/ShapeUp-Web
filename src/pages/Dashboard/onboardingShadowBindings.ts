@@ -1,5 +1,3 @@
-import { createRoot, type Root } from 'react-dom/client';
-import { createElement, type ChangeEvent } from 'react';
 import { sourceDocument } from '../../stitch/sourceRuntime';
 
 const headings = [
@@ -28,68 +26,13 @@ export type OnboardingShadowApi = {
   navigateDashboard: () => void;
 };
 
-let nutritionMount: Root | null = null;
+type NutritionFieldRefs = {
+  ageInput: HTMLInputElement;
+  sexSelect: HTMLSelectElement;
+  activitySelect: HTMLSelectElement;
+};
 
-function NutritionFields({
-  values,
-  update,
-}: {
-  values: OnboardingValues;
-  update: (field: string, value: string) => void;
-}) {
-  return createElement(
-    'div',
-    { className: 'grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5 text-sm' },
-    createElement(
-      'label',
-      null,
-      'Idade',
-      createElement('input', {
-        type: 'number',
-        min: 14,
-        max: 100,
-        value: values.age || '',
-        onChange: (event: ChangeEvent<HTMLInputElement>) => update('age', event.target.value),
-        className: 'w-full bg-oxide-850 border rounded px-3 py-2',
-        'aria-label': 'Idade',
-      }),
-    ),
-    createElement(
-      'label',
-      null,
-      'Sexo biológico',
-      createElement(
-        'select',
-        {
-          value: values.sex || '',
-          onChange: (event: ChangeEvent<HTMLSelectElement>) => update('sex', event.target.value),
-          className: 'w-full bg-oxide-850 border rounded px-3 py-2',
-          'aria-label': 'Sexo biológico',
-        },
-        createElement('option', { value: '' }, 'Selecionar'),
-        createElement('option', { value: 'Male' }, 'Masculino'),
-        createElement('option', { value: 'Female' }, 'Feminino'),
-      ),
-    ),
-    createElement(
-      'label',
-      null,
-      'Atividade diária',
-      createElement(
-        'select',
-        {
-          value: values.activity || 'Moderate',
-          onChange: (event: ChangeEvent<HTMLSelectElement>) => update('activity', event.target.value),
-          className: 'w-full bg-oxide-850 border rounded px-3 py-2',
-        },
-        createElement('option', { value: 'Sedentary' }, 'Sedentário'),
-        createElement('option', { value: 'Light' }, 'Levemente ativo'),
-        createElement('option', { value: 'Moderate' }, 'Moderadamente ativo'),
-        createElement('option', { value: 'Active' }, 'Muito ativo'),
-      ),
-    ),
-  );
-}
+let nutritionFieldRefs: NutritionFieldRefs | null = null;
 
 function mountNutritionFields(root: ShadowRoot, api: OnboardingShadowApi) {
   const panel = root.getElementById('step-content-3');
@@ -98,12 +41,68 @@ function mountNutritionFields(root: ShadowRoot, api: OnboardingShadowApi) {
   if (!host) {
     host = document.createElement('div');
     host.dataset.onboardingNutritionMount = 'true';
+    host.className = 'grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5 text-sm';
+
+    const ageLabel = document.createElement('label');
+    ageLabel.append('Idade');
+    const ageInput = document.createElement('input');
+    ageInput.type = 'number';
+    ageInput.min = '14';
+    ageInput.max = '100';
+    ageInput.className = 'w-full bg-oxide-850 border rounded px-3 py-2';
+    ageInput.setAttribute('aria-label', 'Idade');
+    ageLabel.appendChild(ageInput);
+
+    const sexLabel = document.createElement('label');
+    sexLabel.append('Sexo biológico');
+    const sexSelect = document.createElement('select');
+    sexSelect.className = 'w-full bg-oxide-850 border rounded px-3 py-2';
+    sexSelect.setAttribute('aria-label', 'Sexo biológico');
+    for (const [value, text] of [
+      ['', 'Selecionar'],
+      ['Male', 'Masculino'],
+      ['Female', 'Feminino'],
+    ] as const) {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = text;
+      sexSelect.appendChild(option);
+    }
+    sexLabel.appendChild(sexSelect);
+
+    const activityLabel = document.createElement('label');
+    activityLabel.append('Atividade diária');
+    const activitySelect = document.createElement('select');
+    activitySelect.className = 'w-full bg-oxide-850 border rounded px-3 py-2';
+    for (const [value, text] of [
+      ['Sedentary', 'Sedentário'],
+      ['Light', 'Levemente ativo'],
+      ['Moderate', 'Moderadamente ativo'],
+      ['Active', 'Muito ativo'],
+    ] as const) {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = text;
+      activitySelect.appendChild(option);
+    }
+    activityLabel.appendChild(activitySelect);
+
+    host.append(ageLabel, sexLabel, activityLabel);
     panel.appendChild(host);
+    nutritionFieldRefs = { ageInput, sexSelect, activitySelect };
   }
-  if (!nutritionMount) nutritionMount = createRoot(host);
-  nutritionMount.render(
-    createElement(NutritionFields, { values: api.values, update: api.update }),
-  );
+
+  const refs = nutritionFieldRefs;
+  if (!refs) return;
+  refs.ageInput.value = String(api.values.age ?? '');
+  refs.ageInput.onchange = (event) =>
+    api.update('age', (event.target as HTMLInputElement).value);
+  refs.sexSelect.value = String(api.values.sex ?? '');
+  refs.sexSelect.onchange = (event) =>
+    api.update('sex', (event.target as HTMLSelectElement).value);
+  refs.activitySelect.value = String(api.values.activity ?? 'Moderate');
+  refs.activitySelect.onchange = (event) =>
+    api.update('activity', (event.target as HTMLSelectElement).value);
 }
 
 function syncChoiceGroups(root: ShadowRoot, api: OnboardingShadowApi) {
@@ -181,9 +180,6 @@ function wirePhotoUpload(root: ShadowRoot, api: OnboardingShadowApi) {
     if (!/Carregar foto/.test(button.textContent || '')) return;
     if (button.dataset.onboardingPhotoWired) return;
     button.dataset.onboardingPhotoWired = 'true';
-    const label = document.createElement('label');
-    label.className = button.className;
-    label.textContent = 'Carregar foto local';
     const input = document.createElement('input');
     input.type = 'file';
     input.hidden = true;
@@ -196,8 +192,8 @@ function wirePhotoUpload(root: ShadowRoot, api: OnboardingShadowApi) {
         reader.readAsDataURL(file);
       }
     };
-    label.appendChild(input);
-    button.replaceWith(label);
+    button.parentElement?.appendChild(input);
+    button.onclick = () => input.click();
   });
 }
 
@@ -226,9 +222,7 @@ export function applyOnboardingShadowBindings(root: ShadowRoot, api: OnboardingS
   if (mascot) mascot.src = '/stitch/ryno.png';
 
   mountNutritionFields(root, api);
-  syncChoiceGroups(root, api);
   syncTemplateFields(root, api);
-  replaceKcalCopy(root);
   wirePhotoUpload(root, api);
 
   root.querySelectorAll('[data-source-onclick]').forEach((node) => {
@@ -249,6 +243,5 @@ export function applyOnboardingShadowBindings(root: ShadowRoot, api: OnboardingS
 }
 
 export function teardownOnboardingShadowBindings() {
-  nutritionMount?.unmount();
-  nutritionMount = null;
+  nutritionFieldRefs = null;
 }

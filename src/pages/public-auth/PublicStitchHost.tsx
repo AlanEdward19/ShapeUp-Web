@@ -25,6 +25,7 @@ type PublicStitchHostProps = {
   onBodyClick?: (event: MouseEvent<HTMLDivElement>) => void;
   onBodySubmit?: (event: FormEvent<HTMLDivElement>) => void;
   onShadowRoot?: (root: ShadowRoot | null) => void;
+  bindShadow?: (root: ShadowRoot) => void;
 };
 
 export default function PublicStitchHost({
@@ -36,6 +37,7 @@ export default function PublicStitchHost({
   onBodyClick,
   onBodySubmit,
   onShadowRoot,
+  bindShadow,
 }: PublicStitchHostProps) {
   const navigate = useNavigate();
   const auth = useAuth() as unknown as { currentUser?: unknown } | undefined;
@@ -47,9 +49,11 @@ export default function PublicStitchHost({
   }, []);
 
   useEffect(() => {
+    if (!root) return;
     onShadowRoot?.(root);
+    bindShadow?.(root);
     return () => onShadowRoot?.(null);
-  }, [root, onShadowRoot]);
+  }, [root, onShadowRoot, bindShadow]);
 
   const entry = manifestEntries[name];
 
