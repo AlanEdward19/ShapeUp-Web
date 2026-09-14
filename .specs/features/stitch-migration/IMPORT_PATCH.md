@@ -1,12 +1,20 @@
-# Import path patches (stitch-migration)
+# App.jsx import patch (T10 — Gyms)
 
-## T9 — Exercises shell
+`App.jsx` can keep the existing import; `src/stitch/Gyms.jsx` re-exports the native shell:
 
-Apply in `src/App.jsx`:
-
-```diff
--import Exercises from './stitch/Exercises';
-+import Exercises from './pages/Dashboard/ExercisesShell';
+```jsx
+import ExploreGyms from './stitch/Gyms';
 ```
 
-Until this patch is applied, `src/stitch/Exercises.jsx` re-exports `../pages/Dashboard/ExercisesShell` so the legacy import keeps working.
+Optional direct import (apply when cleaning stitch shims):
+
+```diff
+-import ExploreGyms from './stitch/Gyms';
++import ExploreGyms from './pages/Dashboard/GymsExploreShell';
+```
+
+Route stays unchanged:
+
+```jsx
+<Route path="gyms" element={<ExploreGyms />} />
+```

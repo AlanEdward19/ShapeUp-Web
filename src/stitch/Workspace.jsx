@@ -3,9 +3,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StitchTemplate from './StitchTemplate';
 import { sourceDocument, renderSource, nodeText } from './sourceRuntime';
-import { WorkspaceNavigation, navStyle, UnifiedSidebarNavigation as Navigation } from '../components/Workspace/WorkspaceNavigation';
-
-export { WorkspaceNavigation };
+import UnifiedNavigation from '../components/Workspace/UnifiedNavigation';
+import { unifiedNavigationCss } from '../components/Workspace/unifiedNavigationStyles';
 
 const paths = [
   [/painel do treinador|dashboard|visão geral|meu painel|início|painel do aluno/i, '/dashboard'],
@@ -22,6 +21,10 @@ const paths = [
 ];
 const routeForLabel = text => paths.find(([pattern]) => pattern.test(text))?.[1];
 
+export function WorkspaceNavigation({ isOpen, onClose }) {
+  return <div style={{ position: 'fixed', inset: '0 auto 0 0', width: 256, zIndex: 60, pointerEvents: 'none' }}><StitchTemplate name="professional" bodyClass="" css={`${unifiedNavigationCss}[data-unified-sidebar]{pointer-events:auto}`}><UnifiedNavigation flow={false} open={isOpen} close={onClose} /></StitchTemplate></div>;
+}
+
 export default function Workspace({ name, bind, onClick, after, css = '' }) {
   const profile = useUserProfile();
   const [open, setOpen] = useState(false);
@@ -29,8 +32,8 @@ export default function Workspace({ name, bind, onClick, after, css = '' }) {
   const sidebar = document.querySelector('aside');
   const flow = sidebar && !sidebar.className.includes('fixed');
   const navigate = useNavigate();
-  return <StitchTemplate name={name} css={navStyle + css} after={<>{after}<button className="sn-mobile" aria-label={open ? 'Fechar menu' : 'Abrir menu'} onClick={() => setOpen(!open)}><span className="material-symbols-outlined">{open ? 'close' : 'menu'}</span></button></>} onClick={onClick} bind={(node, props, children, render) => {
-    if (node === sidebar) return <Navigation key="shared-navigation" flow={flow} open={open} close={() => setOpen(false)} />;
+  return <StitchTemplate name={name} css={unifiedNavigationCss + css} after={<>{after}<button className="sn-mobile" aria-label={open ? 'Fechar menu' : 'Abrir menu'} onClick={() => setOpen(!open)}><span className="material-symbols-outlined">{open ? 'close' : 'menu'}</span></button></>} onClick={onClick} bind={(node, props, children, render) => {
+    if (node === sidebar) return <UnifiedNavigation key="shared-navigation" flow={flow} open={open} close={() => setOpen(false)} />;
     if (String(node.className || '').split(/\s+/).some(token => /^[mp]l-(64|60|\[260px\])$/.test(token))) { props['data-stitch-content'] = true; props.style = { ...props.style, ...(String(node.className).includes('pl-') ? { paddingLeft: 256 } : { marginLeft: 256 }) }; }
     if (node.localName === 'table' && !node.parentElement.className.includes('overflow')) return <div key={props.key} data-table-scroll>{renderSource(node, (inner, innerProps, innerChildren, innerRender) => inner === node ? bind?.(inner, innerProps, innerChildren, innerRender) : bind?.(inner, innerProps, innerChildren, innerRender))}</div>;
     if (node.localName === 'a' && ['#', ''].includes(props.href || '')) props.href = routeForLabel(nodeText(node)) || props.href;
@@ -45,3 +48,8 @@ export default function Workspace({ name, bind, onClick, after, css = '' }) {
     if (node.children.length === 0 && /^(Rodrigo Silva|Rodrigo Silva de Albuquerque|Lucas Vianna|Lucas)$/.test(nodeText(node))) return <span {...props}>{profile.name || 'Minha conta'}</span>;
   }} />;
 }
+
+
+
+
+

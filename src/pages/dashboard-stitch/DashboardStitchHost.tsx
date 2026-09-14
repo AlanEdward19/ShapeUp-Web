@@ -1,27 +1,58 @@
-import { useCallback, useEffect, useMemo, useState, type MouseEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import manifest from '../../stitch/manifest.json';
-import exercisesCss from '../../stitch/styles/exercises.css?inline';
+import useStitchLanguage from '../../stitch/useStitchLanguage';
+import { useAuth } from '../../contexts/AuthContext';
 
-const manifestEntries = manifest as Record<string, { bodyClass?: string; fonts: string[] }>;
+const styles = import.meta.glob('../../stitch/styles/*.css', {
+  query: '?inline',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
 
-const hostBaseCss = `:host{all:initial;display:block;color-scheme:dark}.stitch-body{min-height:100dvh;width:100%;box-sizing:border-box}.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased}button,a,input,select,textarea{touch-action:manipulation}[hidden]{display:none!important}button:disabled{opacity:.5;cursor:not-allowed} :focus-visible{outline:2px solid #e06c43;outline-offset:3px}`;
+type ManifestEntry = { bodyClass?: string; fonts: string[] };
+const manifestEntries = manifest as Record<string, ManifestEntry>;
 
-const inlineStyles: Record<string, string> = {
-  exercises: exercisesCss,
-};
+const hostBaseCss = `.st-language-picker select,.st-language-picker option{background-color:#211a17!important;color:#f3eae5!important;color-scheme:dark}.st-language-picker select{cursor:pointer}:host{all:initial;display:block;color-scheme:dark}.stitch-body{min-height:100dvh;width:100%;box-sizing:border-box}.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased}button,a,input,select,textarea{touch-action:manipulation}[hidden]{display:none!important}button:disabled{opacity:.5;cursor:not-allowed} :focus-visible{outline:2px solid #e06c43;outline-offset:3px}`;
+
+export type DashboardStitchPageName =
+  | 'gyms'
+  | 'exercises'
+  | 'messages'
+  | 'settings'
+  | 'nutrition'
+  | 'moderation'
+  | 'finance'
+  | 'athlete'
+  | 'professional'
+  | 'builder'
+  | 'onboarding';
 
 type DashboardStitchHostProps = {
-  name: 'exercises';
+  name: DashboardStitchPageName;
   children: ReactNode;
   css?: string;
+  bodyClass?: string;
   after?: ReactNode;
+  onBodyClick?: (event: MouseEvent<HTMLDivElement>) => void;
+  onBodySubmit?: (event: FormEvent<HTMLDivElement>) => void;
 };
 
-export default function DashboardStitchHost({ name, children, css = '', after }: DashboardStitchHostProps) {
+export default function DashboardStitchHost({
+  name,
+  children,
+  css = '',
+  bodyClass,
+  after,
+  onBodyClick,
+  onBodySubmit,
+}: DashboardStitchHostProps) {
   const navigate = useNavigate();
+  const auth = useAuth() as unknown as { currentUser?: unknown } | undefined;
+  const showLanguagePicker = !auth?.currentUser && false;
   const [root, setRoot] = useState<ShadowRoot | null>(null);
+  const language = useStitchLanguage(root);
   const attach = useCallback((node: HTMLDivElement | null) => {
     if (node) setRoot(node.shadowRoot || node.attachShadow({ mode: 'open' }));
   }, []);
@@ -41,16 +72,26 @@ export default function DashboardStitchHost({ name, children, css = '', after }:
       link.href = href;
       window.document.head.appendChild(link);
     }
-  }, [entry.fonts]);
+  }, [name, entry.fonts]);
 
   const click = (event: MouseEvent<HTMLDivElement>) => {
+    onBodyClick?.(event);
+    if (event.defaultPrevented) return;
     const anchor = (event.target as HTMLElement).closest('a');
     const href = anchor?.getAttribute('href');
     if (href?.startsWith('/') && !event.ctrlKey && !event.metaKey && !event.shiftKey) {
       event.preventDefault();
       navigate(href);
+    } else if (href?.startsWith('#') && href.length > 1) {
+      const target = root?.getElementById(href.slice(1));
+      if (target) {
+        event.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
+
+  const inlineCss = styles[`../../stitch/styles/${name}.css`] ?? '';
 
   const portal = useMemo(
     () =>
@@ -60,17 +101,34 @@ export default function DashboardStitchHost({ name, children, css = '', after }:
               {entry.fonts.map((href) => (
                 <link key={href} rel="stylesheet" href={href} />
               ))}
-              <style>{inlineStyles[name] ?? ''}</style>
+              <style>{inlineCss}</style>
               <style>{`${hostBaseCss}${css}`}</style>
-              <div className={`stitch-body dark ${entry.bodyClass ?? ''}`} onClick={click}>
+              <div
+                className={`stitch-body dark ${bodyClass ?? entry.bodyClass ?? ''}`}
+                onClick={click}
+                onSubmit={onBodySubmit}
+              >
                 {children}
                 {after}
+                {language && showLanguagePicker && (
+                  <label className="st-language-picker" style={{ position: 'fixed', right: 12, bottom: 12, zIndex: 95 }}>
+                    <select
+                      aria-label="Language / Idioma"
+                      value={language.language}
+                      onChange={(event) => language.setLanguage(event.target.value)}
+                    >
+                      <option value="pt-BR">PT</option>
+                      <option value="en">EN</option>
+                      <option value="es">ES</option>
+                    </select>
+                  </label>
+                )}
               </div>
             </>,
             root,
           )
         : null,
-    [root, entry, name, css, children, after, click],
+    [root, entry, inlineCss, css, bodyClass, children, after, click, onBodySubmit, language, showLanguagePicker],
   );
 
   return (
