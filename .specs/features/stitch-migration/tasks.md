@@ -42,7 +42,7 @@ telas complexas.
 
 - [x] **T2** — `AuthBrand.jsx` → `components/AuthBrand.tsx` (componente pequeno, bom piloto do
   método de pixel-parity antes de partir pras telas grandes).
-- [ ] **T3** — `PublicPages.jsx` → `pages/PublicAuthShell.tsx` (Login/Landing/Recovery); atualizar
+- [x] **T3** — `PublicPages.jsx` → `pages/PublicAuthShell.tsx` (Login/Landing/Recovery); atualizar
   `App.jsx`.
 - [ ] **T4** — `Registration.jsx` → `pages/RegistrationShell.tsx`; atualizar `App.jsx`.
 - [ ] **T5** — `Workspace.jsx` → `components/Workspace/WorkspaceNavigation.tsx`; atualizar

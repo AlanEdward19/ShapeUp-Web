@@ -3,7 +3,7 @@ import RouteMetadata from './components/RouteMetadata';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TourProvider } from '@reactour/tour';
 import './styles/Tour.css';
-import { StitchLogin as Login, StitchLanding as LandingPage, StitchRecovery as ForgotPassword } from './stitch/PublicPages';
+import { StitchLogin as Login, StitchLanding as LandingPage, StitchRecovery as ForgotPassword } from './pages/PublicAuthShell';
 import Register from './stitch/Registration';
 
 import ResetPassword from './pages/ResetPassword';
@@ -25,7 +25,8 @@ import Settings from './stitch/Settings';
 import ObjectivesClient from './pages/Dashboard/ObjectivesClient';
 import StaffGym from './pages/Dashboard/StaffGym';
 import TurnstileGym from './pages/Dashboard/TurnstileGym';
-import { StitchFinance as FinancialGym } from './stitch/OperationalPages';
+import GymManagement from './pages/Dashboard/GymManagement';
+const FinancialGym = () => <GymManagement mode="plans" />;
 import DiaryDay from './stitch/Nutrition';
 import FoodSearch from './pages/Dashboard/Nutrition/FoodSearch';
 import MealPlanManager from './pages/Dashboard/Nutrition/MealPlanManager';
