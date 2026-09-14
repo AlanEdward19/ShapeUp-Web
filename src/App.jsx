@@ -35,7 +35,7 @@ import FoodModerationQueue from './stitch/Moderation';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
 import Messages from './stitch/Messages';
 import ExploreGyms from './stitch/Gyms';
-import Onboarding from './stitch/Onboarding';
+import Onboarding from './pages/Dashboard/OnboardingShell';
 import useStitchLanguage from './stitch/useStitchLanguage';
 
 // Wrapper for the Login page
