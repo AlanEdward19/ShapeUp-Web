@@ -1,5 +1,3 @@
-import { sourceDocument } from '../../stitch/sourceRuntime';
-
 const headings = [
   'Bem-vindo ao ShapeUp.',
   'Nutrição & Gasto Calórico.',
@@ -105,8 +103,12 @@ function mountNutritionFields(root: ShadowRoot, api: OnboardingShadowApi) {
     api.update('activity', (event.target as HTMLSelectElement).value);
 }
 
+function choiceNodes(root: ShadowRoot) {
+  return [...root.querySelectorAll('label.cursor-pointer,div.cursor-pointer')];
+}
+
 function syncChoiceGroups(root: ShadowRoot, api: OnboardingShadowApi) {
-  const document = sourceDocument('onboarding');
+  const allChoices = choiceNodes(root);
   root.querySelectorAll('label.cursor-pointer,div.cursor-pointer').forEach((node) => {
     const element = node as HTMLElement;
     if (element.querySelector('input')) return;
@@ -114,10 +116,8 @@ function syncChoiceGroups(root: ShadowRoot, api: OnboardingShadowApi) {
       item.classList.contains('cursor-pointer'),
     );
     if (siblings.length <= 1) return;
-    const group = [...document.querySelectorAll('label.cursor-pointer,div.cursor-pointer')].filter(
-      (item) => item.parentElement === element.parentElement,
-    );
-    const groupId = `choice-${[...document.querySelectorAll('label.cursor-pointer,div.cursor-pointer')].indexOf(group[0])}`;
+    const group = allChoices.filter((item) => item.parentElement === element.parentElement);
+    const groupId = `choice-${allChoices.indexOf(group[0])}`;
     const selected =
       api.values[groupId] ??
       group.findIndex((item) => item.classList.contains('card-selected'));
@@ -139,28 +139,34 @@ function syncChoiceGroups(root: ShadowRoot, api: OnboardingShadowApi) {
   });
 }
 
+function isTemplateField(element: Element) {
+  if (element.closest('[data-onboarding-nutrition-mount]')) return false;
+  if (element instanceof HTMLInputElement && element.type === 'file') return false;
+  return true;
+}
+
 function syncTemplateFields(root: ShadowRoot, api: OnboardingShadowApi) {
-  const document = sourceDocument('onboarding');
-  const templateInputs = [...document.querySelectorAll('input,select')];
-  const shadowInputs = [...root.querySelectorAll('input,select')].filter(
-    (element) => !element.closest('[data-onboarding-nutrition-mount]'),
-  );
-  templateInputs.forEach((_, globalIndex) => {
-    const element = shadowInputs[globalIndex] as HTMLInputElement | HTMLSelectElement | undefined;
-    if (!element) return;
+  const shadowInputs = [...root.querySelectorAll('input,select')].filter(isTemplateField);
+  shadowInputs.forEach((element, globalIndex) => {
+    const fieldElement = element as HTMLInputElement | HTMLSelectElement;
     const field = `field-${globalIndex}`;
     const stored = api.values[field];
     if (stored !== undefined && stored !== '') {
-      element.value = String(stored);
-    } else if (element instanceof HTMLInputElement && element.type === 'text' && globalIndex === 0) {
-      element.value = localStorage.getItem('shapeup_user_name') || element.defaultValue || '';
+      fieldElement.value = String(stored);
+    } else if (
+      fieldElement instanceof HTMLInputElement &&
+      fieldElement.type === 'text' &&
+      globalIndex === 0
+    ) {
+      fieldElement.value =
+        localStorage.getItem('shapeup_user_name') || fieldElement.defaultValue || '';
     }
     const label =
-      element.parentElement?.querySelector('label')?.textContent?.trim() ||
-      element.closest('div')?.previousElementSibling?.textContent?.trim() ||
+      fieldElement.parentElement?.querySelector('label')?.textContent?.trim() ||
+      fieldElement.closest('div')?.previousElementSibling?.textContent?.trim() ||
       `Parâmetro ${globalIndex + 1}`;
-    element.setAttribute('aria-label', label);
-    element.onchange = (event) => {
+    fieldElement.setAttribute('aria-label', label);
+    fieldElement.onchange = (event) => {
       const target = event.target as HTMLInputElement | HTMLSelectElement;
       api.update(field, target.value);
     };
