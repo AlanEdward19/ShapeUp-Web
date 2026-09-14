@@ -2,8 +2,8 @@ import { render, fireEvent, within, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { expect, it, vi } from 'vitest';
 import { LanguageProvider } from '../contexts/LanguageContext';
-import { StitchLanding, StitchLogin } from './PublicPages';
-import Registration from './Registration';
+import { StitchLanding, StitchLogin } from '../pages/PublicAuthShell';
+import Registration from '../pages/RegistrationShell';
 import RouteMetadata from '../components/RouteMetadata';
 
 vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ register: vi.fn(), signIn: vi.fn(), signInWithGoogle: vi.fn(), resetPassword: vi.fn() }) }));
@@ -39,6 +39,11 @@ it('renders one working password toggle and a home link in login', () => {
   expect(root.querySelector('.st-auth-brand')).toHaveAttribute('href','/');
   const button = within(root.querySelector('.stitch-body')).getByRole('button',{name:'Mostrar senha'});
   expect(root.querySelectorAll('#toggle-pwd')).toHaveLength(1);
+  const form = root.querySelector('form');
+  expect(form).toHaveAttribute('autocomplete', 'on');
+  expect(form.elements.email).toHaveAttribute('autocomplete', 'username');
+  expect(form.elements.email).toHaveAttribute('type', 'email');
+  expect(form.elements.password).toHaveAttribute('autocomplete', 'current-password');
   fireEvent.click(button);
   expect(root.getElementById('password')).toHaveAttribute('type','text');
   expect(button).toHaveAttribute('aria-label','Ocultar senha');
@@ -84,5 +89,12 @@ for (const [language, step, badge, birth, finish, mismatch, title] of [
     expect(root.querySelector('label[for="birthDate"]')).toHaveTextContent(birth);
     expect(root.querySelector('button[type="submit"]')).toHaveTextContent(finish);
     expect(root.getElementById('fullName')).toHaveValue('Alan Silva');
+    const form = root.querySelector('form');
+    expect(form).toHaveAttribute('autocomplete', 'on');
+    expect(form.elements.email).toHaveAttribute('autocomplete', 'username');
+    expect(form.elements.password).toHaveAttribute('autocomplete', 'new-password');
+    expect(form.elements.confirmPassword).toHaveAttribute('autocomplete', 'new-password');
+    expect(form.elements.email).toHaveValue('alan@example.com');
+    expect(form.elements.password).toHaveValue('StrongPassword123!');
   });
 }

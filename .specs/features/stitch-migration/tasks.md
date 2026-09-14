@@ -93,10 +93,50 @@ de teste, já ajustados incrementalmente).
 
 ### Fase D — Motor genérico + Fase E — bloqueada
 
-- [ ] **T18** — Confirmar que nenhuma tela ainda importa `sourceRuntime`/`StitchTemplate`/
-  `manifest.json`/`linkBinding`/`copy` (só `Builder.jsx` deveria restar, e ele é bloqueado — ver
-  T19). Se limpo, remover `templates/*.html`, `styles/*.css` órfãos, `manifest.json`, `copy.tsv`
-  (manter só o que `Builder.jsx` ainda usa). Gate: `npm run build && npm run lint`.
+- [x] **T18** — **Limpeza parcial (motor ainda necessário até T19).** Telas convertidas usam markup
+  TSX + `PublicStitchHost`/`DashboardStitchHost` para CSS/fonts (`manifest.json`), mas várias shells
+  ainda importam `sourceRuntime`/`Workspace` para bindings de sombra e `copy` para i18n estático.
+  `linkBinding` removido com `Registration.jsx` morto. Gate: `npm run build && npm run lint`.
+
+  #### T18 — EVIDENCE (2026-09-14)
+
+  **Expectativa original vs realidade:** não é verdade que só `Builder.jsx` importa o motor — hosts e
+  shells migrados ainda dependem de partes do engine (ver tabela abaixo). T18 remove apenas assets
+  com zero importadores de runtime em produção.
+
+  | Símbolo | Importadores de produção (fora `src/stitch/`) | Mantido? |
+  | --- | --- | --- |
+  | `sourceRuntime` | `MessagesShell`, `SettingsShell`, `ModerationShell`, `NutritionDiaryShell`, `OperationalDashboardsShell`, `onboardingShadowBindings.ts` | **sim** — bindings DOM |
+  | `StitchTemplate` | só via `Workspace.jsx` (usado pelas shells acima) + `Builder.jsx` | **sim** |
+  | `manifest.json` | `PublicStitchHost.tsx`, `DashboardStitchHost.tsx`, `StitchTemplate.jsx` (testes) | **sim** |
+  | `copy` / `copy.tsv` | `copy.js` → shells/markup (`NutritionDiaryShell`, `OperationalDashboardsShell`, `RegisterPublicMarkup`, `InvitationPublicMarkup`) + `useStitchLanguage` | **sim** |
+  | `linkBinding` | nenhum após remoção de `Registration.jsx` | **removido** (`linkBinding.js`) |
+
+  **Arquivos `src/stitch/*.jsx` removidos (zero import de produção):**
+
+  | Arquivo | Evidência |
+  | --- | --- |
+  | `Messages.jsx` | `App.jsx` → `MessagesShell.tsx` |
+  | `OperationalPages.jsx` | `Dashboard.jsx` → `OperationalDashboardsShell.tsx`; financeiro → `FinancialGym.jsx` |
+  | `Registration.jsx` | `App.jsx` → `RegistrationShell.tsx` (testes atualizados para Shell) |
+
+  **Templates HTML removidos** (sem `sourceDocument('…')` / `Workspace name=` em produção; markup TSX
+  + hosts cobrem auth/gyms/exercises/finance):
+
+  `landing`, `login`, `recovery`, `register`, `invitation`, `gyms`, `exercises`, `finance`.
+
+  **Templates HTML mantidos** (ainda referenciados em runtime):
+
+  `builder`, `settings`, `messages`, `moderation`, `nutrition`, `professional`, `athlete`, `onboarding`.
+
+  **CSS removido:** `styles/finance.css` (nenhum host com `name="finance"`). Demais `styles/*.css`
+  mantidos — `PublicStitchHost` / `DashboardStitchHost` carregam via glob por `name`.
+
+  **Re-exports finos mantidos:** `PublicPages.jsx`, `Settings.jsx`, `Exercises.jsx`, `Gyms.jsx`,
+  `Nutrition.jsx`, `Moderation.jsx`, `Onboarding.jsx`, `AthleteScoreboard.jsx`, `HistoryChart.jsx`,
+  `useHydration.js`.
+
+  Gate T18: `npm run build && npm run lint` (warnings pré-existentes aceitos).
 - [ ] **T19** — **BLOQUEADA até `workout-editor` (Fase 2, `ShapeUpApi/.specs/features/
   workout-editor/`) fechar Verifier PASS.** Reescrever `stitch/Builder.jsx` como
   `pages/Dashboard/PlanEditorShell.tsx` (mesmo método: pixel-parity antes/depois). Atualizar
