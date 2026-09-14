@@ -49,7 +49,7 @@ telas complexas.
   `Layout.jsx` — CUIDADO: outras telas `stitch/*.jsx` ainda não convertidas importam
   `./Workspace`; manter as duas versões coexistindo até todas migrarem, ou atualizar o import
   delas pro novo caminho nesta mesma task (decidir na hora conforme o que reduzir mais risco).
-- [ ] **T6** — `HistoryChart.jsx` → `components/charts/HistoryChart.tsx`.
+- [x] **T6** — `HistoryChart.jsx` → `components/charts/HistoryChart.tsx`.
 - [ ] **T7** — `useHydration.js` → `hooks/useHydration.ts`.
 - [ ] **T8** — `AthleteScoreboard.jsx` (+ `.test.jsx`) → `components/gamification/
   AthleteScoreboard.tsx`; ajustar teste.
