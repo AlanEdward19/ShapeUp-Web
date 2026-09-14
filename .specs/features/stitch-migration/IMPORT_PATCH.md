@@ -1,12 +1,12 @@
 # Import path patches (stitch-migration)
 
-Canonical implementations move out of `src/stitch/`; legacy paths stay as thin re-exports until screen tasks update imports.
+## T9 — Exercises shell
 
-## T7 — `useHydration`
+Apply in `src/App.jsx`:
 
-| Consumer | Import (unchanged) | Resolves to |
-| --- | --- | --- |
-| `src/stitch/Nutrition.jsx` | `./useHydration` | `src/hooks/useHydration.ts` via `src/stitch/useHydration.js` |
-| `src/stitch/OperationalPages.jsx` | `./useHydration` | same |
+```diff
+-import Exercises from './stitch/Exercises';
++import Exercises from './pages/Dashboard/ExercisesShell';
+```
 
-**Preferred import after stitch screens migrate:** `import useHydration from '../hooks/useHydration'` (or path-relative equivalent).
+Until this patch is applied, `src/stitch/Exercises.jsx` re-exports `../pages/Dashboard/ExercisesShell` so the legacy import keeps working.

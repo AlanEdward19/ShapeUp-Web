@@ -53,7 +53,7 @@ telas complexas.
 - [x] **T7** — `useHydration.js` → `hooks/useHydration.ts`.
 - [ ] **T8** — `AthleteScoreboard.jsx` (+ `.test.jsx`) → `components/gamification/
   AthleteScoreboard.tsx`; ajustar teste.
-- [ ] **T9** — `Exercises.jsx` (+ `.test.jsx`) → `pages/Dashboard/ExercisesShell.tsx`; atualizar
+- [x] **T9** — `Exercises.jsx` (+ `.test.jsx`) → `pages/Dashboard/ExercisesShell.tsx`; atualizar
   `App.jsx` + teste.
 - [ ] **T10** — `Gyms.jsx` → `pages/Dashboard/GymsExploreShell.tsx`; atualizar `App.jsx`.
 - [ ] **T11** — `Messages.jsx` → `pages/Dashboard/MessagesShell.tsx`; atualizar `App.jsx`.
