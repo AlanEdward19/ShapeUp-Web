@@ -6,7 +6,7 @@ import Login from '../pages/Login';
 import ForgotPassword from '../pages/ForgotPassword';
 import SeoHead from '../components/SeoHead';
 import OrganizationJsonLd from '../components/OrganizationJsonLd';
-import AuthBrand from './AuthBrand';
+import AuthBrand from '../components/AuthBrand';
 import publicCss from './publicUsability.css?inline';
 import { useLanguage } from '../contexts/LanguageContext';
 

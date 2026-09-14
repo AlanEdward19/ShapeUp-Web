@@ -40,7 +40,7 @@ pixel-parity passando** (não é opcional, é acceptance criteria — ver design
 Ordem sugerida: mais simples/isolada primeiro, pra validar o método de pixel-parity antes das
 telas complexas.
 
-- [ ] **T2** — `AuthBrand.jsx` → `components/AuthBrand.tsx` (componente pequeno, bom piloto do
+- [x] **T2** — `AuthBrand.jsx` → `components/AuthBrand.tsx` (componente pequeno, bom piloto do
   método de pixel-parity antes de partir pras telas grandes).
 - [ ] **T3** — `PublicPages.jsx` → `pages/PublicAuthShell.tsx` (Login/Landing/Recovery); atualizar
   `App.jsx`.

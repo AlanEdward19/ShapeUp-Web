@@ -5,7 +5,7 @@ import Register from '../pages/Register';
 import StitchTemplate from './StitchTemplate';
 import { sourceDocument, renderSource } from './sourceRuntime';
 import { linkBinding } from './linkBinding';
-import AuthBrand from './AuthBrand';
+import AuthBrand from '../components/AuthBrand';
 import publicCss from './publicUsability.css?inline';
 
 const roleMap = { coach: 'professional', athlete: 'independent', manager: 'gym' };
