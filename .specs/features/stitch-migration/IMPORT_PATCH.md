@@ -1,20 +1,14 @@
-# App.jsx import patch (T10 — Gyms)
+# Import patches — stitch migration
 
-`App.jsx` can keep the existing import; `src/stitch/Gyms.jsx` re-exports the native shell:
+## T11 — `Messages.jsx` → `MessagesShell.tsx`
 
-```jsx
-import ExploreGyms from './stitch/Gyms';
-```
+`App.jsx` imported the **same default export twice** under different local names. Both routes delegate to `StitchMessages` in `MessagesShell.tsx`.
 
-Optional direct import (apply when cleaning stitch shims):
+| Route | Before | After |
+| --- | --- | --- |
+| `/dashboard/feedback` | `import Feedback from './stitch/Messages';` | `import { StitchFeedback as Feedback } from './pages/Dashboard/MessagesShell';` |
+| `/dashboard/messages` | `import Messages from './stitch/Messages';` | `import StitchMessages from './pages/Dashboard/MessagesShell';` |
 
-```diff
--import ExploreGyms from './stitch/Gyms';
-+import ExploreGyms from './pages/Dashboard/GymsExploreShell';
-```
+**Note:** `stitch/Messages.jsx` default export was `StitchMessages` (not a separate Feedback component). The feedback route name was misleading; `StitchFeedback` is an explicit alias of the same shell for documentation clarity.
 
-Route stays unchanged:
-
-```jsx
-<Route path="gyms" element={<ExploreGyms />} />
-```
+**Pixel parity:** `/dashboard/messages` (and pro/gym `/dashboard/feedback` stitch view) at **1440×** and **390×** viewports — dev server port **5191** (`npm run dev -- --port 5191`).
