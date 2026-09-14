@@ -73,10 +73,23 @@ de teste, já ajustados incrementalmente).
 
 ### Fase C — Remoção de arquivo morto (mesma investigação já fechada em design.md)
 
-- [ ] **T17** — Pra cada um dos 5 candidatos (`Dashboard/Settings.jsx`, `Dashboard/Messages.jsx`,
+- [x] **T17** — Pra cada um dos 5 candidatos (`Dashboard/Settings.jsx`, `Dashboard/Messages.jsx`,
   `Dashboard/ExploreGyms.jsx`, `Dashboard/DashboardProfessional.jsx`, `Dashboard/Onboarding.jsx` +
   teste): `grep -rn "<Nome>" src` sem filtro, ler cada ocorrência, confirmar zero-import real antes
   de apagar. Documentar evidência na task.
+
+  #### T17 — EVIDENCE (2026-09-14)
+
+  | Candidato | Produção | Outros hits (não-import) | Ação |
+  | --- | --- | --- | --- |
+  | `Settings.jsx` | `App.jsx` → `SettingsShell.tsx` | `Settings2`/`nav.settings` em i18n/Sidebar; `stitch/Settings.jsx` re-export Shell; `Settings.css` só importado por este arquivo | **apagado** (+ `Settings.css` órfão) |
+  | `Messages.jsx` | `App.jsx` → `MessagesShell.tsx` | copy/i18n, `ChatDrawer` state, `stitch/Messages.jsx`, variável `openMessages` em `DashboardProfessional.jsx` (arquivo morto) | **apagado** |
+  | `ExploreGyms.jsx` | `App.jsx` → `GymsExploreShell.tsx` | só definição no próprio arquivo | **apagado** |
+  | `DashboardProfessional.jsx` | `Dashboard.jsx` → `OperationalDashboardsShell` (`StitchProfessional as DashboardProfessional`) | nome local no router, não import do `.jsx` | **apagado** (+ `DashboardProfessional.css` órfão) |
+  | `Onboarding.jsx` | `App.jsx` → `OnboardingShell.tsx`; `stitch/Onboarding.test.jsx` → Shell | `GoalOnboarding`, `completeOnboarding` API, markup/shell TS | **apagado** |
+  | `__tests__/Onboarding.test.jsx` | único import: `from '../Onboarding'` | — | **apagado** (teste do arquivo morto; cobertura permanece em `stitch/Onboarding.test.jsx` → Shell) |
+
+  Gate T17: `npm run build && npm run lint` (warnings pré-existentes aceitos).
 
 ### Fase D — Motor genérico + Fase E — bloqueada
 
