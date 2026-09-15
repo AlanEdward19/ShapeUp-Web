@@ -1,3 +1,8 @@
+import DatePicker from '../../components/DatePicker';
+import { useGymManagementApi } from '../../hooks/api/useGymManagementApi';
+import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
+import { readAllPages } from '../../utils/readAllPages';
+import { workoutHistory } from '../../utils/workoutHistory';
 import StitchBuilder from '../../stitch/Builder';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
@@ -23,7 +28,7 @@ import '../../components/InviteClientModal.css';
 import '../Dashboard/TrainingPlansProfessional.css';
 import './ClientDetail.css';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
-import { exercisesDB } from '../../data/mockExercises';
+import { useExercises } from '../../hooks/useExercises';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
@@ -64,53 +69,6 @@ const buildWorkoutPlanBody = (plan, targetUserId) => ({
     }))
 });
 
-// ─── Mock Data ─────────────────────────────────────────────
-
-const clientsDB = {};
-
-const getClientData = (id) => {
-    let baseClient = clientsDB[id];
-
-    // Attempt to override/find from localStorage
-    const stored = localStorage.getItem('shapeup_clients');
-    if (stored) {
-        const clients = JSON.parse(stored);
-        const local = clients.find(c => c.id === id);
-        if (local) {
-            baseClient = { ...baseClient, ...local, goal: local.goal || 'General Fitness' };
-        }
-    }
-
-    if (!baseClient) {
-        baseClient = { name: `Client #${id}`, goal: 'General Fitness', status: 'Active' };
-    }
-
-    // Only apply mock charts if it's one of the original 5 hardcoded ones
-    const hasData = id <= 5;
-
-    return {
-        ...baseClient,
-        weightProgress: hasData ? [
-            { week: 'W1', weight: 82.5 }, { week: 'W2', weight: 82.8 },
-            { week: 'W3', weight: 83.1 }, { week: 'W4', weight: 83.5 }, { week: 'W5', weight: 84.0 },
-        ] : [],
-        strengthProgress: hasData ? [
-            { week: 'W1', load: 110 }, { week: 'W2', load: 112.5 },
-            { week: 'W3', load: 115 }, { week: 'W4', load: 120 }, { week: 'W5', load: 122.5 },
-        ] : [],
-        readinessRadar: hasData ? [
-            { subject: 'Sleep', A: 80, fullMark: 100 }, { subject: 'Energy', A: 85, fullMark: 100 },
-            { subject: 'Soreness', A: 60, fullMark: 100 }, { subject: 'Stress', A: 40, fullMark: 100 },
-            { subject: 'Nutrition', A: 90, fullMark: 100 },
-        ] : [],
-        adherence: hasData ? { completed: 18, skipped: 2, partial: 1 } : { completed: 0, skipped: 0, partial: 0 },
-        hasData
-    };
-};
-
-// Plans + per-plan session history
-const initPlans = [];
-
 // ─── Helpers ────────────────────────────────────────────────
 
 // eslint-disable-next-line react-refresh/only-export-components -- shared constant co-located with the components that use it
@@ -144,7 +102,10 @@ export const DIFFICULTIES = ['Easy', 'Intermediate', 'Hard', 'Advanced'];
 // eslint-disable-next-line react-refresh/only-export-components -- shared constant co-located with the components that use it
 export const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
-export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false, stitch = true }) => {
+// Default stitch=false: native BlockCard/SetRow path satisfies WOED UI ACs (Superset grouping,
+// EMOM rotation order, RPE|RIR toggle). Stitch Builder still flattens blocks; keep it opt-in until
+// stitch-migration T19 rewrites it as PlanEditorShell.
+export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false, stitch = false }) => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [name, setName] = useState(plan.name);
@@ -250,7 +211,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
 
             localStorage.setItem(tourKey, 'true');
         }
-    }, [setIsOpen, setSteps, isIndependent, t]);
+    }, [setIsOpen, setSteps, setCurrentStep, isIndependent, t]);
 
     // Derived summary values (live computed)
     const totalSets = allExercises.reduce((acc, ex) => acc + ex.sets.length, 0);
@@ -685,13 +646,16 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
 
 // ─── MAIN COMPONENT ─────────────────────────────────────────
 const ClientDetail = () => {
+    const { exercises: exercisesDB } = useExercises();
     const { t, unitSystem, convertWeight } = useLanguage();
     const { id } = useParams();
-    const { getWorkoutPlansByUser } = useTrainingApi();
+    const { getWorkoutPlansByUser, getWorkoutsByUser } = useTrainingApi();
+    const { getTrainerClients } = useGymManagementApi();
+    const { getMe } = useAuthorizationApi();
     const navigate = useNavigate();
     const location = useLocation();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const client = getClientData(parseInt(id));
+    const [client, setClient] = useState({name:`#${id}`,goal:'—',status:'—',weightProgress:[],strengthProgress:[],readinessRadar:[],adherence:{completed:0,skipped:0,partial:0},hasData:false});
 
     const [activeTab, setActiveTab] = useState(location.state?.tab || 'analytics');
     const [plans, setPlans] = useState([]);
@@ -706,20 +670,15 @@ const ClientDetail = () => {
         }
         const fetchPlans = async () => {
             try {
-                const response = await getWorkoutPlansByUser(numericId);
-                const raw = Array.isArray(response)
-                    ? response
-                    : (response?.data || response?.items || []);
-
-                // Normalizar planos da API para o formato interno do PlanEditor
-                const data = raw.map(p => normalizePlan(p));
-                setPlans(data);
+                const [raw,sessions,me] = await Promise.all([readAllPages(cursor=>getWorkoutPlansByUser(numericId,cursor)),readAllPages(cursor=>getWorkoutsByUser(numericId,cursor)),getMe()]);
+                const roster = await readAllPages(cursor=>getTrainerClients(me.userId || me.id,cursor));
+                const person = roster.find(item=>String(item.clientId)===String(id));
+                const history = sessions.filter(item=>item.isCompleted || item.isCancelled).map(workoutHistory);
+                setClient(prev=>({...prev,name:person?.clientName || `#${id}`,status:person?.status || '—',hasData:history.length>0,adherence:{completed:history.filter(item=>item.status==='completed').length,skipped:history.filter(item=>item.status==='skipped').length,partial:0}}));
+                setPlans(raw.map(p=>({...normalizePlan(p),history:history.filter(item=>String(item.workoutPlanId)===String(p.planId || p.id))})));
             } catch (err) {
                 console.error('Erro ao buscar planos do cliente:', err);
-                // Fallback to localStorage cache
-                const stored = localStorage.getItem('shapeup_client_plans_' + id);
-                if (stored) setPlans(JSON.parse(stored));
-                else setPlans(client.hasData ? initPlans : []);
+                setPlans([]);
             } finally {
                 setLoadingPlans(false);
             }
@@ -781,18 +740,18 @@ const ClientDetail = () => {
                     const start = new Date(muscleCustomRange.start + 'T00:00:00');
                     const end = new Date(muscleCustomRange.end + 'T23:59:59');
                     historyToUse = allHistory.filter(h => {
-                        const d = new Date(h.date + 'T12:00:00');
+                        const d = new Date(h.date.includes('T') ? h.date : h.date + 'T12:00:00');
                         return d >= start && d <= end;
                     });
                 }
             } else {
                 const cutoff = new Date();
                 cutoff.setDate(cutoff.getDate() - parseInt(muscleTimeFilter));
-                historyToUse = allHistory.filter(h => new Date(h.date + 'T12:00:00') >= cutoff);
+                historyToUse = allHistory.filter(h => new Date(h.date.includes('T') ? h.date : h.date + 'T12:00:00') >= cutoff);
             }
         }
         return calculateMuscleSetsTotal(historyToUse, exercisesDB);
-    }, [allHistory, muscleTimeFilter, muscleCustomRange]);
+    }, [allHistory, muscleTimeFilter, muscleCustomRange, exercisesDB]);
 
     const dynamicMuscleVolume = Object.entries(dynamicMuscleVolumeObj)
         .map(([muscle, sets]) => ({ muscle, sets }))
@@ -834,7 +793,7 @@ const ClientDetail = () => {
 
             localStorage.setItem('shapeup_client_detail_tour_seen', 'true');
         }
-    }, [setIsOpen, setSteps, hasRealData]);
+    }, [setIsOpen, setSteps, setCurrentStep, t, hasRealData]);
 
     // --- Recent Improvements (PR Logic) ---
     const recentImprovements = React.useMemo(() => {
@@ -1157,9 +1116,9 @@ const ClientDetail = () => {
                         </div>
                         {muscleTimeFilter === 'custom' && (
                             <div style={{ display: 'flex', gap: '8px', padding: '0.5rem 0', alignItems: 'center', justifyContent: 'flex-end', width: '100%', fontSize: '0.8rem' }}>
-                                <input type="date" value={muscleCustomRange.start} onChange={e => setMuscleCustomRange(p => ({ ...p, start: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
+                                <DatePicker value={muscleCustomRange.start} onChange={e => setMuscleCustomRange(p => ({ ...p, start: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
                                 <span className="su-text-muted">→</span>
-                                <input type="date" value={muscleCustomRange.end} onChange={e => setMuscleCustomRange(p => ({ ...p, end: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
+                                <DatePicker value={muscleCustomRange.end} onChange={e => setMuscleCustomRange(p => ({ ...p, end: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
                             </div>
                         )}
                         <div className="su-chart-wrapper-med" style={{ minHeight: '300px', marginTop: '1rem', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '1rem', width: '100%' }}>
