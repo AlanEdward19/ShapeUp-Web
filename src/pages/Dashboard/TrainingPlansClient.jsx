@@ -1,9 +1,11 @@
+import { readAllPages } from '../../utils/readAllPages';
+import { workoutHistory } from '../../utils/workoutHistory';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
 import Button from '../../components/Button';
 import ExerciseModal from '../../components/ExerciseModal';
-import { exercisesDB } from '../../data/mockExercises';
+import { useExercises } from '../../hooks/useExercises';
 import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
@@ -12,8 +14,30 @@ import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
-import { mapSetType, mapTechnique } from '../../utils/trainingEnums';
+import { buildWorkoutStatePayload as buildWorkoutStateApiPayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import './TrainingPlansClient.css';
+
+const toRuntimeSets = (ex, exIdx) => ({
+    id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
+    exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
+    name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
+    muscles: ex.muscles || [],
+    target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
+    sets: (ex.sets || []).map((s, sIdx) => ({
+        id: s.id || `s_${exIdx}_${sIdx}`,
+        type: s.type,
+        technique: s.technique || 'Straight',
+        target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
+        completed: false,
+        failure: false,
+        prescribedRest: s.rest || 90,
+        prescribedReps: s.reps,
+        prescribedLoad: s.load,
+        prescribedRpe: s.intensityValue,
+        prescribedIntensityType: s.intensityType || 'rpe',
+        log: { weight: '', reps: '', rpe: '' },
+    })),
+});
 
 const formatTime = (totalSeconds) => {
     const hours = Math.floor(totalSeconds / 3600);
@@ -26,10 +50,11 @@ const formatTime = (totalSeconds) => {
 };
 
 const ClientView = () => {
+    const { exercises: exercisesDB } = useExercises();
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { getWorkoutPlansByUser, getActiveWorkout, getWorkoutPlanById } = useTrainingApi();
+    const { getWorkoutPlansByUser, getWorkoutsByUser, getActiveWorkout, getWorkoutPlanById } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
 
     // Session State
@@ -85,35 +110,11 @@ const ClientView = () => {
     }, [workoutTime]);
 
     const buildWorkoutStatePayload = useCallback((sourceExercises, _elapsedSeconds) => {
-        // Only sync exercises that have at least one set with progress
-        const exercisesWithProgress = sourceExercises.map(ex => {
-            const setsWithProgress = ex.sets.filter(s => !!s.completed).map(s => ({
-                id: s.id,
-                repetitions: parseInt(s.log?.reps) || 0,
-                load: parseFloat(s.log?.weight) || 0,
-                loadUnit: String(unitSystem === 'imperial' ? 2 : 1),
-                setType: mapSetType(s.type),
-                technique: mapTechnique(s.technique || 'Straight'),
-                rpe: parseFloat(s.log?.rpe) || 0,
-                restSeconds: parseInt(s.prescribedRest) || 90,
-                isExtra: !!s.isExtra,
-                completed: true, // If it's in this list, it's completed
-                failure: !!s.failure
-            }));
-
-            if (setsWithProgress.length === 0) return null;
-
-            return {
-                exerciseId: parseInt(ex.id) || ex.exerciseId || 0,
-                sets: setsWithProgress
-            };
-        }).filter(Boolean);
-
-        return {
-            sessionId: String(workoutSessionId),
-            savedAtUtc: new Date().toISOString(),
-            exercises: exercisesWithProgress
-        };
+        return buildWorkoutStateApiPayload({
+            sessionId: workoutSessionId,
+            exercises: sourceExercises,
+            unitSystem,
+        });
     }, [workoutSessionId, unitSystem]);
     
     /**
@@ -171,12 +172,9 @@ const ClientView = () => {
                 }
                 
                 console.log('TrainingPlansClient: Fetching training plans for user:', userId);
-                const response = await getWorkoutPlansByUser(userId);
-                const raw = Array.isArray(response) 
-                    ? response 
-                    : (response?.data || response?.items || []);
-                
-                const data = raw.map(p => normalizePlan(p));
+                const [raw,sessions] = await Promise.all([readAllPages(cursor=>getWorkoutPlansByUser(userId,cursor)),readAllPages(cursor=>getWorkoutsByUser(userId,cursor))]);
+                const history = sessions.filter(session=>session.isCompleted || session.isCancelled).map(workoutHistory);
+                const data = raw.map(p => ({...normalizePlan(p),history:history.filter(session=>String(session.workoutPlanId)===String(p.planId || p.id))}));
                 setAssignedPlans(data);
                 
                 // Update local storage cache
@@ -191,7 +189,7 @@ const ClientView = () => {
         };
 
         fetchPlans();
-    }, [getMe, getWorkoutPlansByUser]);
+    }, [getMe, getWorkoutPlansByUser, getWorkoutsByUser]);
 
     // -- Check for active workout on mount --
     useEffect(() => {
@@ -237,21 +235,10 @@ const ClientView = () => {
 
             if (plan) {
                 // Map exercises to runtime format
-                const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => ({
-                    id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
-                    name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
-                    muscles: ex.muscles || [],
-                    target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
-                    sets: ex.sets.map((s, sIdx) => ({
-                        id: `s_${exIdx}_${sIdx}`,
-                        type: s.type,
-                        target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
-                        completed: false,
-                        failure: false,
-                        prescribedRest: s.rest || 90,
-                        log: { weight: '', reps: '', rpe: '' }
-                    }))
-                }));
+                const runtimeExercises = enrichExercisesFromCatalog(
+                    flattenBlockExercises(plan.blocks),
+                    exercisesDB
+                ).map(toRuntimeSets);
 
                 setExercises(runtimeExercises);
                 hasFirstDoneRef.current = false;
@@ -390,23 +377,10 @@ const ClientView = () => {
         }
 
         // Map the plan's exercises into the runtime session engine format
-        const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => {
-            return {
-                id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
-                name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
-                muscles: ex.muscles || [],
-                target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
-                sets: ex.sets.map((s, sIdx) => ({
-                    id: `s_${exIdx}_${sIdx}`,
-                    type: s.type,
-                    target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
-                    completed: false,
-                    failure: false,
-                    prescribedRest: s.rest || 90,
-                    log: { weight: '', reps: '', rpe: '' }
-                }))
-            };
-        });
+        const runtimeExercises = enrichExercisesFromCatalog(
+            flattenBlockExercises(plan.blocks),
+            exercisesDB
+        ).map(toRuntimeSets);
 
         setExercises(runtimeExercises);
         hasFirstDoneRef.current = false;
@@ -796,7 +770,7 @@ const ClientView = () => {
                                         </Button>
                                     </div>
                                 </div>
-                                <WorkoutBodyMap exercises={flattenBlockExercises(plan.blocks)} compact />
+                                <WorkoutBodyMap exercises={enrichExercisesFromCatalog(flattenBlockExercises(plan.blocks), exercisesDB)} compact />
                             </div>
                         ))}
                     </div>

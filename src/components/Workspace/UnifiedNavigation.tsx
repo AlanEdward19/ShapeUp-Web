@@ -1,5 +1,5 @@
 import { useEffect, type ReactElement } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import Logo from '../Logo/Logo';
@@ -71,9 +71,9 @@ export default function UnifiedNavigation({ flow, open, close }: UnifiedNavigati
       <aside data-unified-sidebar data-open={open}>
         <div className="sn-brand">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <a href="/dashboard" aria-label="ShapeUp — Dashboard" onClick={close} style={{ padding: 0, border: 0 }}>
+            <Link to="/dashboard" aria-label="ShapeUp — Dashboard" onClick={close} style={{ padding: 0, border: 0 }}>
               <Logo variant="lockup" width="142" height="34" style={undefined} />
-            </a>
+            </Link>
           </div>
           <small>{role === 'gym' ? 'Academia' : pro ? 'Personal' : 'Atleta'}</small>
         </div>
@@ -82,10 +82,10 @@ export default function UnifiedNavigation({ flow, open, close }: UnifiedNavigati
           {items.map(([icon, label, href], index) => (
             <div key={href}>
               {index === 5 && <p style={{ marginTop: 24 }}>Atendimento & Sistema</p>}
-              <a href={href} aria-current={pathname === href ? 'page' : undefined} onClick={close}>
+              <Link to={href} aria-current={pathname === href ? 'page' : undefined} onClick={close}>
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>{icon}</span>
                 <span>{label}</span>
-              </a>
+              </Link>
             </div>
           ))}
         </nav>

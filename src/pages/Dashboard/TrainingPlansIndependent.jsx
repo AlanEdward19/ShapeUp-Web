@@ -1,3 +1,5 @@
+import { readAllPages } from '../../utils/readAllPages';
+import { workoutHistory } from '../../utils/workoutHistory';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useOutletContext, useLocation, useNavigate } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
@@ -19,9 +21,34 @@ import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
+import { buildWorkoutStatePayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
+import { useExercises } from '../../hooks/useExercises';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import './TrainingPlansClient.css';
 import './TrainingPlansProfessional.css';
+
+const toRuntimeSets = (ex, exIdx) => ({
+    id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
+    exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
+    name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
+    muscles: ex.muscles || [],
+    target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
+    sets: (ex.sets || []).map((s, sIdx) => ({
+        id: s.id || `s_${exIdx}_${sIdx}`,
+        type: s.type,
+        technique: s.technique || 'Straight',
+        target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
+        completed: false,
+        failure: false,
+        prescribedRest: s.rest || 90,
+        prescribedReps: s.reps,
+        prescribedLoad: s.load,
+        prescribedRpe: s.intensityValue,
+        prescribedIntensityType: s.intensityType || 'rpe',
+        log: { weight: '', reps: '', rpe: '' },
+    })),
+});
+
 
 // Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
 // from a plan object shaped like normalizePlan()'s output (PlanEditor's internal shape) and
@@ -67,8 +94,9 @@ const formatTime = (totalSeconds) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 };
 
-const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart }) => {
+const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, owned, catalog = [] }) => {
     const { t } = useLanguage();
+    const mapExercises = enrichExercisesFromCatalog(flattenBlockExercises(plan.blocks), catalog);
     return (
         <div className="su-independent-plan-card">
             <div className="su-plan-card-body">
@@ -81,18 +109,18 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart }) => {
                         {t('pro.builder.diff')}: <strong>{t(`pro.builder.diff.${plan.difficulty?.toLowerCase()}`) || plan.difficulty}</strong> · {plan.weeks} {t('pro.client.plan.weeks')}
                     </p>
                     <div className="su-ex-count-badge">
-                        <span>{flattenBlockExercises(plan.blocks).length} {t('pro.client.plan.exercises')}</span>
+                        <span>{mapExercises.length} {t('pro.client.plan.exercises')}</span>
                     </div>
-                    <WorkoutBodyMap exercises={flattenBlockExercises(plan.blocks)} compact />
+                    <WorkoutBodyMap exercises={mapExercises} compact />
                 </div>
                 <div className="su-plan-card-side">
                     <button className="su-execute-btn-large" onClick={() => onStart(plan)}>
                         {t('client.training.card.btn')}
                     </button>
                     <div className="su-plan-tiny-actions">
-                        <button onClick={() => onEdit(plan)} title={t('pro.client.plan.btn.edit')}>{t('pro.client.plan.btn.edit')}</button>
+                        {owned && <button onClick={() => onEdit(plan)} title={t('pro.client.plan.btn.edit')}>{t('pro.client.plan.btn.edit')}</button>}
                         <button onClick={() => onCopy(plan)} title={t('pro.client.plan.btn.copy')}>{t('pro.client.plan.btn.copy')}</button>
-                        <button onClick={() => onDelete(plan)} title={t('independent.builder.btn.delete')} className="delete">{t('independent.builder.btn.delete')}</button>
+                        {owned && <button onClick={() => onDelete(plan)} title={t('independent.builder.btn.delete')} className="delete">{t('independent.builder.btn.delete')}</button>}
                     </div>
                 </div>
             </div>
@@ -104,20 +132,26 @@ const TrainingPlansIndependent = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { setSessionTitle } = useOutletContext();
-    const { t, unitSystem, formatWeight } = useLanguage();
+    const { t, language, unitSystem, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const {
         getWorkoutPlansByUser,
+        getWorkoutsByUser,
         getActiveWorkout,
         getWorkoutPlanById,
     } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
+    const { exercises: exercisesDB } = useExercises();
 
     // ─── STATE MANAGEMENT ──────────────────────────────────────────
 
     // 1. Storage & Navigation
     const [plans, setPlans] = useState([]);
-    const [, setLoadingPlans] = useState(true);
+    const [loadingPlans, setLoadingPlans] = useState(true);
+    const [userId, setUserId] = useState(null);
+    const [planError, setPlanError] = useState(false);
+    const ownPlan = plan => userId != null && String(plan.createdByUserId) === String(userId);
+    const originText = language === 'en' ? ['Created by me','From my trainer','Other assigned workouts','You can create your own workouts. Workouts from your trainer stay separate.','Loading workouts…','Could not load your workouts.'] : language === 'es' ? ['Creados por mí','De mi entrenador','Otros entrenamientos asignados','Puedes crear tus propios entrenamientos. Los de tu entrenador se mantienen separados.','Cargando entrenamientos…','No se pudieron cargar tus entrenamientos.'] : ['Criados por mim','Do meu treinador','Outros treinos atribuídos','Você pode criar seus próprios treinos. Os treinos do seu treinador ficam separados.','Carregando treinos…','Não foi possível carregar seus treinos.'];
     const [editingPlan, setEditingPlan] = useState(null);
     useEffect(() => {
         if (!location.state?.create) return;
@@ -129,6 +163,7 @@ const TrainingPlansIndependent = () => {
     // Fetch plans from API on mount
     useEffect(() => {
         const fetchPlans = async () => {
+            let fetchedUserId = null;
             try {
                 setLoadingPlans(true);
 
@@ -144,32 +179,31 @@ const TrainingPlansIndependent = () => {
                 }
 
                 console.log('TrainingPlansIndependent: Fetching plans for user:', userId);
-                const response = await getWorkoutPlansByUser(userId);
-                console.log('TrainingPlansIndependent: API Response:', response);
-
-                const raw = Array.isArray(response)
-                    ? response
-                    : (response?.data || response?.items || []);
-
-                // Normalizar planos da API para o formato interno do PlanEditor
-                const data = raw.map(p => normalizePlan(p));
-
+                fetchedUserId = userId;
+                setUserId(userId);
+                const [raw, sessions] = await Promise.all([readAllPages(cursor => getWorkoutPlansByUser(userId, cursor)), readAllPages(cursor => getWorkoutsByUser(userId, cursor))]);
+                const history = sessions.filter(session => session.isCompleted || session.isCancelled).map(workoutHistory);
+                const data = raw.map(p => ({...normalizePlan(p), history:history.filter(session=>String(session.workoutPlanId)===String(p.planId || p.id))}));
+                setPlanError(false);
                 console.log('TrainingPlansIndependent: Final plans data:', data);
                 setPlans(data);
 
                 // Backup cache
-                localStorage.setItem('shapeup_independent_plans', JSON.stringify(data));
+                localStorage.setItem(`shapeup_independent_plans_${userId}`, JSON.stringify(data));
             } catch (err) {
                 console.error('TrainingPlansIndependent: Error fetching plans from API:', err);
-                const stored = localStorage.getItem('shapeup_independent_plans');
-                if (stored) setPlans(JSON.parse(stored));
+                const cached = fetchedUserId && localStorage.getItem(`shapeup_independent_plans_${fetchedUserId}`);
+                let restored = null;
+                try { restored = cached ? JSON.parse(cached) : null; } catch { /* Ignore invalid cache. */ }
+                setPlanError(!Array.isArray(restored));
+                setPlans(Array.isArray(restored) ? restored : []);
             } finally {
                 setLoadingPlans(false);
             }
         };
 
         fetchPlans();
-    }, [getMe, getWorkoutPlansByUser]);
+    }, [getMe, getWorkoutPlansByUser, getWorkoutsByUser]);
 
     // 2. Session Engine State
     const [sessionActive, setSessionActive] = useState(false);
@@ -212,38 +246,14 @@ const TrainingPlansIndependent = () => {
         workoutTimeRef.current = workoutTime;
     }, [workoutTime]);
 
-    const buildWorkoutStatePayload = useCallback((sourceExercises, _elapsedSeconds) => {
-        // Only sync exercises that have at least one set with progress
-        const exercisesWithProgress = sourceExercises.map(ex => {
-            const setsWithProgress = ex.sets.filter(s => !!s.completed).map(s => ({
-                id: s.id,
-                repetitions: parseInt(s.log?.reps) || 0,
-                load: parseFloat(s.log?.weight) || 0,
-                loadUnit: String(unitSystem === 'imperial' ? 2 : 1),
-                setType: mapSetType(s.type),
-                technique: mapTechnique(s.technique || 'Straight'),
-                rpe: parseFloat(s.log?.rpe) || 0,
-                restSeconds: parseInt(s.prescribedRest) || 90,
-                isExtra: !!s.isExtra,
-                completed: true, // If it's in this list, it's completed
-                failure: !!s.failure
-            }));
-
-            if (setsWithProgress.length === 0) return null;
-
-            return {
-                exerciseId: parseInt(ex.id) || ex.exerciseId || 0,
-                sets: setsWithProgress
-            };
-        }).filter(Boolean);
-
-        return {
-            sessionId: String(workoutSessionId),
-            savedAtUtc: new Date().toISOString(),
-            exercises: exercisesWithProgress
-        };
+    const buildWorkoutStatePayloadLocal = useCallback((sourceExercises, _elapsedSeconds) => {
+        return buildWorkoutStatePayload({
+            sessionId: workoutSessionId,
+            exercises: sourceExercises,
+            unitSystem,
+        });
     }, [workoutSessionId, unitSystem]);
-
+    
     /**
      * Sincroniza o estado atual do treino com o servidor.
      * Só envia se houver mudança no payload filtrado desde a última sincronização.
@@ -255,7 +265,7 @@ const TrainingPlansIndependent = () => {
         if (!workoutSessionId) return;
 
         // 1. Build payload containing ONLY current completed sets
-        const payload = buildWorkoutStatePayload(sourceExercises ?? sessionExercisesRef.current, elapsedSeconds ?? workoutTimeRef.current);
+        const payload = buildWorkoutStatePayloadLocal(sourceExercises ?? sessionExercisesRef.current, elapsedSeconds ?? workoutTimeRef.current);
 
         // 2. Compara o hash do payload de séries FINALIZADAS
         const currentPayloadHash = JSON.stringify(payload.exercises); // Compare only exercises/sets content
@@ -286,7 +296,7 @@ const TrainingPlansIndependent = () => {
             body: payload,
             dedupeKey: `workout-state-${workoutSessionId}`,
         });
-    }, [workoutSessionId, buildWorkoutStatePayload]);
+    }, [workoutSessionId, buildWorkoutStatePayloadLocal]);
 
     const mutateSessionExercises = useCallback((mutator) => {
         const next = [...sessionExercisesRef.current];
@@ -341,21 +351,10 @@ const TrainingPlansIndependent = () => {
             }
 
             if (plan) {
-                const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => ({
-                    id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
-                    name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
-                    muscles: ex.muscles || [],
-                    target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
-                    sets: ex.sets.map((s, sIdx) => ({
-                        id: `s_${exIdx}_${sIdx}`,
-                        type: s.type,
-                        target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
-                        completed: false,
-                        failure: false,
-                        prescribedRest: s.rest || 90,
-                        log: { weight: '', reps: '', rpe: '' }
-                    }))
-                }));
+                const runtimeExercises = enrichExercisesFromCatalog(
+                    flattenBlockExercises(plan.blocks),
+                    exercisesDB
+                ).map(toRuntimeSets);
 
                 setSessionExercises(runtimeExercises);
                 hasFirstDoneRef.current = false;
@@ -426,8 +425,8 @@ const TrainingPlansIndependent = () => {
 
     // Sync Plans to Storage
     useEffect(() => {
-        localStorage.setItem('shapeup_independent_plans', JSON.stringify(plans));
-    }, [plans]);
+        if (userId && !loadingPlans && !planError) localStorage.setItem(`shapeup_independent_plans_${userId}`, JSON.stringify(plans));
+    }, [plans, userId, loadingPlans, planError]);
 
     // Global Workout Timers
     useEffect(() => {
@@ -489,12 +488,14 @@ const TrainingPlansIndependent = () => {
     // client-side (objectId.js) and send it along; the backend uses it as-is
     // (CreateWorkoutPlanCommand.Id) instead of always generating one.
     const handleSavePlan = (updated) => {
-        const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
+        const loggedInUserId = userId;
+        if (!loggedInUserId) return;
         const workoutBody = buildWorkoutPlanBody(updated, loggedInUserId);
 
         console.log('Enviando treino (Solo) para a API:', workoutBody);
 
-        let savedPlan = updated;
+        if (updated._planId && !ownPlan(updated)) return;
+        let savedPlan = { ...updated, createdByUserId: userId, targetUserId: userId, trainerUserId: null };
 
         if (updated._planId) {
             enqueueMutation({
@@ -505,7 +506,7 @@ const TrainingPlansIndependent = () => {
             });
         } else {
             const planId = generateObjectId();
-            savedPlan = { ...updated, _planId: planId };
+            savedPlan = { ...savedPlan, id: planId, _planId: planId };
             enqueueMutation({
                 endpoint: '/api/training/workout-plans',
                 method: 'POST',
@@ -537,16 +538,22 @@ const TrainingPlansIndependent = () => {
             ...original,
             id: `p${Date.now()}`,
             _planId: undefined,
+            createdByUserId: userId,
+            targetUserId: userId,
+            trainerUserId: null,
             name: `${original.name} (Copy)`,
             history: [],
             active: false
         };
 
-        const loggedInUserId = parseInt(localStorage.getItem('shapeup_client_id')) || 1;
+        const loggedInUserId = userId;
+        if (!loggedInUserId) return;
+        copy.id = generateObjectId();
+        copy._planId = copy.id;
         enqueueMutation({
             endpoint: '/api/training/workout-plans',
             method: 'POST',
-            body: buildWorkoutPlanBody(copy, loggedInUserId),
+            body: { ...buildWorkoutPlanBody(copy, loggedInUserId), id: copy.id },
             dedupeKey: `workout-plan-${copy.id}`,
         });
 
@@ -555,12 +562,13 @@ const TrainingPlansIndependent = () => {
     };
 
     const handleDeletePlan = (plan) => {
+        if (!ownPlan(plan)) return;
         setPlanToDelete(plan);
         setShowDeleteConfirm(true);
     };
 
     const confirmDeletePlan = () => {
-        if (!planToDelete) return;
+        if (!planToDelete || !ownPlan(planToDelete)) return;
 
         const pid = planToDelete._planId || planToDelete.id;
 
@@ -603,21 +611,10 @@ const TrainingPlansIndependent = () => {
             setWorkoutSessionId(null);
         }
 
-        const runtimeExercises = flattenBlockExercises(plan.blocks).map((ex, exIdx) => ({
-            id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
-            name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
-            muscles: ex.muscles || [],
-            target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
-            sets: ex.sets.map((s, sIdx) => ({
-                id: `s_${exIdx}_${sIdx}`,
-                type: s.type,
-                target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
-                completed: false,
-                failure: false,
-                prescribedRest: s.rest || 90,
-                log: { weight: '', reps: '', rpe: '' }
-            }))
-        }));
+        const runtimeExercises = enrichExercisesFromCatalog(
+            flattenBlockExercises(plan.blocks),
+            exercisesDB
+        ).map(toRuntimeSets);
 
         setSessionExercises(runtimeExercises);
         hasFirstDoneRef.current = false;
@@ -646,7 +643,7 @@ const TrainingPlansIndependent = () => {
         if (workoutSessionId) {
             // Enqueued (offline foundation): the session summary shown next (handleSessionCompleted)
             // is built entirely from local sessionExercises/workoutTime, not from this response.
-            const payload = buildWorkoutStatePayload(sessionExercises, workoutTime);
+            const payload = buildWorkoutStatePayloadLocal(sessionExercises, workoutTime);
             enqueueMutation({
                 endpoint: `/api/training/workouts/${workoutSessionId}/finish`,
                 method: 'POST',
@@ -1014,29 +1011,17 @@ const TrainingPlansIndependent = () => {
             <div className="su-dashboard-header" data-tour="idep-tp-header">
                 <div>
                     <h1 className="su-page-title">{t('client.training.title')}</h1>
-                    <p className="su-text-muted">{t('independent.training.subtitle')}</p>
+                    <p className="su-text-muted">{originText[3]}</p>
                 </div>
-                <Button className="su-mt-4" onClick={handleAddPlan}>{t('independent.training.btn.create')}</Button>
+                <Button className="su-mt-4" disabled={!userId || loadingPlans} onClick={handleAddPlan}>{t('independent.training.btn.create')}</Button>
             </div>
 
             <div className="su-independent-plans-list su-mt-8" data-tour="idep-tp-card">
-                {plans.length === 0 ? (
-                    <div className="su-ledger-sheet su-ledger-sheet--empty">
-                        <h3 className="su-plan-title">{t('independent.training.empty.title')}</h3>
-                        <Button className="su-mt-4" onClick={handleAddPlan}>{t('independent.training.btn.create')}</Button>
-                    </div>
-                ) : (
-                    plans.map(plan => (
-                        <IndependentPlanCard
-                            key={plan.id}
-                            plan={plan}
-                            onEdit={setEditingPlan}
-                            onCopy={handleCopyPlan}
-                            onDelete={() => handleDeletePlan(plan)}
-                            onStart={startSession}
-                        />
-                    ))
-                )}
+                {loadingPlans ? <p role="status">{originText[4]}</p> : planError ? <p role="alert">{originText[5]}</p> : [
+                    plans.filter(ownPlan),
+                    plans.filter(plan => !ownPlan(plan) && (plan.trainerUserId || plan.createdByUserId)),
+                    plans.filter(plan => !ownPlan(plan) && !plan.trainerUserId && !plan.createdByUserId)
+                ].map((group, index) => (index < 2 || group.length > 0) && <section key={index} data-plan-origin={index === 0 ? 'self' : index === 1 ? 'trainer' : 'unknown'} style={{marginBottom:24}}><h2 className="su-section-title" style={{marginBottom:16}}>{originText[index]} <span className="su-text-muted">({group.length})</span></h2>{group.length ? group.map(plan => <IndependentPlanCard key={plan.id} plan={plan} catalog={exercisesDB} owned={ownPlan(plan)} onEdit={setEditingPlan} onCopy={handleCopyPlan} onDelete={handleDeletePlan} onStart={startSession} />) : <p className="su-text-muted">{t('client.training.empty.desc')}</p>}</section>)}
             </div>
 
             <div className="su-history-section su-mt-12" data-tour="idep-tp-history">
