@@ -89,7 +89,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
   };
 
   return (
-    <div className="sn-space flex min-h-screen flex-col flex-1 min-w-0 bg-[#171311]" data-stitch-content style={{ marginLeft: 256 }}>
+    <div className="sn-space flex min-h-screen flex-col flex-1 min-w-0 bg-[#171311]" data-shell-content style={{ marginLeft: 256 }}>
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[#3A2D27] bg-[#171311] px-8">
         <div className="flex items-center gap-4 text-xs">
           <div className="flex items-center gap-2">

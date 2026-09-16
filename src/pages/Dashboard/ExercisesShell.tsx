@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEve
 import { useNavigate } from 'react-router-dom';
 import SuggestExerciseModal from '../../components/SuggestExerciseModal';
 import { useExercises } from '../../hooks/useExercises';
-import DashboardStitchHost from '../dashboard-stitch/DashboardStitchHost';
-import { workspaceNavStyle } from '../dashboard-stitch/workspaceNavStyle';
+import DashboardShellHost from '../shell-assets/DashboardShellHost';
+import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { ExercisesPublicMarkup, type ExerciseRecord } from './markup/ExercisesPublicMarkup';
 
 const drawerCss = `#exerciseDrawer{position:fixed;right:0;top:0;bottom:0;width:min(440px,100vw);height:100dvh;z-index:90;transform:translateX(100%);visibility:hidden;transition:transform 240ms cubic-bezier(.32,.72,0,1),visibility 0s 240ms}#exerciseDrawer[data-open=true]{transform:translateX(0);visibility:visible;transition-delay:0s}@media(prefers-reduced-motion:reduce){#exerciseDrawer{transform:none;opacity:0;transition:opacity 150ms ease,visibility 0s 150ms}#exerciseDrawer[data-open=true]{opacity:1;transition-delay:0s}}`;
@@ -19,7 +19,7 @@ const equipmentName = (ex: ExerciseRecord) =>
   ex.equipments?.map((item) => item.equipmentNamePt || item.equipmentName).join(', ') ||
   'Não informado';
 
-export default function StitchExercises() {
+export default function ExercisesShell() {
   const { exercises: exerciseList, loading, error, searchTerm, setSearchTerm } = useExercises();
   const exercises = exerciseList as ExerciseRecord[];
   const [group, setGroup] = useState('all');
@@ -112,7 +112,7 @@ export default function StitchExercises() {
 
   return (
     <>
-      <DashboardStitchHost
+      <DashboardShellHost
         name="exercises"
         css={workspaceNavStyle + drawerCss}
         after={
@@ -127,7 +127,7 @@ export default function StitchExercises() {
         }
       >
         <ExercisesPublicMarkup state={shellState} />
-      </DashboardStitchHost>
+      </DashboardShellHost>
       {suggesting && <SuggestExerciseModal onClose={() => setSuggesting(false)} />}
     </>
   );

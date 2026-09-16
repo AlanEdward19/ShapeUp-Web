@@ -36,7 +36,7 @@ export default function LandingPage() {
   const { t, language } = useLanguage();
   const [selected, setSelected] = useState([]);
   const toggleExercise = (name) => setSelected(current => current.includes(name) ? current.filter(item => item !== name) : [...current, name]);
-  return <div className="stitch-landing">
+  return <div className="shell-landing">
     <SeoHead title={t('seo.home.title')} description={SITE_DESCRIPTION[language] || SITE_DESCRIPTION.en} path="/" />
     <OrganizationJsonLd />
     <header className="lp-topbar"><div className="lp-container"><Brand /><nav aria-label="Navegação principal"><a href="#pilares">Pilares</a><a href="#fluxo">Workflow real</a><a href="#manifesto">A abordagem</a><a href="#planos">Planos</a></nav><div className="lp-actions"><Link to="/login">Entrar</Link><a href="#planos" className="lp-button lp-primary">Experimentar na prática</a></div></div></header>

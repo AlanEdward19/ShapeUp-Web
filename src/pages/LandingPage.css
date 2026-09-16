@@ -1,13 +1,13 @@
-.stitch-landing{background:#171311;color:#f3eae5;font:400 14px/1.5 'Source Sans 3',sans-serif;--lp-border:#2e2420;--lp-muted:#a89a91;--lp-accent:#e06c43}
-.stitch-landing *{box-sizing:border-box}
-.stitch-landing h1,.stitch-landing h2,.stitch-landing h3,.stitch-landing p{margin:0}
-.stitch-landing h1,.stitch-landing h2,.stitch-landing h3{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:-.02em;line-height:1.08}
-.stitch-landing h2{font-size:48px}
-.stitch-landing h3{font-size:24px}
-.stitch-landing a{color:inherit;text-decoration:none}
-.stitch-landing a:hover{color:#e06c43}
-.stitch-landing button,.stitch-landing a{touch-action:manipulation}
-.stitch-landing :focus-visible{outline:2px solid #e06c43;outline-offset:4px}
+.shell-landing{background:#171311;color:#f3eae5;font:400 14px/1.5 'Source Sans 3',sans-serif;--lp-border:#2e2420;--lp-muted:#a89a91;--lp-accent:#e06c43}
+.shell-landing *{box-sizing:border-box}
+.shell-landing h1,.shell-landing h2,.shell-landing h3,.shell-landing p{margin:0}
+.shell-landing h1,.shell-landing h2,.shell-landing h3{font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:-.02em;line-height:1.08}
+.shell-landing h2{font-size:48px}
+.shell-landing h3{font-size:24px}
+.shell-landing a{color:inherit;text-decoration:none}
+.shell-landing a:hover{color:#e06c43}
+.shell-landing button,.shell-landing a{touch-action:manipulation}
+.shell-landing :focus-visible{outline:2px solid #e06c43;outline-offset:4px}
 .lp-container{max-width:1320px;padding:0 48px;margin:auto}
 .lp-topbar{position:sticky;top:0;z-index:30;height:64px;background:#171311f5;border-bottom:1px solid var(--lp-border)}
 .lp-topbar>.lp-container{display:flex;align-items:center;justify-content:space-between;gap:24px;height:100%}
@@ -16,13 +16,13 @@
 .lp-brand b{color:var(--lp-accent)}
 .lp-topbar nav{display:flex;gap:32px;font:500 17px 'Barlow Condensed',sans-serif;text-transform:uppercase;color:var(--lp-muted)}
 .lp-actions{display:flex;align-items:center;flex-wrap:wrap;gap:16px}
-.stitch-landing .lp-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #3a2d27;border-radius:4px;padding:11px 20px;font-size:14px;font-weight:500;color:var(--lp-muted);background:transparent;cursor:pointer}
-.stitch-landing .lp-button:hover{border-color:#a89a91;color:#f3eae5}
-.stitch-landing .lp-primary{background:#e06c43;border-color:#e06c43;color:#171311;font:600 18px 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.03em}
-.stitch-landing .lp-primary:hover{background:#cb5c35;border-color:#cb5c35;color:#171311}
+.shell-landing .lp-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #3a2d27;border-radius:4px;padding:11px 20px;font-size:14px;font-weight:500;color:var(--lp-muted);background:transparent;cursor:pointer}
+.shell-landing .lp-button:hover{border-color:#a89a91;color:#f3eae5}
+.shell-landing .lp-primary{background:#e06c43;border-color:#e06c43;color:#171311;font:600 18px 'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:.03em}
+.shell-landing .lp-primary:hover{background:#cb5c35;border-color:#cb5c35;color:#171311}
 .lp-topbar .lp-button{font-size:16px;padding:8px 16px}
-.stitch-landing main>section{padding:96px 0;border-bottom:1px solid var(--lp-border);scroll-margin-top:64px}
-.stitch-landing main>.lp-hero{padding-top:80px}
+.shell-landing main>section{padding:96px 0;border-bottom:1px solid var(--lp-border);scroll-margin-top:64px}
+.shell-landing main>.lp-hero{padding-top:80px}
 .lp-eyebrow{display:block;color:var(--lp-accent);font:500 12px/1.5 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
 .lp-hero-copy{max-width:896px}
 .lp-hero-copy h1{font-size:68px;line-height:1.05}
@@ -95,9 +95,9 @@
 .lp-plan{padding:24px}}
 @media(max-width:800px){.lp-container{padding:0 24px}
 .lp-topbar nav{display:none}
-.stitch-landing main>section{padding:64px 0}
+.shell-landing main>section{padding:64px 0}
 .lp-hero-copy h1{font-size:48px}
-.stitch-landing h2{font-size:36px}
+.shell-landing h2{font-size:36px}
 .lp-hero-copy>p{font-size:18px}
 .lp-workflow-grid,.lp-pillars,.lp-testimonials,.lp-plans{grid-template-columns:1fr}
 .lp-pillars article,.lp-pillars article:first-child,.lp-pillars article:last-child{padding:28px 0}

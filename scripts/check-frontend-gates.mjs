@@ -43,24 +43,21 @@ if (/family=Inter|font-family:\s*['"]Inter/.test(ds)) fail.push('design-system s
 if (!ds.includes('oklch(')) fail.push('design-system missing oklch tokens')
 
 const app = readFileSync(join(root, 'src/App.jsx'), 'utf8')
-const stitchManifest = JSON.parse(readFileSync(join(root, 'src/pages/dashboard-stitch/manifest.json'), 'utf8'))
-if (Object.keys(stitchManifest).length !== 16) fail.push('Stitch must include all 16 exported screens')
-for (const name of Object.keys(stitchManifest)) {
-  const htmlPath = `design/stitch/${name}.html`
-  const cssPath = `src/pages/dashboard-stitch/styles/${name}.css`
-  if (!existsSync(join(root, htmlPath))) fail.push(`missing original Stitch screen asset: ${htmlPath}`)
+const shellManifest = JSON.parse(readFileSync(join(root, 'src/pages/shell-assets/manifest.json'), 'utf8'))
+if (Object.keys(shellManifest).length !== 16) fail.push('Shell assets must include all 16 exported screens')
+for (const name of Object.keys(shellManifest)) {
+  const htmlPath = `design/screens/${name}.html`
+  const cssPath = `src/pages/shell-assets/styles/${name}.css`
+  if (!existsSync(join(root, htmlPath))) fail.push(`missing original screen asset: ${htmlPath}`)
   if (!existsSync(join(root, cssPath))) continue // retired screens (e.g. finance) may drop CSS after host conversion
   const css = readFileSync(join(root, cssPath), 'utf8')
-  if (css.includes('.font-.stitch-body')) fail.push(`Stitch ${name} has corrupted font selectors`)
+  if (css.includes('.font-.shell-body')) fail.push(`Shell ${name} has corrupted font selectors`)
 }
-if (
-  !app.includes("from './pages/PublicAuthShell'") &&
-  !app.includes("from './stitch/PublicPages'")
-) {
-  fail.push('Public routes must use the exported Stitch views')
+if (!app.includes("from './pages/PublicAuthShell'")) {
+  fail.push('Public routes must use PublicAuthShell exports')
 }
 if (existsSync(join(root, 'src/stitch'))) {
-  fail.push('src/stitch/ must be removed after stitch-migration T19')
+  fail.push('src/stitch/ must remain removed')
 }
 for (const route of ['/privacy', '/terms', 'NotFound']) {
   if (!app.includes(route === 'NotFound' ? 'NotFound' : `path="${route}"`)) {

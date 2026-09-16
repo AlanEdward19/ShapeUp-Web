@@ -225,7 +225,7 @@ export function applyOnboardingShadowBindings(root: ShadowRoot, api: OnboardingS
   const badge = root.getElementById('left-badge-tag');
   if (badge) badge.textContent = badges[api.step - 1];
   const mascot = root.getElementById('mascot-image') as HTMLImageElement | null;
-  if (mascot) mascot.src = '/stitch/ryno.png';
+  if (mascot) mascot.src = '/assets/ryno.png';
 
   mountNutritionFields(root, api);
   syncTemplateFields(root, api);

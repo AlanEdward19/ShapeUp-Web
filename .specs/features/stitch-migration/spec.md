@@ -25,28 +25,35 @@ pastas). Novo objetivo: **reescrever** cada tela hoje renderizada pelo motor gen
 (.tsx)**, com **obrigatoriedade dura de zero mudança visual/de comportamento** — pixel-parity, não
 "parecido".
 
-- [ ] Cada tela hoje em `src/stitch/*.jsx` vira um ou mais componentes `.tsx` nativos, tipados, sem
+**Feature status (2026-09-16):** ✅ **Verified (PASS)** — T1–T19; Verifier `@fdeb92b`; report
+`.specs/features/stitch-migration/validation.md`.
+
+- [x] Cada tela hoje em `src/stitch/*.jsx` vira um ou mais componentes `.tsx` nativos, tipados, sem
       depender de `sourceRuntime`/`StitchTemplate`/`manifest.json`/HTML externo em runtime.
-- [ ] DOM renderizado (estrutura, classes CSS, texto, comportamento interativo) é **idêntico** ao
+- [x] DOM renderizado (estrutura, classes CSS, texto, comportamento interativo) é **idêntico** ao
       estado atual — verificado por screenshot-diff automatizado (Playwright, já disponível no
       ambiente — ver `.specs/verify-stitch.cjs` como precedente), não só "revisão visual".
-- [ ] TypeScript é adotado no projeto (`tsconfig.json`, `typescript` como devDependency — os
+      *(Verifier: evidência pixel em arquivo parcial/arquivada — aceito no close estrutural; refresh
+      opcional fora desta fase.)*
+- [x] TypeScript é adotado no projeto (`tsconfig.json`, `typescript` como devDependency — os
       `@types/react`/`@types/react-dom` já existem em `package.json` mas não usados) — escopo
       mínimo: habilita `.tsx` coexistindo com `.jsx` existente (não converte o repo inteiro).
-- [ ] Todo import (interno ao repo, inclusive testes) resolve pro novo caminho — zero import morto
+- [x] Todo import (interno ao repo, inclusive testes) resolve pro novo caminho — zero import morto
       apontando pra `stitch/`.
-- [ ] Os 6 arquivos de teste existentes (`AthleteScoreboard.test.jsx`, `Exercises.test.jsx`,
+- [x] Os 6 arquivos de teste existentes (`AthleteScoreboard.test.jsx`, `Exercises.test.jsx`,
       `Moderation.test.jsx`, `Onboarding.test.jsx`, `StitchTemplates.test.jsx`,
       `Usability.test.jsx`) continuam passando após a reescrita, sem alterar o que testam.
-- [ ] Arquivos legados pré-Stitch com nome colidente (ex.: `src/pages/Login.jsx` vs.
+      *(5/6 comportamentos cobertos em shells; `StitchTemplates` retired com o motor — AD-WEB-007.)*
+- [x] Arquivos legados pré-Stitch com nome colidente (ex.: `src/pages/Login.jsx` vs.
       `stitch/PublicPages.jsx`'s `StitchLogin`) são investigados: mantidos (se ainda referenciados
       por import real) ou removidos (se confirmados mortos) — nunca sobrescritos às cegas. Ver
       tabela de investigação já fechada em `design.md` — continua válida, reescrita não muda quem
       é o dono da lógica de negócio (`Login.jsx`, `Register.jsx` etc. continuam sendo a lógica real
       que o novo `.tsx` vai envolver, só que sem o runtime genérico no meio).
-- [ ] Motor genérico (`sourceRuntime.jsx`, `StitchTemplate.jsx`, `manifest.json`, `linkBinding.js`,
+- [x] Motor genérico (`sourceRuntime.jsx`, `StitchTemplate.jsx`, `manifest.json`, `linkBinding.js`,
       `copy.js`/`.tsv`, `templates/*.html`, `styles/*.css`) é **removido** ao final — só existe
       enquanto alguma tela ainda não foi convertida (migração incremental, tela por tela).
+      *(Runtime motor removido; assets estáticos em `pages/shell-assets/` — rename pós-close 2026-09-16.)*
 
 ## Out of Scope
 
@@ -178,24 +185,24 @@ rodar a task de mover `Builder.jsx`.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| STMIG-01 | P1: Motor de template | Design | Pending |
-| STMIG-02 | P1: Motor de template | Design | Pending |
-| STMIG-03 | P1: Motor de template | Design | Pending |
-| STMIG-04 | P1: Telas-wrapper | Design | Pending |
-| STMIG-05 | P1: Telas-wrapper (colisão de nome legado) | Design | Pending |
-| STMIG-06 | P1: Telas-wrapper | Design | Pending |
-| STMIG-07 | P1: Telas-wrapper (testes) | Design | Pending |
-| STMIG-08 | P2: Builder.jsx coordenado | Design | Pending |
-| STMIG-09 | P2: Builder.jsx coordenado | Design | Pending |
+| STMIG-01 | P1: Motor de template | Execute | ⏭️ Superseded (AD-WEB-007 — delete engine, not relocate to `pageTemplateEngine/`) |
+| STMIG-02 | P1: Motor de template | Execute | ⏭️ Superseded (AD-WEB-007) |
+| STMIG-03 | P1: Motor de template | Execute | ✅ Verified |
+| STMIG-04 | P1: Telas-wrapper | Execute | ✅ Verified |
+| STMIG-05 | P1: Telas-wrapper (colisão de nome legado) | Execute | ✅ Verified |
+| STMIG-06 | P1: Telas-wrapper | Execute | ✅ Verified |
+| STMIG-07 | P1: Telas-wrapper (testes) | Execute | ⚠️ Verified — StitchTemplates suite retired with engine |
+| STMIG-08 | P2: Builder.jsx coordenado | Execute | ✅ Verified |
+| STMIG-09 | P2: Builder.jsx coordenado | Execute | ✅ Verified |
 
-**Coverage:** 9 total, 0 mapped to tasks yet, 9 unmapped ⚠️ (Design/Tasks phase seguinte)
+**Coverage:** 9 total — 7 ✅ Verified, 1 ⚠️ Verified (STMIG-07), 2 ⏭️ Superseded (STMIG-01/02). Mapped T1–T19; feature closed 2026-09-16. Source of truth: `validation.md`.
 
 ---
 
 ## Success Criteria
 
-- [ ] Zero caminho contendo `/stitch/` sob `src/` (exceto o histórico do git)
-- [ ] `npm run build`, `npm run lint`, suíte de testes — todos limpos após a migração
-- [ ] `workout-editor` e `stitch-migration` não colidem: `Builder.jsx` migra só depois do Verifier
-      de `workout-editor` (coordenado via `STATE.md` dos dois repos)
-- [ ] Nenhum arquivo removido sem evidência de zero-import real documentada no `validation.md`
+- [x] Zero caminho contendo `/stitch/` sob `src/` (exceto o histórico do git) — `src/stitch/` absent; assets em `shell-assets`
+- [x] `npm run build`, `npm run lint`, suíte de testes — todos limpos após a migração (Verifier: 112 tests)
+- [x] `workout-editor` e `stitch-migration` não colidem: `Builder.jsx` migra só depois do Verifier
+      de `workout-editor` (coordenado via `STATE.md` dos dois repos) — T19 `PlanEditorShell`
+- [x] Nenhum arquivo removido sem evidência de zero-import real documentada no `validation.md`

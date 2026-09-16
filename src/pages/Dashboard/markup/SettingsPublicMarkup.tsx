@@ -1,6 +1,6 @@
 /* eslint-disable */
 import type { ChangeEvent, ReactElement } from 'react';
-import WorkspaceNavigation from '../../dashboard-stitch/WorkspaceNavigation';
+import WorkspaceNavigation from '../../shell-assets/WorkspaceNavigation';
 
 export type SettingsValues = Record<string, string | boolean | undefined>;
 

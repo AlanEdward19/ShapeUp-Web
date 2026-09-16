@@ -10,7 +10,7 @@ Rules. Um commit atômico por task. **Cada task de reescrita de tela só fecha c
 pixel-parity passando** (não é opcional, é acceptance criteria — ver design.md).
 
 **Design**: `ShapeUp-Web/.specs/features/stitch-migration/design.md`
-**Status**: Ready for Execute
+**Status**: ✅ **Verified (PASS)** — T1–T19 complete; closed 2026-09-16 (aligned with `validation.md`)
 
 ---
 
@@ -163,4 +163,4 @@ exceto T5/Workspace, que outras telas ainda-não-convertidas importam — ver no
 gate de pixel-parity, não é opcional. Playwright já usado no repo (`.specs/verify-stitch.cjs`
 como precedente) — reaproveitar o mesmo padrão de screenshot em vez de criar ferramenta nova.
 
-**Status**: aguardando go-ahead do usuário pra iniciar Execute (T1).
+**Status**: ✅ Verified (PASS) — T1–T19 closed 2026-09-16.

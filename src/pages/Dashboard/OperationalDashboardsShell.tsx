@@ -11,8 +11,8 @@ import { useGymManagementApi } from '../../hooks/api/useGymManagementApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { normalizePlan } from '../../utils/trainingNormalization';
-import WorkspaceStitchPage from '../../components/Workspace/WorkspaceStitchPage';
-import { workspaceNavStyle } from '../dashboard-stitch/workspaceNavStyle';
+import WorkspaceShellPage from '../../components/Workspace/WorkspaceShellPage';
+import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { AthleteDashboardMarkup, type AthleteDashboardState } from './operational-dashboard/AthleteDashboardMarkup';
 import {
   ProfessionalDashboardMarkup,
@@ -29,7 +29,7 @@ function read<T>(key: string, fallback: T): T {
   }
 }
 
-export function StitchProfessional() {
+export function ProfessionalDashboard() {
   const user = useUserProfile();
   const { language, tr } = useDashboardCopy();
   const navigate = useNavigate();
@@ -122,9 +122,9 @@ export function StitchProfessional() {
   };
 
   return (
-    <WorkspaceStitchPage name="professional" css={workspaceNavStyle}>
+    <WorkspaceShellPage name="professional" css={workspaceNavStyle}>
       <ProfessionalDashboardMarkup state={shellState} />
-    </WorkspaceStitchPage>
+    </WorkspaceShellPage>
   );
 }
 
@@ -225,12 +225,12 @@ function AthleteView(scoreboardState: AthleteDashboardState) {
   };
 
   return (
-    <WorkspaceStitchPage name="athlete" css={workspaceNavStyle}>
+    <WorkspaceShellPage name="athlete" css={workspaceNavStyle}>
       <AthleteDashboardMarkup state={athleteState} />
-    </WorkspaceStitchPage>
+    </WorkspaceShellPage>
   );
 }
 
-export function StitchAthlete() {
+export function AthleteDashboard() {
   return <LegacyDashboardClient renderView={state => <AthleteView {...state} />} />;
 }

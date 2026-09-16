@@ -1,6 +1,6 @@
 /* eslint-disable */
 import type { KeyboardEvent, MouseEvent, ReactElement, RefObject } from 'react';
-import WorkspaceNavigation from '../../dashboard-stitch/WorkspaceNavigation';
+import WorkspaceNavigation from '../../shell-assets/WorkspaceNavigation';
 
 export type ExerciseRecord = {
   id: number | string;

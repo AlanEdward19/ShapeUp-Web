@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PublicStitchHost from '../public-auth/PublicStitchHost';
+import PublicShellHost from '../public-auth/PublicShellHost';
 import { useNutritionApi } from '../../hooks/api/useNutritionApi';
 import { OnboardingStaticMarkup } from './markup/OnboardingStaticMarkup';
 import {
@@ -102,14 +102,14 @@ export default function OnboardingShell() {
 
   return (
     <>
-      <PublicStitchHost
+      <PublicShellHost
         name="onboarding"
         css={choiceCss}
         onShadowRoot={handleShadowRoot}
         bindShadow={bindShadow}
       >
         <OnboardingStaticMarkup />
-      </PublicStitchHost>
+      </PublicShellHost>
       {error ? (
         <p
           role="alert"

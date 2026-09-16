@@ -64,7 +64,7 @@ export function ProfessionalDashboardMarkup({ state }: { state: ProfessionalDash
   });
 
   return (
-    <div className="sn-space flex min-h-screen flex-col flex-1 min-w-0" data-stitch-content style={{ marginLeft: 256 }}>
+    <div className="sn-space flex min-h-screen flex-col flex-1 min-w-0" data-shell-content style={{ marginLeft: 256 }}>
       <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b border-brand-border bg-brand-bg/95 px-8 backdrop-blur">
         <nav className="flex shrink-0 items-center gap-2 text-xs font-medium text-brand-muted">
           <span>Treinadores</span>

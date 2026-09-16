@@ -1,5 +1,5 @@
 /* eslint-disable */
-/* Auto-generated from stitch/templates/landing.html — do not edit by hand */
+/* Auto-generated from templates/landing.html — do not edit by hand */
 import type { ReactElement } from 'react';
 import Logo from '../../../components/Logo/Logo';
 

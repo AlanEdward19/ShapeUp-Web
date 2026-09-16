@@ -1,7 +1,7 @@
 import { render, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
-vi.mock('../../dashboard-stitch/styles/exercises.css?inline', () => ({ default: '' }));
+vi.mock('../../shell-assets/styles/exercises.css?inline', () => ({ default: '' }));
 vi.mock('../../../contexts/AuthContext', () => ({useAuth:()=>({currentUser:{uid:'test'},signOut:vi.fn()})}));
 vi.mock('../../../contexts/UserProfileContext', () => ({useUserProfile:()=>({name:'Test',initials:'T',photo:''})}));
 vi.mock('../../../hooks/useExercises', () => ({useExercises:()=>({exercises:[{id:7,name:'Exercício real',muscles:['Peitoral'],equipments:[],steps:['Instrução da API'],muscleDetails:[{muscleGroup:1,muscleNamePt:'Peitoral',activationPercent:62}]}],loading:false,searchTerm:'',setSearchTerm:vi.fn()})}));
@@ -11,7 +11,7 @@ describe('ExercisesShell', () => {
 it('opens details only on inspection, uses real data, and closes with Escape',()=>{
  localStorage.setItem('shapeup_language','pt-BR');
  const {container}=render(<MemoryRouter><Exercises /></MemoryRouter>);
- const root=container.querySelector('[data-stitch]').shadowRoot;
+ const root=container.querySelector('[data-shell]').shadowRoot;
  const drawer=root.getElementById('exerciseDrawer');
  expect(drawer).toHaveAttribute('aria-hidden','true');
  const row=root.querySelector('.exercise-item');
@@ -20,7 +20,7 @@ it('opens details only on inspection, uses real data, and closes with Escape',()
  expect(drawer).toHaveTextContent('Instrução da API');
  expect(drawer).toHaveTextContent('62%');
  expect(drawer).not.toHaveTextContent('95%');
- expect(root.querySelector('.stitch-body')).not.toHaveTextContent('PÁGINA 1 DE 15');
+ expect(root.querySelector('.shell-body')).not.toHaveTextContent('PÁGINA 1 DE 15');
  expect(row).not.toHaveTextContent('Glúteo Máximo, Adutores, Lombar');
  fireEvent.keyDown(within(drawer).getByTitle('Fechar Painel'),{key:'Escape'});
  expect(drawer).toHaveAttribute('aria-hidden','true');

@@ -1,6 +1,6 @@
 import type { KeyboardEvent, ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
-import WorkspaceNavigation from '../../dashboard-stitch/WorkspaceNavigation';
+import WorkspaceNavigation from '../../shell-assets/WorkspaceNavigation';
 import type { MessageViewState } from '../MessagesShell';
 
 export type MessagesMarkupState = MessageViewState & {

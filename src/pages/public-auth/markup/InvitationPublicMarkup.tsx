@@ -1,6 +1,6 @@
 /* eslint-disable */
 import type { FormEvent, MouseEvent, ReactElement } from 'react';
-import { copy } from '../../dashboard-stitch/copy';
+import { copy } from '../../shell-assets/copy';
 import { useLanguage } from '../../../contexts/LanguageContext';
 
 export type InvitationShellState = {

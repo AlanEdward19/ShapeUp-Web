@@ -43,13 +43,14 @@
 ## Handoff
 
 - **Feature**: stitch-migration
-- **Phase / Task**: **Verified (PASS)** — T1–T19 complete; Verifier 2026-09-15 @ `fdeb92b`
-- **Completed**: AD-WEB-007 end-state — zero `src/stitch/`; native `.tsx` shells; `PlanEditorShell`; static assets in `pages/dashboard-stitch/`; runtime motor (`sourceRuntime`/`StitchTemplate`) removed; gates green (check-frontend-gates, build, lint, tsc, **112** tests)
+- **Phase / Task**: **Closed — Verified (PASS)** — T1–T19; Verifier 2026-09-15 @ `fdeb92b`; docs aligned 2026-09-16
+- **Completed**: AD-WEB-007 end-state — zero `src/stitch/`; native `.tsx` shells; `PlanEditorShell`; static assets in `pages/shell-assets/`; runtime motor (`sourceRuntime`/`StitchTemplate`) removed; gates green (check-frontend-gates, build, lint, tsc, **112** tests); `spec.md` STMIG table + goals/success synced to `validation.md`
 - **In-progress**: none
-- **Next step**: Optional — refresh archived pixel-parity PNGs; sync `spec.md` STMIG statuses with `.specs/features/stitch-migration/validation.md`
+- **Next step**: none for this feature — pick next roadmap item when ready
 - **Blockers**: none
 - **Cross-repo**: workout-editor PASS; Builder coordination closed by T19
 - **Validation report**: `.specs/features/stitch-migration/validation.md`
+- **Optional backlog (non-blocking)**: none — `shell-assets` rename + PNG cleanup done 2026-09-16
 
 ---
 

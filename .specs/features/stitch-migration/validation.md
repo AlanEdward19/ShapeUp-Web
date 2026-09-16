@@ -146,19 +146,21 @@ Not performed (automated verifier run only).
 
 ## Fix Plans (ranked — optional follow-ups, not blockers for AD-WEB-007 structural close)
 
-### Fix 1: Document StitchTemplates retirement in spec traceability (Minor)
+### Fix 1: Document StitchTemplates retirement in spec traceability (Minor) — ✅ Done 2026-09-16
 
 - **What**: Update `spec.md` STMIG-07 / Success Criteria to note engine test retired when motor removed.
-- **Verify**: Traceability matches this report.
+- **Verify**: Traceability matches this report — ✅ synced; feature marked Closed in `STATE.md` / `tasks.md`.
 
-### Fix 2: Fresh pixel-parity capture for messages / nutrition / onboarding (Major — evidence quality)
+### Fix 2: Fresh pixel-parity capture for messages / nutrition / onboarding (Major — evidence quality) — ✅ Dropped 2026-09-16
 
 - **What**: Re-capture true pre/post pairs at 1440+390; store under `.specs/features/stitch-migration/`.
 - **Verify**: Documented zero-diff or explicit diff resolution.
+- **Resolution**: User dropped — deleted archived before/after PNGs; not required for closed feature.
 
-### Fix 3: Rename `dashboard-stitch` long-term (Cosmetic — out of current scope)
+### Fix 3: Rename `dashboard-stitch` long-term (Cosmetic) — ✅ Done 2026-09-16
 
-- **What**: Optional rename to drop “stitch” from path vocabulary; not required for STMIG-04 (`/stitch/` under `src/` means `src/stitch`, not folder name substring).
+- **What**: Rename path vocabulary off “stitch”.
+- **Verify**: `src/pages/shell-assets/`, hosts `*ShellHost`, `useShellLanguage`, `public/assets/ryno.png`, `design/screens/`, CSS `.shell-body` / `data-shell`.
 
 ---
 
@@ -176,11 +178,13 @@ Not performed (automated verifier run only).
 | STMIG-08 | Verified | ✅ Verified |
 | STMIG-09 | Blocked | ✅ Verified |
 
+*(Synced into `spec.md` Requirement Traceability on 2026-09-16 — phase closed.)*
+
 ---
 
 ## Summary
 
-**Overall**: ✅ **Ready** — AD-WEB-007 structural end-state met at `fdeb92b` (zero `src/stitch/`, native shells, `PlanEditorShell`, no template runtime motor in `src`).
+**Overall**: ✅ **Ready** — AD-WEB-007 structural end-state met at `fdeb92b` (zero `src/stitch/`, native shells, `PlanEditorShell`, no template runtime motor in `src`). **Phase closed 2026-09-16.**
 
 **Spec-anchored check (AD-WEB-007-weighted)**: **14** ✅; **3** ⚠️ (non-blocking evidence gaps)  
 **Sensor**: **3/3** mutations killed  
@@ -188,8 +192,8 @@ Not performed (automated verifier run only).
 
 **What works**: `src/stitch/` absent on disk and in HEAD; production imports use `dashboard-stitch` / shells only; `sourceRuntime`/`StitchTemplate` eliminated; T19 `PlanEditorShell` re-export tested; frontend gates script enforces teardown; full test suite green at 112 tests.
 
-**Issues found (ranked, optional)**: (1) pixel-parity archive incomplete for some screens; (2) literal sixth legacy test file removed with engine; (3) spec.md traceability table still shows Pending in source file (update separately).
+**Issues found (ranked, optional backlog)**: none remaining — PNG archive deleted; `dashboard-stitch` renamed to `shell-assets` (2026-09-16).
 
-**Next steps**: Optional pixel refresh; update `spec.md` requirement statuses to match table above; feature may mark **Verified** in `STATE.md`.
+**Next steps**: none for stitch-migration.
 
 **Lessons**: Clean PASS on structural ACs — no `scripts/lessons.py` entry required.

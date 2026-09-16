@@ -18,7 +18,7 @@ export const navStyle = `
 [data-unified-sidebar] .sn-profile{margin:12px;padding:8px;border:1px solid #3a2d27;border-radius:6px;background:#211a17;display:flex;align-items:center;gap:10px}
 [data-unified-sidebar] .sn-profile strong{display:block;font-size:12px}[data-unified-sidebar] .sn-profile small{font-size:11px;color:#85766f}
 .sn-mobile{display:none}
-@media(max-width:767px){[data-unified-sidebar]{transform:translateX(-100%)}[data-unified-sidebar][data-open=true]{transform:none}.sn-mobile{display:block;position:fixed;bottom:18px;left:18px;z-index:80;background:#e06c43;color:#171311;border-radius:8px;padding:12px;border:1px solid #3a2d27}.sn-space{display:none!important}.stitch-body [data-stitch-content]{margin-left:0!important;padding-left:0!important;width:100%!important}.stitch-body{overflow-x:hidden}.stitch-body header{flex-wrap:wrap;height:auto;min-height:64px}.stitch-body main{max-width:100%;padding-left:16px;padding-right:16px}.stitch-body table{min-width:650px}.stitch-body [data-table-scroll]{overflow:auto}}
+@media(max-width:767px){[data-unified-sidebar]{transform:translateX(-100%)}[data-unified-sidebar][data-open=true]{transform:none}.sn-mobile{display:block;position:fixed;bottom:18px;left:18px;z-index:80;background:#e06c43;color:#171311;border-radius:8px;padding:12px;border:1px solid #3a2d27}.sn-space{display:none!important}.shell-body [data-shell-content]{margin-left:0!important;padding-left:0!important;width:100%!important}.shell-body{overflow-x:hidden}.shell-body header{flex-wrap:wrap;height:auto;min-height:64px}.shell-body main{max-width:100%;padding-left:16px;padding-right:16px}.shell-body table{min-width:650px}.shell-body [data-table-scroll]{overflow:auto}}
 `;
 
 type UnifiedSidebarNavigationProps = {

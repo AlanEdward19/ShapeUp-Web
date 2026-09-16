@@ -1,5 +1,5 @@
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { copy } from '../../dashboard-stitch/copy';
+import { copy } from '../../shell-assets/copy';
 
 export function useDashboardCopy() {
   const { language, translateCopy } = useLanguage();

@@ -6,7 +6,7 @@ input::-ms-reveal,input::-ms-clear{display:none}
 .st-registration-password::placeholder{color:#b8aaa2;opacity:1}
 .st-registration-password:focus{border-color:#e06c43;outline-color:#e06c43}
 .st-registration-password:-webkit-autofill,.st-registration-password:-webkit-autofill:hover,.st-registration-password:-webkit-autofill:focus{-webkit-text-fill-color:#f3eae5;caret-color:#f3eae5;box-shadow:0 0 0 1000px #1a1412 inset}
-.stitch-body{--st-ease-out:cubic-bezier(.23,1,.32,1)}
+.shell-body{--st-ease-out:cubic-bezier(.23,1,.32,1)}
 [data-auth-register] main{max-width:600px;padding:24px 8px}
 [data-auth-register] header{border:0;padding:0;display:block}
 [data-auth-register] header .st-auth-brand{margin-bottom:24px}
@@ -18,8 +18,8 @@ input::-ms-reveal,input::-ms-clear{display:none}
 [data-reveal]{transition:opacity 600ms var(--st-ease-out),transform 600ms var(--st-ease-out)}
 [data-reveal=pending]{opacity:0;transform:translateY(32px)}
 [data-reveal=visible]{opacity:1;transform:translateY(0)}
-.stitch-body dialog{max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);overflow:auto}
-.stitch-body section[id]{scroll-margin-top:100px}
-@media(max-width:767px){.stitch-body>header>div{height:auto;min-height:64px;flex-wrap:wrap;padding:12px 16px;gap:12px}.stitch-body>header nav{display:flex;order:3;width:100%;overflow:auto;gap:24px;font-size:14px}.stitch-body>header nav a{white-space:nowrap}.stitch-body>header a[href="/login"]{display:inline-block}.stitch-body>header+main{padding-top:116px}.stitch-body>header>div>div:last-child{gap:12px}.stitch-body>header a[href="#planos"]{font-size:12px;padding:8px}}
+.shell-body dialog{max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);overflow:auto}
+.shell-body section[id]{scroll-margin-top:100px}
+@media(max-width:767px){.shell-body>header>div{height:auto;min-height:64px;flex-wrap:wrap;padding:12px 16px;gap:12px}.shell-body>header nav{display:flex;order:3;width:100%;overflow:auto;gap:24px;font-size:14px}.shell-body>header nav a{white-space:nowrap}.shell-body>header a[href="/login"]{display:inline-block}.shell-body>header+main{padding-top:116px}.shell-body>header>div>div:last-child{gap:12px}.shell-body>header a[href="#planos"]{font-size:12px;padding:8px}}
 @media(hover:hover) and (pointer:fine){button,a{transition:background-color 160ms ease,color 160ms ease,opacity 160ms ease}.st-auth-brand:hover{color:#e06c43}}
 @media(prefers-reduced-motion:reduce){[data-reveal]{transition:none;transform:none!important;opacity:1!important}[data-auth-register] #setup-form>*{animation:none!important}}

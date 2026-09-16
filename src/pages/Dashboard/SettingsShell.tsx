@@ -1,8 +1,8 @@
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useUserManagementApi } from '../../hooks/api/useUserManagementApi';
-import DashboardStitchHost from '../dashboard-stitch/DashboardStitchHost';
-import { workspaceNavStyle } from '../dashboard-stitch/workspaceNavStyle';
+import DashboardShellHost from '../shell-assets/DashboardShellHost';
+import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { useEffect, useState } from 'react';
 import {
   SettingsPublicMarkup,
@@ -82,7 +82,7 @@ export default function SettingsShell() {
   };
 
   return (
-    <DashboardStitchHost
+    <DashboardShellHost
       name="settings"
       css={workspaceNavStyle}
       after={
@@ -97,6 +97,6 @@ export default function SettingsShell() {
       }
     >
       <SettingsPublicMarkup state={shellState} />
-    </DashboardStitchHost>
+    </DashboardShellHost>
   );
 }

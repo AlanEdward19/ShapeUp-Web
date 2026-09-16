@@ -31,8 +31,8 @@ it('connects the exported inspection drawer to the existing decision callback', 
       <ModerationShell />
     </MemoryRouter>,
   );
-  const root = container.querySelector('[data-stitch]').shadowRoot;
-  const query = within(root.querySelector('.stitch-body'));
+  const root = container.querySelector('[data-shell]').shadowRoot;
+  const query = within(root.querySelector('.shell-body'));
   await query.findByText('Alimento de teste isolado');
   fireEvent.click(query.getByRole('button', { name: /Inspecionar/ }));
   const drawer = root.getElementById('inspectionDrawer');

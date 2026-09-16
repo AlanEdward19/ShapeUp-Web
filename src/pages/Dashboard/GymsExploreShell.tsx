@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState, type ChangeEvent, type MouseEvent, type ReactElement } from 'react';
-import WorkspaceStitchPage from '../../components/Workspace/WorkspaceStitchPage';
+import WorkspaceShellPage from '../../components/Workspace/WorkspaceShellPage';
 import { useGymManagementApi } from '../../hooks/api/useGymManagementApi';
 import { GymsExploreChrome } from './gyms-explore/GymsExploreChrome';
 
 const gymsMobileCss =
-  '@media(max-width:767px){[data-gym-page]{height:auto!important;overflow:visible!important}[data-gym-layout]{flex-direction:column!important;overflow:visible!important}[data-gym-list]{width:100%!important;border-right:0}[data-gym-map]{height:500px;min-height:500px;flex:none!important;width:100%}.stitch-body article{max-width:100%}.stitch-body article>div{flex-wrap:wrap;gap:8px}.stitch-body header{padding:16px;gap:12px}.stitch-body header input{min-width:0}.stitch-body header>div{max-width:100%;overflow:auto}}';
+  '@media(max-width:767px){[data-gym-page]{height:auto!important;overflow:visible!important}[data-gym-layout]{flex-direction:column!important;overflow:visible!important}[data-gym-list]{width:100%!important;border-right:0}[data-gym-map]{height:500px;min-height:500px;flex:none!important;width:100%}.shell-body article{max-width:100%}.shell-body article>div{flex-wrap:wrap;gap:8px}.shell-body header{padding:16px;gap:12px}.shell-body header input{min-width:0}.shell-body header>div{max-width:100%;overflow:auto}}';
 
 type GymAddress = string | { street?: string; number?: string; city?: string };
 type GymRecord = { id: string | number; name: string; address?: GymAddress };
@@ -14,7 +14,7 @@ function formatAddress(gym: GymRecord): string {
   return [gym.address?.street, gym.address?.number, gym.address?.city].filter(Boolean).join(', ');
 }
 
-export default function StitchGyms(): ReactElement {
+export default function GymsShell(): ReactElement {
   const { getGyms } = useGymManagementApi();
   const [gyms, setGyms] = useState<GymRecord[]>([]);
   const [query, setQuery] = useState('');
@@ -65,7 +65,7 @@ export default function StitchGyms(): ReactElement {
   };
 
   return (
-    <WorkspaceStitchPage name="gyms" css={gymsMobileCss} onBodyClick={onBodyClick}>
+    <WorkspaceShellPage name="gyms" css={gymsMobileCss} onBodyClick={onBodyClick}>
       <GymsExploreChrome
         query={query}
         onQueryChange={(event: ChangeEvent<HTMLInputElement>) => setQuery(event.target.value)}
@@ -139,6 +139,6 @@ export default function StitchGyms(): ReactElement {
           </div>
         }
       />
-    </WorkspaceStitchPage>
+    </WorkspaceShellPage>
   );
 }

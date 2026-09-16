@@ -1,4 +1,4 @@
-/* Shared Stitch shell. Keep geometry here so route styles cannot change it. */
+/* Shared page shell. Keep geometry here so route styles cannot change it. */
 .su-layout-wrapper { height: 100dvh; width: 100%; }
 .su-layout-main { border-left: 1px solid var(--border-color); }
 .su-layout-content { padding: var(--workspace-gutter); padding-bottom: 3rem; }
@@ -164,7 +164,7 @@
 .su-messages-page .su-chat-drawer { max-width: none; border: 1px solid var(--border-color); border-radius: var(--radius-md); animation: none; }
 .su-messages-page .su-chat-close-btn { display: none; }
 
-/* Public screens use the same palette, with the compositions from Stitch. */
+/* Public screens use the same palette, with the shared shell compositions. */
 .su-auth-login .su-auth-header { max-width: 1280px; margin: auto; border: 0; padding: 2rem; }
 .su-auth-login .su-auth-hero { max-width: 1280px; margin: auto; padding: 2rem 2rem 5rem; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem 8%; align-items: start; }
 .su-auth-login .su-auth-copy { grid-column: 1; grid-row: 1; }

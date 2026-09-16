@@ -1,8 +1,8 @@
 import DatePicker from '../../../components/DatePicker';
 import HistoryChart from '../../../components/charts/HistoryChart';
-import WorkspaceStitchPage from '../../../components/Workspace/WorkspaceStitchPage';
+import WorkspaceShellPage from '../../../components/Workspace/WorkspaceShellPage';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { copy } from '../../dashboard-stitch/copy';
+import { copy } from '../../shell-assets/copy';
 import useHydration from '../../../hooks/useHydration';
 import { useEffect, useState, type ChangeEvent, type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 const diaryCss =
-  'article table{min-width:520px}article{overflow:auto}@media(max-width:767px){.stitch-body .pl-64{padding-left:0!important}}';
+  'article table{min-width:520px}article{overflow:auto}@media(max-width:767px){.shell-body .pl-64{padding-left:0!important}}';
 
 const slots: Record<string, string> = {
   Breakfast: 'Café da Manhã',
@@ -223,7 +223,7 @@ function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement {
   const displayName = localStorage.getItem('shapeup_user_name') || 'Diário Nutricional';
 
   return (
-    <WorkspaceStitchPage name="nutrition" css={diaryCss}>
+    <WorkspaceShellPage name="nutrition" css={diaryCss}>
       <div className="pl-64">
         <header
           className="sticky top-0 z-40 h-16 bg-[#211A17]/95 backdrop-blur border-b border-[#3A2D27] px-8 flex items-center justify-between"
@@ -556,7 +556,7 @@ function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement {
           </div>
         </main>
       </div>
-    </WorkspaceStitchPage>
+    </WorkspaceShellPage>
   );
 }
 

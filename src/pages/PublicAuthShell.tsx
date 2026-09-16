@@ -6,7 +6,7 @@ import SeoHead from '../components/SeoHead';
 import OrganizationJsonLd from '../components/OrganizationJsonLd';
 import publicCss from './public-auth/publicUsability.css?inline';
 import { useLanguage } from '../contexts/LanguageContext';
-import PublicStitchHost from './public-auth/PublicStitchHost';
+import PublicShellHost from './public-auth/PublicShellHost';
 import { LandingStaticMarkup } from './public-auth/markup/LandingStaticMarkup';
 import { LoginPublicMarkup } from './public-auth/markup/LoginPublicMarkup';
 import { RecoveryPublicMarkup } from './public-auth/markup/RecoveryPublicMarkup';
@@ -64,31 +64,31 @@ function landingBodyClick(event: MouseEvent<HTMLDivElement>, navigate: (path: st
   }
 }
 
-export function StitchLanding() {
+export function LandingShell() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   return (
     <>
       <SeoHead title={t('seo.home.title')} path="/" />
       <OrganizationJsonLd />
-      <PublicStitchHost
+      <PublicShellHost
         name="landing"
         reveal
         css={publicCss}
         onBodyClick={(event) => landingBodyClick(event, navigate)}
       >
         <LandingStaticMarkup />
-      </PublicStitchHost>
+      </PublicShellHost>
     </>
   );
 }
 
-export function StitchLogin() {
+export function LoginShell() {
   const [passkeyNotice, setPasskeyNotice] = useState('');
   return (
     <Login
       renderView={(state) => (
-        <PublicStitchHost name="login" css={publicCss}>
+        <PublicShellHost name="login" css={publicCss}>
           <LoginPublicMarkup
             state={{
               ...(state as import('./public-auth/markup/LoginPublicMarkup').LoginShellState),
@@ -99,21 +99,21 @@ export function StitchLogin() {
                 ),
             }}
           />
-        </PublicStitchHost>
+        </PublicShellHost>
       )}
     />
   );
 }
 
-export function StitchRecovery() {
+export function RecoveryShell() {
   return (
     <ForgotPassword
       renderView={(state) => (
-        <PublicStitchHost name="recovery">
+        <PublicShellHost name="recovery">
           <RecoveryPublicMarkup
             state={state as import('./public-auth/markup/RecoveryPublicMarkup').RecoveryShellState}
           />
-        </PublicStitchHost>
+        </PublicShellHost>
       )}
     />
   );

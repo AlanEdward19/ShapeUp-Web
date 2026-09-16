@@ -1,6 +1,6 @@
 import Register from './Register';
 import publicCss from './public-auth/publicUsability.css?inline';
-import PublicStitchHost from './public-auth/PublicStitchHost';
+import PublicShellHost from './public-auth/PublicShellHost';
 import {
   RegisterPublicMarkup,
   type RegisterShellState,
@@ -13,13 +13,13 @@ import {
 const registerRoleCss =
   '.role-option:has(input:checked){border-color:#e06c43;background:rgba(224,108,67,.06)}.role-option:has(input:checked) .role-dot{display:block}.role-option:has(input:checked) .role-radio{border-color:#e06c43}';
 
-export default function StitchRegistration() {
+export default function RegistrationShell() {
   return (
     <Register
       renderView={(state: Record<string, unknown>) => {
         const invited = Boolean(state.inviteToken);
         return (
-          <PublicStitchHost
+          <PublicShellHost
             name={invited ? 'invitation' : 'register'}
             css={invited ? publicCss : `${publicCss}${registerRoleCss}`}
           >
@@ -28,7 +28,7 @@ export default function StitchRegistration() {
             ) : (
               <RegisterPublicMarkup state={state as unknown as RegisterShellState} />
             )}
-          </PublicStitchHost>
+          </PublicShellHost>
         );
       }}
     />

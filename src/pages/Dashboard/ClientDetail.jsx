@@ -101,7 +101,7 @@ export const DIFFICULTIES = ['Easy', 'Intermediate', 'Hard', 'Advanced'];
 // eslint-disable-next-line react-refresh/only-export-components -- shared constant co-located with the components that use it
 export const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
-// Native BlockCard/SetRow path (WOED UI ACs). Stitch Builder removed in T19 → PlanEditorShell.
+// Native BlockCard/SetRow path (WOED UI ACs). Builder removed in T19 → PlanEditorShell.
 export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false }) => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();

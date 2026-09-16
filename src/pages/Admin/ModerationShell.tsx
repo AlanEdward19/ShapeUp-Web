@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactElement, type ReactNode } from 'react';
 import { useNutritionApi } from '../../hooks/api/useNutritionApi';
-import DashboardStitchHost from '../dashboard-stitch/DashboardStitchHost';
+import DashboardShellHost from '../shell-assets/DashboardShellHost';
 import {
   ModerationPublicMarkup,
   type ModerationQueueItem,
@@ -81,8 +81,8 @@ export default function ModerationShell(): ReactElement {
   };
 
   return (
-    <DashboardStitchHost name="moderation" after={errorAlert}>
+    <DashboardShellHost name="moderation" after={errorAlert}>
       <ModerationPublicMarkup state={shellState} />
-    </DashboardStitchHost>
+    </DashboardShellHost>
   );
 }

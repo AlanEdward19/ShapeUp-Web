@@ -3,8 +3,8 @@ import RouteMetadata from './components/RouteMetadata';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TourProvider } from '@reactour/tour';
 import './styles/Tour.css';
-import { StitchLogin as Login, StitchLanding as LandingPage, StitchRecovery as ForgotPassword } from './pages/PublicAuthShell';
-import StitchRegistration from './pages/RegistrationShell';
+import { LoginShell as Login, LandingShell as LandingPage, RecoveryShell as ForgotPassword } from './pages/PublicAuthShell';
+import RegistrationShell from './pages/RegistrationShell';
 
 import ResetPassword from './pages/ResetPassword';
 
@@ -18,7 +18,7 @@ import TrainingPlans from './pages/TrainingPlans';
 import Clients from './pages/Dashboard/Clients';
 import ClientDetail from './pages/Dashboard/ClientDetail';
 import Exercises from './pages/Dashboard/ExercisesShell';
-import StitchMessages, { StitchFeedback as Feedback } from './pages/Dashboard/MessagesShell';
+import MessagesShell, { FeedbackShell as Feedback } from './pages/Dashboard/MessagesShell';
 import Analytics from './pages/Dashboard/Analytics';
 import Reports from './pages/Dashboard/Reports';
 import Settings from './pages/Dashboard/SettingsShell';
@@ -35,7 +35,7 @@ import FoodModerationQueue from './pages/Admin/ModerationShell';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
 import ExploreGyms from './pages/Dashboard/GymsExploreShell';
 import Onboarding from './pages/Dashboard/OnboardingShell';
-import useStitchLanguage from './hooks/useStitchLanguage';
+import useShellLanguage from './hooks/useShellLanguage';
 
 // Wrapper for the Login page
 const LoginWrapper = () => {
@@ -50,7 +50,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
-  useStitchLanguage(document.getElementById('root'));
+  useShellLanguage(document.getElementById('root'));
   return (
     <TourProvider
       steps={[]}
@@ -95,7 +95,7 @@ function App() {
           <Route path="/privacy" element={<LegalDocument kind="privacy" />} />
           <Route path="/terms" element={<LegalDocument kind="terms" />} />
           <Route path="/login" element={<LoginWrapper />} />
-          <Route path="/register" element={<StitchRegistration />} />
+          <Route path="/register" element={<RegistrationShell />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/__/auth/action" element={<ResetPassword />} />
@@ -121,7 +121,7 @@ function App() {
             <Route path="turnstile" element={<TurnstileGym />} />
             <Route path="financial" element={<FinancialGym />} />
             {/* Mock nested routes below */}
-            <Route path="messages" element={<StitchMessages />} />
+            <Route path="messages" element={<MessagesShell />} />
             <Route path="gyms" element={<ExploreGyms />} />
 
           </Route>

@@ -1,12 +1,12 @@
 import { useState, type ChangeEvent, type ReactElement, type RefObject } from 'react';
 import ChatDrawer from '../../components/ChatDrawer';
 import Feedback from './Feedback';
-import DashboardStitchHost from '../dashboard-stitch/DashboardStitchHost';
-import { workspaceNavStyle } from '../dashboard-stitch/workspaceNavStyle';
+import DashboardShellHost from '../shell-assets/DashboardShellHost';
+import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { MessagesPublicMarkup } from './markup/MessagesPublicMarkup';
 
 const MESSAGES_RESPONSIVE_CSS =
-  '@media(max-width:1200px){main+aside{display:none}}@media(max-width:767px){.stitch-body>div{min-width:0}main{width:100%;min-width:0}main>header{padding:12px}main>div{padding:12px}.sn-conversations{display:block!important;width:100%!important;max-height:180px;overflow:auto;flex:none!important}.stitch-body>div{flex-wrap:wrap}}';
+  '@media(max-width:1200px){main+aside{display:none}}@media(max-width:767px){.shell-body>div{min-width:0}main{width:100%;min-width:0}main>header{padding:12px}main>div{padding:12px}.sn-conversations{display:block!important;width:100%!important;max-height:180px;overflow:auto;flex:none!important}.shell-body>div{flex-wrap:wrap}}';
 
 export type InboxFeedItem = {
   clientId: string;
@@ -52,7 +52,7 @@ function MessageView(state: MessageViewState) {
   const sender = state.inboxFeed ? 'coach' : 'client';
 
   return (
-    <DashboardStitchHost
+    <DashboardShellHost
       name="messages"
       css={workspaceNavStyle + MESSAGES_RESPONSIVE_CSS}
       after={
@@ -77,7 +77,7 @@ function MessageView(state: MessageViewState) {
           setNavOpen,
         }}
       />
-    </DashboardStitchHost>
+    </DashboardShellHost>
   );
 }
 
@@ -92,7 +92,7 @@ const ChatDrawerWithView = ChatDrawer as (props: {
   renderView?: (state: MessageViewState) => ReactElement;
 }) => ReactElement;
 
-function StitchMessages() {
+function MessagesShell() {
   const role = localStorage.getItem('shapeup_role');
   const isPro = role === 'professional' || role === 'gym';
   if (isPro) {
@@ -109,7 +109,7 @@ function StitchMessages() {
   );
 }
 
-/** `/dashboard/feedback` — pro/gym inbox uses the same stitch messages shell via `Feedback`. */
-export const StitchFeedback = StitchMessages;
+/** `/dashboard/feedback` — pro/gym inbox uses the same messages shell via `Feedback`. */
+export const FeedbackShell = MessagesShell;
 
-export default StitchMessages;
+export default MessagesShell;

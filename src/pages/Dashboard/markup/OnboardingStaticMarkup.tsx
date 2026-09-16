@@ -1,5 +1,5 @@
 /* eslint-disable */
-/* Auto-generated from stitch/templates/onboarding.html — wire interactivity in OnboardingDashboardMarkup.tsx */
+/* Auto-generated from templates/onboarding.html — wire interactivity in OnboardingDashboardMarkup.tsx */
 import type { ReactElement } from 'react';
 
 export function OnboardingStaticMarkup(): ReactElement {
