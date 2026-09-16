@@ -1,3 +1,4 @@
+import { useTrainerPortfolio } from '../../hooks/useTrainerPortfolio';
 import React, { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
 import { useTour } from '@reactour/tour';
@@ -11,25 +12,22 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import './Analytics.css';
 
 const Analytics = () => {
+    const portfolio = useTrainerPortfolio();
     const { t, language } = useLanguage();
+    const tr=(pt,en,es)=>({'pt-BR':pt,en,es}[language]);
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [metrics, setMetrics] = useState({
         mrr: 0,
         activeClients: 0,
         globalAdherence: 0,
-        avgLifespan: 9
+        avgLifespan: 0
     });
 
     const [growthData, setGrowthData] = useState([]);
     const [distData, setDistData] = useState([]);
 
     useEffect(() => {
-        const storedClients = localStorage.getItem('shapeup_clients');
-        const storedPlans = localStorage.getItem('shapeup_pro_plans');
-
-        const clients = storedClients ? JSON.parse(storedClients) : [];
-        const plans = storedPlans ? JSON.parse(storedPlans) : [];
-
+        const { clients, plans } = portfolio;
         // 1. Filter out only Active or Needs Attention (excluding Invited and Inactive)
         const activeUsers = clients.filter(c => c.status === 'Active' || c.status === 'Needs Attention');
 
@@ -104,44 +102,15 @@ const Analytics = () => {
             { range: '< 70%', clients: buckets['< 70%'] },
         ]);
 
-        // 5. Generate Trailing 6 Month Growth Data (ending at current active)
-        const currentMonthIdx = new Date().getMonth();
+        const nowDate = new Date();
+        const monthly = Array.from({length:6},(_,index)=>{
+            const start = new Date(nowDate.getFullYear(),nowDate.getMonth()-5+index,1);
+            const end = new Date(start.getFullYear(),start.getMonth()+1,1);
+            return {month:start.toLocaleDateString(language,{month:'short'}),active:clients.filter(client=>client.joinDate && new Date(client.joinDate)>=start && new Date(client.joinDate)<end).length};
+        });
+        setGrowthData(monthly);
 
-        let buildGrowth = [];
-        let simulatedActive = activeUsers.length;
-
-        // Count actual inactive clients for churned, instead of random
-        const inactiveClients = clients.filter(c => c.status === 'Inactive');
-        let totalChurned = inactiveClients.length;
-
-        // Work backwards 6 months
-        for (let i = 0; i < 6; i++) {
-            let mIdx = currentMonthIdx - i;
-            if (mIdx < 0) mIdx += 12;
-
-            const date = new Date(2000, mIdx, 1);
-            const formattedMonth = date.toLocaleString(language === 'pt-BR' ? 'pt-BR' : 'en-US', { month: 'short' });
-
-            // Distribute inactive clients across months (for visual, mostly in recent months)
-            const expectedChurn = i === 0 ? totalChurned : 0; // Just put all churn in current month for real data accuracy, or 0.
-
-            buildGrowth.unshift({
-                month: formattedMonth,
-                active: Math.max(0, simulatedActive),
-                churned: expectedChurn
-            });
-
-            // To make the graph look logical, subtract a logical amount for previous months based on real data if we had it.
-            // But since we don't have historical snapshots, we just step down slightly so it's not a flat line, but strictly based on currently active.
-            // If active is 0, keep it 0.
-            if (simulatedActive > 0) {
-                simulatedActive = Math.max(0, simulatedActive - 1);
-            }
-        }
-
-        setGrowthData(buildGrowth);
-
-    }, [language]);
+    }, [language, portfolio]);
 
     // ─── Insights / Analytics Tour Trigger ─────────────────────────────
     useEffect(() => {
@@ -168,25 +137,24 @@ setTimeout(() => {
             }, 500);
             sessionStorage.setItem('shapeup_analytics_tour_seen', 'true');
         }
-    }, [setIsOpen, setSteps]);
+    }, [setIsOpen, setSteps, setCurrentStep, t]);
 
     return (
-        <div className="su-analytics-dashboard">
+        <div className="su-analytics-dashboard">{portfolio.error && <p role="alert">{t('common.error')}</p>}
             <div className="su-dashboard-header-flex" data-tour="an-header">
                 <div>
                     <h1 className="su-page-title">{t('pro.analytics.title')}</h1>
                     <p className="su-page-subtitle">{t('pro.analytics.subtitle')}</p>
                 </div>
-                <Button variant="outline" icon={<Download size={16} />}>{t('pro.analytics.btn.export')}</Button>
+                <Button variant="outline" onClick={()=>{ const csv=["month,enrollments",...growthData.map(row=>`${row.month},${row.active}`)].join("\n");const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));const link=document.createElement("a");link.href=url;link.download="shapeup-enrollments.csv";link.click();setTimeout(()=>URL.revokeObjectURL(url),1000); }} icon={<Download size={16} />}>{t('pro.analytics.btn.export')}</Button>
             </div>
 
             <div className="su-analytics-metrics-grid" data-tour="an-metrics">
                 <Card className="su-metric-card su-analytics-feature">
                     <div className="su-metric-header">
-                        <span className="su-metric-label">{t('pro.analytics.metric.mrr')}</span>
+                        <span className="su-metric-label">{tr('Valor dos planos ativos','Active plan value','Valor de los planes activos')}</span>
                     </div>
                     <div className="su-metric-value">${metrics.mrr.toLocaleString()}</div>
-                    <span className="su-metric-trend positive">{t('pro.analytics.metric.mrr.trend')}</span>
                 </Card>
 
                 <div className="su-analytics-stack">
@@ -195,7 +163,6 @@ setTimeout(() => {
                             <span className="su-metric-label">{t('pro.analytics.metric.clients')}</span>
                         </div>
                         <div className="su-metric-value">{metrics.activeClients}</div>
-                        <span className="su-metric-trend positive">{t('pro.analytics.metric.clients.trend')}</span>
                     </Card>
 
                     <Card className="su-metric-card">
@@ -203,7 +170,6 @@ setTimeout(() => {
                             <span className="su-metric-label">{t('pro.analytics.metric.adherence')}</span>
                         </div>
                         <div className="su-metric-value">{metrics.globalAdherence}%</div>
-                        <span className="su-metric-trend positive">{t('pro.analytics.metric.adherence.trend')}</span>
                     </Card>
 
                     <Card className="su-metric-card">
@@ -211,7 +177,6 @@ setTimeout(() => {
                             <span className="su-metric-label">{t('pro.analytics.metric.lifespan')}</span>
                         </div>
                         <div className="su-metric-value">{metrics.avgLifespan} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>{t('pro.analytics.metric.lifespan.unit')}</span></div>
-                        <span className="su-metric-trend">{t('pro.analytics.metric.lifespan.trend')}</span>
                     </Card>
                 </div>
             </div>
@@ -221,7 +186,7 @@ setTimeout(() => {
 
                 {/* Client Growth Chart */}
                 <Card className="su-chart-card su-col-span-2">
-                    <h3 className="su-section-title">{t('pro.analytics.chart.growth')}</h3>
+                    <h3 className="su-section-title">{tr('Matrículas por mês','Enrollments by month','Matrículas por mes')}</h3>
                     <div className="su-chart-container-large">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={growthData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -229,8 +194,7 @@ setTimeout(() => {
                                 <YAxis tick={{ fontSize: 12 }} tickLine={false} axisLine={false} stroke="var(--text-muted)" />
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                                 <RechartsTooltip contentStyle={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', borderRadius: '2px' }} />
-                                <Area type="monotone" name={t('pro.analytics.chart.growth.active')} dataKey="active" stroke="var(--primary)" strokeWidth={2} fill="var(--primary)" fillOpacity={0.12} />
-                                <Area type="monotone" name={t('pro.analytics.chart.growth.churned')} dataKey="churned" stroke="var(--error)" strokeWidth={2} fill="transparent" strokeDasharray="5 5" />
+                                <Area type="monotone" name={tr('Matrículas','Enrollments','Matrículas')} dataKey="active" stroke="var(--primary)" strokeWidth={2} fill="var(--primary)" fillOpacity={0.12} />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>

@@ -1,3 +1,4 @@
+import DatePicker from '../../components/DatePicker';
 import React, { useState, useEffect, useCallback } from 'react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -86,8 +87,8 @@ const ObjectivesClient = () => {
             const data = await getWeightRegisters(startDateUtc, endDateUtc);
             if (!data) return;
 
-            const mappedHistory = data.map(entry => {
-                const dateObj = new Date(entry.dateUtc);
+            const mappedHistory = (Array.isArray(data) ? data : data.items || []).map(entry => {
+                const dateObj = new Date(entry.dateUtc || `${entry.date}T12:00:00`);
                 return {
                     id: entry.id || dateObj.getTime(),
                     date: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
@@ -101,7 +102,8 @@ const ObjectivesClient = () => {
 
             setObjectives(prev => ({
                 ...prev,
-                history: mappedHistory
+                history: mappedHistory,
+                ...(data.targetWeight != null ? { goalWeight: data.targetWeight, goalUnit: 'metric' } : {})
             }));
         } catch (err) {
             console.error("Failed to fetch weight logs", err);
@@ -158,7 +160,7 @@ const ObjectivesClient = () => {
         enqueueMutation({
             endpoint: '/api/nutrition/weight/target',
             method: 'PUT',
-            body: { targetWeight: parseFloat(tempGoalWeight), unit: unitSystem },
+            body: { targetWeight: unitSystem === 'imperial' ? parseFloat(tempGoalWeight) / 2.2046226218 : parseFloat(tempGoalWeight) },
             dedupeKey: `weight-target-${clientId}`,
         });
         setObjectives(prev => ({
@@ -186,7 +188,7 @@ const ObjectivesClient = () => {
         enqueueMutation({
             endpoint: '/api/nutrition/weight/registers',
             method: 'POST',
-            body: { weight: parsedWeight, dateUtc },
+            body: { weight: unitSystem === 'imperial' ? parsedWeight / 2.2046226218 : parsedWeight, dateUtc },
         });
 
         const dateObj = new Date(dateUtc);
@@ -316,8 +318,8 @@ const ObjectivesClient = () => {
                         </div>
                         {period === 'custom' && (
                             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', justifyContent: 'flex-end' }}>
-                                <input type="date" className="su-input" style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }} value={customDates.start} onChange={e => setCustomDates(prev => ({...prev, start: e.target.value}))} />
-                                <input type="date" className="su-input" style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }} value={customDates.end} onChange={e => setCustomDates(prev => ({...prev, end: e.target.value}))} />
+                                <DatePicker className="su-input" style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }} value={customDates.start} onChange={e => setCustomDates(prev => ({...prev, start: e.target.value}))} />
+                                <DatePicker className="su-input" style={{ padding: '0.25rem 0.5rem', fontSize: '0.875rem' }} value={customDates.end} onChange={e => setCustomDates(prev => ({...prev, end: e.target.value}))} />
                             </div>
                         )}
                         <div style={{ flex: 1, minHeight: 0, marginTop: '1rem' }}>

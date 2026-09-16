@@ -1,3 +1,4 @@
+import { useUserProfile } from '../contexts/UserProfileContext';
 import React, { useState } from 'react';
 import NotificationsPanel from './NotificationsPanel';
 import { useNotifications } from '../utils/notifications';
@@ -39,7 +40,8 @@ const Header = ({ isProfessional, isIndependent, isGym, profile, sessionTitle, n
             ? t('header.role.gym')
             : (isIndependent ? t('header.role.independent') : t('header.role.client')));
 
-    const displayName = profile?.name || (isProfessional ? 'Coach Alex' : (isGym ? 'Gym Admin' : 'Jane Doe'));
+    const userProfile = useUserProfile();
+    const displayName = userProfile.name || profile?.name || t('nav.settings');
     const section = pathname.split('/')[2] || 'dashboard';
     const sectionKeys = { dashboard: 'nav.dashboard', clients: 'nav.clients', training: 'nav.training_plans', exercises: 'nav.exercises_library', nutrition: 'nav.nutrition', settings: 'nav.settings', feedback: 'nav.feedback', messages: 'nav.feedback', reports: 'nav.reports', analytics: 'nav.analytics', financial: 'nav.financial', staff: 'nav.staff', objectives: 'nav.objectives', turnstile: 'nav.turnstile', admin: 'nav.food_moderation' };
     const sectionLabel = pathname.includes('/nutrition/diary') && language === 'pt-BR' ? 'Diário de nutrição' : section === 'messages' && language === 'pt-BR' ? 'Mensagens' : section === 'gyms' ? (language === 'pt-BR' ? 'Explorar academias' : 'Explore gyms') : section === 'onboarding' ? (language === 'pt-BR' ? 'Configuração inicial' : 'Initial setup') : t(sectionKeys[section] || 'nav.dashboard');
@@ -83,8 +85,8 @@ const Header = ({ isProfessional, isIndependent, isGym, profile, sessionTitle, n
 
                 <div className={`su-profile-menu ${isProfessional ? 'su-profile-menu-secondary' : ''}`}>
                     <div className="su-avatar" aria-hidden="true">
-                        {profile?.avatar ? (
-                            <img src={profile.avatar} alt="" className="su-avatar-img" />
+                        {(userProfile.photo || profile?.avatar) ? (
+                            <img src={userProfile.photo || profile.avatar} alt="" className="su-avatar-img" />
                         ) : (
                             <span className="su-avatar-initials">{initialsFrom(displayName)}</span>
                         )}

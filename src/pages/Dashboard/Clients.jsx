@@ -7,7 +7,6 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 import InviteClientModal from '../../components/InviteClientModal';
 import ClientBillingModal from '../../components/ClientBillingModal';
-import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useOutletContext } from 'react-router-dom';
 import ClientsGym from './ClientsGym';
@@ -20,6 +19,7 @@ const Clients = () => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [showInvite, setShowInvite] = useState(false);
+    const [operationError, setOperationError] = useState('');
     const [clients, setClients] = useState([]);
     const [clientsLoaded, setClientsLoaded] = useState(false);
     const [clientToDelete, setClientToDelete] = useState(null);
@@ -30,12 +30,13 @@ const Clients = () => {
     const { isGym, isProfessional } = useOutletContext() || {};
     const [showGymClients, setShowGymClients] = useState(false);
 
-    const { getTrainerClients } = useGymManagementApi();
+    const { getTrainerClients, removeTrainerClient, deactivateTrainerClientPlan } = useGymManagementApi();
     const { getMe } = useAuthorizationApi();
 
     useEffect(() => {
         const fetchAndComputeClients = async () => {
             try {
+                if (isGym) { setClientsLoaded(true); return; }
                 if (isProfessional || !isGym) {
                     const me = await getMe();
                     const userId = me.id || me.userId;
@@ -46,7 +47,8 @@ const Clients = () => {
                         const updatedList = data.map(item => ({
                             id: item.clientId || item.id,
                             name: item.clientName,
-                            email: item.clientName,
+                            email: item.email || '',
+                            hasActivePlan: item.hasActivePlan,
                             activePlan: item.planName || '-',
                             compliance: item.adherencePercentage || 0,
                             lastCheckin: item.enrolledAt ? new Date(item.enrolledAt).toLocaleDateString() : '-',
@@ -63,48 +65,8 @@ const Clients = () => {
                 console.error("Failed to fetch trainer clients:", error);
             }
 
-            let storedClients = localStorage.getItem('shapeup_clients');
-            let clientsList = storedClients ? JSON.parse(storedClients) : [];
-
-            // Compute real compliance for each client from their plan history
-            const updatedList = clientsList.map(c => {
-                const storedPlans = localStorage.getItem(`shapeup_client_plans_${c.id}`);
-                let compliance = c.compliance; // fallback to mock
-                let activePlanName = c.activePlan;
-
-                if (storedPlans) {
-                    const plans = JSON.parse(storedPlans);
-                    if (plans.length > 0) {
-                        activePlanName = plans.length === 1 ? plans[0].name : `${plans.length} Active Plans`;
-                    }
-
-                    const allHistory = plans.flatMap(p => p.history || []);
-                    if (allHistory.length > 0) {
-                        let totalEx = 0;
-                        let skippedEx = 0;
-                        allHistory.forEach(h => {
-                            h.exercises.forEach(ex => {
-                                totalEx++;
-                                if (ex.skipped) skippedEx++;
-                            });
-                        });
-                        compliance = totalEx === 0 ? 100 : Math.round(((totalEx - skippedEx) / totalEx) * 100);
-                    } else if (plans.length > 0) {
-                        compliance = 0; // Has plans but no history yet
-                    }
-                }
-
-                let newStatus = c.status;
-                if (c.status === 'Active' && compliance < 70) {
-                    newStatus = 'Needs Attention';
-                } else if (c.status === 'Needs Attention' && compliance >= 70) {
-                    newStatus = 'Active';
-                }
-
-                return { ...c, compliance, activePlan: activePlanName, status: newStatus };
-            });
-
-            setClients(updatedList);
+            setClients([]);
+            setOperationError(t('clients.load.error'));
             setClientsLoaded(true);
         };
 
@@ -115,7 +77,7 @@ const Clients = () => {
         window.addEventListener('shapeup_clients_updated', handleClientsUpdated);
 
         return () => window.removeEventListener('shapeup_clients_updated', handleClientsUpdated);
-    }, [getTrainerClients, getMe, isProfessional, isGym]);
+    }, [getTrainerClients, getMe, isProfessional, isGym, t]);
 
     // ─── Tour Trigger ─────────────────────────────────────────────────
     useEffect(() => {
@@ -209,42 +171,9 @@ const Clients = () => {
     }, [justInvitedClient, showInvite, setIsOpen, setSteps, setCurrentStep]);
 
 
-    const handleInvite = (emailAddress) => {
-        const normalizedEmail = emailAddress.trim().toLowerCase();
-        const newClient = {
-            id: Date.now(),
-            name: normalizedEmail, // Will be updated on registration
-            email: normalizedEmail, // Used to match during registration
-            activePlan: '-',
-            compliance: 0,
-            lastCheckin: '-',
-            status: 'Invited'
-        };
-        const updated = [...clients, newClient];
-        setClients(updated);
-
-        const currentStorage = JSON.parse(localStorage.getItem('shapeup_clients') || '[]');
-        const updatedStorage = [...currentStorage, newClient];
-        localStorage.setItem('shapeup_clients', JSON.stringify(updatedStorage));
+    const handleInvite = () => {
         window.dispatchEvent(new Event('shapeup_clients_updated'));
-
-        setJustInvitedClient(true); // Flag that we just invited a client
-
-        // Simulate client registration
-        setTimeout(() => {
-            addNotification('pro', 'system', 'New Client Registered', `${normalizedEmail} has accepted your invite and joined your roster.`, 'primary', {
-                clientId: newClient.id,
-                link: `/dashboard/clients/${newClient.id}`
-            });
-
-            // Optionally, we update the local storage to reflect 'Active' status to complete the illusion
-            const refreshed = JSON.parse(localStorage.getItem('shapeup_clients') || '[]');
-            const finalized = refreshed.map(c => c.id === newClient.id ? { ...c, status: 'Active' } : c);
-            localStorage.setItem('shapeup_clients', JSON.stringify(finalized));
-
-            // If the user is still on the Clients screen, trigger a re-render
-            setClients(prev => prev.map(c => c.id === newClient.id ? { ...c, status: 'Active' } : c));
-        }, 3000);
+        setJustInvitedClient(true);
     };
 
     const handleRowClick = (id) => {
@@ -256,36 +185,28 @@ const Clients = () => {
         setClientToToggle(client);
     };
 
-    const confirmToggleStatus = () => {
+    const confirmToggleStatus = async () => {
         if (!clientToToggle) return;
-        const updated = clients.map(c => {
-            if (c.id === clientToToggle.id) {
-                let newStatus;
-                if (clientToToggle.status === 'Inactive') {
-                    // When reactivating, restore the correct status based on compliance
-                    newStatus = c.compliance < 70 ? 'Needs Attention' : 'Active';
-                } else {
-                    newStatus = 'Inactive';
-                }
-                return { ...c, status: newStatus };
-            }
-            return c;
-        });
-        setClients(updated);
-        localStorage.setItem('shapeup_clients', JSON.stringify(updated));
-        setClientToToggle(null);
+        try {
+            const me = await getMe();
+            await deactivateTrainerClientPlan(me.userId || me.id, clientToToggle.id, { isActive: !clientToToggle.hasActivePlan });
+            setClientToToggle(null);
+            window.dispatchEvent(new Event('shapeup_clients_updated'));
+        } catch { setOperationError(t('common.error')); }
     };
 
     const handleDeleteClient = (client) => {
         setClientToDelete(client);
     };
 
-    const confirmDeleteClient = () => {
+    const confirmDeleteClient = async () => {
         if (!clientToDelete) return;
-        const updated = clients.filter(c => c.id !== clientToDelete.id);
-        setClients(updated);
-        localStorage.setItem('shapeup_clients', JSON.stringify(updated));
-        setClientToDelete(null);
+        try {
+            const me = await getMe();
+            await removeTrainerClient(me.userId || me.id, clientToDelete.id);
+            setClientToDelete(null);
+            window.dispatchEvent(new Event('shapeup_clients_updated'));
+        } catch { setOperationError(t('common.error')); }
     };
 
     const handleSaveBilling = (billingData) => {
@@ -302,6 +223,7 @@ const Clients = () => {
 
     return (
         <div className="su-clients-dashboard">
+            {operationError && <p role="alert">{operationError}</p>}
             {showInvite && <InviteClientModal onClose={() => setShowInvite(false)} onInvite={handleInvite} />}
 
             <ClientBillingModal

@@ -38,6 +38,7 @@ export const useExercises = () => {
                 const data = rawData.map(ex => ({
                     ...ex,
                     muscleDetails: ex.muscles,
+                    muscleActivations: Object.fromEntries((ex.muscles || []).filter(m => typeof m === 'object' && Number.isFinite(m.activationPercent)).map(m => [m.muscleNamePt || m.muscleName, m.activationPercent / 100])),
                     name: ex.namePt || ex.name,
                     muscles: Array.isArray(ex.muscles)
                         ? ex.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName) : m)

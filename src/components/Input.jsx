@@ -1,4 +1,5 @@
 import React from 'react';
+import DatePicker from './DatePicker';
 import './Input.css';
 
 const Input = ({
@@ -9,8 +10,9 @@ const Input = ({
     trailing,
     ...props
 }) => {
+    const Field = type === 'date' ? DatePicker : 'input';
     const field = (
-        <input
+        <Field
             id={id}
             name={props.name || id}
             type={type}

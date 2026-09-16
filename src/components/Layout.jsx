@@ -18,15 +18,15 @@ const Layout = () => {
 
     // Global profile state for the session
     const storedName = localStorage.getItem('shapeup_user_name');
-    const [coachProfile, setCoachProfile] = useState({ name: storedName || 'Coach Alex', avatar: null });
-    const [clientProfile, setClientProfile] = useState({ name: storedName || 'Jane Doe', avatar: null });
-    const [gymProfile, setGymProfile] = useState({ name: storedName || 'Gym Admin', avatar: null });
+    const [coachProfile, setCoachProfile] = useState({ name: storedName || '', avatar: null });
+    const [clientProfile, setClientProfile] = useState({ name: storedName || '', avatar: null });
+    const [gymProfile, setGymProfile] = useState({ name: storedName || '', avatar: null });
     const currentProfile = isProfessional ? coachProfile : (isGym ? gymProfile : clientProfile);
 
     // Session title — set by TrainingPlansClient when a session starts/ends
     const [sessionTitle, setSessionTitle] = useState(null);
 
-    if (!(isGym && location.pathname === '/dashboard') && ['/dashboard', '/dashboard/exercises', '/dashboard/settings', '/dashboard/financial', '/dashboard/nutrition/diary', '/dashboard/admin/food-moderation', '/dashboard/messages', '/dashboard/feedback', '/dashboard/gyms'].includes(location.pathname)) return <Outlet context={{ isProfessional, isIndependent, isGym, coachProfile, setCoachProfile, clientProfile, setClientProfile, gymProfile, setGymProfile, setSessionTitle }} />;
+    if (!(isGym && location.pathname === '/dashboard') && ['/dashboard', '/dashboard/exercises', '/dashboard/settings', '/dashboard/nutrition/diary', '/dashboard/admin/food-moderation', '/dashboard/messages', '/dashboard/feedback', '/dashboard/gyms'].includes(location.pathname)) return <Outlet context={{ isProfessional, isIndependent, isGym, coachProfile, setCoachProfile, clientProfile, setClientProfile, gymProfile, setGymProfile, setSessionTitle }} />;
     return (
         <div className="su-layout-wrapper">
             {navigationOpen && <button className="su-navigation-backdrop" aria-label="Fechar menu" onClick={() => setNavigationOpen(false)} />}

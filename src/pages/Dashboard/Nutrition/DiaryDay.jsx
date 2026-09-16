@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import DatePicker from '../../../components/DatePicker';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import NutritionNav from './NutritionNav';
 import SubstituteItemModal from './SubstituteItemModal';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
@@ -7,7 +8,7 @@ import { isMacroGoalMet } from './nutritionUtils';
 import './Nutrition.css';
 import DiarySidebar from './DiarySidebar';
 import HydrationMetric from '../../../components/HydrationMetric';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const MACRO_KEYS = [
     { key: 'kcal', labelKey: 'nutrition.macro.kcal', color: '#e06c43', informational: true },
@@ -52,34 +53,42 @@ const MacroProgressBar = ({ label, consumed, goal, color, informational, infoLab
 const DiaryDay = ({ renderView } = {}) => {
     const { t } = useLanguage();
     const { getDiaryDay, getNutritionProfile, removeDiaryEntry } = useNutritionApi();
-    const [date, setDate] = useState(toDateKey());
+    const [searchParams, setSearchParams] = useSearchParams();
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(searchParams.get('date') || '') ? searchParams.get('date') : toDateKey();
+    const setDate = next => setSearchParams(previous => { const params=new URLSearchParams(previous);params.set('date',next);return params; }, { replace:true });
+    const requestVersion = useRef(0);
     const [diary, setDiary] = useState(null);
     const [goal, setGoal] = useState(null);
     const [loading, setLoading] = useState(true);
     const [substituteEntry, setSubstituteEntry] = useState(null);
 
     const loadData = useCallback(async () => {
+        const version = ++requestVersion.current;
         setLoading(true);
+        setDiary(null);
         try {
             const [dayData, profile] = await Promise.all([
                 getDiaryDay(date),
                 getNutritionProfile(),
             ]);
+            if (version !== requestVersion.current) return;
             setDiary(dayData);
             setGoal(profile?.activeGoal ?? null);
         } catch (err) {
+            if (version !== requestVersion.current) return;
             console.error('Failed to load diary', err);
             setDiary({ date, meals: [], totals: { kcal: 0, proteinG: 0, carbG: 0, fatG: 0 } });
         } finally {
-            setLoading(false);
+            if (version === requestVersion.current) setLoading(false);
         }
     }, [date, getDiaryDay, getNutritionProfile]);
 
     useEffect(() => {
         loadData();
+        return () => { requestVersion.current += 1; };
     }, [loadData]);
 
-    const totals = diary?.totals ?? { kcal: 0, proteinG: 0, carbG: 0, fatG: 0 };
+    const totals = useMemo(() => diary?.totals ?? { kcal: 0, proteinG: 0, carbG: 0, fatG: 0 }, [diary]);
     const meals = diary?.meals ?? [];
     const isEmpty = meals.length === 0 || meals.every((m) => !m.items?.length);
     const goalMet = useMemo(() => isMacroGoalMet(totals, goal), [totals, goal]);
@@ -98,8 +107,7 @@ const DiaryDay = ({ renderView } = {}) => {
                     <span className="su-nutrition-kicker">{t('nutrition.diary.kicker')}</span>
                     <h1 className="su-page-title">{localStorage.getItem('shapeup_user_name') || t('nutrition.diary.title')}</h1><p className="su-text-muted su-diary-prescribed-goal">Meta diária prescrita: <strong>{goal?.kcal ? `${goal.kcal.toLocaleString('pt-BR')} kcal` : 'Não configurada'}</strong></p>
                 </div>
-                <input
-                    type="date"
+                <DatePicker
                     className="su-input su-nutrition-date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}

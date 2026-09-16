@@ -9,6 +9,7 @@ import {
     signOut as firebaseSignOut,
     onAuthStateChanged,
     updatePassword,
+    updateProfile,
     sendPasswordResetEmail,
     confirmPasswordReset,
     reauthenticateWithPopup,
@@ -26,6 +27,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [profileVersion, setProfileVersion] = useState(0);
 
     // Monitor Firebase auth state
     useEffect(() => {
@@ -170,39 +172,33 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const updateProfilePhoto = async (file) => {
+        if (!currentUser) throw new Error('auth/no-current-user');
+        let photoURL = null;
+        if (file) {
+            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 2 * 1024 * 1024) throw new Error('profile/invalid-photo');
+            const { getStorage, ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
+            const imageRef = ref(getStorage(auth.app), `users/${currentUser.uid}/profile/${crypto.randomUUID()}`);
+            await uploadBytes(imageRef, file, { contentType: file.type });
+            photoURL = await getDownloadURL(imageRef);
+        }
+        await updateProfile(currentUser, { photoURL });
+        setProfileVersion(version => version + 1);
+    };
+
     // --------------- helpers ---------------
 
     const persistSession = (user, email, role) => {
         localStorage.setItem('shapeup_role', role);
         localStorage.setItem('shapeup_user_email', email);
 
-        if (role === 'professional') {
-            localStorage.setItem('shapeup_user_name', user.displayName || 'Coach');
-        } else if (role === 'gym') {
-            localStorage.setItem('shapeup_user_name', user.displayName || 'Gym Admin');
-        } else if (role === 'independent') {
-            localStorage.setItem('shapeup_client_id', 'independent');
-            localStorage.setItem('shapeup_user_name', user.displayName || email.split('@')[0]);
-        } else {
-            // coached client — keep existing client-list logic untouched
-            const storedClients = localStorage.getItem('shapeup_clients');
-            let matchedId = Date.now();
-            let userName = user.displayName || email.split('@')[0];
+        localStorage.setItem('shapeup_user_name', user.displayName || email.split('@')[0]);
+        const knownUserId = localStorage.getItem('shapeup_user_id');
+        if (knownUserId) localStorage.setItem('shapeup_client_id', knownUserId);
 
-            if (storedClients) {
-                const clients = JSON.parse(storedClients);
-                const match = clients.find(c => c.email?.toLowerCase() === email.toLowerCase());
-                if (match) {
-                    matchedId = match.id;
-                    userName = match.name;
-                }
-            }
-            localStorage.setItem('shapeup_client_id', matchedId);
-            localStorage.setItem('shapeup_user_name', userName);
-        }
     };
 
-    const value = { currentUser, loading, signIn, signInWithGoogle, register, signOut, updateUserPassword, resetPassword, confirmReset, persistSession };
+    const value = { currentUser, loading, profileVersion, updateProfilePhoto, signIn, signInWithGoogle, register, signOut, updateUserPassword, resetPassword, confirmReset, persistSession };
 
     return (
         <AuthContext.Provider value={value}>

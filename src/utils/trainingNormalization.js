@@ -74,6 +74,9 @@ export const countBlockSets = (blocks) =>
  * Normalizes a workout plan from API shape to internal PlanEditor shape.
  */
 export const normalizePlan = (plan) => ({
+    createdByUserId: plan.createdByUserId ?? null,
+    targetUserId: plan.targetUserId ?? null,
+    trainerUserId: plan.trainerUserId ?? null,
     id: plan.planId ?? plan.id ?? `plan_${Date.now()}`,
     name: plan.name ?? '',
     notes: plan.notes ?? '',

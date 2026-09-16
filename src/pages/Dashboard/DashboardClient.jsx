@@ -1,3 +1,4 @@
+import DatePicker from '../../components/DatePicker';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import RankingList from '../../components/gamification/RankingList';
 import GamificationProgressCard from '../../components/gamification/GamificationProgressCard';
@@ -6,7 +7,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
-import { exercisesDB } from '../../data/mockExercises';
+import { useExercises } from '../../hooks/useExercises';
 import './DashboardClient.css';
 import AthleteDailyPanel from '../../components/AthleteDailyPanel';
 
@@ -31,6 +32,7 @@ const getWeekKey = (date) => {
 };
 
 const DashboardClient = ({ renderView } = {}) => {
+    const { exercises: exercisesDB } = useExercises();
     const { t, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const { getGamificationProfile, getRanking } = useGamificationApi();
@@ -229,7 +231,7 @@ const DashboardClient = ({ renderView } = {}) => {
             .map(([muscle, sets]) => ({ muscle, sets }))
             .sort((a, b) => b.sets - a.sets)
             .slice(0, 8); // Show top 8 for RadarChart layout
-    }, [allHistory, muscleTimeFilter, muscleCustomRange]);
+    }, [allHistory, muscleTimeFilter, muscleCustomRange, exercisesDB]);
 
 
     // ─── Recent Improvements ─────────────────────────────────────────
@@ -412,9 +414,9 @@ const DashboardClient = ({ renderView } = {}) => {
                     </div>
                     {muscleTimeFilter === 'custom' && (
                         <div style={{ display: 'flex', gap: '8px', padding: '0.5rem 0', alignItems: 'center', width: '100%', fontSize: '0.8rem' }}>
-                            <input type="date" value={muscleCustomRange.start} onChange={e => setMuscleCustomRange(p => ({ ...p, start: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
+                            <DatePicker value={muscleCustomRange.start} onChange={e => setMuscleCustomRange(p => ({ ...p, start: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
                             <span className="su-text-muted">→</span>
-                            <input type="date" value={muscleCustomRange.end} onChange={e => setMuscleCustomRange(p => ({ ...p, end: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
+                            <DatePicker value={muscleCustomRange.end} onChange={e => setMuscleCustomRange(p => ({ ...p, end: e.target.value }))} className="su-input" style={{ width: 'auto', padding: '4px 8px', minHeight: 'unset', height: '28px' }} />
                         </div>
                     )}
                     <div className="su-area-chart-container" style={{ minHeight: '280px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1.5rem', width: '100%' }}>

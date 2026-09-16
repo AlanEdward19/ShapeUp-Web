@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { X, Send } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
-import { enqueueMutation } from '../services/mutationQueue';
+import { useGymManagementApi } from '../hooks/api/useGymManagementApi';
 import './InviteClientModal.css';
 
 const InviteClientModal = ({ onClose, onInvite }) => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps } = useTour();
     const [email, setEmail] = useState('');
+    const { generateTrainerClientInvite } = useGymManagementApi();
+    const [sending, setSending] = useState(false);
     const [sent, setSent] = useState(false);
     const [error, setError] = useState('');
 
@@ -37,7 +39,8 @@ const InviteClientModal = ({ onClose, onInvite }) => {
 
     const isValidEmail = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
 
-    const handleSend = () => {
+    const handleSend = async () => {
+        if (sending) return;
         if (!email.trim()) {
             setError(t('clients.invite.error.empty'));
             return;
@@ -54,21 +57,13 @@ const InviteClientModal = ({ onClose, onInvite }) => {
             return;
         }
 
-        // Enqueued (offline foundation): the invite email itself is a fire-and-forget backend
-        // side-effect -- the caller (Clients.jsx) already writes its own local "Invited" client
-        // record independent of this response, so there's nothing to wait for here. Goes
-        // through even offline; if it later fails (e.g. lost the permission to invite by the
-        // time connectivity returns), it shows up in OfflineQueueIndicator like any other issue.
-        enqueueMutation({
-            endpoint: `/api/gym-management/trainers/${trainerId}/clients/invites/${email}`,
-            method: 'POST',
-            body: { trainerPlanId: null, expiresInHours: 48 },
-        });
-
-        setSent(true);
-        if (onInvite) {
-            onInvite(email);
-        }
+        setSending(true);
+        try {
+            await generateTrainerClientInvite(trainerId, encodeURIComponent(email.trim()), { trainerPlanId: null, expiresInHours: 48 });
+            setSent(true);
+            onInvite?.(email);
+        } catch { setError(t('common.error')); }
+        finally { setSending(false); }
     };
 
     return (
@@ -103,7 +98,7 @@ const InviteClientModal = ({ onClose, onInvite }) => {
 
                         <div className="su-modal-actions">
                             <button className="su-modal-btn-cancel" onClick={onClose}>{t('clients.invite.btn.cancel')}</button>
-                            <button className="su-modal-btn-primary" onClick={handleSend} data-tour="invite-send">
+                            <button className="su-modal-btn-primary" disabled={sending} onClick={handleSend} data-tour="invite-send">
                                 <Send size={16} /> {t('clients.invite.btn.send')}
                             </button>
                         </div>

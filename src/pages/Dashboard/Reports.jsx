@@ -1,3 +1,8 @@
+import DatePicker from '../../components/DatePicker';
+import { useTrainerPortfolio } from '../../hooks/useTrainerPortfolio';
+import { useTrainingApi } from '../../hooks/api/useTrainingApi';
+import { readAllPages } from '../../utils/readAllPages';
+import { workoutHistory } from '../../utils/workoutHistory';
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { Download, ChevronDown, Plus, Clock, AlertTriangle } from 'lucide-react';
@@ -7,10 +12,11 @@ import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { useTour } from '@reactour/tour';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
-import { exercisesDB } from '../../data/mockExercises';
+import { useExercises } from '../../hooks/useExercises';
 import './Reports.css';
 
 const Reports = () => {
+    const { exercises: exercisesDB } = useExercises();
     const { t, unitSystem, convertWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [reportType, setReportType] = useState('performance');
@@ -24,14 +30,19 @@ const Reports = () => {
     const [reportsHistory, setReportsHistory] = useState([]);
 
     // Data state
-    const [clients, setClients] = useState([]);
+    const { clients, plans: billingPlans, loading: portfolioLoading, error: portfolioError } = useTrainerPortfolio();
+    const { getWorkoutsByUser } = useTrainingApi();
+    const [plansByClient, setPlansByClient] = useState({});
+    const [historyLoading, setHistoryLoading] = useState(true);
+    const [historyError, setHistoryError] = useState(false);
+    useEffect(()=>{let active=true;setHistoryLoading(true);setHistoryError(false);
+      Promise.all(clients.map(async client=>{
+        const sessions=await readAllPages(cursor=>getWorkoutsByUser(client.id,cursor));
+        return [client.id,[{name:client.activePlan || '—',history:sessions.filter(session=>session.isCompleted || session.isCancelled).map(workoutHistory)}]];
+      })).then(entries=>{if(active)setPlansByClient(Object.fromEntries(entries));}).catch(()=>{if(active)setHistoryError(true);}).finally(()=>{if(active)setHistoryLoading(false);});return()=>{active=false;};
+    },[clients,getWorkoutsByUser]);
 
     React.useEffect(() => {
-        const storedClients = localStorage.getItem('shapeup_clients');
-        if (storedClients) {
-            setClients(JSON.parse(storedClients));
-        }
-
         const storedHistory = localStorage.getItem('shapeup_reports_history');
         if (storedHistory) {
             setReportsHistory(JSON.parse(storedHistory));
@@ -67,13 +78,12 @@ setTimeout(() => {
             }, 500);
             sessionStorage.setItem('shapeup_reports_tour_seen', 'true');
         }
-    }, [setIsOpen, setSteps]);
+    }, [setIsOpen, setSteps, setCurrentStep, t]);
 
     const handleGenerateReport = async () => {
         setIsGenerating(true);
 
-        // Short delay to simulate generation
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        if (portfolioLoading || historyLoading || portfolioError || historyError) { setIsGenerating(false); return; }
 
         try {
             if (exportFormat === 'pdf') {
@@ -89,7 +99,7 @@ setTimeout(() => {
                 type: reportType,
                 date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
                 status: 'Completed',
-                size: exportFormat === 'pdf' ? '0.5 MB' : '0.05 MB'
+                size: '—'
             };
 
             const updatedHistory = [newReport, ...reportsHistory].slice(0, 10);
@@ -183,7 +193,7 @@ setTimeout(() => {
             }
 
             rows = targetClients.map(client => {
-                const storedPlans = localStorage.getItem(`shapeup_client_plans_${client.id}`);
+                const storedPlans = JSON.stringify(plansByClient[client.id] || []);
                 let completed = 0;
                 let skipped = 0;
                 let totalVolumeSum = 0;
@@ -220,7 +230,7 @@ setTimeout(() => {
         }
         else if (reportType === 'billing') {
             headers = [t('reports.export.billing.col.name'), t('reports.export.billing.col.status'), t('reports.export.billing.col.type'), t('reports.export.billing.col.detail'), t('reports.export.billing.col.rate')];
-            const storedPlans = localStorage.getItem('shapeup_pro_plans');
+            const storedPlans = JSON.stringify(billingPlans);
             const proPlans = storedPlans ? JSON.parse(storedPlans) : [];
             let targetClients = clients;
             if (targetScope === 'specific' && selectedClientId) {
@@ -250,7 +260,7 @@ setTimeout(() => {
             const client = clients.find(c => String(c.id) === String(selectedClientId));
             if (!client) return;
 
-            const storedPlans = localStorage.getItem(`shapeup_client_plans_${client.id}`);
+            const storedPlans = JSON.stringify(plansByClient[client.id] || []);
             if (storedPlans) {
                 const plans = JSON.parse(storedPlans);
                 plans.forEach(plan => {
@@ -317,7 +327,7 @@ setTimeout(() => {
         doc.setTextColor(100, 100, 100);
         doc.text(`${t('reports.export.pdf.period')} ${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`, 14, 52);
 
-        const storedPlans = localStorage.getItem(`shapeup_client_plans_${client.id}`);
+        const storedPlans = JSON.stringify(plansByClient[client.id] || []);
         let sessions = [];
 
         if (storedPlans) {
@@ -403,7 +413,7 @@ setTimeout(() => {
     };
 
     const generateBillingReport = (doc) => {
-        const storedPlans = localStorage.getItem('shapeup_pro_plans');
+        const storedPlans = JSON.stringify(billingPlans);
         const proPlans = storedPlans ? JSON.parse(storedPlans) : [];
 
         // Filter clients based on scope
@@ -512,7 +522,7 @@ setTimeout(() => {
         let globalMuscleVolumes = {};
 
         const tableData = targetClients.map(client => {
-            const storedPlans = localStorage.getItem(`shapeup_client_plans_${client.id}`);
+            const storedPlans = JSON.stringify(plansByClient[client.id] || []);
             let completed = 0;
             let skipped = 0;
             let totalVolumeSum = 0;
@@ -706,8 +716,7 @@ setTimeout(() => {
                             <div className="su-form-row su-mt-4">
                                 <div className="su-form-group su-flex-1">
                                     <label className="su-form-label">{t('reports.form.start')}</label>
-                                    <input
-                                        type="date"
+                                    <DatePicker
                                         className="su-input su-full-width"
                                         value={customStartDate}
                                         onChange={(e) => setCustomStartDate(e.target.value)}
@@ -715,8 +724,7 @@ setTimeout(() => {
                                 </div>
                                 <div className="su-form-group su-flex-1">
                                     <label className="su-form-label">{t('reports.form.end')}</label>
-                                    <input
-                                        type="date"
+                                    <DatePicker
                                         className="su-input su-full-width"
                                         value={customEndDate}
                                         onChange={(e) => setCustomEndDate(e.target.value)}
@@ -762,7 +770,7 @@ setTimeout(() => {
                                 onClick={handleGenerateReport}
                                 data-tour="rep-generate-btn"
                                 disabled={
-                                    isGenerating ||
+                                    isGenerating || portfolioLoading || historyLoading || portfolioError || historyError ||
                                     (targetScope === 'specific' && !selectedClientId) ||
                                     (dateRange === 'custom' && (!customStartDate || !customEndDate)) ||
                                     (reportType === 'client_history' && targetScope !== 'specific')
