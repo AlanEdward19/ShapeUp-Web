@@ -43,12 +43,12 @@
 ## Handoff
 
 - **Feature**: stitch-migration
-- **Phase / Task**: Execute T1–T18 done; **T19 UNBLOCKED** (workout-editor Verifier PASS 2026-09-15)
-- **Completed**: TypeScript setup; native shells (T2–T16 + native rewrite of remaining sourceRuntime shells); T17 dead files; T18 partial engine cleanup; gates 4/4 at `bbe3859` (121 tests); report `.specs/features/stitch-migration/validation.md`
-- **In-progress**: nenhum
-- **Next step**: **T19** — rewrite `src/stitch/Builder.jsx` → `PlanEditorShell.tsx` (or agreed path) + remove remaining `src/stitch/` engine assets; then re-run stitch-migration Verifier for feature close
-- **Blockers**: none — `ShapeUpApi/.specs/features/workout-editor/validation.md` = **PASS** (Api `280cd31`, Web PlanEditor default `stitch=false` at `95fb58c`); zero ranked WOED blockers
-- **Cross-repo**: keep Builder path coordinated until T19 commit lands
+- **Phase / Task**: Execute **T1–T19 DONE** — awaiting Verifier re-run for feature close
+- **Completed**: TypeScript setup; native shells (T2–T16); T17 dead files; T18 partial engine cleanup; **T19** PlanEditorShell + `src/stitch/` removed (assets → `dashboard-stitch/` + hooks + public-auth CSS); gates green (build, check-frontend-gates, 112 tests)
+- **In-progress**: Verifier (post-T19)
+- **Next step**: Independent Verifier on stitch-migration against AD-WEB-007 end-state (zero `src/stitch/`)
+- **Blockers**: none
+- **Cross-repo**: workout-editor PASS already landed; Builder coordination closed by T19
 
 ---
 

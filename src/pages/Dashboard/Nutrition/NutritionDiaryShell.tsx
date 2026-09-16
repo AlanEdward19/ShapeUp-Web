@@ -2,7 +2,7 @@ import DatePicker from '../../../components/DatePicker';
 import HistoryChart from '../../../components/charts/HistoryChart';
 import WorkspaceStitchPage from '../../../components/Workspace/WorkspaceStitchPage';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { copy } from '../../../stitch/copy';
+import { copy } from '../../dashboard-stitch/copy';
 import useHydration from '../../../hooks/useHydration';
 import { useEffect, useState, type ChangeEvent, type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';

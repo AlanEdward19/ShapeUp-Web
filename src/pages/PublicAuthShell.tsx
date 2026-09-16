@@ -4,7 +4,7 @@ import Login from './Login';
 import ForgotPassword from './ForgotPassword';
 import SeoHead from '../components/SeoHead';
 import OrganizationJsonLd from '../components/OrganizationJsonLd';
-import publicCss from '../stitch/publicUsability.css?inline';
+import publicCss from './public-auth/publicUsability.css?inline';
 import { useLanguage } from '../contexts/LanguageContext';
 import PublicStitchHost from './public-auth/PublicStitchHost';
 import { LandingStaticMarkup } from './public-auth/markup/LandingStaticMarkup';

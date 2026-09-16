@@ -1,12 +1,12 @@
 import { render, fireEvent, within, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { expect, it, vi } from 'vitest';
-import { LanguageProvider } from '../contexts/LanguageContext';
-import { StitchLanding, StitchLogin } from '../pages/PublicAuthShell';
-import Registration from '../pages/RegistrationShell';
-import RouteMetadata from '../components/RouteMetadata';
+import { LanguageProvider } from '../../contexts/LanguageContext';
+import { StitchLanding, StitchLogin } from '../PublicAuthShell';
+import Registration from '../RegistrationShell';
+import RouteMetadata from '../../components/RouteMetadata';
 
-vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ register: vi.fn(), signIn: vi.fn(), signInWithGoogle: vi.fn(), resetPassword: vi.fn() }) }));
+vi.mock('../../contexts/AuthContext', () => ({ useAuth: () => ({ register: vi.fn(), signIn: vi.fn(), signInWithGoogle: vi.fn(), resetPassword: vi.fn() }) }));
 const mount = component => {
   localStorage.setItem('shapeup_language', 'pt-BR');
   const {container} = render(<LanguageProvider><MemoryRouter>{component}</MemoryRouter></LanguageProvider>);
@@ -98,3 +98,4 @@ for (const [language, step, badge, birth, finish, mismatch, title] of [
     expect(form.elements.password).toHaveValue('StrongPassword123!');
   });
 }
+

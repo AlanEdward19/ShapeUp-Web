@@ -139,10 +139,11 @@ de teste, já ajustados incrementalmente).
   **Pixel-parity evidence (messages, nutrition, onboarding):** PNGs em `{before,after}-{messages,nutrition,onboarding}-{1440,390}.png` arquivados a partir de `.specs/source-*.png` (before, captura legada) e `.specs/verified-*-{1440,390}.png` (after); where live before/after capture was blocked, `before-*-390` reuses verified at 390px (archived reference, not a fresh diff pair).
 
   Gate T18: `npm run build && npm run lint` (warnings pré-existentes aceitos).
-- [ ] **T19** — **BLOQUEADA até `workout-editor` (Fase 2, `ShapeUpApi/.specs/features/
-  workout-editor/`) fechar Verifier PASS.** Reescrever `stitch/Builder.jsx` como
-  `pages/Dashboard/PlanEditorShell.tsx` (mesmo método: pixel-parity antes/depois). Atualizar
-  `ClientDetail.jsx`. Remover `src/stitch/` por completo (pasta vazia).
+- [x] **T19** — Reescrever `stitch/Builder.jsx` como `pages/Dashboard/PlanEditorShell.tsx`
+  (native PlanEditor re-export; StitchBuilder removido). Atualizar `ClientDetail.jsx`.
+  Remover `src/stitch/` por completo (assets em `pages/dashboard-stitch/`,
+  `hooks/useStitchLanguage.js`, `pages/public-auth/publicUsability.css`).
+  Gate: `node scripts/check-frontend-gates.mjs && npm run build && npx tsc --noEmit && npm test`.
 
 ---
 

@@ -1,7 +1,7 @@
 import { render, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
-vi.mock('../../../stitch/styles/exercises.css?inline', () => ({ default: '' }));
+vi.mock('../../dashboard-stitch/styles/exercises.css?inline', () => ({ default: '' }));
 vi.mock('../../../contexts/AuthContext', () => ({useAuth:()=>({currentUser:{uid:'test'},signOut:vi.fn()})}));
 vi.mock('../../../contexts/UserProfileContext', () => ({useUserProfile:()=>({name:'Test',initials:'T',photo:''})}));
 vi.mock('../../../hooks/useExercises', () => ({useExercises:()=>({exercises:[{id:7,name:'Exercício real',muscles:['Peitoral'],equipments:[],steps:['Instrução da API'],muscleDetails:[{muscleGroup:1,muscleNamePt:'Peitoral',activationPercent:62}]}],loading:false,searchTerm:'',setSearchTerm:vi.fn()})}));

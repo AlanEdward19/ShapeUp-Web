@@ -2,7 +2,6 @@
 .st-auth-brand strong{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;line-height:1}
 .st-auth-mark{width:36px;height:36px;display:grid;place-items:center;border:1px solid #3a2d27;border-radius:4px;background:#211a17;color:#e06c43}
 input::-ms-reveal,input::-ms-clear{display:none}
-input[type=password]::-webkit-credentials-auto-fill-button{visibility:hidden;pointer-events:none}
 .st-registration-password{background-color:#1a1412;color:#f3eae5;border-color:#3a2d27;caret-color:#f3eae5;color-scheme:dark}
 .st-registration-password::placeholder{color:#b8aaa2;opacity:1}
 .st-registration-password:focus{border-color:#e06c43;outline-color:#e06c43}

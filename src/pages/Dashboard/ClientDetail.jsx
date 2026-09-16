@@ -3,7 +3,6 @@ import { useGymManagementApi } from '../../hooks/api/useGymManagementApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { readAllPages } from '../../utils/readAllPages';
 import { workoutHistory } from '../../utils/workoutHistory';
-import StitchBuilder from '../../stitch/Builder';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
@@ -102,10 +101,8 @@ export const DIFFICULTIES = ['Easy', 'Intermediate', 'Hard', 'Advanced'];
 // eslint-disable-next-line react-refresh/only-export-components -- shared constant co-located with the components that use it
 export const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 
-// Default stitch=false: native BlockCard/SetRow path satisfies WOED UI ACs (Superset grouping,
-// EMOM rotation order, RPE|RIR toggle). Stitch Builder still flattens blocks; keep it opt-in until
-// stitch-migration T19 rewrites it as PlanEditorShell.
-export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false, stitch = false }) => {
+// Native BlockCard/SetRow path (WOED UI ACs). Stitch Builder removed in T19 → PlanEditorShell.
+export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false }) => {
     const { t } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [name, setName] = useState(plan.name);
@@ -262,7 +259,6 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             }));
     })();
 
-    if (stitch) return <StitchBuilder state={{ plan, onSave, onAssign, onCancel, name, setName, phase, setPhase, difficulty, setDiff, weeks, setWeeks, planNotes, setPlanNotes, currentBlocks, setCurrentBlocks, totalSets, avgRpe, addExercise, addExerciseToBlock, showExerciseLibrary, setShowExerciseLibrary, handleSelectExercise, alertModal, setAlertModal }} />;
     return (
         <div className="su-builder-layout su-prescription-editor">
             <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">Prescrição & periodização</span><h1>{name || t('pro.builder.name')}</h1><p>{phase} · {weeks} semanas · {difficulty}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> exercícios</span><span><b>{totalSets}</b> séries</span><span><b>{estMins}</b> duração estimada</span></div><Button icon={<Save size={16} />} onClick={() => onSave({ ...plan, name, phase, difficulty, weeks, notes: planNotes, blocks: currentBlocks })}>{t('pro.builder.btn.save')}</Button></header>

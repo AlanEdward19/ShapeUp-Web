@@ -2,7 +2,7 @@
 import type { FormEvent, MouseEvent, ReactElement } from 'react';
 import AuthBrand from '../../../components/AuthBrand';
 import DatePicker from '../../../components/DatePicker';
-import { copy } from '../../../stitch/copy';
+import { copy } from '../../dashboard-stitch/copy';
 import { useLanguage } from '../../../contexts/LanguageContext';
 
 const roleMap: Record<string, string> = { coach: 'professional', athlete: 'independent', manager: 'gym' };

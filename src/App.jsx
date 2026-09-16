@@ -35,7 +35,7 @@ import FoodModerationQueue from './pages/Admin/ModerationShell';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
 import ExploreGyms from './pages/Dashboard/GymsExploreShell';
 import Onboarding from './pages/Dashboard/OnboardingShell';
-import useStitchLanguage from './stitch/useStitchLanguage';
+import useStitchLanguage from './hooks/useStitchLanguage';
 
 // Wrapper for the Login page
 const LoginWrapper = () => {

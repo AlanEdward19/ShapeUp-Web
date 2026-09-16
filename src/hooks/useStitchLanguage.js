@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { copy } from './copy';
+import { copy } from '../pages/dashboard-stitch/copy';
 
 export default function useStitchLanguage(root) {
   const context = useLanguage();

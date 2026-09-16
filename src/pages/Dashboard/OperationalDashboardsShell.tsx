@@ -5,7 +5,7 @@ import { useUserProfile } from '../../contexts/UserProfileContext';
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LegacyDashboardClient from './DashboardClient';
-import useHydration from '../../stitch/useHydration';
+import useHydration from '../../hooks/useHydration';
 import { useNutritionApi } from '../../hooks/api/useNutritionApi';
 import { useGymManagementApi } from '../../hooks/api/useGymManagementApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';

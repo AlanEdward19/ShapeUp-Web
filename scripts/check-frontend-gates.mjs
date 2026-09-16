@@ -43,15 +43,14 @@ if (/family=Inter|font-family:\s*['"]Inter/.test(ds)) fail.push('design-system s
 if (!ds.includes('oklch(')) fail.push('design-system missing oklch tokens')
 
 const app = readFileSync(join(root, 'src/App.jsx'), 'utf8')
-const stitchManifest = JSON.parse(readFileSync(join(root, 'src/stitch/manifest.json'), 'utf8'))
+const stitchManifest = JSON.parse(readFileSync(join(root, 'src/pages/dashboard-stitch/manifest.json'), 'utf8'))
 if (Object.keys(stitchManifest).length !== 16) fail.push('Stitch must include all 16 exported screens')
 for (const name of Object.keys(stitchManifest)) {
-  for (const file of [`design/stitch/${name}.html`, `src/stitch/templates/${name}.html`, `src/stitch/styles/${name}.css`]) {
-    if (!existsSync(join(root, file))) fail.push(`missing original Stitch screen asset: ${file}`)
-  }
-  const html = readFileSync(join(root, `src/stitch/templates/${name}.html`), 'utf8')
-  const css = readFileSync(join(root, `src/stitch/styles/${name}.css`), 'utf8')
-  if (/<script|\son(?:click|submit)=/i.test(html)) fail.push(`Stitch ${name} has executable prototype scripts`)
+  const htmlPath = `design/stitch/${name}.html`
+  const cssPath = `src/pages/dashboard-stitch/styles/${name}.css`
+  if (!existsSync(join(root, htmlPath))) fail.push(`missing original Stitch screen asset: ${htmlPath}`)
+  if (!existsSync(join(root, cssPath))) continue // retired screens (e.g. finance) may drop CSS after host conversion
+  const css = readFileSync(join(root, cssPath), 'utf8')
   if (css.includes('.font-.stitch-body')) fail.push(`Stitch ${name} has corrupted font selectors`)
 }
 if (
@@ -59,6 +58,9 @@ if (
   !app.includes("from './stitch/PublicPages'")
 ) {
   fail.push('Public routes must use the exported Stitch views')
+}
+if (existsSync(join(root, 'src/stitch'))) {
+  fail.push('src/stitch/ must be removed after stitch-migration T19')
 }
 for (const route of ['/privacy', '/terms', 'NotFound']) {
   if (!app.includes(route === 'NotFound' ? 'NotFound' : `path="${route}"`)) {

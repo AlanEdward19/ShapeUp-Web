@@ -17,8 +17,7 @@ const names = {
   modera: 'moderation', onboarding: 'onboarding', painel: 'professional', recupera: 'recovery',
 };
 await mkdir('design/stitch', { recursive: true });
-await mkdir('src/stitch/templates', { recursive: true });
-await mkdir('src/stitch/styles', { recursive: true });
+await mkdir('src/pages/dashboard-stitch/styles', { recursive: true });
 await writeFile('design/stitch/DESIGN.md', await readFile(path.join(source, 'warm_oxide_athletic/DESIGN.md')));
 const manifest = {};
 for (const folder of await readdir(source)) {
@@ -42,12 +41,10 @@ for (const folder of await readdir(source)) {
       selectors.walkPseudos(pseudo => { if (pseudo.value === ':root') pseudo.value = ':host'; });
     }).processSync(rule.selector);
   });
-  await writeFile(`src/stitch/styles/${name}.css`, css.toString());
+  await writeFile(`src/pages/dashboard-stitch/styles/${name}.css`, css.toString());
   const bodyClass = html.match(/<body[^>]*class="([^"]*)"/i)?.[1] || '';
-  const body = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i)?.[1] || '';
-  await writeFile(`src/stitch/templates/${name}.html`, body.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '').replace(/\son(\w+)=/gi, ' data-source-on$1='));
   manifest[name] = { source: folder, bodyClass, fonts: [...html.matchAll(/<link[^>]*href="([^"]+)"[^>]*rel="stylesheet"/gi)].map(match => match[1].replaceAll('&amp;', '&')) };
   console.log(`Imported ${name}: original markup and compiled CSS`);
 }
-await writeFile('src/stitch/manifest.json', JSON.stringify(manifest, null, 2));
+await writeFile('src/pages/dashboard-stitch/manifest.json', JSON.stringify(manifest, null, 2));
 

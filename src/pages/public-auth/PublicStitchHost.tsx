@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent, type MouseEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import manifest from '../../stitch/manifest.json';
-import useStitchLanguage from '../../stitch/useStitchLanguage';
+import manifest from '../dashboard-stitch/manifest.json';
+import useStitchLanguage from '../../hooks/useStitchLanguage';
 import { useAuth } from '../../contexts/AuthContext';
 
-const styles = import.meta.glob('../../stitch/styles/*.css', {
+const styles = import.meta.glob('../dashboard-stitch/styles/*.css', {
   query: '?inline',
   import: 'default',
   eager: true,
@@ -108,7 +108,7 @@ export default function PublicStitchHost({
     }
   };
 
-  const inlineCss = styles[`../../stitch/styles/${name}.css`] ?? '';
+  const inlineCss = styles[`../dashboard-stitch/styles/${name}.css`] ?? '';
 
   const portal = useMemo(
     () =>

@@ -1,13 +1,13 @@
 import { render, fireEvent, within, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import Onboarding from '../pages/Dashboard/OnboardingShell';
+import Onboarding from '../OnboardingShell';
 
 const completeOnboarding = vi.fn().mockResolvedValue({});
-vi.mock('../hooks/api/useNutritionApi', () => ({
+vi.mock('../../../hooks/api/useNutritionApi', () => ({
   useNutritionApi: () => ({ completeOnboarding }),
 }));
-vi.mock('../contexts/AuthContext', () => ({
+vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({ currentUser: { uid: 'test-athlete' }, signOut: vi.fn() }),
 }));
 
@@ -43,3 +43,4 @@ describe('Onboarding shell', () => {
     await waitFor(() => expect(root.getElementById('step-content-4')).not.toHaveAttribute('hidden'));
   });
 });
+

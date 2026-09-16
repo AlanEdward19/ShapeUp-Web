@@ -1,5 +1,5 @@
 import Register from './Register';
-import publicCss from '../stitch/publicUsability.css?inline';
+import publicCss from './public-auth/publicUsability.css?inline';
 import PublicStitchHost from './public-auth/PublicStitchHost';
 import {
   RegisterPublicMarkup,
