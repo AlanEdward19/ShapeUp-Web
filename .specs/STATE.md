@@ -43,12 +43,13 @@
 ## Handoff
 
 - **Feature**: stitch-migration
-- **Phase / Task**: Execute **T1–T19 DONE** — awaiting Verifier re-run for feature close
-- **Completed**: TypeScript setup; native shells (T2–T16); T17 dead files; T18 partial engine cleanup; **T19** PlanEditorShell + `src/stitch/` removed (assets → `dashboard-stitch/` + hooks + public-auth CSS); gates green (build, check-frontend-gates, 112 tests)
-- **In-progress**: Verifier (post-T19)
-- **Next step**: Independent Verifier on stitch-migration against AD-WEB-007 end-state (zero `src/stitch/`)
+- **Phase / Task**: **Verified (PASS)** — T1–T19 complete; Verifier 2026-09-15 @ `fdeb92b`
+- **Completed**: AD-WEB-007 end-state — zero `src/stitch/`; native `.tsx` shells; `PlanEditorShell`; static assets in `pages/dashboard-stitch/`; runtime motor (`sourceRuntime`/`StitchTemplate`) removed; gates green (check-frontend-gates, build, lint, tsc, **112** tests)
+- **In-progress**: none
+- **Next step**: Optional — refresh archived pixel-parity PNGs; sync `spec.md` STMIG statuses with `.specs/features/stitch-migration/validation.md`
 - **Blockers**: none
-- **Cross-repo**: workout-editor PASS already landed; Builder coordination closed by T19
+- **Cross-repo**: workout-editor PASS; Builder coordination closed by T19
+- **Validation report**: `.specs/features/stitch-migration/validation.md`
 
 ---
 
