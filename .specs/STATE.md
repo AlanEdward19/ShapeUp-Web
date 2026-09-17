@@ -23,8 +23,16 @@
 - **Status**: active
 
 ### AD-WEB-005
-- **Decision**: Redesign Impeccable do app autenticado em 6 fatias paralelas (shell, auth, dashboards, treino, nutrição/admin, clientes/academia/settings). Tokens e direção visual permanecem jornal de academia (giz/ferro/ferrugem).
+- **Decision**: Redesign Impeccable do app autenticado em 6 fatias paralelas (shell, auth, dashboards, treino, nutrição/admin, clientes/academia/settings). ~~Tokens e direção visual permanecem jornal de academia (giz/ferro/ferrugem)~~ — **SUPERSEDED por AD-WEB-008** (usuário pediu explicitamente a paleta Warm Oxide Athletic no app todo).
 - **Date**: 2026-09-10
+- **Status**: superseded by AD-WEB-008
+
+### AD-WEB-008
+- **Decision**: Direção visual do app todo (não só páginas profissionais) passa a ser **Warm Oxide Athletic** (primary terracota `#e06c43`, secondary oliva `#7d9b68`, tertiary âmbar `#d4a359`, Barlow Condensed + Source Sans 3), substituindo o restante do token set "giz/ferro/ferrugem" de `AD-WEB-005`. `src/styles/design-system.css` (modo claro E escuro) é a única fonte de tokens; `src/pages/shell-assets/styles/*.css` (páginas profissionais, já corretas) serve de fonte de VALOR pros tokens, sem reescrever o pipeline que as gera. Modo claro é derivado algoritmicamente (mesma família de matiz, luminosidade invertida, validado por contraste WCAG AA) — não fica dark-only. Ver `.specs/features/design-system-retheme/spec.md` + `design.md`.
+- **Reason**: usuário revisou 2 telas de referência (`DESIGN.md`, Warm Oxide Athletic) e decidiu explicitamente "usar a paleta da referência no app todo" — supersede o trecho de `AD-WEB-005` que fixava giz/ferro/ferrugem como direção permanente.
+- **Trade-off**: modo escuro já estava parcialmente convergido (commit `c58c4d3` já usa os 3 hex de brand); modo claro e as telas fora do pipeline Stitch ainda não — rollout é feito com o token file trocado em bloco (barato, atômico) mas verificação por tela incremental com gate (reusa precedente de `stitch-migration`), pra não deixar hex hardcoded remanescente passar despercebido. Duplicação entre `shell-assets` (Tailwind gerado) e `design-system.css` (tokens) é aceita por ora, com consolidação futura como fast-follow não-bloqueante.
+- **Scope**: `src/styles/design-system.css` (tokens de cor/tipografia/raio/espaçamento, ambos os temas); `scripts/check-frontend-gates.mjs` (1 checagem nova de higiene de hex); feature `design-system-retheme`. Execução tela a tela fica para uma fase de Tasks futura, ainda não iniciada.
+- **Date**: 2026-09-16
 - **Status**: active
 
 ### AD-WEB-006
