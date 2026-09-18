@@ -32,7 +32,7 @@ import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
 import { normalizePlan, flattenBlockExercises, applyRequireRpeToAll } from '../../utils/trainingNormalization';
-import { WEEKDAY_API_NAMES } from '../../utils/workoutSchedule';
+import { WEEKDAY_API_NAMES, mapAssignedWeekdaysToApi } from '../../utils/workoutSchedule';
 
 const PLAN_WEEKDAY_SHORT_LABELS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
@@ -48,6 +48,7 @@ export const buildWorkoutPlanBody = (plan, targetUserId) => ({
     durationInWeeks: parseInt(plan.weeks) || 4,
     phase: plan.phase || 'Hypertrophy',
     difficulty: mapDifficulty(plan.difficulty),
+    assignedWeekdays: mapAssignedWeekdaysToApi(plan.assignedWeekdays ?? []),
     blocks: (plan.blocks || []).map(block => ({
         type: mapBlockType(block.type),
         timeCapSeconds: block.timeCapSeconds === '' || block.timeCapSeconds == null ? null : parseInt(block.timeCapSeconds),
