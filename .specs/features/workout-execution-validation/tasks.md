@@ -320,8 +320,8 @@ T13
 
 **Done when**:
 
-- [ ] Classe existe e usa cor de erro do design system
-- [ ] `npm run lint` passes
+- [x] Classe existe e usa cor de erro do design system
+- [x] `npm run lint` passes
 
 **Tests**: none  
 **Gate**: build (`node scripts/check-frontend-gates.mjs && npm run lint`)

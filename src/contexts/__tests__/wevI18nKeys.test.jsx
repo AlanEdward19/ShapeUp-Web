@@ -16,7 +16,7 @@ const WEV_KEYS = [
     'client.session.validation.rpe_required',
 ];
 
-const Probe = ({ lang }) => {
+const Probe = () => {
     const { t } = useLanguage();
     return (
         <ul>
@@ -31,7 +31,7 @@ const valuesFor = (lang) => {
     localStorage.setItem('shapeup_language', lang);
     const { container } = render(
         <LanguageProvider>
-            <Probe lang={lang} />
+            <Probe />
         </LanguageProvider>
     );
     const map = {};

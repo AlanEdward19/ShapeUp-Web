@@ -584,6 +584,11 @@
     opacity: 0.6;
 }
 
+.su-exec-input--invalid {
+    color: var(--error);
+    border-bottom-color: var(--error);
+}
+
 .su-check-circle {
     width: 1.35rem;
     height: 1.35rem;
