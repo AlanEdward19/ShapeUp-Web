@@ -446,10 +446,10 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] TimeBased live row has duration + distance + RPE, not weight/reps
-- [ ] WeightBased live row still has weight/reps + RPE
-- [ ] Summary table branches the same way
-- [ ] Gate check passes: `npm run gate && npm run lint && npx tsc --noEmit && npm test && npm run build`
+- [x] TimeBased live row has duration + distance + RPE, not weight/reps
+- [x] WeightBased live row still has weight/reps + RPE
+- [x] Summary table branches the same way
+- [x] Gate check passes: `npm run gate && npm run lint && npx tsc --noEmit && npm test && npm run build`
 
 **Tests**: none
 **Gate**: build
