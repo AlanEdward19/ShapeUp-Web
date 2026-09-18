@@ -2,6 +2,12 @@
 import type { KeyboardEvent, MouseEvent, ReactElement, RefObject } from 'react';
 import WorkspaceNavigation from '../../shell-assets/WorkspaceNavigation';
 
+export type ExerciseEquivalent = {
+  exerciseId: number | string;
+  matchLabel?: string;
+  note?: string;
+};
+
 export type ExerciseRecord = {
   id: number | string;
   name: string;
@@ -21,6 +27,7 @@ export type ExerciseRecord = {
     muscleName?: string;
     activationPercent?: number;
   }[];
+  equivalents?: ExerciseEquivalent[];
 };
 
 export type ExercisesShellState = {

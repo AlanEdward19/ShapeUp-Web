@@ -140,24 +140,24 @@ Cada requisito recebe um ID único para rastreamento entre design, tasks e valid
 
 | Requirement ID | Story | Phase | Status |
 |---|---|---|---|
-| EDD-01 | P1: Player de vídeo embutido (arquivo direto) | Design | Pending |
-| EDD-02 | P1: Player de vídeo embutido (lite-embed YouTube/Vimeo) | Design | Pending |
-| EDD-03 | P1: Estado vazio do vídeo (ausente/inválido) | Design | Pending |
-| EDD-04 | P1: Reset de estado do player ao trocar de exercício | Design | Pending |
-| EDD-05 | P1: Lista de substituições — item estruturado + contagem | Design | Pending |
-| EDD-06 | P1: Estado vazio das substituições (sem dado fabricado) | Design | Pending |
-| EDD-07 | P1: Navegação ao clicar num equivalente | Design | Pending |
-| EDD-08 | P1: Backdrop dimming + click-outside-to-close | Design | Pending |
-| EDD-09 | P1: Barras de ativação primária & sinergista | Design | Pending |
-| EDD-10 | P1: Numeração consistente das Diretrizes Técnicas | Design | Pending |
-| EDD-11 | P1: Largura do painel (460px) + destaque visual do código | Design | Pending |
-| EDD-12 | P1: Remoção de seções duplicadas sem equivalente na referência | Design | Pending |
+| EDD-01 | P1: Player de vídeo embutido (arquivo direto) | Tasks | In Tasks |
+| EDD-02 | P1: Player de vídeo embutido (lite-embed YouTube/Vimeo) | Tasks | In Tasks |
+| EDD-03 | P1: Estado vazio do vídeo (ausente/inválido) | Tasks | In Tasks |
+| EDD-04 | P1: Reset de estado do player ao trocar de exercício | Tasks | In Tasks |
+| EDD-05 | P1: Lista de substituições — item estruturado + contagem | Tasks | Implementing |
+| EDD-06 | P1: Estado vazio das substituições (sem dado fabricado) | Tasks | Implementing |
+| EDD-07 | P1: Navegação ao clicar num equivalente | Tasks | In Tasks |
+| EDD-08 | P1: Backdrop dimming + click-outside-to-close | Tasks | In Tasks |
+| EDD-09 | P1: Barras de ativação primária & sinergista | Tasks | In Tasks |
+| EDD-10 | P1: Numeração consistente das Diretrizes Técnicas | Tasks | In Tasks |
+| EDD-11 | P1: Largura do painel (460px) + destaque visual do código | Tasks | In Tasks |
+| EDD-12 | P1: Remoção de seções duplicadas sem equivalente na referência | Tasks | In Tasks |
 
 **ID format:** `EDD-NN`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 12 total, 0 mapped to tasks, 12 unmapped ⚠️ (fase Tasks não roda neste ciclo — só Specify + Design, por pedido explícito do usuário)
+**Coverage:** 12 total, 12 mapped to tasks, 0 unmapped
 
 ---
 
