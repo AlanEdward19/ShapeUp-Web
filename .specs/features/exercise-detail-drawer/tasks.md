@@ -240,11 +240,11 @@ T5 ------→ T6 ------→ T7
 
 **Done when**:
 
-- [ ] Markup no longer inlines the old drawer sections (video link, static `drawerSubs` paragraph, duplicate muscle dump)
-- [ ] `id="exerciseDrawer"` still exists via `ExerciseDrawer`
-- [ ] Tests in `src/pages/Dashboard/__tests__/ExercisesPublicMarkup.test.jsx` assert mount + ids
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: 2 tests pass (no silent deletions)
+- [x] Markup no longer inlines the old drawer sections (video link, static `drawerSubs` paragraph, duplicate muscle dump)
+- [x] `id="exerciseDrawer"` still exists via `ExerciseDrawer`
+- [x] Tests in `src/pages/Dashboard/__tests__/ExercisesPublicMarkup.test.jsx` assert mount + ids
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: 2 tests pass (no silent deletions)
 
 **Tests**: unit
 **Gate**: full

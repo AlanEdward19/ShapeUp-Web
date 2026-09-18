@@ -1,6 +1,7 @@
 /* eslint-disable */
-import type { KeyboardEvent, MouseEvent, ReactElement, RefObject } from 'react';
+import type { KeyboardEvent, MouseEvent, ReactElement } from 'react';
 import WorkspaceNavigation from '../../shell-assets/WorkspaceNavigation';
+import { ExerciseDrawer } from './ExerciseDrawer';
 
 export type ExerciseEquivalent = {
   exerciseId: number | string;
@@ -129,24 +130,6 @@ function ExerciseRow({
 export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState }): ReactElement {
   const muscleOptions = ['all', ...new Set(state.exercises.flatMap((ex) => ex.muscles))];
   const equipmentOptions = ['all', ...new Set(state.exercises.map(state.equipmentName))];
-  const active = state.active;
-  const drawer = {
-    drawerCode: active ? `EX-${active.id}` : '—',
-    drawerTitle: active?.name || 'Selecione um exercício',
-    drawerPattern: active?.type || 'Exercício',
-    drawerPrimaryMuscle: active?.muscles?.join(', ') || '—',
-    drawerAgonist: active?.muscles?.[0] || '—',
-    drawerSynergist: active?.muscles?.slice(1).join(', ') || '—',
-    drawerSets: 'Definir na ficha',
-    drawerReps: 'Definir na ficha',
-    drawerRest: 'Definir na ficha',
-    drawerUsageBadge: 'Biblioteca de exercícios',
-    drawerStep1: active?.descriptionPt || active?.description || 'Orientação não cadastrada.',
-    drawerStep2: active?.instructions?.[1] || '—',
-    drawerStep3: active?.instructions?.[2] || '—',
-    drawerError: active?.precautions || '—',
-    drawerSubs: 'Consulte a biblioteca para selecionar uma substituição.',
-  };
 
   return (
     <>
@@ -318,136 +301,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
             </div>
           </section>
 
-          <aside
-            className="w-[390px] xl:w-[440px] shrink-0 border-l border-border-subtle bg-surface flex flex-col h-full shadow-2xl transition-all duration-300 z-20"
-            id="exerciseDrawer"
-            ref={state.panelRef as RefObject<HTMLElement>}
-            data-open={state.open}
-            inert={!state.open}
-            aria-hidden={!state.open}
-            aria-labelledby="drawerTitle"
-            onKeyDown={(event) => {
-              if (event.key === 'Escape') state.close();
-            }}
-          >
-            <div className="p-4 border-b border-border-subtle bg-surface flex items-start justify-between">
-              <div className="min-w-0 pr-3">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="font-mono text-[10px] text-text-muted" id="drawerCode">{drawer.drawerCode}</span>
-                  <span className="text-border-subtle">·</span>
-                  <span className="font-mono text-[10px] text-text-muted uppercase" id="drawerPattern">{drawer.drawerPattern}</span>
-                </div>
-                <h2 className="font-condensed font-bold text-lg text-text-primary leading-tight truncate" id="drawerTitle">
-                  {drawer.drawerTitle}
-                </h2>
-                <p className="text-xs text-text-secondary mt-0.5" id="drawerPrimaryMuscle">{drawer.drawerPrimaryMuscle}</p>
-              </div>
-              <button
-                type="button"
-                className="p-1 text-text-muted hover:text-text-primary transition-colors"
-                title="Fechar Painel"
-                onClick={state.close}
-              >
-                <span className="material-symbols-outlined text-[18px]">close</span>
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 font-sans text-xs">
-              <div className="border border-border-subtle rounded divide-x divide-border-subtle grid grid-cols-3 bg-surface-muted py-2 text-center">
-                <div>
-                  <span className="block font-mono text-[10px] uppercase text-text-muted">Séries</span>
-                  <span className="font-mono text-xs font-semibold text-text-primary" id="drawerSets">{drawer.drawerSets}</span>
-                </div>
-                <div>
-                  <span className="block font-mono text-[10px] uppercase text-text-muted">Repetições</span>
-                  <span className="font-mono text-xs font-semibold text-text-primary" id="drawerReps">{drawer.drawerReps}</span>
-                </div>
-                <div>
-                  <span className="block font-mono text-[10px] uppercase text-text-muted">Descanso</span>
-                  <span className="font-mono text-xs font-semibold text-text-primary" id="drawerRest">{drawer.drawerRest}</span>
-                </div>
-              </div>
-
-              <div className="space-y-2 pt-1 border-t border-border-subtle">
-                <div className="flex items-center justify-between text-text-secondary font-mono text-[10px] uppercase tracking-wider">
-                  <span>Ativação Primária &amp; Sinergistas</span>
-                  <span className="text-text-muted" id="drawerUsageBadge">{drawer.drawerUsageBadge}</span>
-                </div>
-                <div>
-                  <p id="drawerAgonist">{drawer.drawerAgonist}</p>
-                  <p id="drawerSynergist">{drawer.drawerSynergist}</p>
-                </div>
-              </div>
-
-              {active?.description && <p>{active.description}</p>}
-              {active?.muscles?.length ? (
-                <section>
-                  <h4>Músculos</h4>
-                  <p>{active.muscles.join(', ')}</p>
-                </section>
-              ) : null}
-              {active?.muscleDetails
-                ?.filter((muscle) => typeof muscle === 'object' && Number.isFinite(muscle.activationPercent))
-                .map((muscle) => (
-                  <p key={String(muscle.muscleGroup)}>
-                    {muscle.muscleNamePt || muscle.muscleName}: {muscle.activationPercent}%
-                  </p>
-                ))}
-
-              <section>
-                <h4>Diretrizes Técnicas de Execução</h4>
-                {active?.steps?.length ? (
-                  <ol style={{ listStyle: 'decimal', paddingLeft: 20 }}>
-                    {active.steps.map((step, index) => (
-                      <li key={index} style={{ marginTop: 8 }}>
-                        {typeof step === 'string' ? step : step.description}
-                      </li>
-                    ))}
-                  </ol>
-                ) : (
-                  <p id="drawerStep1">{drawer.drawerStep1}</p>
-                )}
-              </section>
-
-              {active?.videoUrl && /^https?:\/\//.test(active.videoUrl) && (
-                <a href={active.videoUrl} target="_blank" rel="noopener noreferrer">Vídeo do exercício</a>
-              )}
-
-              <div className="p-2.5 rounded bg-surface-muted border-l-2 border-brand-ochre space-y-1">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-brand-ochre font-semibold block">
-                  Ponto Crítico &amp; Compensações
-                </span>
-                <p className="text-text-secondary text-[11px] leading-relaxed" id="drawerError">{drawer.drawerError}</p>
-              </div>
-
-              <div className="pt-1 space-y-1">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-text-muted block">
-                  Substituições Mecânicas Equivalentes
-                </span>
-                <p className="text-text-secondary text-[11px]" id="drawerSubs">{drawer.drawerSubs}</p>
-              </div>
-            </div>
-
-            <div className="p-3 border-t border-border-subtle bg-surface flex items-center gap-2">
-              <button
-                type="button"
-                className="flex-1 h-8 bg-brand-terracotta hover:bg-brand-terracotta-hover text-white rounded text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
-                onClick={() => state.add(active)}
-              >
-                <span className="material-symbols-outlined text-[16px]">playlist_add</span>
-                <span>Adicionar à Ficha do Aluno</span>
-              </button>
-              <button
-                type="button"
-                className="h-8 px-2.5 border border-border-subtle hover:border-border-strong text-text-secondary hover:text-text-primary rounded text-xs transition-colors flex items-center gap-1"
-                title="Copiar Parâmetros"
-                onClick={state.onCopyDetails}
-              >
-                <span className="material-symbols-outlined text-[16px]">content_copy</span>
-                <span>Copiar</span>
-              </button>
-            </div>
-          </aside>
+          <ExerciseDrawer state={state} />
         </div>
       </div>
 
