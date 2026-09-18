@@ -84,7 +84,7 @@ const DiaryDay = ({ renderView } = {}) => {
         } finally {
             if (version === requestVersion.current) setLoading(false);
         }
-    }, [date, getDiaryDay, getNutritionProfile, t]);
+    }, [date, getDiaryDay, getNutritionProfile]);
 
     useEffect(() => {
         loadData();

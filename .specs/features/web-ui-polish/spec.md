@@ -117,15 +117,15 @@ Esta spec cobre os três problemas como stories separadas, dimensionadas pelo es
 
 | Requirement ID | Story | Phase | Status |
 |---|---|---|---|
-| POL-01 | P1: Navegação unificada de Nutrição — submenu persistente | Design | Pending |
-| POL-02 | P1: Skeleton — primitivo de loading state reutilizável | Design | Pending |
-| POL-03 | P2: Correções de CSS/layout localizadas (Privacy/Terms, recuperação de senha, cardápio) | Design | Pending |
+| POL-01 | P1: Navegação unificada de Nutrição — submenu persistente | Design | Implementing |
+| POL-02 | P1: Skeleton — primitivo de loading state reutilizável | Design | Implementing |
+| POL-03 | P2: Correções de CSS/layout localizadas (Privacy/Terms, recuperação de senha, cardápio) | Design | Implementing |
 
 **ID format:** `POL-NN`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 3 total, 0 mapped to tasks, 3 unmapped ⚠️ (Tasks phase ainda não rodou)
+**Coverage:** 3 total, 3 mapped to tasks (T1–T18), 0 unmapped
 
 ---
 

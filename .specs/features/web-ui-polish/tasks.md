@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/web-ui-polish/design.md`
-**Status**: Draft
+**Status**: Complete
 
 ---
 
@@ -324,12 +324,12 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] `renderView` receives `loadError` and `loadData`
-- [ ] Catch no longer sets a fake empty diary
-- [ ] Fallback: skeleton while loading without data; alert + retry on error
-- [ ] Tests: delayed fetch shows `skeleton`; rejected fetch shows alert not empty ledger; retry calls `getDiaryDay` again
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite plus ≥3 new tests (no silent deletions)
+- [x] `renderView` receives `loadError` and `loadData`
+- [x] Catch no longer sets a fake empty diary
+- [x] Fallback: skeleton while loading without data; alert + retry on error
+- [x] Tests: delayed fetch shows `skeleton`; rejected fetch shows alert not empty ledger; retry calls `getDiaryDay` again
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite plus ≥3 new tests (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
@@ -351,11 +351,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] Loading without diary data renders `data-testid="skeleton"` with table or card variant
-- [ ] Error renders explicit message + retry control
-- [ ] Success still renders meals; empty day still empty (not error)
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite plus ≥2 new tests (no silent deletions)
+- [x] Loading without diary data renders `data-testid="skeleton"` with table or card variant
+- [x] Error renders explicit message + retry control
+- [x] Success still renders meals; empty day still empty (not error)
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite plus ≥2 new tests (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
@@ -377,11 +377,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] Loading results region shows `skeleton` `data-variant="list"`
-- [ ] Failure still `role="alert"`; skeleton is gone
-- [ ] Tests cover slow search and failed search
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite plus ≥2 new tests (no silent deletions)
+- [x] Loading results region shows `skeleton` `data-variant="list"`
+- [x] Failure still `role="alert"`; skeleton is gone
+- [x] Tests cover slow search and failed search
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite plus ≥2 new tests (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
@@ -403,11 +403,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] Pending create/activate shows `skeleton` card variant
-- [ ] Error still `role="alert"`; skeleton clears
-- [ ] Tests cover delayed create
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite plus ≥1 new test (no silent deletions)
+- [x] Pending create/activate shows `skeleton` card variant
+- [x] Error still `role="alert"`; skeleton clears
+- [x] Tests cover delayed create
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite plus ≥1 new test (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
@@ -429,11 +429,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] Pending submit shows `skeleton` card variant
-- [ ] Error still `role="alert"`; skeleton clears
-- [ ] Tests cover delayed TDEE submit
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: existing suite plus ≥1 new test (no silent deletions)
+- [x] Pending submit shows `skeleton` card variant
+- [x] Error still `role="alert"`; skeleton clears
+- [x] Tests cover delayed TDEE submit
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: existing suite plus ≥1 new test (no silent deletions)
 
 **Tests**: unit
 **Gate**: full
@@ -457,11 +457,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] `.su-legal-article p` is `font-size: 1rem; line-height: 1.65`
-- [ ] `h1` uses `--font-display` without a shrink transform
-- [ ] Tests for privacy and terms assert no `transform` on `.su-legal` and readable body font-size
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite plus ≥1 new assertion/test (no silent deletions)
+- [x] `.su-legal-article p` is `font-size: 1rem; line-height: 1.65`
+- [x] `h1` uses `--font-display` without a shrink transform
+- [x] Tests for privacy and terms assert no `transform` on `.su-legal` and readable body font-size
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite plus ≥1 new assertion/test (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
@@ -483,11 +483,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] No `lh3.googleusercontent.com` image
-- [ ] `.st-auth-brand` present in recovery shadow
-- [ ] Primary submit still `bg-primary-container hover:bg-primary`; "Tentar outro e-mail" stays surface/secondary tokens
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite plus ≥1 new test (no silent deletions)
+- [x] No `lh3.googleusercontent.com` image
+- [x] `.st-auth-brand` present in recovery shadow
+- [x] Primary submit still `bg-primary-container hover:bg-primary`; "Tentar outro e-mail" stays surface/secondary tokens
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite plus ≥1 new test (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
@@ -509,11 +509,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] `recovery.bodyClass` includes `bg-brand-bg` and not `bg-surface` as the page background
-- [ ] Recovery shell-body class list includes `bg-brand-bg`
-- [ ] No `bg-gradient-*` on recovery markup/CSS (remove if found)
-- [ ] Gate check passes: `npm test && npm run lint && npm run gate && npm run build`
-- [ ] Test count: existing suite plus ≥1 new assertion (no silent deletions)
+- [x] `recovery.bodyClass` includes `bg-brand-bg` and not `bg-surface` as the page background
+- [x] Recovery shell-body class list includes `bg-brand-bg`
+- [x] No `bg-gradient-*` on recovery markup/CSS (remove if found)
+- [x] Gate check passes: `npm test && npm run lint && npm run gate && npm run build`
+- [x] Test count: existing suite plus ≥1 new assertion (no silent deletions)
 
 **Tests**: unit
 **Gate**: build
@@ -535,10 +535,10 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] Add + submit sit in `.su-form-actions` (no ad-hoc margin-only stack)
-- [ ] Test asserts the group class on the form actions
-- [ ] Gate check passes: `npm test && npm run lint && npm run gate && npm run build`
-- [ ] Test count: existing suite plus ≥1 new assertion (no silent deletions)
+- [x] Add + submit sit in `.su-form-actions` (no ad-hoc margin-only stack)
+- [x] Test asserts the group class on the form actions
+- [x] Gate check passes: `npm test && npm run lint && npm run gate && npm run build`
+- [x] Test count: existing suite plus ≥1 new assertion (no silent deletions)
 
 **Tests**: unit
 **Gate**: build
