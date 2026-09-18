@@ -140,18 +140,18 @@ Cada requisito recebe um ID único para rastreamento entre design, tasks e valid
 
 | Requirement ID | Story | Phase | Status |
 |---|---|---|---|
-| EDD-01 | P1: Player de vídeo embutido (arquivo direto) | Tasks | Implementing |
-| EDD-02 | P1: Player de vídeo embutido (lite-embed YouTube/Vimeo) | Tasks | Implementing |
-| EDD-03 | P1: Estado vazio do vídeo (ausente/inválido) | Tasks | Implementing |
-| EDD-04 | P1: Reset de estado do player ao trocar de exercício | Tasks | Implementing |
-| EDD-05 | P1: Lista de substituições — item estruturado + contagem | Tasks | Implementing |
-| EDD-06 | P1: Estado vazio das substituições (sem dado fabricado) | Tasks | Implementing |
-| EDD-07 | P1: Navegação ao clicar num equivalente | Tasks | Implementing |
-| EDD-08 | P1: Backdrop dimming + click-outside-to-close | Tasks | Implementing |
-| EDD-09 | P1: Barras de ativação primária & sinergista | Tasks | Implementing |
-| EDD-10 | P1: Numeração consistente das Diretrizes Técnicas | Tasks | Implementing |
-| EDD-11 | P1: Largura do painel (460px) + destaque visual do código | Tasks | Implementing |
-| EDD-12 | P1: Remoção de seções duplicadas sem equivalente na referência | Tasks | Implementing |
+| EDD-01 | P1: Player de vídeo embutido (arquivo direto) | Execute | Verified |
+| EDD-02 | P1: Player de vídeo embutido (lite-embed YouTube/Vimeo) | Execute | Verified |
+| EDD-03 | P1: Estado vazio do vídeo (ausente/inválido) | Execute | Verified |
+| EDD-04 | P1: Reset de estado do player ao trocar de exercício | Execute | Verified |
+| EDD-05 | P1: Lista de substituições — item estruturado + contagem | Execute | Verified |
+| EDD-06 | P1: Estado vazio das substituições (sem dado fabricado) | Execute | Verified |
+| EDD-07 | P1: Navegação ao clicar num equivalente | Execute | Verified |
+| EDD-08 | P1: Backdrop dimming + click-outside-to-close | Execute | Verified |
+| EDD-09 | P1: Barras de ativação primária & sinergista | Execute | Verified |
+| EDD-10 | P1: Numeração consistente das Diretrizes Técnicas | Execute | Verified |
+| EDD-11 | P1: Largura do painel (460px) + destaque visual do código | Execute | Verified |
+| EDD-12 | P1: Remoção de seções duplicadas sem equivalente na referência | Execute | Verified |
 
 **ID format:** `EDD-NN`
 

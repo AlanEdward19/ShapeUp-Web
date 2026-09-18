@@ -268,14 +268,14 @@ T5 ------→ T6 ------→ T7
 
 **Done when**:
 
-- [ ] `drawerCss` uses `min(460px,100vw)` instead of 440px
-- [ ] Backdrop is in the overlay stack and closes the drawer
-- [ ] Equivalent click updates the active exercise from the loaded list
-- [ ] Missing id shows toast "Exercício não encontrado na lista atual" and keeps the current exercise
-- [ ] Escape still closes; existing test is not weakened or deleted
-- [ ] `ExercisesShell.test.jsx` covers Escape, activation 62% (not 95%), empty video/subs, equivalent navigation, missing-id toast
-- [ ] Gate check passes: `npm run lint && npm run gate && npm run build && npm test`
-- [ ] Test count: existing ExercisesShell case plus 5 new cases pass (no silent deletions)
+- [x] `drawerCss` uses `min(460px,100vw)` instead of 440px
+- [x] Backdrop is in the overlay stack and closes the drawer
+- [x] Equivalent click updates the active exercise from the loaded list
+- [x] Missing id shows toast "Exercício não encontrado na lista atual" and keeps the current exercise
+- [x] Escape still closes; existing test is not weakened or deleted
+- [x] `ExercisesShell.test.jsx` covers Escape, activation 62% (not 95%), empty video/subs, equivalent navigation, missing-id toast
+- [x] Gate check passes: `npm run lint && npm run gate && npm run build && npm test`
+- [x] Test count: existing ExercisesShell case plus 5 new cases pass (no silent deletions)
 
 **Tests**: unit
 **Gate**: build
