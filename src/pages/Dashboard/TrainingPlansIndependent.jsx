@@ -19,9 +19,8 @@ import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
-import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
-import { mapAssignedWeekdaysToApi } from '../../utils/workoutSchedule';
+import { buildWorkoutPlanBody } from '../../utils/workoutPlanPayload';
 import { buildWorkoutStatePayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { useExercises } from '../../hooks/useExercises';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
@@ -66,41 +65,7 @@ export const toRuntimeSets = (ex, exIdx) => ({
 });
 
 
-// Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
-// from a plan object shaped like normalizePlan()'s output (PlanEditor's internal shape) and
-// need the same API request body built from it.
-export const buildWorkoutPlanBody = (plan, targetUserId) => ({
-    targetUserId,
-    name: plan.name || 'Novo Treino',
-    notes: plan.notes || null,
-    durationInWeeks: parseInt(plan.weeks) || 4,
-    phase: plan.phase || 'Hypertrophy',
-    difficulty: mapDifficulty(plan.difficulty),
-    assignedWeekdays: mapAssignedWeekdaysToApi(plan.assignedWeekdays ?? []),
-    blocks: (plan.blocks || []).map(block => ({
-        type: mapBlockType(block.type),
-        timeCapSeconds: block.timeCapSeconds === '' || block.timeCapSeconds == null ? null : parseInt(block.timeCapSeconds),
-        intervalSeconds: block.intervalSeconds === '' || block.intervalSeconds == null ? null : parseInt(block.intervalSeconds),
-        totalRounds: block.totalRounds === '' || block.totalRounds == null ? null : parseInt(block.totalRounds),
-        restAfterSeconds: block.restAfterSeconds === '' || block.restAfterSeconds == null ? null : parseInt(block.restAfterSeconds),
-        exercises: (block.exercises || []).map(ex => ({
-            exerciseId: parseInt(ex.exerciseId) || 1,
-            requireRpe: Boolean(ex.requireRpe),
-            sets: (ex.sets || []).map(s => ({
-                repetitions: s.reps === '' || s.reps == null ? null : parseInt(s.reps),
-                load: parseFloat(s.load) || 0,
-                loadUnit: mapLoadUnit(s.loadUnit),
-                setType: mapSetType(s.type ?? s.setType),
-                technique: mapTechnique(s.technique),
-                intensity: s.intensityType && s.intensityValue !== ''
-                    ? { type: mapIntensityType(s.intensityType), value: parseInt(s.intensityValue) }
-                    : null,
-                restSeconds: s.rest === '' || s.rest == null ? null : parseInt(s.rest),
-                isExtra: false
-            }))
-        }))
-    }))
-});
+export { buildWorkoutPlanBody };
 
 const formatTime = (totalSeconds) => {
     const hours = Math.floor(totalSeconds / 3600);
