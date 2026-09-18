@@ -211,10 +211,10 @@ T13
 
 **Done when**:
 
-- [ ] Clique chama `onChange('requireRpe', nextBoolean)`
-- [ ] `exercise.requireRpe === true` renderiza ligado
-- [ ] RTL cobre on/off
-- [ ] Test count: at least 2 tests pass
+- [x] Clique chama `onChange('requireRpe', nextBoolean)`
+- [x] `exercise.requireRpe === true` renderiza ligado
+- [x] RTL cobre on/off
+- [x] Test count: at least 2 tests pass
 
 **Tests**: unit  
 **Gate**: quick (`npm test -- src/components/training/__tests__/ExerciseRow.test.jsx`)

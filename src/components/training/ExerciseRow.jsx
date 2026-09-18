@@ -37,6 +37,14 @@ const ExerciseRow = ({ exercise, blockType, onChange, onRemove, index = 0 }) => 
                         />
                     </div>
                     <div className="su-ex-toggles">
+                        <button
+                            type="button"
+                            className={`su-toggle-btn${exercise.requireRpe ? ' active' : ''}`}
+                            aria-pressed={Boolean(exercise.requireRpe)}
+                            onClick={() => onChange('requireRpe', !exercise.requireRpe)}
+                        >
+                            {t('pro.builder.require_rpe')}
+                        </button>
                         <button className="su-icon-btn su-error-text" onClick={onRemove}>
                             ×
                         </button>
