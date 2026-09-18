@@ -29,7 +29,8 @@ const GamificationProgressCard = ({ profile }) => {
     const shapeScore = profile?.shapeScore ?? 0;
 
     const xpInCurrentLevel = totalXp % XP_PER_LEVEL;
-    const xpProgressPercent = Math.min(100, Math.round((xpInCurrentLevel / XP_PER_LEVEL) * 100));
+    const xpProgressPercent =
+        xpInCurrentLevel === 0 ? 0 : (xpInCurrentLevel / XP_PER_LEVEL) * 100;
     const xpToNextLevel = XP_PER_LEVEL - xpInCurrentLevel;
     const isZeroed = isZeroedProfile(profile);
 

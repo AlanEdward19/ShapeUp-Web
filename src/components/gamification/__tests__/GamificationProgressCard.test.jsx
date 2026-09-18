@@ -27,3 +27,58 @@ describe('GamificationProgressCard nutrition streak', () => {
         expect(getByTestId('nutrition-streak-value')).toHaveTextContent('0');
     });
 });
+
+describe('GamificationProgressCard XP bar', () => {
+    const activeProfile = {
+        totalXp: 750,
+        level: 2,
+        currentStreak: 3,
+        nutritionCurrentStreak: 1,
+        shapeCoins: 50,
+        shapeScore: 120,
+    };
+
+    it('shows non-zero fill and aria-valuenow for in-level remainder', () => {
+        const { getByRole } = render(<GamificationProgressCard profile={activeProfile} />);
+        const bar = getByRole('progressbar');
+        expect(bar).toHaveAttribute('aria-valuenow', '250');
+        const fill = bar.querySelector('.su-gamification-progress-fill');
+        expect(fill?.style.width).not.toBe('0%');
+        expect(parseFloat(fill?.style.width ?? '0')).toBeGreaterThan(0);
+    });
+
+    it('shows 0% fill at level boundary without empty-state copy', () => {
+        const { getByRole, queryByText } = render(
+            <GamificationProgressCard
+                profile={{
+                    totalXp: 1000,
+                    level: 2,
+                    currentStreak: 2,
+                    nutritionCurrentStreak: 1,
+                    shapeCoins: 10,
+                    shapeScore: 80,
+                }}
+            />
+        );
+        expect(queryByText('Complete seu primeiro treino pra começar')).not.toBeInTheDocument();
+        const fill = getByRole('progressbar').querySelector('.su-gamification-progress-fill');
+        expect(fill?.style.width).toBe('0%');
+    });
+
+    it('shows empty copy and no progressbar for all-zero profile', () => {
+        const { getByText, queryByRole } = render(
+            <GamificationProgressCard
+                profile={{
+                    totalXp: 0,
+                    level: 1,
+                    currentStreak: 0,
+                    nutritionCurrentStreak: 0,
+                    shapeCoins: 0,
+                    shapeScore: 0,
+                }}
+            />
+        );
+        expect(getByText('Complete seu primeiro treino pra começar')).toBeInTheDocument();
+        expect(queryByRole('progressbar')).not.toBeInTheDocument();
+    });
+});
