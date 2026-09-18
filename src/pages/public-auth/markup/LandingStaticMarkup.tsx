@@ -9,7 +9,7 @@ export function LandingStaticMarkup(): ReactElement {
 
 
     <header
-      className="fixed top-0 left-0 right-0 z-50 bg-[#171311]/90 backdrop-blur-md border-b border-border-subtle"
+      className="fixed top-0 left-0 right-0 z-50 bg-[color-mix(in_srgb,var(--bg-main)_90%,transparent)] backdrop-blur-md border-b border-border-subtle"
     >
 
       <div

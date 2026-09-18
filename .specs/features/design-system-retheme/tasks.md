@@ -146,12 +146,12 @@ T8
 
 **Done when**:
 
-- [ ] PNGs `before-landing-{1440,390}.png` and `after-landing-{1440,390}.png` in the feature folder
-- [ ] Dark landing matches professional Warm Oxide family; light theme (`data-theme` on root, do not change `ThemeContext.jsx` handlers) stays readable
-- [ ] `shell-assets/` CSS is not rewritten (out of scope)
-- [ ] If `src/pages/public-auth/markup/LandingStaticMarkup.tsx` still has retired hex, it is switched to tokens in this task
-- [ ] Console clean; Gate check passes: `npm test && npm run gate`
-- [ ] Test count: `src/pages/__tests__/LandingPage.test.jsx` still passes
+- [x] PNGs `before-landing-{1440,390}.png` and `after-landing-{1440,390}.png` in the feature folder
+- [x] Dark landing matches professional Warm Oxide family; light theme (`data-theme` on root, do not change `ThemeContext.jsx` handlers) stays readable
+- [x] `shell-assets/` CSS is not rewritten (out of scope)
+- [x] If `src/pages/public-auth/markup/LandingStaticMarkup.tsx` still has retired hex, it is switched to tokens in this task
+- [x] Console clean; Gate check passes: `npm test && npm run gate`
+- [x] Test count: `src/pages/__tests__/LandingPage.test.jsx` still passes
 
 **Tests**: visual
 **Gate**: full
