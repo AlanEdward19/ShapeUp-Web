@@ -118,11 +118,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] Injects `Nutrition.css?inline` plus `:host,.shell-body` token bridge (dark DS custom properties)
-- [ ] Moves diary overflow CSS (`article table{min-width:520px}` / mobile `pl-64`) into this host `css`
-- [ ] Tests render nested routes for the 4 paths; `nutrition-nav` is in the shadow root; active tab matches path; clicking another tab keeps the same nav node (no remount); Suspense fallback is `skeleton`
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite plus ≥3 new tests (no silent deletions)
+- [x] Injects `Nutrition.css?inline` plus `:host,.shell-body` token bridge (dark DS custom properties)
+- [x] Moves diary overflow CSS (`article table{min-width:520px}` / mobile `pl-64`) into this host `css`
+- [x] Tests render nested routes for the 4 paths; `nutrition-nav` is in the shadow root; active tab matches path; clicking another tab keeps the same nav node (no remount); Suspense fallback is `skeleton`
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite plus ≥3 new tests (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
