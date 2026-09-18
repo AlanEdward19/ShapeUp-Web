@@ -1,12 +1,13 @@
 import Input from '../Input';
 import Button from '../Button';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { createDefaultPlannedSet } from '../../utils/workoutPlanPayload';
 import SetRow from './SetRow';
-
-const newSet = () => ({ type: 'working', technique: 'Straight', reps: '8-10', load: '75', intensityType: 'rpe', intensityValue: '8', rest: '90' });
 
 const ExerciseRow = ({ exercise, blockType, onChange, onRemove, index = 0 }) => {
     const { t } = useLanguage();
+    const exerciseType = exercise.exerciseType || 'weightBased';
+    const isTimeBased = exerciseType === 'timeBased';
 
     const updateSet = (sIdx, field, value) => {
         const sets = [...exercise.sets];
@@ -14,7 +15,7 @@ const ExerciseRow = ({ exercise, blockType, onChange, onRemove, index = 0 }) => 
         onChange('sets', sets);
     };
 
-    const addSet = () => onChange('sets', [...exercise.sets, newSet()]);
+    const addSet = () => onChange('sets', [...exercise.sets, createDefaultPlannedSet(exerciseType)]);
     const removeSet = (sIdx) => onChange('sets', exercise.sets.filter((_, i) => i !== sIdx));
 
     return (
@@ -58,8 +59,8 @@ const ExerciseRow = ({ exercise, blockType, onChange, onRemove, index = 0 }) => 
                         <span></span>
                         <span>{t('pro.builder.set.type')}</span>
                         <span>{t('pro.builder.set.tech')}</span>
-                        <span>{t('pro.builder.set.reps')}</span>
-                        <span>{t('pro.builder.set.load')}</span>
+                        <span>{isTimeBased ? t('pro.builder.set.duration') : t('pro.builder.set.reps')}</span>
+                        <span>{isTimeBased ? t('pro.builder.set.distance') : t('pro.builder.set.load')}</span>
                         <span>{t('pro.builder.set.intensity')}</span>
                         <span>{t('pro.builder.set.rest')}</span>
                         <span></span>
@@ -71,6 +72,7 @@ const ExerciseRow = ({ exercise, blockType, onChange, onRemove, index = 0 }) => 
                             set={s}
                             index={sIdx}
                             blockType={blockType}
+                            exerciseType={exerciseType}
                             onChange={(field, value) => updateSet(sIdx, field, value)}
                             onRemove={() => removeSet(sIdx)}
                         />

@@ -289,10 +289,10 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] TimeBased headers show duration/distance instead of reps/load
-- [ ] Add-set on TimeBased uses Straight + duration default
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: at least 2 RTL tests
+- [x] TimeBased headers show duration/distance instead of reps/load
+- [x] Add-set on TimeBased uses Straight + duration default
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: at least 2 RTL tests
 
 **Tests**: unit
 **Gate**: full

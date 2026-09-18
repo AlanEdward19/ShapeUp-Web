@@ -10,6 +10,31 @@ const baseExercise = {
     sets: [{ type: 'working', technique: 'Straight', reps: '8', load: '75', intensityType: 'rpe', intensityValue: '8', rest: '90' }],
 };
 
+describe('ExerciseRow time-based columns (TBE-02)', () => {
+    it('shows duration/distance headers for timeBased exercises', () => {
+        localStorage.setItem('shapeup_language', 'en');
+        render(withLang(
+            <ExerciseRow
+                exercise={{ ...baseExercise, exerciseType: 'timeBased', sets: [{ ...baseExercise.sets[0], duration: '05:00', distance: '' }] }}
+                blockType="straight"
+                onChange={() => {}}
+                onRemove={() => {}}
+            />
+        ));
+        expect(screen.getByText('Duration')).toBeInTheDocument();
+        expect(screen.getByText('Distance (m)')).toBeInTheDocument();
+    });
+
+    it('shows reps/load headers for weightBased exercises', () => {
+        localStorage.setItem('shapeup_language', 'en');
+        render(withLang(
+            <ExerciseRow exercise={baseExercise} blockType="straight" onChange={() => {}} onRemove={() => {}} />
+        ));
+        expect(screen.getByText('Reps')).toBeInTheDocument();
+        expect(screen.getByText('Load %')).toBeInTheDocument();
+    });
+});
+
 describe('ExerciseRow requireRpe toggle (WEV-05)', () => {
     it('renders off by default and calls onChange with true on click', () => {
         const onChange = vi.fn();
