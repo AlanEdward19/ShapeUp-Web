@@ -160,12 +160,12 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] TimeBased set with `05:00` and empty distance sends `durationSeconds: 300`, `distanceMeters: null`, `load: null`, `repetitions: null`, `technique: 1`
-- [ ] WeightBased set still sends numeric load/reps as today
-- [ ] `findTimeBasedDurationError` returns a message naming duration when duration is missing
-- [ ] `createDefaultPlannedSet('timeBased')` is Straight + duration preset, no load/reps
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: at least 4 tests (TimeBased save shape, WeightBased regression, missing duration, default set)
+- [x] TimeBased set with `05:00` and empty distance sends `durationSeconds: 300`, `distanceMeters: null`, `load: null`, `repetitions: null`, `technique: 1`
+- [x] WeightBased set still sends numeric load/reps as today
+- [x] `findTimeBasedDurationError` returns a message naming duration when duration is missing
+- [x] `createDefaultPlannedSet('timeBased')` is Straight + duration preset, no load/reps
+- [x] Gate check passes: `npm test`
+- [x] Test count: at least 4 tests (TimeBased save shape, WeightBased regression, missing duration, default set)
 
 **Tests**: unit
 **Gate**: quick
