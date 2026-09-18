@@ -26,7 +26,10 @@ const Layout = () => {
     // Session title — set by TrainingPlansClient when a session starts/ends
     const [sessionTitle, setSessionTitle] = useState(null);
 
-    if (!(isGym && location.pathname === '/dashboard') && ['/dashboard', '/dashboard/exercises', '/dashboard/settings', '/dashboard/nutrition/diary', '/dashboard/admin/food-moderation', '/dashboard/messages', '/dashboard/feedback', '/dashboard/gyms'].includes(location.pathname)) return <Outlet context={{ isProfessional, isIndependent, isGym, coachProfile, setCoachProfile, clientProfile, setClientProfile, gymProfile, setGymProfile, setSessionTitle }} />;
+    const bypassLegacyChrome =
+        location.pathname.startsWith('/dashboard/nutrition') ||
+        ['/dashboard', '/dashboard/exercises', '/dashboard/settings', '/dashboard/admin/food-moderation', '/dashboard/messages', '/dashboard/feedback', '/dashboard/gyms'].includes(location.pathname);
+    if (!(isGym && location.pathname === '/dashboard') && bypassLegacyChrome) return <Outlet context={{ isProfessional, isIndependent, isGym, coachProfile, setCoachProfile, clientProfile, setClientProfile, gymProfile, setGymProfile, setSessionTitle }} />;
     return (
         <div className="su-layout-wrapper">
             {navigationOpen && <button className="su-navigation-backdrop" aria-label="Fechar menu" onClick={() => setNavigationOpen(false)} />}

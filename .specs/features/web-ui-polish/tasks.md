@@ -144,11 +144,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] Prefix `/dashboard/nutrition` bypasses `.su-layout-wrapper`
-- [ ] Non-nutrition dashboard paths still use the old chrome
-- [ ] Tests cover diary, foods, meal-plans, goal
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite plus ≥2 new tests (no silent deletions)
+- [x] Prefix `/dashboard/nutrition` bypasses `.su-layout-wrapper`
+- [x] Non-nutrition dashboard paths still use the old chrome
+- [x] Tests cover diary, foods, meal-plans, goal
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite plus ≥2 new tests (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
