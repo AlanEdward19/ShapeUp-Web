@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import RouteMetadata from './components/RouteMetadata';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TourProvider } from '@reactour/tour';
@@ -27,10 +27,12 @@ import StaffGym from './pages/Dashboard/StaffGym';
 import TurnstileGym from './pages/Dashboard/TurnstileGym';
 import GymManagement from './pages/Dashboard/GymManagement';
 const FinancialGym = () => <GymManagement mode="plans" />;
-import NutritionDiaryShell from './pages/Dashboard/Nutrition/NutritionDiaryShell';
-import FoodSearch from './pages/Dashboard/Nutrition/FoodSearch';
-import MealPlanManager from './pages/Dashboard/Nutrition/MealPlanManager';
-import GoalOnboarding from './pages/Dashboard/Nutrition/GoalOnboarding';
+import NutritionWorkspaceShell from './pages/Dashboard/Nutrition/NutritionWorkspaceShell';
+
+const NutritionDiaryShell = lazy(() => import('./pages/Dashboard/Nutrition/NutritionDiaryShell'));
+const FoodSearch = lazy(() => import('./pages/Dashboard/Nutrition/FoodSearch'));
+const MealPlanManager = lazy(() => import('./pages/Dashboard/Nutrition/MealPlanManager'));
+const GoalOnboarding = lazy(() => import('./pages/Dashboard/Nutrition/GoalOnboarding'));
 import FoodModerationQueue from './pages/Admin/ModerationShell';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
 import ExploreGyms from './pages/Dashboard/GymsExploreShell';
@@ -111,10 +113,12 @@ function App() {
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
             <Route path="objectives" element={<ObjectivesClient />} />
-            <Route path="nutrition/diary" element={<NutritionDiaryShell />} />
-            <Route path="nutrition/foods" element={<FoodSearch />} />
-            <Route path="nutrition/meal-plans" element={<MealPlanManager />} />
-            <Route path="nutrition/goal" element={<GoalOnboarding />} />
+            <Route path="nutrition" element={<NutritionWorkspaceShell />}>
+              <Route path="diary" element={<NutritionDiaryShell />} />
+              <Route path="foods" element={<FoodSearch />} />
+              <Route path="meal-plans" element={<MealPlanManager />} />
+              <Route path="goal" element={<GoalOnboarding />} />
+            </Route>
             <Route path="admin/food-moderation" element={<FoodModerationQueue />} />
             <Route path="admin/feature-flags" element={<FeatureFlagsPanel />} />
             <Route path="staff" element={<StaffGym />} />

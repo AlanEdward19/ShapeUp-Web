@@ -170,11 +170,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] Routes are `nutrition` → shell, children `diary|foods|meal-plans|goal` with the same public URLs
-- [ ] Child pages are `React.lazy` imports
-- [ ] Direct URL to each of the 4 still renders (covered by shell tests + this wiring)
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: existing suite does not drop (no silent deletions)
+- [x] Routes are `nutrition` → shell, children `diary|foods|meal-plans|goal` with the same public URLs
+- [x] Child pages are `React.lazy` imports
+- [x] Direct URL to each of the 4 still renders (covered by shell tests + this wiring)
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: existing suite does not drop (no silent deletions)
 
 **Tests**: unit
 **Gate**: full
