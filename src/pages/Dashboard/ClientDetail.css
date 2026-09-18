@@ -964,3 +964,28 @@
 .su-imp-to {
     color: var(--success);
 }
+
+.su-weekday-toggle-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+}
+
+.su-weekday-toggle {
+    min-width: 2rem;
+    padding: 0.25rem 0.45rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.su-weekday-toggle.is-on {
+    border-color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 18%, transparent);
+    color: var(--text-main);
+}

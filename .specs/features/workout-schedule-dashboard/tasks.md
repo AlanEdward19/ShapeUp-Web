@@ -141,13 +141,13 @@ T6 → T7
 
 **Done when**:
 
-- [ ] Seletor visível só em plano (não template)
-- [ ] Estado inicial reflete `plan.assignedWeekdays`
-- [ ] Save/assign inclui `assignedWeekdays` (number[]) inclusive `[]`
-- [ ] `handleAddPlan` inicializa `assignedWeekdays: []`
-- [ ] RTL: marcar Mon+Thu e salvar; limpar todos e salvar; template sem seletor
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: at least 3 tests in `src/pages/Dashboard/__tests__/PlanEditorWeekdays.test.jsx`
+- [x] Seletor visível só em plano (não template)
+- [x] Estado inicial reflete `plan.assignedWeekdays`
+- [x] Save/assign inclui `assignedWeekdays` (number[]) inclusive `[]`
+- [x] `handleAddPlan` inicializa `assignedWeekdays: []`
+- [x] RTL: marcar Mon+Thu e salvar; limpar todos e salvar; template sem seletor
+- [x] Gate check passes: `npm test`
+- [x] Test count: at least 3 tests in `src/pages/Dashboard/__tests__/PlanEditorWeekdays.test.jsx`
 
 **Tests**: unit
 **Gate**: quick
@@ -303,7 +303,7 @@ The orchestrating agent's role during Execute:
 | ---- | ----- | ------ |
 | T1: workoutSchedule helpers | 1 module | Done |
 | T2: normalizePlan field | 1 function | Done |
-| T3: PlanEditor selector | 1 component | Granular |
+| T3: PlanEditor selector | 1 component | Done |
 | T4: ClientDetail body field | 1 function | Granular |
 | T5: Independent body field | 1 function | Granular |
 | T6: Markup card guard | 1 component | Granular |

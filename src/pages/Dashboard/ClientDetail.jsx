@@ -32,6 +32,9 @@ import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
 import { normalizePlan, flattenBlockExercises, applyRequireRpeToAll } from '../../utils/trainingNormalization';
+import { WEEKDAY_API_NAMES } from '../../utils/workoutSchedule';
+
+const PLAN_WEEKDAY_SHORT_LABELS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 
 // Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
@@ -112,6 +115,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     const [difficulty, setDiff] = useState(plan.difficulty || 'Intermediate');
     const [weeks, setWeeks] = useState(plan.weeks);
     const [planNotes, setPlanNotes] = useState(plan.notes || '');
+    const [assignedWeekdays, setAssignedWeekdays] = useState(plan.assignedWeekdays ?? []);
     const [currentBlocks, setCurrentBlocks] = useState(
         (plan.blocks || []).map(block => ({
             ...block,
@@ -125,6 +129,23 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     const [alertModal, setAlertModal] = useState({ visible: false, title: '', message: '' });
 
     const allExercises = currentBlocks.flatMap(b => b.exercises);
+
+    const planPayload = () => ({
+        ...plan,
+        name,
+        phase,
+        difficulty,
+        weeks,
+        notes: planNotes,
+        blocks: currentBlocks,
+        assignedWeekdays,
+    });
+
+    const toggleWeekday = (day) => {
+        setAssignedWeekdays(prev =>
+            prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day].sort((a, b) => a - b),
+        );
+    };
 
     const addExercise = () => { setAddingToBlockIndex(null); setShowExerciseLibrary(true); };
     const addExerciseToBlock = (blockIdx) => { setAddingToBlockIndex(blockIdx); setShowExerciseLibrary(true); };
@@ -264,7 +285,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
 
     return (
         <div className="su-builder-layout su-prescription-editor">
-            <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">Prescrição & periodização</span><h1>{name || t('pro.builder.name')}</h1><p>{phase} · {weeks} semanas · {difficulty}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> exercícios</span><span><b>{totalSets}</b> séries</span><span><b>{estMins}</b> duração estimada</span></div><Button icon={<Save size={16} />} onClick={() => onSave({ ...plan, name, phase, difficulty, weeks, notes: planNotes, blocks: currentBlocks })}>{t('pro.builder.btn.save')}</Button></header>
+            <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">Prescrição & periodização</span><h1>{name || t('pro.builder.name')}</h1><p>{phase} · {weeks} semanas · {difficulty}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> exercícios</span><span><b>{totalSets}</b> séries</span><span><b>{estMins}</b> duração estimada</span></div><Button icon={<Save size={16} />} onClick={() => onSave(planPayload())}>{t('pro.builder.btn.save')}</Button></header>
             {/* LEFT: Plan builder */}
             <div className="su-plan-builder">
                 <details className="su-plan-header-card su-prescription-settings" data-tour="pe-settings" open={!plan.name}><summary>Parâmetros do plano <span>Nome, objetivo, duração e orientações</span></summary>
@@ -291,6 +312,26 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                             onChange={e => setPlanNotes(e.target.value)}
                             placeholder={t('pro.builder.notes.ph')} />
                     </div>
+                    {!plan._templateId && (
+                        <div className="su-mt-4">
+                            <span className="su-input-label">{t('pro.builder.weekdays') || 'Dias da semana'}</span>
+                            <div className="su-weekday-toggle-row" role="group" data-testid="weekday-selector" aria-label={t('pro.builder.weekdays') || 'Dias da semana'}>
+                                {PLAN_WEEKDAY_SHORT_LABELS.map((label, day) => (
+                                    <button
+                                        key={day}
+                                        type="button"
+                                        data-testid={`weekday-${day}`}
+                                        aria-label={WEEKDAY_API_NAMES[day]}
+                                        aria-pressed={assignedWeekdays.includes(day)}
+                                        className={assignedWeekdays.includes(day) ? 'su-weekday-toggle is-on' : 'su-weekday-toggle'}
+                                        onClick={() => toggleWeekday(day)}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </details>
 
                 <div className="su-plan-session-strip"><span aria-current="true"><b>Treino</b><strong>{name}</strong><small>{totalSets} séries · {phase}</small></span></div>
@@ -403,13 +444,13 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
 
                     <Button fullWidth icon={<Save size={16} />}
                         onClick={() => {
-                            onSave({ ...plan, name, phase, difficulty, weeks, notes: planNotes, blocks: currentBlocks });
+                            onSave(planPayload());
                         }}>
                         {t('pro.builder.btn.save')}
                     </Button>
                     {onAssign && (
                         <Button fullWidth variant="outline" className="su-mt-2" style={{ color: 'var(--text-main)' }}
-                            onClick={() => onAssign({ ...plan, name, phase, difficulty, weeks, notes: planNotes, blocks: currentBlocks })}>
+                            onClick={() => onAssign(planPayload())}>
                             {t('pro.builder.btn.assign')}
                         </Button>
                     )}
@@ -979,7 +1020,8 @@ const ClientDetail = () => {
         const newPlan = {
             id: `p${Date.now()}`, name: 'New Training Plan',
             phase: 'Hypertrophy', difficulty: 'Intermediate',
-            weeks: 6, active: false, notes: '', blocks: [], history: []
+            weeks: 6, active: false, notes: '', blocks: [], history: [],
+            assignedWeekdays: [],
         };
         setEditingPlan(newPlan);
     };
