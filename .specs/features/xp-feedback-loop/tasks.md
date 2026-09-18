@@ -111,14 +111,14 @@ T4 → T5
 
 **Done when**:
 
-- [ ] Exports `XP_POLL_INTERVAL_MS = 2000` and `XP_POLL_TIMEOUT_MS = 15000`
-- [ ] `start` with snapshot 100 then profile 220 resolves `delta === 120` and status `resolved`
-- [ ] No increase for 15000 ms yields status `neutral` and `delta === null`
-- [ ] GET reject during poll does not reset the timeout; still `neutral` at 15s if no delta
-- [ ] `dismiss` or unmount stops further GET calls
-- [ ] Second `start` with a different `sessionId` does not apply the first session's delta
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: at least 5 hook cases in `src/hooks/__tests__/useXpCelebration.test.js`
+- [x] Exports `XP_POLL_INTERVAL_MS = 2000` and `XP_POLL_TIMEOUT_MS = 15000`
+- [x] `start` with snapshot 100 then profile 220 resolves `delta === 120` and status `resolved`
+- [x] No increase for 15000 ms yields status `neutral` and `delta === null`
+- [x] GET reject during poll does not reset the timeout; still `neutral` at 15s if no delta
+- [x] `dismiss` or unmount stops further GET calls
+- [x] Second `start` with a different `sessionId` does not apply the first session's delta
+- [x] Gate check passes: `npm test`
+- [x] Test count: at least 5 hook cases in `src/hooks/__tests__/useXpCelebration.test.js`
 
 **Tests**: unit
 **Gate**: quick
