@@ -419,11 +419,11 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] Runtime exercise has `exerciseType`; TimeBased `target` uses duration not "reps @ load"
-- [ ] `addExtraSet` log includes `duration` and `distance`
-- [ ] Complete path does not flip `completed` when `canCompleteSet` is false; rest does not start
-- [ ] Clearing duration on a completed TimeBased set uncompletes it
-- [ ] Gate check passes: `npm run gate && npm run lint && npx tsc --noEmit && npm test && npm run build`
+- [x] Runtime exercise has `exerciseType`; TimeBased `target` uses duration not "reps @ load"
+- [x] `addExtraSet` log includes `duration` and `distance`
+- [x] Complete path does not flip `completed` when `canCompleteSet` is false; rest does not start
+- [x] Clearing duration on a completed TimeBased set uncompletes it
+- [x] Gate check passes: `npm run gate && npm run lint && npx tsc --noEmit && npm test && npm run build`
 
 **Tests**: none
 **Gate**: build

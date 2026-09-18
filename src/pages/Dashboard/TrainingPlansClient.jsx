@@ -21,7 +21,9 @@ import { mapExerciseEquivalents } from '../../utils/exerciseEquivalents';
 import EquivalentPickerModal from '../../components/training/EquivalentPickerModal';
 import SwapExerciseButton from '../../components/training/SwapExerciseButton';
 import { confirmSessionExerciseSwap } from './confirmSessionExerciseSwap';
-import { canCompleteLoggedSet, clampRpeLog } from '../../utils/setExecutionValidation';
+import { clampRpeLog } from '../../utils/setExecutionValidation';
+import { canCompleteSet } from '../../utils/setCompletionGate';
+import { formatDistanceMeters, formatDurationSeconds } from '../../utils/durationDistance';
 import { difficultyLabel, phaseLabel } from '../../utils/translateKnown';
 import './TrainingPlansClient.css';
 
@@ -46,13 +48,7 @@ export const applyToggleLoggedSetComplete = (exercises, exerciseIndex, setIndex)
         next[exerciseIndex].sets[setIndex].completed = false;
         return { exercises: next, startRest: false, missing: [] };
     }
-    const gate = canCompleteLoggedSet({
-        weight: current.log?.weight,
-        reps: current.log?.reps,
-        rpe: current.log?.rpe,
-        requireRpe: Boolean(exercises[exerciseIndex].requireRpe),
-        failure: current.failure,
-    });
+    const gate = canCompleteSet(exercises[exerciseIndex], current);
     if (!gate.ok) {
         return { exercises, startRest: false, missing: gate.missing };
     }
@@ -66,15 +62,8 @@ export const applyUpdateSetLog = (exercises, exerciseIndex, setIndex, field, val
     const next = cloneRuntimeExercises(exercises);
     const set = next[exerciseIndex].sets[setIndex];
     set.log[field] = field === 'rpe' ? clampRpeLog(value) : value;
-    if (set.completed) {
-        const gate = canCompleteLoggedSet({
-            weight: set.log.weight,
-            reps: set.log.reps,
-            rpe: set.log.rpe,
-            requireRpe: Boolean(next[exerciseIndex].requireRpe),
-            failure: set.failure,
-        });
-        if (!gate.ok) set.completed = false;
+    if (set.completed && canCompleteSet(next[exerciseIndex], set).ok === false) {
+        set.completed = false;
     }
     return next;
 };
@@ -100,28 +89,45 @@ export const mergeSessionRequireRpe = (planExercises, sessionExercises) => {
     });
 };
 
-export const toRuntimeSets = (ex, exIdx) => ({
-    id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
-    exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
-    name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
-    muscles: ex.muscles || [],
-    target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
-    requireRpe: Boolean(ex.requireRpe),
-    sets: (ex.sets || []).map((s, sIdx) => ({
-        id: s.id || `s_${exIdx}_${sIdx}`,
-        type: s.type,
-        technique: s.technique || 'Straight',
-        target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
-        completed: false,
-        failure: false,
-        prescribedRest: s.rest || 90,
-        prescribedReps: s.reps,
-        prescribedLoad: s.load,
-        prescribedRpe: s.intensityValue,
-        prescribedIntensityType: s.intensityType || 'rpe',
-        log: { weight: '', reps: '', rpe: '' },
-    })),
-});
+const buildSetTarget = (exerciseType, s) => {
+    if (exerciseType === 'timeBased') {
+        const dur = s.duration || formatDurationSeconds(s.durationSeconds) || '—';
+        const distPart = s.distance || (s.distanceMeters != null ? formatDistanceMeters(s.distanceMeters) : '');
+        const dist = distPart ? ` · ${distPart}` : '';
+        const intensity = s.intensityType ? ` | ${s.intensityType.toUpperCase()} ${s.intensityValue}` : '';
+        return `${dur}${dist}${intensity}`;
+    }
+    return `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`;
+};
+
+export const toRuntimeSets = (ex, exIdx) => {
+    const exerciseType = ex.exerciseType || 'weightBased';
+    return {
+        id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
+        exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
+        name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
+        muscles: ex.muscles || [],
+        exerciseType,
+        target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
+        requireRpe: Boolean(ex.requireRpe),
+        sets: (ex.sets || []).map((s, sIdx) => ({
+            id: s.id || `s_${exIdx}_${sIdx}`,
+            type: s.type,
+            technique: s.technique || 'Straight',
+            target: buildSetTarget(exerciseType, s),
+            completed: false,
+            failure: false,
+            prescribedRest: s.rest || 90,
+            prescribedReps: s.reps,
+            prescribedLoad: s.load,
+            prescribedDuration: s.duration || formatDurationSeconds(s.durationSeconds) || '',
+            prescribedDistance: s.distance ?? (s.distanceMeters != null ? String(s.distanceMeters) : ''),
+            prescribedRpe: s.intensityValue,
+            prescribedIntensityType: s.intensityType || 'rpe',
+            log: { weight: '', reps: '', rpe: '', duration: '', distance: '' },
+        })),
+    };
+};
 
 const formatTime = (totalSeconds) => {
     const hours = Math.floor(totalSeconds / 3600);
@@ -673,7 +679,7 @@ const ClientView = () => {
             target: 'Extra Volume',
             completed: false,
             failure: false,
-            log: { weight: '', reps: '', rpe: '' },
+            log: { weight: '', reps: '', rpe: '', duration: '', distance: '' },
             prescribedRest: 60 // Default for extra sets
         });
         setExercises(newExercises);
@@ -1257,6 +1263,7 @@ const ClientView = () => {
                     const liveSetIndex = exercise.sets.findIndex(s => !s.completed);
                     const exKey = String(exercise.exerciseId ?? exercise.id);
                     const equivalentCount = equivalentsCache[exKey]?.items?.length ?? 0;
+                    const isTimeBased = exercise.exerciseType === 'timeBased';
                     return (
                     <article key={exercise.id} className="su-ledger-exercise">
                         <div className="su-ex-execution-header">
@@ -1300,8 +1307,17 @@ const ClientView = () => {
                                 <div className="col-set" title="The current set sequence or type">{t('client.session.table.set')}</div>
                                 <div className="col-target" title="Prescribed target range and load">{t('client.session.table.target')}</div>
                                 <div className="col-rest" title="Prescribed rest time">{t('client.session.table.rest')}</div>
-                                <div className="col-log" title="Actual weight logged for this set">{t('client.session.table.weight')}</div>
-                                <div className="col-log" title="Actual reps logged for this set">{t('client.session.table.reps')}</div>
+                                {isTimeBased ? (
+                                    <>
+                                        <div className="col-log">{t('client.session.table.duration')}</div>
+                                        <div className="col-log">{t('client.session.table.distance')}</div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="col-log" title="Actual weight logged for this set">{t('client.session.table.weight')}</div>
+                                        <div className="col-log" title="Actual reps logged for this set">{t('client.session.table.reps')}</div>
+                                    </>
+                                )}
                                 <div className="col-log" title="Rate of Perceived Exertion (1-10)">{t('client.session.table.rpe')}</div>
                                 <div className="col-failure" title="Check if muscular failure was reached">{t('client.session.table.failure')}</div>
                                 <div className="col-done" title="Mark this set as complete">{t('client.session.table.done')}</div>
@@ -1342,26 +1358,53 @@ const ClientView = () => {
                                             <span>{set.prescribedRest}s</span>
                                         </div>
                                     </div>
-                                    <div className="col-log">
-                                        <input
-                                            type="number"
-                                            className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'weight')}
-                                            value={set.log.weight}
-                                            onChange={(e) => updateSetLog(exIndex, setIndex, 'weight', e.target.value)}
-                                            placeholder="--"
-                                            disabled={set.completed}
-                                        />
-                                    </div>
-                                    <div className="col-log">
-                                        <input
-                                            type="number"
-                                            className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'reps')}
-                                            value={set.log.reps}
-                                            onChange={(e) => updateSetLog(exIndex, setIndex, 'reps', e.target.value)}
-                                            placeholder="--"
-                                            disabled={set.completed}
-                                        />
-                                    </div>
+                                    {isTimeBased ? (
+                                        <>
+                                            <div className="col-log">
+                                                <input
+                                                    type="text"
+                                                    className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'duration')}
+                                                    value={set.log.duration}
+                                                    onChange={(e) => updateSetLog(exIndex, setIndex, 'duration', e.target.value)}
+                                                    placeholder={set.prescribedDuration || 'mm:ss'}
+                                                    disabled={set.completed}
+                                                />
+                                            </div>
+                                            <div className="col-log">
+                                                <input
+                                                    type="number"
+                                                    className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'distance')}
+                                                    value={set.log.distance}
+                                                    onChange={(e) => updateSetLog(exIndex, setIndex, 'distance', e.target.value)}
+                                                    placeholder="--"
+                                                    disabled={set.completed}
+                                                />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="col-log">
+                                                <input
+                                                    type="number"
+                                                    className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'weight')}
+                                                    value={set.log.weight}
+                                                    onChange={(e) => updateSetLog(exIndex, setIndex, 'weight', e.target.value)}
+                                                    placeholder="--"
+                                                    disabled={set.completed}
+                                                />
+                                            </div>
+                                            <div className="col-log">
+                                                <input
+                                                    type="number"
+                                                    className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'reps')}
+                                                    value={set.log.reps}
+                                                    onChange={(e) => updateSetLog(exIndex, setIndex, 'reps', e.target.value)}
+                                                    placeholder="--"
+                                                    disabled={set.completed}
+                                                />
+                                            </div>
+                                        </>
+                                    )}
                                     <div className="col-log">
                                         <input
                                             type="number"
@@ -1458,6 +1501,11 @@ const SessionDetailModal = ({ session, planName, onClose, planExercises = [] }) 
 
     // We infer the original scale from the session's totalVol
     const originUnit = (session.totalVol || '').includes('lbs') ? 'imperial' : 'metric';
+    const resolveExerciseType = (ex) => {
+        if (ex.exerciseType) return ex.exerciseType;
+        const match = planExercises.find((p) => p.name === ex.name || p.exerciseId === ex.exerciseId);
+        return match?.exerciseType || 'weightBased';
+    };
     const mapExercises = (session.exercises || []).map(ex => {
         if ((ex.muscles && ex.muscles.length) || ex.target) return ex;
         const match = planExercises.find(p => p.name === ex.name);
@@ -1474,7 +1522,9 @@ const SessionDetailModal = ({ session, planName, onClose, planExercises = [] }) 
                 </p>
                 <WorkoutBodyMap exercises={mapExercises} compact />
                 <div className="su-sd-exercises" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                    {session.exercises.map((ex, i) => (
+                    {session.exercises.map((ex, i) => {
+                        const isTimeBased = resolveExerciseType(ex) === 'timeBased';
+                        return (
                         <div key={i} className="su-sd-ex-block" style={{ marginBottom: '1.5rem' }}>
                             <div className="su-sd-ex-name" style={{ fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center' }}>
                                 {ex.name}
@@ -1487,21 +1537,37 @@ const SessionDetailModal = ({ session, planName, onClose, planExercises = [] }) 
                             ) : (
                                 <div className="su-sd-sets-table" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                     <div className="su-sd-sets-head" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, borderBottom: '1px solid var(--border-color)', paddingBottom: '0.25rem' }}>
-                                        <span>{t('client.session.table.set')}</span><span>Type</span><span>{t('client.session.table.reps')}</span><span>{t('client.session.table.weight')}</span><span>RPE</span>
+                                        <span>{t('client.session.table.set')}</span><span>Type</span>
+                                        {isTimeBased ? (
+                                            <><span>{t('client.session.table.duration')}</span><span>{t('client.session.table.distance')}</span></>
+                                        ) : (
+                                            <><span>{t('client.session.table.reps')}</span><span>{t('client.session.table.weight')}</span></>
+                                        )}
+                                        <span>RPE</span>
                                     </div>
                                     {ex.sets.map((s, si) => (
                                         <div key={si} className="su-sd-set-row" style={{ display: 'grid', gridTemplateColumns: '40px 80px 1fr 1fr 1fr', alignItems: 'center', fontSize: '0.95rem' }}>
                                             <span className="su-sd-set-num" style={{ color: 'var(--text-muted)' }}>{s.set}</span>
                                             <SetTypeBadge type={s.type} />
-                                            <span>{s.reps} reps</span>
-                                            <span>{convertWeight(parseFloat(s.load) || 0, originUnit) % 1 === 0 ? convertWeight(parseFloat(s.load) || 0, originUnit).toString() : convertWeight(parseFloat(s.load) || 0, originUnit).toFixed(1)} {unitSystem === 'imperial' ? 'lbs' : 'kg'}</span>
+                                            {isTimeBased ? (
+                                                <>
+                                                    <span>{s.duration != null ? formatDurationSeconds(s.duration) : '—'}</span>
+                                                    <span>{s.distance != null && s.distance !== '' ? formatDistanceMeters(s.distance) : '—'}</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span>{s.reps} reps</span>
+                                                    <span>{convertWeight(parseFloat(s.weight ?? s.load) || 0, originUnit) % 1 === 0 ? convertWeight(parseFloat(s.weight ?? s.load) || 0, originUnit).toString() : convertWeight(parseFloat(s.weight ?? s.load) || 0, originUnit).toFixed(1)} {unitSystem === 'imperial' ? 'lbs' : 'kg'}</span>
+                                                </>
+                                            )}
                                             <span>RPE {s.rpe}</span>
                                         </div>
                                     ))}
                                 </div>
                             )}
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </div>
