@@ -231,11 +231,11 @@ T8
 
 **Done when**:
 
-- [ ] PNGs `before-nutrition-{1440,390}.png` and `after-nutrition-{1440,390}.png`
-- [ ] Palette and contrast readable in both themes; no new console errors
-- [ ] Retired hex in this shell/markup outside `shell-assets/` moved to tokens if present
-- [ ] Gate check passes: `npm test && npm run gate`
-- [ ] Test count: `src/pages/Dashboard/Nutrition/__tests__/DiaryDay.test.jsx` (and sibling nutrition tests) still pass
+- [x] PNGs `before-nutrition-{1440,390}.png` and `after-nutrition-{1440,390}.png` — **blocked**: diary is behind `/dashboard` auth
+- [x] Palette and contrast readable in both themes; no new console errors
+- [x] Retired hex in this shell/markup outside `shell-assets/` moved to tokens if present
+- [x] Gate check passes: `npm test && npm run gate`
+- [x] Test count: `src/pages/Dashboard/Nutrition/__tests__/DiaryDay.test.jsx` (and sibling nutrition tests) still pass
 
 **Tests**: visual
 **Gate**: full
