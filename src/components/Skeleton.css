@@ -1,0 +1,65 @@
+.su-skeleton {
+  background: var(--bg-card, #211a17);
+  border-radius: var(--radius-sm, 0.375rem);
+}
+
+.su-skeleton-pulse {
+  animation: su-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes su-skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .su-skeleton-pulse {
+    animation: none;
+  }
+}
+
+.su-skeleton-text-line {
+  height: 0.875rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
+.su-skeleton-text-line:last-child {
+  width: 72%;
+  margin-bottom: 0;
+}
+
+.su-skeleton-card {
+  height: 8rem;
+  width: 100%;
+}
+
+.su-skeleton-list-item {
+  height: 3rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.su-skeleton-list-item:last-child {
+  margin-bottom: 0;
+}
+
+.su-skeleton-table-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.su-skeleton-table-cell {
+  flex: 1;
+  height: 1.25rem;
+}
+
+.su-skeleton-table-cell:first-child {
+  flex: 2;
+}
