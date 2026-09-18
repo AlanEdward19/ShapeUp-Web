@@ -1,6 +1,5 @@
 import DatePicker from '../../../components/DatePicker';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import NutritionNav from './NutritionNav';
 import SubstituteItemModal from './SubstituteItemModal';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
 import { useLanguage } from '../../../contexts/LanguageContext';
@@ -101,7 +100,6 @@ const DiaryDay = ({ renderView } = {}) => {
     if (renderView) return renderView({ date, setDate, diary, goal, loading, totals, meals, handleRemove, setSubstituteEntry, loadData });
     return (
         <div className="su-nutrition-page">
-            <NutritionNav />
             <header className="su-nutrition-masthead">
                 <div>
                     <span className="su-nutrition-kicker">{t('nutrition.diary.kicker')}</span>
