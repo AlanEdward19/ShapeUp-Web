@@ -60,6 +60,11 @@ describe('MealPlanManager', () => {
         });
     });
 
+    it('groups add and submit actions in su-form-actions', () => {
+        const { getByTestId } = renderManager();
+        expect(getByTestId('meal-plan-form-actions')).toHaveClass('su-form-actions');
+    });
+
     it('creates and activates a meal plan filling the diary', async () => {
         const { getByTestId } = renderManager();
 

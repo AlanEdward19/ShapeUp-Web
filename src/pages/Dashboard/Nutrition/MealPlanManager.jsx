@@ -118,15 +118,16 @@ const MealPlanManager = () => {
                         </div>
                     ))}
 
-                    <Button type="button" variant="secondary" onClick={addItem} className="su-mb-4">
-                        {t('nutrition.plan.add')}
-                    </Button>
-
                     {error && <p className="su-input-error-text" role="alert">{error}</p>}
 
-                    <Button type="submit" disabled={loading || !name.trim()} data-testid="create-plan-btn">
-                        {loading ? t('nutrition.form.saving') : t('nutrition.plan.submit')}
-                    </Button>
+                    <div className="su-form-actions" data-testid="meal-plan-form-actions">
+                        <Button type="button" variant="secondary" onClick={addItem}>
+                            {t('nutrition.plan.add')}
+                        </Button>
+                        <Button type="submit" disabled={loading || !name.trim()} data-testid="create-plan-btn">
+                            {loading ? t('nutrition.form.saving') : t('nutrition.plan.submit')}
+                        </Button>
+                    </div>
                 </form>
                 )}
             </section>
