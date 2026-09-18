@@ -315,10 +315,10 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] `handleSelectExercise` stores `exerciseType` from catalog (`unmapExerciseType`)
-- [ ] Mixed Superset add does not introduce a new error
-- [ ] Save with blank TimeBased duration shows the duration error and does not call create/update
-- [ ] Gate check passes: `npm run gate && npm run lint && npx tsc --noEmit && npm test && npm run build`
+- [x] `handleSelectExercise` stores `exerciseType` from catalog (`unmapExerciseType`)
+- [x] Mixed Superset add does not introduce a new error
+- [x] Save with blank TimeBased duration shows the duration error and does not call create/update
+- [x] Gate check passes: `npm run gate && npm run lint && npx tsc --noEmit && npm test && npm run build`
 
 **Tests**: none
 **Gate**: build

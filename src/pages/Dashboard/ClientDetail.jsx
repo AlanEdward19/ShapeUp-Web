@@ -36,7 +36,8 @@ import { WEEKDAY_API_NAMES } from '../../utils/workoutSchedule';
 const PLAN_WEEKDAY_SHORT_LABELS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 
-import { buildWorkoutPlanBody } from '../../utils/workoutPlanPayload';
+import { unmapExerciseType } from '../../utils/trainingEnums';
+import { buildWorkoutPlanBody, createDefaultPlannedSet, findTimeBasedDurationError } from '../../utils/workoutPlanPayload';
 // eslint-disable-next-line react-refresh/only-export-components -- re-export for existing plan-body tests
 export { buildWorkoutPlanBody };
 
@@ -108,6 +109,20 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
         assignedWeekdays,
     });
 
+    const commitPlan = () => {
+        const payload = planPayload();
+        const durationErr = findTimeBasedDurationError(payload, t('pro.builder.set.duration'));
+        if (durationErr) {
+            setAlertModal({
+                visible: true,
+                title: t('pro.builder.error.title'),
+                message: durationErr,
+            });
+            return;
+        }
+        onSave(payload);
+    };
+
     const toggleWeekday = (day) => {
         setAssignedWeekdays(prev =>
             prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day].sort((a, b) => a - b),
@@ -135,6 +150,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             tagsParts.push(ex.muscles.join(' • '));
         }
 
+        const exerciseType = unmapExerciseType(ex.exerciseType);
         const newExercise = {
             id: `e${Date.now()}`,
             exerciseId: ex.id,
@@ -143,7 +159,8 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             tags: tagsParts.join(' • '),
             notes: '',
             requireRpe: false,
-            sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '75', intensityType: 'rpe', intensityValue: '8', rest: '90' }]
+            exerciseType,
+            sets: [createDefaultPlannedSet(exerciseType)],
         };
 
         if (addingToBlockIndex === null) {
@@ -252,7 +269,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
 
     return (
         <div className="su-builder-layout su-prescription-editor">
-            <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">Prescrição & periodização</span><h1>{name || t('pro.builder.name')}</h1><p>{phase} · {weeks} semanas · {difficulty}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> exercícios</span><span><b>{totalSets}</b> séries</span><span><b>{estMins}</b> duração estimada</span></div><Button icon={<Save size={16} />} onClick={() => onSave(planPayload())}>{t('pro.builder.btn.save')}</Button></header>
+            <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">Prescrição & periodização</span><h1>{name || t('pro.builder.name')}</h1><p>{phase} · {weeks} semanas · {difficulty}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> exercícios</span><span><b>{totalSets}</b> séries</span><span><b>{estMins}</b> duração estimada</span></div><Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button></header>
             {/* LEFT: Plan builder */}
             <div className="su-plan-builder">
                 <details className="su-plan-header-card su-prescription-settings" data-tour="pe-settings" open={!plan.name}><summary>Parâmetros do plano <span>Nome, objetivo, duração e orientações</span></summary>
@@ -409,10 +426,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                         </div>
                     )}
 
-                    <Button fullWidth icon={<Save size={16} />}
-                        onClick={() => {
-                            onSave(planPayload());
-                        }}>
+                    <Button fullWidth icon={<Save size={16} />} onClick={commitPlan}>
                         {t('pro.builder.btn.save')}
                     </Button>
                     {onAssign && (
@@ -933,6 +947,9 @@ const ClientDetail = () => {
     // the server response. Safe to defer: never throws, works offline.
     const handleSavePlan = (updated) => {
         console.log("handleSavePlan disparado! Dados recebidos:", updated);
+
+        const durationErr = findTimeBasedDurationError(updated);
+        if (durationErr) return;
 
         // Determine IDs
         const urlClientId = id; // from useParams
