@@ -108,15 +108,16 @@ T6 -> T7 -> T8
 
 **Done when**:
 
-- [ ] Empty/malformed payload yields `{ equivalents: [], records: [] }`
-- [ ] No fabricated similarity string
-- [ ] Tests cover array vs `{ items }` vs empty
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: previous + ≥3 (no silent deletions)
+- [x] Empty/malformed payload yields `{ equivalents: [], records: [] }`
+- [x] No fabricated similarity string
+- [x] Tests cover array vs `{ items }` vs empty
+- [x] Gate check passes: `npm test`
+- [x] Test count: previous + ≥3 (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
 **Commit**: `feat(training): map exercise equivalents for the drawer`
+**Status**: ✅ Complete
 
 ---
 
