@@ -38,6 +38,28 @@ describe('MealPlanManager', () => {
         });
     });
 
+    it('shows card skeleton while plan creation is pending', async () => {
+        let resolveCreate;
+        mockCreateMealPlan.mockImplementation(
+            () => new Promise((resolve) => { resolveCreate = resolve; }),
+        );
+
+        const { getByTestId } = renderManager();
+        fireEvent.change(getByTestId('plan-name-input'), { target: { value: 'Semana leve' } });
+        fireEvent.change(getByTestId('plan-item-food-0'), { target: { value: 'food-1' } });
+        fireEvent.click(getByTestId('create-plan-btn'));
+
+        expect(getByTestId('skeleton')).toHaveAttribute('data-variant', 'card');
+        resolveCreate({
+            id: 'plan-1',
+            name: 'Semana leve',
+            items: [{ mealSlot: 'Breakfast', foodId: 'food-1', quantityGramsOrMl: 100 }],
+        });
+        await waitFor(() => {
+            expect(getByTestId('created-plan-card')).toBeInTheDocument();
+        });
+    });
+
     it('creates and activates a meal plan filling the diary', async () => {
         const { getByTestId } = renderManager();
 

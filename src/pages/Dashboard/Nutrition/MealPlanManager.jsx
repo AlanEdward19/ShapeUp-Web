@@ -3,6 +3,7 @@ import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import Skeleton from '../../../components/Skeleton';
 import './Nutrition.css';
 
 const MEAL_SLOTS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
@@ -78,6 +79,9 @@ const MealPlanManager = () => {
 
             <section className="su-journal-sheet" data-testid="meal-plan-form">
                 <h3 className="su-ledger-heading">{t('nutrition.plan.create')}</h3>
+                {loading ? (
+                    <Skeleton variant="card" />
+                ) : (
                 <form onSubmit={handleCreate}>
                     <Input
                         label={t('nutrition.plan.name')}
@@ -124,6 +128,7 @@ const MealPlanManager = () => {
                         {loading ? t('nutrition.form.saving') : t('nutrition.plan.submit')}
                     </Button>
                 </form>
+                )}
             </section>
 
             {createdPlan && (
