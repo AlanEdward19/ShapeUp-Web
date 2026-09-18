@@ -143,7 +143,7 @@ Cada requisito recebe um ID único para rastreamento entre design, tasks e valid
 | EDD-01 | P1: Player de vídeo embutido (arquivo direto) | Tasks | Implementing |
 | EDD-02 | P1: Player de vídeo embutido (lite-embed YouTube/Vimeo) | Tasks | Implementing |
 | EDD-03 | P1: Estado vazio do vídeo (ausente/inválido) | Tasks | Implementing |
-| EDD-04 | P1: Reset de estado do player ao trocar de exercício | Tasks | In Tasks |
+| EDD-04 | P1: Reset de estado do player ao trocar de exercício | Tasks | Implementing |
 | EDD-05 | P1: Lista de substituições — item estruturado + contagem | Tasks | Implementing |
 | EDD-06 | P1: Estado vazio das substituições (sem dado fabricado) | Tasks | Implementing |
 | EDD-07 | P1: Navegação ao clicar num equivalente | Tasks | In Tasks |

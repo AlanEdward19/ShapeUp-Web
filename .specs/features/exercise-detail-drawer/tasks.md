@@ -146,13 +146,13 @@ T5 ------→ T6 ------→ T7
 
 **Done when**:
 
-- [ ] Direct file URLs render 16:9 native video with play/pause, progress, replay, timestamp, fullscreen
-- [ ] YouTube/Vimeo start as poster + play and swap to iframe only after click
-- [ ] Missing/invalid/unknown URL shows "Vídeo de execução não cadastrado" (no broken player)
-- [ ] Changing `videoUrl` resets to paused/start of the new source
-- [ ] Tests in `src/pages/Dashboard/__tests__/ExerciseDrawerVideo.test.jsx`
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: 5 tests pass (no silent deletions)
+- [x] Direct file URLs render 16:9 native video with play/pause, progress, replay, timestamp, fullscreen
+- [x] YouTube/Vimeo start as poster + play and swap to iframe only after click
+- [x] Missing/invalid/unknown URL shows "Vídeo de execução não cadastrado" (no broken player)
+- [x] Changing `videoUrl` resets to paused/start of the new source
+- [x] Tests in `src/pages/Dashboard/__tests__/ExerciseDrawerVideo.test.jsx`
+- [x] Gate check passes: `npm test`
+- [x] Test count: 5 tests pass (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
