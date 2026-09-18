@@ -120,7 +120,7 @@
   },
   "recovery": {
     "source": "recupera_o_de_senha_acesso",
-    "bodyClass": "bg-surface font-body-md text-body-md text-on-surface min-h-screen flex flex-col justify-center selection:bg-primary-container selection:text-on-primary-container",
+    "bodyClass": "bg-brand-bg font-body-md text-body-md text-on-surface min-h-screen flex flex-col justify-center selection:bg-primary-container selection:text-on-primary-container",
     "fonts": [
       "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&display=swap",
       "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200",
