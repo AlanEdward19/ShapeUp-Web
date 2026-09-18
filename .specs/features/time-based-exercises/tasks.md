@@ -239,8 +239,8 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] Keys exist in all three locale objects: `pro.builder.set.duration`, `pro.builder.set.distance`, `client.session.table.duration`, `client.session.table.distance`
-- [ ] Gate check passes: `npm run gate && npm run lint && npx tsc --noEmit && npm test && npm run build`
+- [x] Keys exist in all three locale objects: `pro.builder.set.duration`, `pro.builder.set.distance`, `client.session.table.duration`, `client.session.table.distance`
+- [x] Gate check passes: `npm run gate && npm run lint && npx tsc --noEmit && npm test && npm run build`
 
 **Tests**: none
 **Gate**: build
