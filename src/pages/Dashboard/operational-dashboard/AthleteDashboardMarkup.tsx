@@ -69,10 +69,10 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
     const title = day.toLocaleDateString(language, { dateStyle: 'full' });
     const letter = day.toLocaleDateString(language, { weekday: 'short' }).slice(0, 1).toUpperCase();
     const style = {
-      color: done ? '#f3eae5' : '#b8aaa2',
+      color: done ? 'var(--text-main)' : 'var(--text-muted)',
       background: done ? '#506443' : 'transparent',
-      border: `2px solid ${isToday ? '#e06c43' : done ? '#506443' : '#3a2d27'}`,
-      boxShadow: isToday ? '0 0 0 2px #171311' : undefined,
+      border: `2px solid ${isToday ? '#e06c43' : done ? '#506443' : 'var(--border-color)'}`,
+      boxShadow: isToday ? '0 0 0 2px var(--bg-main)' : undefined,
     };
     return (
       <span
@@ -89,8 +89,8 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
   };
 
   return (
-    <div className="sn-space flex min-h-screen flex-col flex-1 min-w-0 bg-[#171311]" data-shell-content style={{ marginLeft: 256 }}>
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[#3A2D27] bg-[#171311] px-8">
+    <div className="sn-space flex min-h-screen flex-col flex-1 min-w-0 bg-[color:var(--bg-main)]" data-shell-content style={{ marginLeft: 256 }}>
+      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[color:var(--border-color)] bg-[color:var(--bg-main)] px-8">
         <div className="flex items-center gap-4 text-xs">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-[#eee0da]">{plan?.name || tr('Plano de treinamento')}</span>
@@ -243,7 +243,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
                           </p>
                         </div>
                         <input
-                          className="h-4 w-4 cursor-pointer rounded border-[#382b24] bg-[#171311] text-[#e06c43] focus:ring-0"
+                          className="h-4 w-4 cursor-pointer rounded border-[#382b24] bg-[color:var(--bg-main)] text-[#e06c43] focus:ring-0"
                           title="Abrir sessão para registrar a execução"
                           type="checkbox"
                           onChange={() => onNavigate('/dashboard/training')}

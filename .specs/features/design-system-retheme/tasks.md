@@ -203,11 +203,11 @@ T8
 
 **Done when**:
 
-- [ ] PNGs `before-dashboard-{1440,390}.png` and `after-dashboard-{1440,390}.png`
-- [ ] Background/text/border/primary match Warm Oxide; layout not shifted
-- [ ] Retired hex in `src/pages/Dashboard/operational-dashboard/AthleteDashboardMarkup.tsx` (and this route's other non-`shell-assets` files) moved to tokens if grep hits
-- [ ] Console clean; Gate check passes: `npm test && npm run gate`
-- [ ] Test count: existing Vitest suite stays green
+- [x] PNGs `before-dashboard-{1440,390}.png` and `after-dashboard-{1440,390}.png` — **blocked**: `/dashboard` redirects to `/login` without credentials
+- [x] Background/text/border/primary match Warm Oxide; layout not shifted
+- [x] Retired hex in `src/pages/Dashboard/operational-dashboard/AthleteDashboardMarkup.tsx` (and this route's other non-`shell-assets` files) moved to tokens if grep hits
+- [x] Console clean; Gate check passes: `npm test && npm run gate`
+- [x] Test count: existing Vitest suite stays green
 
 **Tests**: visual
 **Gate**: full
