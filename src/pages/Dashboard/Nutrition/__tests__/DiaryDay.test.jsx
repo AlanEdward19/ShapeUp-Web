@@ -100,6 +100,49 @@ describe('DiaryDay', () => {
         });
     });
 
+    it('shows skeleton while diary fetch is in flight', async () => {
+        let resolveDay;
+        mockGetDiaryDay.mockImplementation(
+            () => new Promise((resolve) => { resolveDay = resolve; }),
+        );
+        mockGetNutritionProfile.mockResolvedValue({ activeGoal: null });
+
+        const { getByTestId } = renderDiaryDay();
+        expect(getByTestId('skeleton')).toBeInTheDocument();
+        resolveDay(sampleDiary);
+        await waitFor(() => {
+            expect(getByTestId('meal-Breakfast')).toBeInTheDocument();
+        });
+    });
+
+    it('shows load error instead of empty day when API fails', async () => {
+        mockGetDiaryDay.mockRejectedValue(new Error('Network down'));
+
+        const { getByTestId, queryByTestId } = renderDiaryDay();
+
+        await waitFor(() => {
+            expect(getByTestId('diary-load-error')).toBeInTheDocument();
+        });
+        expect(queryByTestId('empty-day')).not.toBeInTheDocument();
+    });
+
+    it('retries diary fetch when retry is clicked', async () => {
+        mockGetDiaryDay.mockRejectedValueOnce(new Error('Network down'));
+        mockGetDiaryDay.mockResolvedValueOnce(sampleDiary);
+
+        const { getByTestId } = renderDiaryDay();
+
+        await waitFor(() => {
+            expect(getByTestId('diary-retry-btn')).toBeInTheDocument();
+        });
+        fireEvent.click(getByTestId('diary-retry-btn'));
+
+        await waitFor(() => {
+            expect(getByTestId('meal-Breakfast')).toBeInTheDocument();
+        });
+        expect(mockGetDiaryDay).toHaveBeenCalledTimes(2);
+    });
+
     it('shows celebration when macro goal is met', async () => {
         mockGetDiaryDay.mockResolvedValue({
             ...sampleDiary,

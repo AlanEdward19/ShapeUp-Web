@@ -1,4 +1,5 @@
 import DatePicker from '../../../components/DatePicker';
+import Skeleton from '../../../components/Skeleton';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import SubstituteItemModal from './SubstituteItemModal';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
@@ -59,11 +60,13 @@ const DiaryDay = ({ renderView } = {}) => {
     const [diary, setDiary] = useState(null);
     const [goal, setGoal] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(null);
     const [substituteEntry, setSubstituteEntry] = useState(null);
 
     const loadData = useCallback(async () => {
         const version = ++requestVersion.current;
         setLoading(true);
+        setLoadError(null);
         setDiary(null);
         try {
             const [dayData, profile] = await Promise.all([
@@ -76,11 +79,12 @@ const DiaryDay = ({ renderView } = {}) => {
         } catch (err) {
             if (version !== requestVersion.current) return;
             console.error('Failed to load diary', err);
-            setDiary({ date, meals: [], totals: { kcal: 0, proteinG: 0, carbG: 0, fatG: 0 } });
+            setLoadError(err.message || 'Não foi possível carregar o diário.');
+            setDiary(null);
         } finally {
             if (version === requestVersion.current) setLoading(false);
         }
-    }, [date, getDiaryDay, getNutritionProfile]);
+    }, [date, getDiaryDay, getNutritionProfile, t]);
 
     useEffect(() => {
         loadData();
@@ -97,7 +101,21 @@ const DiaryDay = ({ renderView } = {}) => {
         await loadData();
     };
 
-    if (renderView) return renderView({ date, setDate, diary, goal, loading, totals, meals, handleRemove, setSubstituteEntry, loadData });
+    if (renderView) {
+        return renderView({
+            date,
+            setDate,
+            diary,
+            goal,
+            loading,
+            loadError,
+            totals,
+            meals,
+            handleRemove,
+            setSubstituteEntry,
+            loadData,
+        });
+    }
     return (
         <div className="su-nutrition-page">
             <header className="su-nutrition-masthead">
@@ -147,8 +165,15 @@ const DiaryDay = ({ renderView } = {}) => {
             </section>
 
             <div className="su-diary-layout"><div className="su-diary-meals">
-            {loading ? (
-                <p className="su-text-muted">{t('nutrition.diary.loading')}</p>
+            {loadError ? (
+                <div className="su-journal-sheet" data-testid="diary-load-error">
+                    <p className="su-input-error-text" role="alert">{loadError}</p>
+                    <button type="button" className="su-btn su-btn-secondary" onClick={() => loadData()} data-testid="diary-retry-btn">
+                        Tentar novamente
+                    </button>
+                </div>
+            ) : loading && !diary ? (
+                <Skeleton variant="table" rows={4} />
             ) : isEmpty ? (
                 <section className="su-empty-ledger" data-testid="empty-day">
                     <p className="su-text-muted" style={{ margin: 0 }}>
