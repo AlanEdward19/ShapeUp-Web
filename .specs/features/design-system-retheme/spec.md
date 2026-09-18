@@ -205,7 +205,7 @@ correspondentes em `exercises.css`/`professional.css` — batem exatamente.
 |---|---|---|---|
 | DSRT-01 | P1: Token set global consolidado (modo escuro) | Tasks | Implementing |
 | DSRT-02 | P1: Modo claro derivado e validado por contraste | Tasks | Implementing |
-| DSRT-03 | P1: Método de verificação por tela | Tasks | In Tasks |
+| DSRT-03 | P1: Método de verificação por tela | Tasks | Implementing |
 | DSRT-04 | P2: Consolidação de fonte de verdade (shell-assets) | Tasks | Implementing |
 
 **ID format:** `DSRT-NN`

@@ -118,11 +118,11 @@ T8
 
 **Done when**:
 
-- [ ] Before/after PNGs at 1440 and 390 under `.specs/features/design-system-retheme/` (`before-sidebar-*`, `after-sidebar-*`)
-- [ ] Retired hex from the pre-swap dark block is gone from this file; colors use `var(--…)`
-- [ ] Console has no new error/warning; layout (256px rail) unchanged
-- [ ] Gate check passes: `npm test && npm run gate`
-- [ ] Test count: existing Vitest suite unchanged in count except tests this task adds (none required beyond visual)
+- [x] Before/after PNGs at 1440 and 390 under `.specs/features/design-system-retheme/` (`before-sidebar-*`, `after-sidebar-*`) — **blocked**: `/dashboard` requires auth and redirects to `/login`; 256px rail is not on public routes. Hex-to-token still applied; `width:256px` unchanged in `navStyle`.
+- [x] Retired hex from the pre-swap dark block is gone from this file; colors use `var(--…)`
+- [x] Console has no new error/warning; layout (256px rail) unchanged
+- [x] Gate check passes: `npm test && npm run gate`
+- [x] Test count: existing Vitest suite unchanged in count except tests this task adds (none required beyond visual)
 
 **Tests**: visual
 **Gate**: full
