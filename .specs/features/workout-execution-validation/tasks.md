@@ -240,11 +240,11 @@ T13
 
 **Done when**:
 
-- [ ] Body de save inclui `requireRpe` por exercício
-- [ ] Bulk só muta estado local
-- [ ] Botão `disabled` quando `allExercises.length === 0`
-- [ ] Toggle individual depois do bulk vence
-- [ ] Gate check passes: `npm test`
+- [x] Body de save inclui `requireRpe` por exercício
+- [x] Bulk só muta estado local
+- [x] Botão `disabled` quando `allExercises.length === 0`
+- [x] Toggle individual depois do bulk vence
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit  
 **Gate**: full

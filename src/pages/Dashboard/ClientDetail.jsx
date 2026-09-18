@@ -31,13 +31,14 @@ import { useExercises } from '../../hooks/useExercises';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
-import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
+import { normalizePlan, flattenBlockExercises, applyRequireRpeToAll } from '../../utils/trainingNormalization';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 
 // Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
 // from a plan object shaped like normalizePlan()'s output (PlanEditor's internal shape) and
 // need the same API request body built from it.
-const buildWorkoutPlanBody = (plan, targetUserId) => ({
+// eslint-disable-next-line react-refresh/only-export-components -- mapper tested from PlanEditor save path
+export const buildWorkoutPlanBody = (plan, targetUserId) => ({
     targetUserId,
     name: plan.name || 'Novo Treino',
     notes: plan.notes || null,
@@ -52,6 +53,7 @@ const buildWorkoutPlanBody = (plan, targetUserId) => ({
         restAfterSeconds: block.restAfterSeconds === '' || block.restAfterSeconds == null ? null : parseInt(block.restAfterSeconds),
         exercises: (block.exercises || []).map(ex => ({
             exerciseId: parseInt(ex.exerciseId) || 1,
+            requireRpe: Boolean(ex.requireRpe),
             sets: (ex.sets || []).map(s => ({
                 repetitions: s.reps === '' || s.reps == null ? null : parseInt(s.reps),
                 load: parseFloat(s.load) || 0,
@@ -152,6 +154,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             muscles: Array.isArray(ex.muscles) ? ex.muscles : [],
             tags: tagsParts.join(' • '),
             notes: '',
+            requireRpe: false,
             sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '75', intensityType: 'rpe', intensityValue: '8', rest: '90' }]
         };
 
@@ -294,6 +297,13 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                 <div className="su-exercise-stack" data-tour="pe-stack">
                     <div className="su-stack-header">
                         <h2>Exercícios prescritos <small>{allExercises.length} exercícios · {estMins}</small></h2>
+                        <Button
+                            variant="outline"
+                            disabled={allExercises.length === 0}
+                            onClick={() => setCurrentBlocks((prev) => applyRequireRpeToAll(prev))}
+                        >
+                            {t('pro.builder.require_rpe.all')}
+                        </Button>
                         <Button icon={<Plus size={16} />} onClick={addExercise}>{t('pro.builder.add.ex')}</Button>
                     </div>
 
