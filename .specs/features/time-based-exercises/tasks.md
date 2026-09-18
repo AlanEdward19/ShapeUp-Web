@@ -263,10 +263,10 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] TimeBased: no load/reps inputs; duration required field present; distance optional; technique cannot become Drop Set
-- [ ] WeightBased: load/reps and full technique list still render
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: at least 2 RTL tests (TimeBased vs WeightBased)
+- [x] TimeBased: no load/reps inputs; duration required field present; distance optional; technique cannot become Drop Set
+- [x] WeightBased: load/reps and full technique list still render
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: at least 2 RTL tests (TimeBased vs WeightBased)
 
 **Tests**: unit
 **Gate**: full

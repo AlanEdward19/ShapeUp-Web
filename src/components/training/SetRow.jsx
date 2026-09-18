@@ -4,9 +4,11 @@ import { SET_TYPES, TECHNIQUES } from '../../pages/Dashboard/ClientDetail';
 
 // Straight blocks control their own per-set rest; grouped blocks (Superset/Amrap/Emom) govern
 // timing at the block level instead (Block.RestAfterSeconds / TimeCapSeconds / IntervalSeconds).
-const SetRow = ({ set, index, blockType, onChange, onRemove }) => {
+const SetRow = ({ set, index, blockType, exerciseType = 'weightBased', onChange, onRemove }) => {
     const { t } = useLanguage();
     const restEnabled = blockType === 'straight';
+    const isTimeBased = exerciseType === 'timeBased';
+    const techniqueOptions = isTimeBased ? ['Straight'] : TECHNIQUES;
 
     const toggleIntensityType = () => {
         const nextType = set.intensityType === 'rir' ? 'rpe' : 'rir';
@@ -26,13 +28,23 @@ const SetRow = ({ set, index, blockType, onChange, onRemove }) => {
                     </select>
                 </div>
                 <div className="su-input-group">
-                    <select className="su-select" value={set.technique}
+                    <select className="su-select" value={isTimeBased ? 'Straight' : set.technique}
+                        disabled={isTimeBased}
                         onChange={e => onChange('technique', e.target.value)}>
-                        {TECHNIQUES.map(tech => <option key={tech} value={tech}>{t(`pro.builder.tech.${tech.toLowerCase().replace(' ', '')}`) || tech}</option>)}
+                        {techniqueOptions.map(tech => <option key={tech} value={tech}>{t(`pro.builder.tech.${tech.toLowerCase().replace(' ', '')}`) || tech}</option>)}
                     </select>
                 </div>
-                <Input value={set.reps} onChange={e => onChange('reps', e.target.value)} placeholder="8-10" />
-                <Input value={set.load} onChange={e => onChange('load', e.target.value)} placeholder="75" />
+                {isTimeBased ? (
+                    <>
+                        <Input value={set.duration ?? ''} onChange={e => onChange('duration', e.target.value)} placeholder="05:00" />
+                        <Input value={set.distance ?? ''} onChange={e => onChange('distance', e.target.value)} placeholder="1000" />
+                    </>
+                ) : (
+                    <>
+                        <Input value={set.reps} onChange={e => onChange('reps', e.target.value)} placeholder="8-10" />
+                        <Input value={set.load} onChange={e => onChange('load', e.target.value)} placeholder="75" />
+                    </>
+                )}
                 <div className="su-intensity-group">
                     <button
                         type="button"
