@@ -62,5 +62,11 @@
 
 .su-legal-article p {
   color: var(--text-muted);
+  font-size: 1rem;
   line-height: 1.65;
+}
+
+.su-legal,
+.su-legal * {
+  transform: none;
 }
