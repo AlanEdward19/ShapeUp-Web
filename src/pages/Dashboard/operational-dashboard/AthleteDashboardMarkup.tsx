@@ -7,6 +7,7 @@ import type { ChartPoint, NormalizedExercise, NormalizedPlan, StoredMessage } fr
 export type AthleteDashboardState = AthleteScoreboardState & {
   userName: string;
   plan: NormalizedPlan | undefined;
+  showTodayCard: boolean;
   exercises: NormalizedExercise[];
   chartData: ChartPoint[];
   trainingError: string;
@@ -44,6 +45,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
   const {
     userName,
     plan,
+    showTodayCard,
     exercises,
     chartData,
     trainingError,
@@ -209,18 +211,18 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
 
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
           <div id="tabela-exercicios" className="space-y-8 lg:col-span-8">
-            <div>
-              <div className="flex items-center justify-between border-b border-[#2a201b] pb-3">
-                <div>
-                  <h2 className="font-headline text-xl font-bold uppercase tracking-tight text-[#eee0da]">
-                    Exercícios Prescritos para Hoje
-                  </h2>
+            {showTodayCard ? (
+              <div data-testid="today-workout-card">
+                <div className="flex items-center justify-between border-b border-[#2a201b] pb-3">
+                  <div>
+                    <h2 className="font-headline text-xl font-bold uppercase tracking-tight text-[#eee0da]">
+                      Exercícios Prescritos para Hoje
+                    </h2>
+                  </div>
+                  <span className="text-xs text-[#bdaea6]">{exercises.length} exercícios</span>
                 </div>
-                <span className="text-xs text-[#bdaea6]">{exercises.length} exercícios</span>
-              </div>
-              <div className="divide-y divide-[#2a201b]">
-                {exercises.length ? (
-                  exercises.map((exercise, index) => (
+                <div className="divide-y divide-[#2a201b]">
+                  {exercises.map((exercise, index) => (
                     <div key={exercise.id ?? index} className="group flex items-center justify-between gap-4 py-4">
                       <div className="flex min-w-0 items-start gap-3.5">
                         <span className="pt-0.5 font-mono text-xs font-bold text-[#82736b]">
@@ -250,12 +252,10 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
                         />
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <p className="py-4 text-xs text-[#82736b]">Seu treino aparecerá aqui após a prescrição.</p>
-                )}
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : null}
 
             <div className="border-t border-[#2a201b] pt-4">
               <h3 className="font-headline text-lg font-bold uppercase">Histórico de Volume</h3>

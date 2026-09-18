@@ -227,11 +227,11 @@ T6 → T7
 
 **Done when**:
 
-- [ ] `AthleteDashboardState` inclui `showTodayCard: boolean`
-- [ ] Card (heading + lista) ausente do DOM quando `showTodayCard` é false
-- [ ] Card lista todos os `exercises` quando true (dois planos no teste)
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: at least 2 RTL tests in `src/pages/Dashboard/operational-dashboard/__tests__/AthleteDashboardMarkup.today.test.tsx`
+- [x] `AthleteDashboardState` inclui `showTodayCard: boolean`
+- [x] Card (heading + lista) ausente do DOM quando `showTodayCard` é false
+- [x] Card lista todos os `exercises` quando true (dois planos no teste)
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: at least 2 RTL tests in `src/pages/Dashboard/operational-dashboard/__tests__/AthleteDashboardMarkup.today.test.tsx`
 
 **Tests**: unit
 **Gate**: full
