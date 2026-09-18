@@ -136,15 +136,16 @@ T6 -> T7 -> T8
 
 **Done when**:
 
-- [ ] Duplicate replacement returns `already-in-session` and enqueue is not called
-- [ ] `retainedSetsForOriginal` includes only completed sets
-- [ ] `enqueueMutation` mock receives endpoint `/api/training/workouts/{sessionId}/swap-exercise`, method POST
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: previous + ≥4 (no silent deletions)
+- [x] Duplicate replacement returns `already-in-session` and enqueue is not called
+- [x] `retainedSetsForOriginal` includes only completed sets
+- [x] `enqueueMutation` mock receives endpoint `/api/training/workouts/{sessionId}/swap-exercise`, method POST
+- [x] Gate check passes: `npm test`
+- [x] Test count: previous + ≥4 (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
 **Commit**: `feat(training): apply session exercise swap locally and enqueue`
+**Status**: ✅ Complete
 
 ---
 
