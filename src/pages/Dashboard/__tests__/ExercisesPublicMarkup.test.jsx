@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, fireEvent } from '@testing-library/react';
 import { createRef } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
@@ -77,5 +77,42 @@ describe('ExercisesPublicMarkup', () => {
       'Nenhuma substituição cadastrada para este exercício.',
     );
     expect(container.textContent).not.toMatch(/Peitoral: 62%/);
+  });
+
+  it('lists API equivalents on the active exercise and navigates on click', () => {
+    const equivalent = {
+      id: 8,
+      name: 'Variação em máquina',
+      muscles: ['Peitoral'],
+      equipment: 'Máquina',
+    };
+    const inspect = vi.fn();
+    const { container, getByText } = render(
+      <MemoryRouter>
+        <ExercisesPublicMarkup
+          state={state({
+            active: { ...active, equivalents: [{ exerciseId: 8 }] },
+            exerciseLookup: [active, equivalent],
+            inspect,
+          })}
+        />
+      </MemoryRouter>,
+    );
+    expect(container).toHaveTextContent('Variação em máquina');
+    expect(container).toHaveTextContent('1 opções');
+    expect(container).not.toHaveTextContent('Consulte a biblioteca para selecionar uma substituição.');
+    fireEvent.click(getByText('Variação em máquina'));
+    expect(inspect).toHaveBeenCalledWith(equivalent, expect.any(Object));
+  });
+
+  it('shows sibling empty copy when GET equivalents are empty', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ExercisesPublicMarkup state={state({ active: { ...active, equivalents: [] } })} />
+      </MemoryRouter>,
+    );
+    expect(container.querySelector('#drawerSubs')).toHaveTextContent(
+      'Nenhuma substituição cadastrada para este exercício.',
+    );
   });
 });

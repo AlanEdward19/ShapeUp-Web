@@ -60,7 +60,7 @@ export type ExercisesShellState = {
   navOpen: boolean;
   setNavOpen: (open: boolean) => void;
   equipmentName: (ex: ExerciseRecord) => string;
-  onEquivalentMissing?: () => void;
+  onEquivalentMissing?: (exerciseId?: number | string) => void;
 };
 
 function ExerciseRow({

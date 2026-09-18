@@ -76,7 +76,7 @@ describe('ExerciseDrawerSubstitutions', () => {
       />,
     );
     fireEvent.click(getByRole('button'));
-    expect(onNotFound).toHaveBeenCalledTimes(1);
+    expect(onNotFound).toHaveBeenCalledWith(99);
     expect(onSelect).not.toHaveBeenCalled();
   });
 });

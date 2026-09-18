@@ -218,7 +218,7 @@ export function ExerciseDrawer({ state }: { state: DrawerState }): ReactElement 
               const target = (state.panelRef.current || document.body) as HTMLElement;
               state.inspect(ex, { currentTarget: target } as never);
             }}
-            onNotFound={() => state.onEquivalentMissing?.()}
+            onNotFound={(exerciseId) => state.onEquivalentMissing?.(exerciseId)}
           />
         </div>
 

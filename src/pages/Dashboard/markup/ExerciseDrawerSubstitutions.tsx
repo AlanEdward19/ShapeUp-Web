@@ -20,7 +20,7 @@ export function ExerciseDrawerSubstitutions({
   equivalents?: ExerciseEquivalent[];
   exercises: ExerciseRecord[];
   onSelect: (ex: ExerciseRecord) => void;
-  onNotFound: () => void;
+  onNotFound: (exerciseId: number | string) => void;
 }): ReactElement {
   const items = equivalents ?? [];
 
@@ -46,7 +46,7 @@ export function ExerciseDrawerSubstitutions({
                   className="w-full flex items-center justify-between gap-2 px-2 py-2 rounded hover:bg-surface-subtle text-left"
                   onClick={() => {
                     if (match) onSelect(match);
-                    else onNotFound();
+                    else onNotFound(item.exerciseId);
                   }}
                 >
                   <div className="min-w-0">

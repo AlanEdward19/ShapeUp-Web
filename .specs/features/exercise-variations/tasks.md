@@ -194,15 +194,16 @@ T6 -> T7 -> T8
 
 **Done when**:
 
-- [ ] String `Consulte a biblioteca para selecionar uma substituição.` is gone from the drawer path
-- [ ] Empty GET shows sibling empty copy, not the old placeholder
-- [ ] Click navigates drawer title/content to the equivalent
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: previous + ≥2 (no silent deletions)
+- [x] String `Consulte a biblioteca para selecionar uma substituição.` is gone from the drawer path
+- [x] Empty GET shows sibling empty copy, not the old placeholder
+- [x] Click navigates drawer title/content to the equivalent
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: previous + ≥2 (no silent deletions)
 
 **Tests**: unit
 **Gate**: full
 **Commit**: `feat(training): show API equivalents in the exercise drawer`
+**Status**: ✅ Complete
 
 ---
 
