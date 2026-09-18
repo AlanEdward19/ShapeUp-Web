@@ -1,6 +1,5 @@
 import DatePicker from '../../../components/DatePicker';
 import HistoryChart from '../../../components/charts/HistoryChart';
-import WorkspaceShellPage from '../../../components/Workspace/WorkspaceShellPage';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { copy } from '../../shell-assets/copy';
 import useHydration from '../../../hooks/useHydration';
@@ -10,9 +9,6 @@ import DiaryDay from './DiaryDay';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-
-const diaryCss =
-  'article table{min-width:520px}article{overflow:auto}@media(max-width:767px){.shell-body .pl-64{padding-left:0!important}}';
 
 const slots: Record<string, string> = {
   Breakfast: 'Café da Manhã',
@@ -223,7 +219,6 @@ function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement {
   const displayName = localStorage.getItem('shapeup_user_name') || 'Diário Nutricional';
 
   return (
-    <WorkspaceShellPage name="nutrition" css={diaryCss}>
       <div className="pl-64">
         <header
           className="sticky top-0 z-40 h-16 bg-[#211A17]/95 backdrop-blur border-b border-[color:var(--border-color)] px-8 flex items-center justify-between"
@@ -556,7 +551,6 @@ function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement {
           </div>
         </main>
       </div>
-    </WorkspaceShellPage>
   );
 }
 
