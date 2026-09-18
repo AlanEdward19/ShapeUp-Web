@@ -176,12 +176,12 @@ T5 ------→ T6 ------→ T7
 
 **Done when**:
 
-- [ ] Non-empty `equivalents` render name, equipment, optional similarity, chevron, header count
-- [ ] Absent/empty `equivalents` render "Nenhuma substituição cadastrada para este exercício."
-- [ ] Click calls `onSelect` when `exerciseId` exists in `exercises`; otherwise `onNotFound`
-- [ ] Tests in `src/pages/Dashboard/__tests__/ExerciseDrawerSubstitutions.test.jsx`
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: 4 tests pass (no silent deletions)
+- [x] Non-empty `equivalents` render name, equipment, optional similarity, chevron, header count
+- [x] Absent/empty `equivalents` render "Nenhuma substituição cadastrada para este exercício."
+- [x] Click calls `onSelect` when `exerciseId` exists in `exercises`; otherwise `onNotFound`
+- [x] Tests in `src/pages/Dashboard/__tests__/ExerciseDrawerSubstitutions.test.jsx`
+- [x] Gate check passes: `npm test`
+- [x] Test count: 4 tests pass (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick

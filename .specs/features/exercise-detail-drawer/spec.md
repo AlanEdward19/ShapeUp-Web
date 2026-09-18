@@ -146,7 +146,7 @@ Cada requisito recebe um ID único para rastreamento entre design, tasks e valid
 | EDD-04 | P1: Reset de estado do player ao trocar de exercício | Tasks | Implementing |
 | EDD-05 | P1: Lista de substituições — item estruturado + contagem | Tasks | Implementing |
 | EDD-06 | P1: Estado vazio das substituições (sem dado fabricado) | Tasks | Implementing |
-| EDD-07 | P1: Navegação ao clicar num equivalente | Tasks | In Tasks |
+| EDD-07 | P1: Navegação ao clicar num equivalente | Tasks | Implementing |
 | EDD-08 | P1: Backdrop dimming + click-outside-to-close | Tasks | In Tasks |
 | EDD-09 | P1: Barras de ativação primária & sinergista | Tasks | In Tasks |
 | EDD-10 | P1: Numeração consistente das Diretrizes Técnicas | Tasks | In Tasks |
