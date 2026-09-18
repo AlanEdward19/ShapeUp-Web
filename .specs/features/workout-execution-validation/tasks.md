@@ -11,7 +11,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 **Design**: `.specs/features/workout-execution-validation/design.md`  
 **Spec**: `.specs/features/workout-execution-validation/spec.md`  
 **Canonical API**: `ShapeUpV2/.specs/features/workout-execution-validation/` (do not implement backend)  
-**Status**: Draft
+**Status**: Complete
 
 ---
 
@@ -430,10 +430,10 @@ T13
 
 **Done when**:
 
-- [ ] Check-circle Independent recusa set vazio / RPE faltando quando exigido
-- [ ] Clamp RPE igual ao Client
-- [ ] Kicker não é `"Rest"` literal
-- [ ] Gate check passes: `node scripts/check-frontend-gates.mjs && npm run lint && npm test && npx tsc --noEmit`
+- [x] Check-circle Independent recusa set vazio / RPE faltando quando exigido
+- [x] Clamp RPE igual ao Client
+- [x] Kicker não é `"Rest"` literal
+- [x] Gate check passes: `node scripts/check-frontend-gates.mjs && npm run lint && npm test && npx tsc --noEmit`
 
 **Tests**: unit  
 **Gate**: build

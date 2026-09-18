@@ -8,16 +8,18 @@ import {
     toRuntimeSets,
 } from '../TrainingPlansClient';
 
-const setOf = (overrides = {}) => ({
-    id: 's1',
-    completed: false,
-    failure: false,
-    isExtra: false,
-    prescribedRest: 90,
-    log: { weight: '', reps: '', rpe: '' },
-    ...overrides,
-    log: { weight: '', reps: '', rpe: '', ...(overrides.log || {}) },
-});
+const setOf = (overrides = {}) => {
+    const { log: logOverrides, ...rest } = overrides;
+    return {
+        id: 's1',
+        completed: false,
+        failure: false,
+        isExtra: false,
+        prescribedRest: 90,
+        log: { weight: '', reps: '', rpe: '', ...logOverrides },
+        ...rest,
+    };
+};
 
 const session = (sets, requireRpe = false) => [{
     exerciseId: 1,

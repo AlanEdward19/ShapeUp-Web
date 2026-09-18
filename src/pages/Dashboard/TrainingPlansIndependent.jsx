@@ -24,15 +24,28 @@ import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormal
 import { buildWorkoutStatePayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { useExercises } from '../../hooks/useExercises';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
+import {
+    applyToggleLoggedSetComplete,
+    applyUpdateSetLog,
+    execInputClassName,
+    INVALID_LOG_FLASH_MS,
+    mergeSessionRequireRpe,
+} from './TrainingPlansClient';
 import './TrainingPlansClient.css';
 import './TrainingPlansProfessional.css';
 
-const toRuntimeSets = (ex, exIdx) => ({
+/* eslint-disable react-refresh/only-export-components -- execution helpers tested without mounting the page */
+export { applyToggleLoggedSetComplete, applyUpdateSetLog };
+
+export const independentRestKicker = (t) => t('client.session.timer.rest_label');
+
+export const toRuntimeSets = (ex, exIdx) => ({
     id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
     exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
     name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
     muscles: ex.muscles || [],
     target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
+    requireRpe: Boolean(ex.requireRpe),
     sets: (ex.sets || []).map((s, sIdx) => ({
         id: s.id || `s_${exIdx}_${sIdx}`,
         type: s.type,
@@ -53,7 +66,6 @@ const toRuntimeSets = (ex, exIdx) => ({
 // Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
 // from a plan object shaped like normalizePlan()'s output (PlanEditor's internal shape) and
 // need the same API request body built from it.
-// eslint-disable-next-line react-refresh/only-export-components -- mapper for independent plan save
 export const buildWorkoutPlanBody = (plan, targetUserId) => ({
     targetUserId,
     name: plan.name || 'Novo Treino',
@@ -220,6 +232,7 @@ const TrainingPlansIndependent = () => {
     const [pendingActiveWorkout, setPendingActiveWorkout] = useState(null);
     const [isResumingWorkout, setIsResumingWorkout] = useState(false);
     const [isCancellingActive, setIsCancellingActive] = useState(false);
+    const [invalidLogs, setInvalidLogs] = useState({});
 
     const hasFirstDoneRef = useRef(false);
     const lastSyncedHashRef = useRef('');
@@ -307,6 +320,19 @@ const TrainingPlansIndependent = () => {
         return next;
     }, []);
 
+    const flashInvalidLog = (exerciseIndex, setIndex, missing) => {
+        const key = `${exerciseIndex}-${setIndex}`;
+        setInvalidLogs((prev) => ({ ...prev, [key]: missing }));
+        window.setTimeout(() => {
+            setInvalidLogs((prev) => {
+                if (!prev[key]) return prev;
+                const next = { ...prev };
+                delete next[key];
+                return next;
+            });
+        }, INVALID_LOG_FLASH_MS);
+    };
+
     // ─── EFFECTS ───────────────────────────────────────────────────
 
     // Initial Load handled in useState to prevent race conditions with Sync
@@ -353,10 +379,14 @@ const TrainingPlansIndependent = () => {
             }
 
             if (plan) {
-                const runtimeExercises = enrichExercisesFromCatalog(
+                const flattened = enrichExercisesFromCatalog(
                     flattenBlockExercises(plan.blocks),
                     exercisesDB
-                ).map(toRuntimeSets);
+                );
+                const sessionSnap = pendingActiveWorkout.exercises
+                    || pendingActiveWorkout.Exercises;
+                const runtimeExercises = mergeSessionRequireRpe(flattened, sessionSnap)
+                    .map(toRuntimeSets);
 
                 setSessionExercises(runtimeExercises);
                 hasFirstDoneRef.current = false;
@@ -766,7 +796,7 @@ const TrainingPlansIndependent = () => {
                     <div className={`su-rest-timer-group ${isResting ? 'active' : ''}`}>
                         <div className="su-rest-controls">
                             <button className="su-adjust-rest-btn minus" onClick={() => setRestTimer(p => Math.max(0, p - 15))}>-15s</button>
-                            <div className="su-rest-clock-display"><span className="su-timer-kicker">Rest</span> <span className="su-timer-digits">{formatTime(restTimer)}</span></div>
+                            <div className="su-rest-clock-display"><span className="su-timer-kicker">{independentRestKicker(t)}</span> <span className="su-timer-digits">{formatTime(restTimer)}</span></div>
                             <button className="su-adjust-rest-btn plus" onClick={() => setRestTimer(p => p + 15)}>+15s</button>
                         </div>
                     </div>
@@ -824,13 +854,13 @@ const TrainingPlansIndependent = () => {
                                             </div>
                                         </div>
                                         <div className="col-log">
-                                            <input type="number" className="su-exec-input" value={s.log.weight} onChange={e => mutateSessionExercises(updated => { updated[exIdx].sets[sIdx].log.weight = e.target.value; })} placeholder="--" disabled={s.completed} />
+                                            <input type="number" className={execInputClassName(invalidLogs[`${exIdx}-${sIdx}`], 'weight')} value={s.log.weight} onChange={e => setSessionExercises(applyUpdateSetLog(sessionExercisesRef.current, exIdx, sIdx, 'weight', e.target.value))} placeholder="--" disabled={s.completed} />
                                         </div>
                                         <div className="col-log">
-                                            <input type="number" className="su-exec-input" value={s.log.reps} onChange={e => mutateSessionExercises(updated => { updated[exIdx].sets[sIdx].log.reps = e.target.value; })} placeholder="--" disabled={s.completed} />
+                                            <input type="number" className={execInputClassName(invalidLogs[`${exIdx}-${sIdx}`], 'reps')} value={s.log.reps} onChange={e => setSessionExercises(applyUpdateSetLog(sessionExercisesRef.current, exIdx, sIdx, 'reps', e.target.value))} placeholder="--" disabled={s.completed} />
                                         </div>
                                         <div className="col-log">
-                                            <input type="number" className="su-exec-input" value={s.log.rpe} onChange={e => mutateSessionExercises(updated => { updated[exIdx].sets[sIdx].log.rpe = e.target.value; })} placeholder="--" disabled={s.completed} />
+                                            <input type="number" className={execInputClassName(invalidLogs[`${exIdx}-${sIdx}`], 'rpe')} value={s.log.rpe} onChange={e => setSessionExercises(applyUpdateSetLog(sessionExercisesRef.current, exIdx, sIdx, 'rpe', e.target.value))} placeholder="--" disabled={s.completed} />
                                         </div>
                                         <div className="col-failure">
                                             <label className={`su-failure-checkbox ${s.failure ? 'checked' : ''}`}>
@@ -856,18 +886,21 @@ const TrainingPlansIndependent = () => {
                                                 if (now - lastClick < 350) return;
                                                 doneClickGuardRef.current[clickKey] = now;
 
-                                                let completedState = false;
-                                                mutateSessionExercises(updated => {
-                                                    updated[exIdx].sets[sIdx].completed = !updated[exIdx].sets[sIdx].completed;
-                                                    completedState = updated[exIdx].sets[sIdx].completed;
-                                                });
+                                                const result = applyToggleLoggedSetComplete(sessionExercisesRef.current, exIdx, sIdx);
+                                                if (result.missing.length) {
+                                                    flashInvalidLog(exIdx, sIdx, result.missing);
+                                                    return;
+                                                }
+
+                                                setSessionExercises(result.exercises);
+                                                const completedState = result.exercises[exIdx].sets[sIdx].completed;
 
                                                 if (completedState) {
                                                     committedSetsRef.current.add(s.id);
                                                     hasFirstDoneRef.current = true;
                                                 }
 
-                                                if (completedState && s.prescribedRest > 0) { setRestTimer(s.prescribedRest); setIsResting(true); }
+                                                if (result.startRest && s.prescribedRest > 0) { setRestTimer(s.prescribedRest); setIsResting(true); }
                                             }} aria-label={t('client.session.table.done')} />
                                         </div>
                                     </div>
