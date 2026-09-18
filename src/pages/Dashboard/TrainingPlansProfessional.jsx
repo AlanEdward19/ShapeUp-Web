@@ -16,7 +16,8 @@ import './TrainingPlansProfessional.css';
 // Shared by handleSaveTemplate and the offline-safe path of duplicateTemplate below --
 // both start from a template object shaped like normalizeTemplate()'s output (PlanEditor's
 // internal shape) and need the same API request body built from it.
-const buildTemplateBody = (plan) => ({
+// eslint-disable-next-line react-refresh/only-export-components -- mapper for template PUT/POST
+export const buildTemplateBody = (plan) => ({
     name: plan.name || 'New Template',
     notes: plan.notes || null,
     durationInWeeks: parseInt(plan.weeks) || 4,
@@ -30,6 +31,7 @@ const buildTemplateBody = (plan) => ({
         restAfterSeconds: block.restAfterSeconds === '' || block.restAfterSeconds == null ? null : parseInt(block.restAfterSeconds),
         exercises: (block.exercises || []).map(ex => ({
             exerciseId: parseInt(ex.exerciseId) || 1,
+            requireRpe: Boolean(ex.requireRpe),
             sets: (ex.sets || []).map(s => ({
                 repetitions: s.reps === '' || s.reps == null ? null : parseInt(s.reps),
                 load: parseFloat(s.load) || 0,

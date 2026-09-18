@@ -268,8 +268,8 @@ T13
 
 **Done when**:
 
-- [ ] Template PUT/POST carrega `requireRpe: Boolean(ex.requireRpe)`
-- [ ] Gate check passes: `npm test`
+- [x] Template PUT/POST carrega `requireRpe: Boolean(ex.requireRpe)`
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit  
 **Gate**: full
