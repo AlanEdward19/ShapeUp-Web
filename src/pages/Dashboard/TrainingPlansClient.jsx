@@ -15,7 +15,62 @@ import { generateObjectId } from '../../utils/objectId';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import { buildWorkoutStatePayload as buildWorkoutStateApiPayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
+import { canCompleteLoggedSet } from '../../utils/setExecutionValidation';
 import './TrainingPlansClient.css';
+
+/* eslint-disable react-refresh/only-export-components -- execution helpers tested without mounting the page */
+export const INVALID_LOG_FLASH_MS = 800;
+
+export const execInputClassName = (invalidFields, field) =>
+    ['su-exec-input', (invalidFields || []).includes(field) ? 'su-exec-input--invalid' : '']
+        .filter(Boolean)
+        .join(' ');
+
+const cloneRuntimeExercises = (exercises) =>
+    exercises.map((ex) => ({
+        ...ex,
+        sets: (ex.sets || []).map((s) => ({ ...s, log: { ...(s.log || {}) } })),
+    }));
+
+export const applyToggleLoggedSetComplete = (exercises, exerciseIndex, setIndex) => {
+    const current = exercises[exerciseIndex].sets[setIndex];
+    if (current.completed) {
+        const next = cloneRuntimeExercises(exercises);
+        next[exerciseIndex].sets[setIndex].completed = false;
+        return { exercises: next, startRest: false, missing: [] };
+    }
+    const gate = canCompleteLoggedSet({
+        weight: current.log?.weight,
+        reps: current.log?.reps,
+        rpe: current.log?.rpe,
+        requireRpe: Boolean(exercises[exerciseIndex].requireRpe),
+        failure: current.failure,
+    });
+    if (!gate.ok) {
+        return { exercises, startRest: false, missing: gate.missing };
+    }
+    const next = cloneRuntimeExercises(exercises);
+    next[exerciseIndex].sets[setIndex].completed = true;
+    const rest = Number(current.prescribedRest) || 0;
+    return { exercises: next, startRest: rest > 0, missing: [] };
+};
+
+export const applyUpdateSetLog = (exercises, exerciseIndex, setIndex, field, value) => {
+    const next = cloneRuntimeExercises(exercises);
+    const set = next[exerciseIndex].sets[setIndex];
+    set.log[field] = value;
+    if (set.completed) {
+        const gate = canCompleteLoggedSet({
+            weight: set.log.weight,
+            reps: set.log.reps,
+            rpe: set.log.rpe,
+            requireRpe: Boolean(next[exerciseIndex].requireRpe),
+            failure: set.failure,
+        });
+        if (!gate.ok) set.completed = false;
+    }
+    return next;
+};
 
 const toRuntimeSets = (ex, exIdx) => ({
     id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
@@ -86,6 +141,7 @@ const ClientView = () => {
     const [pendingActiveWorkout, setPendingActiveWorkout] = useState(null);
     const [isResumingWorkout, setIsResumingWorkout] = useState(false);
     const [isCancellingActive, setIsCancellingActive] = useState(false);
+    const [invalidLogs, setInvalidLogs] = useState({});
 
     const hasFirstDoneRef = useRef(false);
     const lastSyncedHashRef = useRef('');
@@ -436,6 +492,19 @@ const ClientView = () => {
         setRestTimer(0);
     };
 
+    const flashInvalidLog = (exerciseIndex, setIndex, missing) => {
+        const key = `${exerciseIndex}-${setIndex}`;
+        setInvalidLogs((prev) => ({ ...prev, [key]: missing }));
+        window.setTimeout(() => {
+            setInvalidLogs((prev) => {
+                if (!prev[key]) return prev;
+                const next = { ...prev };
+                delete next[key];
+                return next;
+            });
+        }, INVALID_LOG_FLASH_MS);
+    };
+
     const toggleSetComplete = (exerciseIndex, setIndex, defaultRest) => {
         const clickKey = `${exerciseIndex}-${setIndex}`;
         const now = Date.now();
@@ -443,19 +512,22 @@ const ClientView = () => {
         if (now - lastClick < 350) return;
         doneClickGuardRef.current[clickKey] = now;
 
-        const newExercises = [...exercises];
-        const isNowComplete = !newExercises[exerciseIndex].sets[setIndex].completed;
+        const result = applyToggleLoggedSetComplete(exercises, exerciseIndex, setIndex);
+        if (result.missing.length) {
+            flashInvalidLog(exerciseIndex, setIndex, result.missing);
+            return;
+        }
 
-        newExercises[exerciseIndex].sets[setIndex].completed = isNowComplete;
-        setExercises(newExercises);
+        setExercises(result.exercises);
+        const isNowComplete = result.exercises[exerciseIndex].sets[setIndex].completed;
 
         if (isNowComplete) {
-            const targetSet = newExercises[exerciseIndex].sets[setIndex];
+            const targetSet = result.exercises[exerciseIndex].sets[setIndex];
             committedSetsRef.current.add(targetSet.id);
             hasFirstDoneRef.current = true;
         }
 
-        if (isNowComplete && defaultRest > 0) {
+        if (result.startRest && defaultRest > 0) {
             startRest(defaultRest);
         }
     };
@@ -474,9 +546,7 @@ const ClientView = () => {
     };
 
     const updateSetLog = (exerciseIndex, setIndex, field, value) => {
-        const newExercises = [...exercises];
-        newExercises[exerciseIndex].sets[setIndex].log[field] = value;
-        setExercises(newExercises);
+        setExercises(applyUpdateSetLog(exercises, exerciseIndex, setIndex, field, value));
     };
 
     const addExtraSet = (exerciseIndex) => {
@@ -1137,7 +1207,7 @@ const ClientView = () => {
                                     <div className="col-log">
                                         <input
                                             type="number"
-                                            className="su-exec-input"
+                                            className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'weight')}
                                             value={set.log.weight}
                                             onChange={(e) => updateSetLog(exIndex, setIndex, 'weight', e.target.value)}
                                             placeholder="--"
@@ -1147,7 +1217,7 @@ const ClientView = () => {
                                     <div className="col-log">
                                         <input
                                             type="number"
-                                            className="su-exec-input"
+                                            className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'reps')}
                                             value={set.log.reps}
                                             onChange={(e) => updateSetLog(exIndex, setIndex, 'reps', e.target.value)}
                                             placeholder="--"
@@ -1157,7 +1227,7 @@ const ClientView = () => {
                                     <div className="col-log">
                                         <input
                                             type="number"
-                                            className="su-exec-input"
+                                            className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'rpe')}
                                             value={set.log.rpe}
                                             onChange={(e) => updateSetLog(exIndex, setIndex, 'rpe', e.target.value)}
                                             placeholder="--"

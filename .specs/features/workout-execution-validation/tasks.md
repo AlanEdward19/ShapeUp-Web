@@ -345,11 +345,11 @@ T13
 
 **Done when**:
 
-- [ ] Sem peso/reps válidos não seta `completed` e não chama `startRest`
-- [ ] Peso `0` + reps `>= 1` conclui
-- [ ] Editar log para inválido desmarca `completed`
-- [ ] Extra set usa o mesmo gate
-- [ ] Gate check passes: `npm test`
+- [x] Sem peso/reps válidos não seta `completed` e não chama `startRest`
+- [x] Peso `0` + reps `>= 1` conclui
+- [x] Editar log para inválido desmarca `completed`
+- [x] Extra set usa o mesmo gate
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit  
 **Gate**: full
