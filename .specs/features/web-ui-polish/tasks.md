@@ -196,10 +196,10 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] File has no `WorkspaceShellPage` import/usage
-- [ ] Add-food still navigates to `/dashboard/nutrition/foods?...`
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite does not drop (no silent deletions)
+- [x] File has no `WorkspaceShellPage` import/usage
+- [x] Add-food still navigates to `/dashboard/nutrition/foods?...`
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite does not drop (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
@@ -221,11 +221,11 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] No `NutritionNav` import/render
-- [ ] `FoodSearch.test.jsx` no longer expects `nutrition-nav` on the isolated page
-- [ ] Search/empty/barcode tests still pass
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite does not drop (no silent deletions)
+- [x] No `NutritionNav` import/render
+- [x] `FoodSearch.test.jsx` no longer expects `nutrition-nav` on the isolated page
+- [x] Search/empty/barcode tests still pass
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite does not drop (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick

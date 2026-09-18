@@ -34,10 +34,9 @@ describe('FoodSearch', () => {
         delete window.BarcodeDetector;
     });
 
-    it('renders search form and nutrition nav', () => {
+    it('renders search form', () => {
         const { getByTestId } = renderFoodSearch();
         expect(getByTestId('food-search-input')).toBeInTheDocument();
-        expect(getByTestId('nutrition-nav')).toBeInTheDocument();
     });
 
     it('runs text search and shows results', async () => {
