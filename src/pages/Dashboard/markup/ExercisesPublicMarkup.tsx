@@ -33,6 +33,8 @@ export type ExerciseRecord = {
 
 export type ExercisesShellState = {
   exercises: ExerciseRecord[];
+  /** Catalog plus GET equivalent records for drawer substitution lookup */
+  exerciseLookup?: ExerciseRecord[];
   filtered: ExerciseRecord[];
   loading: boolean;
   error: boolean;
@@ -221,7 +223,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
                     style={{
                       padding: '4px 8px',
                       borderRadius: 4,
-                      background: state.equipment === value ? '#3a2d27' : 'transparent',
+                      background: state.equipment === value ? 'var(--border-color)' : 'transparent',
                     }}
                   >
                     {value === 'all' ? 'Todos' : value}

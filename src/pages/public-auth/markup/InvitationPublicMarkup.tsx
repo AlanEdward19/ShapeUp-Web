@@ -107,7 +107,7 @@ export function InvitationPublicMarkup({ state }: { state: InvitationShellState 
               {tr('E-mail')}
             </label>
             <input
-              className="w-full bg-[#171311] border border-brand-border/70 rounded-md px-3.5 py-2.5 text-sm text-brand-muted cursor-not-allowed select-none focus:outline-none"
+              className="w-full bg-[var(--bg-main)] border border-brand-border/70 rounded-md px-3.5 py-2.5 text-sm text-brand-muted cursor-not-allowed select-none focus:outline-none"
               id="email"
               name="email"
               readOnly={false}

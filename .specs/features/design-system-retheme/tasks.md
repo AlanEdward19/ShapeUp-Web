@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/design-system-retheme/design.md`
-**Status**: Implementing
+**Status**: Complete
 
 ---
 
@@ -259,12 +259,12 @@ T8
 
 **Done when**:
 
-- [ ] PNGs `before-settings-{1440,390}.png` and `after-settings-{1440,390}.png` for dark, plus light after-settings shots at both viewports
-- [ ] Setting `data-theme` to `light` then `dark` still swaps token blocks; no ThemeContext API change
-- [ ] Links in light mode use `--link-color` (readable vs `--bg-main`)
-- [ ] Retired hex in settings markup / `src/components/ProfileControls.jsx` moved to tokens if present
-- [ ] Console clean; Gate check passes: `npm test && npm run gate`
-- [ ] Test count: existing Vitest suite stays green
+- [x] PNGs `before-settings-{1440,390}.png` and `after-settings-{1440,390}.png` for dark, plus light after-settings shots at both viewports — **blocked**: `/dashboard/settings` requires auth
+- [x] Setting `data-theme` to `light` then `dark` still swaps token blocks; no ThemeContext API change
+- [x] Links in light mode use `--link-color` (readable vs `--bg-main`)
+- [x] Retired hex in settings markup / `src/components/ProfileControls.jsx` moved to tokens if present
+- [x] Console clean; Gate check passes: `npm test && npm run gate`
+- [x] Test count: existing Vitest suite stays green
 
 **Tests**: visual
 **Gate**: full
@@ -290,13 +290,13 @@ T8
 
 **Done when**:
 
-- [ ] Retired hex list is the pre-T1 dark values that Design replaced (not `#e06c43`, `#211a17`, `#d4a359`, which stay)
-- [ ] Files under `shell-assets` are skipped; `.(css|jsx|tsx)$` only
-- [ ] Any remaining grep hits outside `shell-assets` are tokenized in this task until the gate is green
-- [ ] Unit assertions in `src/styles/__tests__/designSystemTokens.test.js`: gate file contains the skip for `shell-assets`; `package.json` has no `playwright` or `pixelmatch` dependency names
-- [ ] `npm run gate` prints `frontend gates PASS`
-- [ ] Gate check passes: `npm test && npm run lint && npm run gate && npm run build`
-- [ ] Test count: T1 tests plus ≥2 new assertions pass; existing suite not deleted
+- [x] Retired hex list is the pre-T1 dark values that Design replaced (not `#e06c43`, `#211a17`, `#d4a359`, which stay)
+- [x] Files under `shell-assets` are skipped; `.(css|jsx|tsx)$` only
+- [x] Any remaining grep hits outside `shell-assets` are tokenized in this task until the gate is green
+- [x] Unit assertions in `src/styles/__tests__/designSystemTokens.test.js`: gate file contains the skip for `shell-assets`; `package.json` has no `playwright` or `pixelmatch` dependency names
+- [x] `npm run gate` prints `frontend gates PASS`
+- [x] Gate check passes: `npm test && npm run lint && npm run gate && npm run build`
+- [x] Test count: T1 tests plus ≥2 new assertions pass; existing suite not deleted
 
 **Tests**: unit
 **Gate**: build

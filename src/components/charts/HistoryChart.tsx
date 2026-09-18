@@ -44,7 +44,7 @@ export default function HistoryChart({
             type="button"
             aria-pressed={limit === value}
             onClick={() => setLimit(value)}
-            style={{ color: limit === value ? '#e06c43' : '#b8aaa2' }}
+            style={{ color: limit === value ? '#e06c43' : 'var(--text-muted)' }}
           >
             {value} {periodUnit}
           </button>
@@ -57,14 +57,14 @@ export default function HistoryChart({
             data={data.slice(-limit)}
             margin={{ top: 16, right: 12, left: 0, bottom: 0 }}
           >
-            <CartesianGrid stroke="#3a2d27" strokeDasharray="3 3" />
-            <XAxis dataKey="session" stroke="#b8aaa2" fontSize={11} />
-            <YAxis stroke="#b8aaa2" fontSize={11} width={44} />
+            <CartesianGrid stroke="var(--border-color)" strokeDasharray="3 3" />
+            <XAxis dataKey="session" stroke="var(--text-muted)" fontSize={11} />
+            <YAxis stroke="var(--text-muted)" fontSize={11} width={44} />
             <Tooltip
               contentStyle={{
                 background: '#211a17',
-                border: '1px solid #3a2d27',
-                color: '#f3eae5',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-main)',
               }}
               labelFormatter={(label, payload) => payload[0]?.payload?.date || label}
             />
@@ -79,7 +79,7 @@ export default function HistoryChart({
           </AreaChart>
         </ResponsiveContainer>
       ) : (
-        <p style={{ padding: '40px 16px', color: '#b8aaa2', fontSize: 13 }}>
+        <p style={{ padding: '40px 16px', color: 'var(--text-muted)', fontSize: 13 }}>
           Registre uma sessão para acompanhar sua evolução.
         </p>
       )}

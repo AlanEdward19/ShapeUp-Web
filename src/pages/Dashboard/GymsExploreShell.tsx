@@ -75,7 +75,7 @@ export default function GymsShell(): ReactElement {
               <article
                 key={gym.id}
                 className="bg-surface-panel border rounded-lg p-4 relative shadow-md transition-all cursor-pointer"
-                style={{ borderColor: gym.id === selected?.id ? '#e06c43' : '#3a2d27' }}
+                style={{ borderColor: gym.id === selected?.id ? '#e06c43' : 'var(--border-color)' }}
                 onClick={() => setSelected(gym)}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -97,7 +97,7 @@ export default function GymsShell(): ReactElement {
         mapColumn={
           <div
             data-gym-map
-            className="flex-1 relative bg-[#171311] overflow-hidden flex flex-col justify-between"
+            className="flex-1 relative bg-[var(--bg-main)] overflow-hidden flex flex-col justify-between"
             style={{ position: 'relative', minWidth: 0 }}
           >
             <iframe
@@ -120,7 +120,7 @@ export default function GymsShell(): ReactElement {
                   right: 20,
                   background: '#211a17',
                   padding: 20,
-                  border: '1px solid #3a2d27',
+                  border: '1px solid var(--border-color)',
                   borderRadius: 8,
                 }}
               >

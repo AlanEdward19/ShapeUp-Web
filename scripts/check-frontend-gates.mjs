@@ -72,6 +72,31 @@ for (const file of walk(join(root, 'src'))) {
   if (secretRe.test(text)) fail.push(`possible secret in ${relative(root, file)}`)
 }
 
+/** Pre-T1 dark token hex replaced in design-system.css (Warm Oxide); not #e06c43, #211a17, #d4a359 */
+const retiredDarkHex = [
+  /#171311/i,
+  /#1b1613/i,
+  /#f3eae5/i,
+  /#b8aaa2/i,
+  /#3a2d27/i,
+  /#493930/i,
+  /#ed805a/i,
+  /#9bb888/i,
+  /#21130d/i,
+  /#ed827a/i,
+]
+for (const file of walk(join(root, 'src'))) {
+  if (file.includes('shell-assets')) continue
+  if (!/\.(css|jsx|tsx)$/.test(file)) continue
+  const text = readFileSync(file, 'utf8')
+  for (const hex of retiredDarkHex) {
+    if (hex.test(text)) {
+      fail.push(`old palette hex ${hex} remains in ${relative(root, file)}`)
+      break
+    }
+  }
+}
+
 if (fail.length) {
   console.error(fail.map((m) => `FAIL ${m}`).join('\n'))
   process.exit(1)

@@ -38,7 +38,7 @@ export function RegisterPublicMarkup({ state }: { state: RegisterShellState }): 
   };
 
   const stepBarColor = (index: number) =>
-    index <= state.step ? '#e06c43' : '#3a2d27';
+    index <= state.step ? '#e06c43' : 'var(--border-color)';
 
   return (
     <main className="w-full max-w-[560px] mx-auto flex flex-col my-auto">

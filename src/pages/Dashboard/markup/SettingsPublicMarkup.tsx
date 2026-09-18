@@ -37,7 +37,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
       className="flex-1 flex flex-col min-h-screen"
     >
       <header
-      className="sticky top-0 z-40 h-14 bg-[#171311]/90 backdrop-blur border-b border-[#3A2D27] px-8 flex items-center justify-between"
+      className="sticky top-0 z-40 h-14 bg-[color-mix(in_srgb,var(--bg-main)_90%,transparent)] backdrop-blur border-b border-[color:var(--border-color)] px-8 flex items-center justify-between"
       >
 
         <div
@@ -53,7 +53,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
           >/</span>
 
           <span
-      className="text-[#f3eae5] font-medium"
+      className="text-[color:var(--text-main)] font-medium"
           >Conta &amp; Preferências</span>
 
         </div>
@@ -63,7 +63,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
         >
 
           <button
-      className="px-3 py-1.5 rounded text-xs font-medium text-[#b3a39c] hover:text-[#f3eae5] transition-colors"
+      className="px-3 py-1.5 rounded text-xs font-medium text-[#b3a39c] hover:text-[color:var(--text-main)] transition-colors"
       type="button"
           >
 
@@ -89,11 +89,11 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
       >
 
         <div
-      className="pb-8 mb-8 border-b border-[#3A2D27]"
+      className="pb-8 mb-8 border-b border-[color:var(--border-color)]"
         >
 
           <h1
-      className="font-headline-md text-3xl uppercase tracking-tight text-[#f3eae5]"
+      className="font-headline-md text-3xl uppercase tracking-tight text-[color:var(--text-main)]"
           >Configurações da Conta</h1>
 
           <p
@@ -106,7 +106,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
         </div>
 
         <nav
-      className="flex items-center gap-6 border-b border-[#3A2D27] text-sm mb-10"
+      className="flex items-center gap-6 border-b border-[color:var(--border-color)] text-sm mb-10"
         >
 
           <a
@@ -115,17 +115,17 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
           >Perfil &amp; Registro</a>
 
           <a
-      className="pb-3 text-[#968882] hover:text-[#f3eae5] transition-colors"
+      className="pb-3 text-[#968882] hover:text-[color:var(--text-main)] transition-colors"
       href="#notacao"
           >Notação &amp; Treino</a>
 
           <a
-      className="pb-3 text-[#968882] hover:text-[#f3eae5] transition-colors"
+      className="pb-3 text-[#968882] hover:text-[color:var(--text-main)] transition-colors"
       href="#notificacoes"
           >Notificações</a>
 
           <a
-      className="pb-3 text-[#968882] hover:text-[#f3eae5] transition-colors"
+      className="pb-3 text-[#968882] hover:text-[color:var(--text-main)] transition-colors"
       href="#seguranca"
           >Segurança &amp; Sessões</a>
 
@@ -147,7 +147,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
               <div>
 
                 <h2
-      className="text-base font-semibold text-[#f3eae5]"
+      className="text-base font-semibold text-[color:var(--text-main)]"
                 >Perfil &amp; Identidade Profissional</h2>
 
                 <p
@@ -169,7 +169,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
 
                   <img
       alt="Foto de perfil"
-      className="w-16 h-16 rounded-full object-cover border border-[#3A2D27]"
+      className="w-16 h-16 rounded-full object-cover border border-[color:var(--border-color)]"
       src="https://lh3.googleusercontent.com/aida/AEtjO1VcvgpwuiKK3hu_9KYWEBUt-1aZ49wRlSA9fG1EtilO7V9ZDiiFFEkVBgIoCzTxFBOB_OwzR4bVoXlT70LtBOGsIQWG3fN3Yq5-ICGZ4S71s7wt2LjVQBQBtj2jjY28UYwGK8oQqeS78lkVqXPMMEmnRXggU_6fuR7SD96PsABn-V5KP8huPLxEpLe9k4raV85qjTF2aPzTyaPHkj8WgbwfrOOemCKKxn1xZYcFt6oDCiIqNmEtN9Je4A"
                   />
 
@@ -178,7 +178,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                   >
 
                     <button
-      className="px-3 py-1.5 text-xs font-medium rounded border border-[#3A2D27] bg-[#211A17] text-[#f3eae5] hover:bg-[#29211D] transition-colors"
+      className="px-3 py-1.5 text-xs font-medium rounded border border-[color:var(--border-color)] bg-[#211A17] text-[color:var(--text-main)] hover:bg-[#29211D] transition-colors"
       type="button"
                     >
 
@@ -207,7 +207,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
 
                     <label className="text-xs font-medium text-[#b3a39c]">Nome completo</label>
                     <input
-      className="w-full bg-[#211A17] text-[#f3eae5] border border-[#3A2D27] rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] transition-colors"
+      className="w-full bg-[#211A17] text-[color:var(--text-main)] border border-[color:var(--border-color)] rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] transition-colors"
       type="text"
       {...pf('name', 'Nome completo')}
                     />
@@ -220,7 +220,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
 
                     <label className="text-xs font-medium text-[#b3a39c]">E-mail profissional</label>
                     <input
-      className="w-full bg-[#211A17] text-[#f3eae5] border border-[#3A2D27] rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] transition-colors"
+      className="w-full bg-[#211A17] text-[color:var(--text-main)] border border-[color:var(--border-color)] rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] transition-colors"
       type="email"
       {...pf('email', 'E-mail profissional')}
                     />
@@ -252,7 +252,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                     </div>
 
                     <input
-      className="w-full bg-[#211A17] text-[#f3eae5] border border-[#3A2D27] rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] font-mono transition-colors"
+      className="w-full bg-[#211A17] text-[color:var(--text-main)] border border-[color:var(--border-color)] rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] font-mono transition-colors"
       type="text"
       defaultValue="089281-G/SP"
                     />
@@ -265,7 +265,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
 
                     <label className="text-xs font-medium text-[#b3a39c]">Telefone operacional</label>
                     <input
-      className="w-full bg-[#211A17] text-[#f3eae5] border border-[#3A2D27] rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] transition-colors"
+      className="w-full bg-[#211A17] text-[color:var(--text-main)] border border-[color:var(--border-color)] rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] transition-colors"
       type="tel"
       {...pf('phone', 'Telefone operacional')}
                     />
@@ -283,7 +283,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                   >Especialidade &amp; Biografia curta</label>
 
                   <textarea
-      className="w-full bg-[#211A17] text-[#f3eae5] border border-[#3A2D27] rounded px-3 py-2 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] transition-colors leading-relaxed"
+      className="w-full bg-[#211A17] text-[color:var(--text-main)] border border-[color:var(--border-color)] rounded px-3 py-2 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] transition-colors leading-relaxed"
       rows={3}
       {...pf('bio', 'Especialidade & Biografia curta')}
                   />
@@ -299,7 +299,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                   >Unidade principal de atendimento</label>
 
                   <select
-      className="w-full bg-[#211A17] text-[#f3eae5] border border-[#3A2D27] rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] transition-colors"
+      className="w-full bg-[#211A17] text-[color:var(--text-main)] border border-[color:var(--border-color)] rounded px-3 py-1.5 text-sm focus:outline-none focus:border-[#e06c43] focus:ring-1 focus:ring-[#e06c43] transition-colors"
       {...pf('specialty', 'Unidade principal de atendimento')}
                   >
                     <option value="jardins">ShapeUp — Unidade Jardins (São Paulo, SP)</option>
@@ -316,7 +316,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
           </section>
 
           <div
-      className="border-t border-[#3A2D27]"
+      className="border-t border-[color:var(--border-color)]"
           ></div>
 
           <section className="pt-2" id="notacao">
@@ -329,11 +329,11 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                 flexWrap: 'wrap',
                 paddingBottom: 24,
                 marginBottom: 24,
-                borderBottom: '1px solid #3a2d27',
+                borderBottom: '1px solid var(--border-color)',
               }}
             >
               <div>
-                <label htmlFor="settings-language" style={{ fontSize: 14, fontWeight: 600, color: '#f3eae5' }}>
+                <label htmlFor="settings-language" style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-main)' }}>
                   {state.langTitle}
                 </label>
                 <p style={{ fontSize: 12, color: '#968882', marginTop: 4 }}>{state.langDesc}</p>
@@ -344,8 +344,8 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                 onChange={(e) => state.setLanguage(e.target.value)}
                 style={{
                   background: '#211a17',
-                  color: '#f3eae5',
-                  border: '1px solid #3a2d27',
+                  color: 'var(--text-main)',
+                  border: '1px solid var(--border-color)',
                   borderRadius: 4,
                   padding: '8px 12px',
                 }}
@@ -363,7 +363,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
               <div>
 
                 <h2
-      className="text-base font-semibold text-[#f3eae5]"
+      className="text-base font-semibold text-[color:var(--text-main)]"
                 >Notação de Treino &amp; Biomecânica</h2>
 
                 <p
@@ -380,13 +380,13 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
               >
 
                 <div
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[#3A2D27]"
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[color:var(--border-color)]"
                 >
 
                   <div>
 
                     <span
-      className="text-sm font-medium text-[#f3eae5]"
+      className="text-sm font-medium text-[color:var(--text-main)]"
                     >Sistema de unidades</span>
 
                     <p
@@ -405,7 +405,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
 
                       <input
       checked={state.unitSystem === 'metric'}
-      className="text-[#e06c43] focus:ring-[#e06c43] bg-[#211A17] border-[#3A2D27]"
+      className="text-[#e06c43] focus:ring-[#e06c43] bg-[#211A17] border-[color:var(--border-color)]"
       name="unit_system"
       type="radio"
       onChange={() => {
@@ -415,7 +415,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                     />
 
                       <span
-      className="text-[#f3eae5]"
+      className="text-[color:var(--text-main)]"
                       >Métrico (kg / cm)</span>
 
                     </label>
@@ -426,7 +426,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
 
                       <input
       checked={state.unitSystem === 'imperial'}
-      className="text-[#e06c43] focus:ring-[#e06c43] bg-[#211A17] border-[#3A2D27]"
+      className="text-[#e06c43] focus:ring-[#e06c43] bg-[#211A17] border-[color:var(--border-color)]"
       name="unit_system"
       type="radio"
       onChange={() => {
@@ -446,7 +446,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                 </div>
 
                 <div
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#3A2D27]"
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[color:var(--border-color)]"
                 >
 
                   <div
@@ -454,7 +454,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                   >
 
                     <span
-      className="text-sm font-medium text-[#f3eae5]"
+      className="text-sm font-medium text-[color:var(--text-main)]"
                     >Formato de cadência (TUT)</span>
 
                     <p
@@ -468,7 +468,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                   >
 
                     <select
-      className="w-full bg-[#211A17] text-[#f3eae5] border border-[#3A2D27] rounded px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-[#e06c43]"
+      className="w-full bg-[#211A17] text-[color:var(--text-main)] border border-[color:var(--border-color)] rounded px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-[#e06c43]"
       value={String(state.values['notation-1'] ?? '4-0-1-0')}
       onChange={(e) => state.update('notation-1', e.target.value)}
                   >
@@ -483,13 +483,13 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                 </div>
 
                 <div
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[#3A2D27]"
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[color:var(--border-color)]"
                 >
 
                   <div>
 
                     <span
-      className="text-sm font-medium text-[#f3eae5]"
+      className="text-sm font-medium text-[color:var(--text-main)]"
                     >Métrica de percepção de esforço</span>
 
                     <p
@@ -508,13 +508,13 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
 
                       <input
       defaultChecked
-      className="text-[#e06c43] focus:ring-[#e06c43] bg-[#211A17] border-[#3A2D27]"
+      className="text-[#e06c43] focus:ring-[#e06c43] bg-[#211A17] border-[color:var(--border-color)]"
       name="effort_scale"
       type="radio"
                       />
 
                       <span
-      className="text-[#f3eae5]"
+      className="text-[color:var(--text-main)]"
                       >RPE (Escala Borg 1–10)</span>
 
                     </label>
@@ -524,7 +524,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                     >
 
                       <input
-      className="text-[#e06c43] focus:ring-[#e06c43] bg-[#211A17] border-[#3A2D27]"
+      className="text-[#e06c43] focus:ring-[#e06c43] bg-[#211A17] border-[color:var(--border-color)]"
       name="effort_scale"
       type="radio"
                       />
@@ -548,7 +548,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                   >
 
                     <span
-      className="text-sm font-medium text-[#f3eae5]"
+      className="text-sm font-medium text-[color:var(--text-main)]"
                     >Incremento mínimo de carga</span>
 
                     <p
@@ -562,7 +562,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                   >
 
                     <select
-      className="w-full bg-[#211A17] text-[#f3eae5] border border-[#3A2D27] rounded px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-[#e06c43]"
+      className="w-full bg-[#211A17] text-[color:var(--text-main)] border border-[color:var(--border-color)] rounded px-3 py-1.5 text-xs font-mono focus:outline-none focus:border-[#e06c43]"
       value={String(state.values['notation-2'] ?? '1.0')}
       onChange={(e) => state.update('notation-2', e.target.value)}
                   >
@@ -581,7 +581,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
           </section>
 
           <div
-      className="border-t border-[#3A2D27]"
+      className="border-t border-[color:var(--border-color)]"
           ></div>
 
           <section
@@ -596,7 +596,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
               <div>
 
                 <h2
-      className="text-base font-semibold text-[#f3eae5]"
+      className="text-base font-semibold text-[color:var(--text-main)]"
                 >Notificações &amp; Alertas</h2>
 
                 <p
@@ -619,7 +619,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                   <div>
 
                     <span
-      className="text-sm font-medium text-[#f3eae5] block"
+      className="text-sm font-medium text-[color:var(--text-main)] block"
                     >Check-ins de treino concluídos</span>
 
                     <span
@@ -629,7 +629,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                   </div>
 
                   <input
-      className="mt-1 rounded bg-[#211A17] border-[#3A2D27] text-[#e06c43] focus:ring-[#e06c43]"
+      className="mt-1 rounded bg-[#211A17] border-[color:var(--border-color)] text-[#e06c43] focus:ring-[#e06c43]"
       type="checkbox"
       checked={Boolean(state.values['notification-0'])}
       onChange={(e) => state.update('notification-0', e.target.checked)}
@@ -638,7 +638,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                 </label>
 
                 <div
-      className="border-t border-[#3A2D27]"
+      className="border-t border-[color:var(--border-color)]"
                 ></div>
 
                 <label
@@ -648,7 +648,7 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
                   <div>
 
                     <span
-      className="text-sm font-medium text-[#f3eae5] block"
+      className="text-sm font-medium text-[color:var(--text-main)] block"
                     >Resumo diário de feedbacks</span>
 
                     <span
@@ -659,7 +659,7 @@ Compilado matinal com notas de esforço, dores articulares relatadas e vídeos a
                   </div>
 
                   <input
-      className="mt-1 rounded bg-[#211A17] border-[#3A2D27] text-[#e06c43] focus:ring-[#e06c43]"
+      className="mt-1 rounded bg-[#211A17] border-[color:var(--border-color)] text-[#e06c43] focus:ring-[#e06c43]"
       type="checkbox"
       checked={Boolean(state.values['notification-1'])}
       onChange={(e) => state.update('notification-1', e.target.checked)}
@@ -668,7 +668,7 @@ Compilado matinal com notas de esforço, dores articulares relatadas e vídeos a
                 </label>
 
                 <div
-      className="border-t border-[#3A2D27]"
+      className="border-t border-[color:var(--border-color)]"
                 ></div>
 
                 <label
@@ -678,7 +678,7 @@ Compilado matinal com notas de esforço, dores articulares relatadas e vídeos a
                   <div>
 
                     <span
-      className="text-sm font-medium text-[#f3eae5] block"
+      className="text-sm font-medium text-[color:var(--text-main)] block"
                     >Alerta de sobrecarga e queda de rendimento</span>
 
                     <span
@@ -689,7 +689,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
                   </div>
 
                   <input
-      className="mt-1 rounded bg-[#211A17] border-[#3A2D27] text-[#e06c43] focus:ring-[#e06c43]"
+      className="mt-1 rounded bg-[#211A17] border-[color:var(--border-color)] text-[#e06c43] focus:ring-[#e06c43]"
       type="checkbox"
       checked={Boolean(state.values['notification-2'])}
       onChange={(e) => state.update('notification-2', e.target.checked)}
@@ -704,7 +704,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
           </section>
 
           <div
-      className="border-t border-[#3A2D27]"
+      className="border-t border-[color:var(--border-color)]"
           ></div>
 
           <section
@@ -719,7 +719,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
               <div>
 
                 <h2
-      className="text-base font-semibold text-[#f3eae5]"
+      className="text-base font-semibold text-[color:var(--text-main)]"
                 >Segurança &amp; Sessões</h2>
 
                 <p
@@ -736,13 +736,13 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
               >
 
                 <div
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#3A2D27]"
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[color:var(--border-color)]"
                 >
 
                   <div>
 
                     <span
-      className="text-sm font-medium text-[#f3eae5]"
+      className="text-sm font-medium text-[color:var(--text-main)]"
                     >Senha de acesso</span>
 
                     <p className="text-xs text-[#968882]"></p>
@@ -750,7 +750,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
                   </div>
 
                   <button
-      className="px-3 py-1.5 text-xs font-medium rounded border border-[#3A2D27] bg-[#211A17] text-[#f3eae5] hover:bg-[#29211D] self-start sm:self-auto transition-colors"
+      className="px-3 py-1.5 text-xs font-medium rounded border border-[color:var(--border-color)] bg-[#211A17] text-[color:var(--text-main)] hover:bg-[#29211D] self-start sm:self-auto transition-colors"
       type="button"
       onClick={() => void state.onResetPassword()}
                   >
@@ -760,7 +760,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
                 </div>
 
                 <div
-      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[#3A2D27]"
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-[color:var(--border-color)]"
                 >
 
                   <div>
@@ -770,7 +770,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
                     >
 
                       <span
-      className="text-sm font-medium text-[#f3eae5]"
+      className="text-sm font-medium text-[color:var(--text-main)]"
                       >Autenticação em duas etapas (2FA)</span>
 
                       <span
@@ -786,7 +786,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
                   </div>
 
                   <button
-      className="px-3 py-1.5 text-xs font-medium rounded border border-[#3A2D27] bg-[#211A17] text-[#f3eae5] hover:bg-[#29211D] self-start sm:self-auto transition-colors"
+      className="px-3 py-1.5 text-xs font-medium rounded border border-[color:var(--border-color)] bg-[#211A17] text-[color:var(--text-main)] hover:bg-[#29211D] self-start sm:self-auto transition-colors"
       type="button"
       onClick={state.onStubAction}
                   >
@@ -816,7 +816,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
                   </div>
 
                   <div
-      className="divide-y divide-[#3A2D27] border-t border-b border-[#3A2D27] text-xs"
+      className="divide-y divide-[var(--border-color)] border-t border-b border-[color:var(--border-color)] text-xs"
                   >
 
                     <div
@@ -830,7 +830,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
                         >
 
                           <span
-      className="font-medium text-[#f3eae5]"
+      className="font-medium text-[color:var(--text-main)]"
                           >Navegador atual</span>
 
                           <span
@@ -858,7 +858,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
                       <div>
 
                         <span
-      className="font-medium text-[#f3eae5]"
+      className="font-medium text-[color:var(--text-main)]"
                         >iPhone 15 Pro — App Coach</span>
 
                         <div
@@ -894,7 +894,7 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
 
 
     <div
-      className={`fixed bottom-6 right-6 z-50 bg-[#231c19] text-[#f3eae5] border border-[#332822] px-4 py-2.5 rounded text-xs items-center gap-2.5 shadow-lg ${state.notice ? 'flex' : 'hidden'}`}
+      className={`fixed bottom-6 right-6 z-50 bg-[#231c19] text-[color:var(--text-main)] border border-[#332822] px-4 py-2.5 rounded text-xs items-center gap-2.5 shadow-lg ${state.notice ? 'flex' : 'hidden'}`}
       id="toast"
       role="status"
       hidden={!state.notice}

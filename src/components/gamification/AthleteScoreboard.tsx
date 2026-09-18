@@ -47,8 +47,8 @@ export default function AthleteScoreboard({ state }: AthleteScoreboardProps): Re
   const p = state.gamificationProfile;
   const number = (value: number) => Number(value).toLocaleString(language);
   return (
-    <section data-athlete-scoreboard style={{ borderBottom: '1px solid #3a2d27', padding: '20px 0', color: '#f3eae5' }}>
-      <style>{`[data-athlete-scoreboard] progress{appearance:none;border:0;background:#3a2d27;border-radius:2px;overflow:hidden}[data-athlete-scoreboard] progress::-webkit-progress-bar{background:#3a2d27}[data-athlete-scoreboard] progress::-webkit-progress-value{background:#e06c43}[data-athlete-scoreboard] progress::-moz-progress-bar{background:#e06c43}`}</style>
+    <section data-athlete-scoreboard style={{ borderBottom: '1px solid var(--border-color)', padding: '20px 0', color: 'var(--text-main)' }}>
+      <style>{`[data-athlete-scoreboard] progress{appearance:none;border:0;background:var(--border-color);border-radius:2px;overflow:hidden}[data-athlete-scoreboard] progress::-webkit-progress-bar{background:var(--border-color)}[data-athlete-scoreboard] progress::-webkit-progress-value{background:#e06c43}[data-athlete-scoreboard] progress::-moz-progress-bar{background:#e06c43}`}</style>
       <h2 style={{ fontSize: 13, fontWeight: 600, marginBottom: 16 }}>{l[0]}</h2>
       {state.gamificationError ? (
         <p role="alert">
@@ -63,7 +63,7 @@ export default function AthleteScoreboard({ state }: AthleteScoreboardProps): Re
             <span style={{ fontVariantNumeric: 'tabular-nums' }}>{number(p.totalXp)} XP</span>
           </div>
           <progress aria-label={l[0]} max={500} value={p.totalXp % 500} style={{ display: 'block', width: '100%', height: 6, accentColor: '#e06c43', margin: '12px 0' }} />
-          <div style={{ display: 'flex', gap: 20, justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 12, color: '#b8aaa2' }}>
+          <div style={{ display: 'flex', gap: 20, justifyContent: 'space-between', flexWrap: 'wrap', fontSize: 12, color: 'var(--text-muted)' }}>
             <span>{number(500 - (p.totalXp % 500))} XP {l[2]}</span>
             <span>{l[3]}: {p.currentStreak}</span>
             <span>ShapeScore: {number(p.shapeScore)}</span>
@@ -71,7 +71,7 @@ export default function AthleteScoreboard({ state }: AthleteScoreboardProps): Re
           </div>
         </>
       )}
-      <details style={{ marginTop: 20, borderTop: '1px solid #3a2d27', paddingTop: 12 }}>
+      <details style={{ marginTop: 20, borderTop: '1px solid var(--border-color)', paddingTop: 12 }}>
         <summary style={{ cursor: 'pointer', fontSize: 13 }}>{l[4]}</summary>
         {state.rankingError && (
           <p role="alert">
@@ -92,9 +92,9 @@ export default function AthleteScoreboard({ state }: AthleteScoreboardProps): Re
                   gap: 16,
                   alignItems: 'baseline',
                   padding: '12px 0',
-                  borderBottom: '1px solid #3a2d27',
+                  borderBottom: '1px solid var(--border-color)',
                   fontSize: 13,
-                  color: String(entry.userId) === String(user.id) ? '#e06c43' : '#f3eae5',
+                  color: String(entry.userId) === String(user.id) ? '#e06c43' : 'var(--text-main)',
                 }}
               >
                 <span style={{ width: 28, fontVariantNumeric: 'tabular-nums' }}>{index + 1}</span>

@@ -59,24 +59,24 @@ function QueueCard({
             <div className="flex items-center gap-2.5 flex-wrap">
               <span className="text-xs text-[#85766f] font-mono">#{item.requestId}</span>
             </div>
-            <h3 className="text-base font-semibold text-[#f3eae5] group-hover:text-[#ffb59d] transition-colors mt-1">
+            <h3 className="text-base font-semibold text-[var(--text-main)] group-hover:text-[#ffb59d] transition-colors mt-1">
               {item.foodName}
             </h3>
             <div className="flex items-center gap-2 text-xs text-[#85766f] mt-0.5">
               <span>
-                Enviado por: <span className="text-[#f3eae5]">{item.requestedByUserId}</span>
+                Enviado por: <span className="text-[var(--text-main)]">{item.requestedByUserId}</span>
               </span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-4 lg:self-center shrink-0">
-          <div className="flex items-center gap-3 text-xs font-mono-num bg-[#171311] px-3.5 py-2 rounded-md border border-[#2b221d]">
+          <div className="flex items-center gap-3 text-xs font-mono-num bg-[var(--bg-main)] px-3.5 py-2 rounded-md border border-[#2b221d]">
             {MACRO_KEYS.map((key, index) => (
               <div key={key} className="flex items-center gap-3">
                 {index > 0 && <div className="w-px h-6 bg-[#2b221d]" />}
                 <div>
                   <span className="text-[#85766f] text-[10px] block font-sans">{MACRO_LABELS[key]}</span>
-                  <strong className="text-[#f3eae5] text-sm">
+                  <strong className="text-[var(--text-main)] text-sm">
                     {item.proposedMacros?.[key] ?? '—'}
                   </strong>
                   {key === 'kcal' ? ' kcal' : 'g'}
@@ -114,7 +114,7 @@ export function ModerationPublicMarkup({ state }: { state: ModerationShellState 
         <div className="flex flex-col">
           <div className="h-14 px-4 border-b border-[#2b221d] flex items-center justify-between">
             <div className="flex flex-col">
-              <span className="font-condensed font-bold tracking-wider text-base text-[#f3eae5] leading-none">
+              <span className="font-condensed font-bold tracking-wider text-base text-[var(--text-main)] leading-none">
                 SHAPEUP
               </span>
               <span className="text-[10px] uppercase font-mono tracking-widest text-[#85766f]">DATA ENGINE</span>
@@ -123,7 +123,7 @@ export function ModerationPublicMarkup({ state }: { state: ModerationShellState 
           <nav className="flex flex-col px-2 space-y-0.5 mt-3">
             <span
               aria-current="page"
-              className="flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs font-medium text-[#f3eae5] bg-[#211a17] border-l-2 border-[#e06c43]"
+              className="flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs font-medium text-[var(--text-main)] bg-[#211a17] border-l-2 border-[#e06c43]"
             >
               <span className="material-symbols-outlined text-base text-[#e06c43]">restaurant</span>
               <span>Moderação de Alimentos</span>
@@ -132,17 +132,17 @@ export function ModerationPublicMarkup({ state }: { state: ModerationShellState 
         </div>
       </aside>
 
-      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 bg-[#171311]">
+      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0 bg-[var(--bg-main)]">
         <header className="h-14 border-b border-[#2b221d] bg-[#1c1613] px-5 flex items-center justify-between shrink-0 z-20">
           <div className="flex items-center gap-2 text-xs font-mono">
             <span className="text-[#85766f]">Administração</span>
             <span className="text-[#2b221d]">/</span>
-            <span className="text-[#f3eae5] font-medium">Moderação de Catálogo</span>
+            <span className="text-[var(--text-main)] font-medium">Moderação de Catálogo</span>
           </div>
           <div className="w-96 max-w-md hidden md:flex items-center relative">
             <span className="material-symbols-outlined absolute left-2.5 text-base text-[#85766f]">search</span>
             <input
-              className="w-full pl-8 pr-12 py-1.5 bg-[#171311] border border-[#2b221d] rounded text-xs text-[#f3eae5] placeholder-[#85766f] focus:outline-none focus:border-[#e06c43]"
+              className="w-full pl-8 pr-12 py-1.5 bg-[var(--bg-main)] border border-[#2b221d] rounded text-xs text-[var(--text-main)] placeholder-[#85766f] focus:outline-none focus:border-[#e06c43]"
               placeholder="Buscar por nome do produto, marca ou EAN..."
               type="text"
               value={query}
@@ -151,9 +151,9 @@ export function ModerationPublicMarkup({ state }: { state: ModerationShellState 
           </div>
         </header>
 
-        <section className="border-b border-[#2b221d] bg-[#171311] px-8 flex flex-col md:flex-row items-center justify-between gap-6 shrink-0 relative py-3.5">
+        <section className="border-b border-[#2b221d] bg-[var(--bg-main)] px-8 flex flex-col md:flex-row items-center justify-between gap-6 shrink-0 relative py-3.5">
           <div className="flex flex-col">
-            <h1 className="font-condensed text-2xl font-bold tracking-wide text-[#f3eae5] leading-tight">
+            <h1 className="font-condensed text-2xl font-bold tracking-wide text-[var(--text-main)] leading-tight">
               Moderação de Alimentos &amp; Catálogo
             </h1>
             <p className="text-xs text-[#85766f] mt-1">
@@ -162,7 +162,7 @@ export function ModerationPublicMarkup({ state }: { state: ModerationShellState 
           </div>
         </section>
 
-        <div className="flex-1 flex flex-col overflow-hidden min-h-0 relative bg-[#171311]">
+        <div className="flex-1 flex flex-col overflow-hidden min-h-0 relative bg-[var(--bg-main)]">
           <div className="flex-1 overflow-y-auto px-6 lg:px-10 py-6">
             <div className="max-w-6xl mx-auto flex flex-col space-y-5">
               <div className="flex flex-col space-y-3.5">
@@ -195,7 +195,7 @@ export function ModerationPublicMarkup({ state }: { state: ModerationShellState 
             <div className="h-16 px-6 border-b border-[#2b221d] bg-[#211a17] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 <div>
-                  <h2 className="text-sm font-semibold text-[#f3eae5] font-condensed tracking-wide uppercase">
+                  <h2 className="text-sm font-semibold text-[var(--text-main)] font-condensed tracking-wide uppercase">
                     Mesa de Análise &amp; Validação Técnica
                   </h2>
                   <span className="text-[11px] font-mono text-[#85766f]" id="drawerItemCode">
@@ -205,7 +205,7 @@ export function ModerationPublicMarkup({ state }: { state: ModerationShellState 
               </div>
               <button
                 type="button"
-                className="w-8 h-8 rounded-md border border-[#2b221d] hover:bg-[#171311] text-[#85766f] hover:text-[#f3eae5] flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-md border border-[#2b221d] hover:bg-[var(--bg-main)] text-[#85766f] hover:text-[var(--text-main)] flex items-center justify-center transition-colors"
                 title="Fechar painel (Esc)"
                 onClick={() => setSelected(null)}
               >
@@ -213,9 +213,9 @@ export function ModerationPublicMarkup({ state }: { state: ModerationShellState 
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[#171311]">
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-[var(--bg-main)]">
               <div className="p-4 rounded-lg bg-[#1c1613] border border-[#2b221d] flex flex-col gap-2">
-                <h3 className="font-condensed text-xl font-bold tracking-wide text-[#f3eae5] mt-1" id="drawerTitle">
+                <h3 className="font-condensed text-xl font-bold tracking-wide text-[var(--text-main)] mt-1" id="drawerTitle">
                   {selected?.foodName}
                 </h3>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#85766f]" id="drawerMeta">
@@ -230,7 +230,7 @@ export function ModerationPublicMarkup({ state }: { state: ModerationShellState 
               >
                 <div className="flex items-center gap-3">
                   <div>
-                    <span className="font-semibold text-[#f3eae5]" id="drawerAlertTitle">
+                    <span className="font-semibold text-[var(--text-main)]" id="drawerAlertTitle">
                       Compare os valores publicados com a proposta
                     </span>
                     <span className="block text-[#85766f] text-[11px] mt-0.5" id="drawerAlertDesc">
@@ -274,7 +274,7 @@ export function ModerationPublicMarkup({ state }: { state: ModerationShellState 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  className="px-3 py-2 rounded border border-[#2b221d] text-xs font-medium text-[#f3eae5] hover:bg-[#171311] transition-colors flex items-center gap-1.5"
+                  className="px-3 py-2 rounded border border-[#2b221d] text-xs font-medium text-[var(--text-main)] hover:bg-[var(--bg-main)] transition-colors flex items-center gap-1.5"
                   disabled={deciding}
                   onClick={() => decide('Rejected')}
                 >

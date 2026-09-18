@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vitest'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '../../..')
 const css = readFileSync(join(root, 'src/styles/design-system.css'), 'utf8')
+const gateScript = readFileSync(join(root, 'scripts/check-frontend-gates.mjs'), 'utf8')
+const packageJson = readFileSync(join(root, 'package.json'), 'utf8')
 const exercisesCss = readFileSync(
   join(root, 'src/pages/shell-assets/styles/exercises.css'),
   'utf8',
@@ -157,5 +159,20 @@ describe('design-system Warm Oxide token contract', () => {
     const lightLink = tokenValue(light, '--link-color')
     const lightBg = tokenValue(light, '--bg-main')
     expect(contrastRatio(lightLink, lightBg)).toBeGreaterThanOrEqual(4.5)
+  })
+})
+
+describe('frontend gate hygiene (design-system retheme)', () => {
+  it('skips shell-assets when scanning for retired dark palette hex', () => {
+    expect(gateScript).toContain('retiredDarkHex')
+    expect(gateScript).toMatch(/file\.includes\('shell-assets'\)/)
+    expect(gateScript).toMatch(/#493930/i)
+    expect(gateScript).toMatch(/#ed827a/i)
+  })
+
+  it('does not add playwright or pixelmatch as package dependencies', () => {
+    const deps = { ...JSON.parse(packageJson).dependencies, ...JSON.parse(packageJson).devDependencies }
+    expect(Object.keys(deps)).not.toContain('playwright')
+    expect(Object.keys(deps)).not.toContain('pixelmatch')
   })
 })
