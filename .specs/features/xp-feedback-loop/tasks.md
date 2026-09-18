@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/xp-feedback-loop/design.md`
-**Status**: Draft
+**Status**: Complete
 
 ---
 
@@ -203,11 +203,11 @@ T4 → T5
 
 **Done when**:
 
-- [ ] `submitFeedback` still enqueues finish and opens overview
-- [ ] Celebration start + popup mount match T4
-- [ ] No other session-flow edits
-- [ ] Gate check passes: `npm test && npm run lint && npm run build`
-- [ ] Spec traceability for XPF-01/02/03/05/06 set to Implementing or left for Execute to flip per task commits
+- [x] `submitFeedback` still enqueues finish and opens overview
+- [x] Celebration start + popup mount match T4
+- [x] No other session-flow edits
+- [x] Gate check passes: `npm test && npm run lint && npm run build`
+- [x] Spec traceability for XPF-01/02/03/05/06 set to Implementing or left for Execute to flip per task commits
 
 **Tests**: none
 **Gate**: build

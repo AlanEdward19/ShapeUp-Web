@@ -14,6 +14,8 @@ import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
+import XpCelebrationPopup from '../../components/gamification/XpCelebrationPopup';
+import { useXpCelebration } from '../../hooks/useXpCelebration';
 import { buildWorkoutStatePayload as buildWorkoutStateApiPayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { mapExerciseEquivalents } from '../../utils/exerciseEquivalents';
 import EquivalentPickerModal from '../../components/training/EquivalentPickerModal';
@@ -158,6 +160,8 @@ const ClientView = () => {
     const [showOverviewModal, setShowOverviewModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [sessionFeedback, setSessionFeedback] = useState({ rpe: null, comments: '' });
+
+    const xpCelebration = useXpCelebration();
 
     // Dynamic Sets Data Structure (Simplified for demo)
     // We store arrays of sets for each exercise block
@@ -721,6 +725,9 @@ const ClientView = () => {
         }
         setShowFeedbackModal(false);
         setShowOverviewModal(true);
+        if (workoutSessionId) {
+            void xpCelebration.start({ sessionId: String(workoutSessionId) });
+        }
     };
 
     const skipOverviewAndFinish = () => {
@@ -1230,6 +1237,14 @@ const ClientView = () => {
                     </div>
                 );
             })()}
+
+            <XpCelebrationPopup
+                open={xpCelebration.open}
+                status={xpCelebration.status}
+                delta={xpCelebration.delta}
+                mascotImageUrl={xpCelebration.mascotImageUrl}
+                onDismiss={xpCelebration.dismiss}
+            />
 
             <div className="su-execution-scroll" data-tour="se-exercises">
                 {sessionSwapNotice ? (

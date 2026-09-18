@@ -13,10 +13,10 @@ Gamification already credits XP on the server. The web app still fails the two m
 
 ## Goals
 
-- [ ] Finishing a workout opens an XP popup in pending state, then shows the real delta or a neutral timeout state. Never "+0 XP".
-- [ ] Popup image slot is a prop with a lucide placeholder. No mascot art.
-- [ ] `GamificationProgressCard` fill is proportional to `totalXp % 500` when that remainder is greater than 0.
-- [ ] A regression test in `src/components/gamification/__tests__/GamificationProgressCard.test.jsx` fails on a zero bar with in-level XP greater than 0, and passes after the fix.
+- [x] Finishing a workout opens an XP popup in pending state, then shows the real delta or a neutral timeout state. Never "+0 XP".
+- [x] Popup image slot is a prop with a lucide placeholder. No mascot art.
+- [x] `GamificationProgressCard` fill is proportional to `totalXp % 500` when that remainder is greater than 0.
+- [x] A regression test in `src/components/gamification/__tests__/GamificationProgressCard.test.jsx` fails on a zero bar with in-level XP greater than 0, and passes after the fix.
 
 ## Out of Scope
 
@@ -107,8 +107,8 @@ Gamification already credits XP on the server. The web app still fails the two m
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| XPF-01 | P1: Popup pending, poll, resolve, dismiss | Tasks | Implementing |
-| XPF-02 | P1: Popup timeout / neutral / poll errors | Tasks | Implementing |
+| XPF-01 | P1: Popup pending, poll, resolve, dismiss | Tasks | Verified |
+| XPF-02 | P1: Popup timeout / neutral / poll errors | Tasks | Verified |
 | XPF-03 | P1: Popup image slot | Tasks | Verified |
 | XPF-05 | P1: Card bar fill | Tasks | Verified |
 | XPF-06 | P1: Card regression test (frontend half) | Tasks | Verified |
@@ -123,8 +123,8 @@ Gamification already credits XP on the server. The web app still fails the two m
 
 ## Success Criteria
 
-- [ ] Finish workout shows pending XP popup that resolves to the credited delta or to "XP em processamento".
-- [ ] Image slot exists with lucide default. No mascot asset shipped.
-- [ ] `GamificationProgressCard` bar is empty only when `totalXp % 500 === 0`.
-- [ ] `GamificationProgressCard.test.jsx` locks that render. Nutrition-streak cases remain.
-- [ ] No new gamification formula and no new API.
+- [x] Finish workout shows pending XP popup that resolves to the credited delta or to "XP em processamento".
+- [x] Image slot exists with lucide default. No mascot asset shipped.
+- [x] `GamificationProgressCard` bar is empty only when `totalXp % 500 === 0`.
+- [x] `GamificationProgressCard.test.jsx` locks that render. Nutrition-streak cases remain.
+- [x] No new gamification formula and no new API.
