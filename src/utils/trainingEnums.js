@@ -132,3 +132,27 @@ export const unmapDifficulty = (value) => {
     if (typeof value === 'string' && isNaN(value)) return value;
     return INT_TO_DIFFICULTY[parseInt(value)] ?? 'Intermediate';
 };
+
+// ─── EXERCISE TYPE ───────────────────────────────────────────────────────────
+// ExerciseType: 1=WeightBased, 2=TimeBased
+export const EXERCISE_TYPE_TO_INT = {
+    weightbased: 1,
+    timebased: 2,
+};
+export const INT_TO_EXERCISE_TYPE = {
+    1: 'weightBased',
+    2: 'timeBased',
+};
+export const mapExerciseType = (value) => {
+    if (typeof value === 'number') return value;
+    return EXERCISE_TYPE_TO_INT[String(value).toLowerCase()] ?? 1;
+};
+export const unmapExerciseType = (value) => {
+    if (typeof value === 'string' && isNaN(value)) {
+        const lower = value.toLowerCase();
+        if (lower === 'timebased') return 'timeBased';
+        if (lower === 'weightbased') return 'weightBased';
+        return INT_TO_EXERCISE_TYPE[EXERCISE_TYPE_TO_INT[lower]] ?? 'weightBased';
+    }
+    return INT_TO_EXERCISE_TYPE[parseInt(value, 10)] ?? 'weightBased';
+};
