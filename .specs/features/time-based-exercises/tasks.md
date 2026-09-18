@@ -472,10 +472,10 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] Mapped TimeBased set exposes duration and distance
-- [ ] Existing lbs volume test still passes
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing tests plus at least 1 TimeBased mapping test
+- [x] Mapped TimeBased set exposes duration and distance
+- [x] Existing lbs volume test still passes
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing tests plus at least 1 TimeBased mapping test
 
 **Tests**: unit
 **Gate**: quick
