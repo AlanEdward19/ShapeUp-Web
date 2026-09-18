@@ -134,10 +134,10 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] API set `{ durationSeconds: 300, distanceMeters: 1000 }` normalizes to editor `duration`/`distance` strings via T2 formatters
-- [ ] Missing type normalizes to `weightBased`
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: at least 3 assertions
+- [x] API set `{ durationSeconds: 300, distanceMeters: 1000 }` normalizes to editor `duration`/`distance` strings via T2 formatters
+- [x] Missing type normalizes to `weightBased`
+- [x] Gate check passes: `npm test`
+- [x] Test count: at least 3 assertions
 
 **Tests**: unit
 **Gate**: quick

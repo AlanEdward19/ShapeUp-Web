@@ -1,4 +1,5 @@
-import { unmapSetType, unmapTechnique, unmapDifficulty, unmapBlockType, unmapIntensityType } from './trainingEnums';
+import { unmapSetType, unmapTechnique, unmapDifficulty, unmapBlockType, unmapIntensityType, unmapExerciseType } from './trainingEnums';
+import { formatDurationSeconds } from './durationDistance';
 import { unmapAssignedWeekdays } from './workoutSchedule';
 
 /**
@@ -10,8 +11,18 @@ export const normalizeSet = (s, idx) => ({
     id: s.setId ?? s.id ?? `set_${idx}`,
     type: unmapSetType(s.setType ?? s.type ?? 3),
     reps: s.repetitions == null && s.reps == null ? '' : String(s.repetitions ?? s.reps),
-    load: String(s.load ?? ''),
+    load: s.load == null ? '' : String(s.load),
     loadUnit: s.loadUnit ?? 1,
+    duration: s.durationSeconds == null && s.duration == null
+        ? ''
+        : (s.duration != null && s.duration !== ''
+            ? String(s.duration)
+            : formatDurationSeconds(s.durationSeconds)),
+    distance: s.distanceMeters == null && s.distance == null
+        ? ''
+        : (s.distance != null && s.distance !== ''
+            ? String(s.distance)
+            : (s.distanceMeters == null ? '' : String(s.distanceMeters))),
     intensityType: s.intensity ? unmapIntensityType(s.intensity.type) : null,
     intensityValue: s.intensity ? String(s.intensity.value ?? '') : '',
     rest: s.restSeconds == null && s.rest == null ? '' : String(s.restSeconds ?? s.rest),
@@ -29,6 +40,7 @@ const normalizeBlockExercise = (ex, idx) => ({
         : (ex.exercise?.muscles ? ex.exercise.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName) : m) : []),
     sets: (ex.sets ?? []).map((s, sIdx) => normalizeSet(s, sIdx)),
     requireRpe: Boolean(ex.requireRpe),
+    exerciseType: unmapExerciseType(ex.exerciseType ?? 1),
 });
 
 /**

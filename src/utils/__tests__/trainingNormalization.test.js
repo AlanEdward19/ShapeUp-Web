@@ -1,5 +1,37 @@
 import { describe, expect, it } from 'vitest';
-import { applyRequireRpeToAll, normalizeBlock, normalizePlan, normalizeTemplate } from '../trainingNormalization';
+import { applyRequireRpeToAll, normalizeBlock, normalizePlan, normalizeSet, normalizeTemplate } from '../trainingNormalization';
+
+describe('normalizeSet duration and distance (TBE-02, TBE-05)', () => {
+    it('maps API durationSeconds and distanceMeters to editor strings', () => {
+        const set = normalizeSet({ durationSeconds: 300, distanceMeters: 1000 }, 0);
+        expect(set.duration).toBe('05:00');
+        expect(set.distance).toBe('1000');
+    });
+
+    it('defaults empty duration and distance when API omits them', () => {
+        const set = normalizeSet({ repetitions: 8, load: 50 }, 0);
+        expect(set.duration).toBe('');
+        expect(set.distance).toBe('');
+    });
+});
+
+describe('normalizeBlockExercise exerciseType (TBE-02)', () => {
+    it('defaults missing exerciseType to weightBased', () => {
+        const block = normalizeBlock({
+            type: 1,
+            exercises: [{ exerciseId: 1, name: 'Squat', sets: [] }],
+        }, 0);
+        expect(block.exercises[0].exerciseType).toBe('weightBased');
+    });
+
+    it('maps API TimeBased enum to timeBased', () => {
+        const block = normalizeBlock({
+            type: 1,
+            exercises: [{ exerciseId: 2, exerciseType: 2, name: 'Run', sets: [] }],
+        }, 0);
+        expect(block.exercises[0].exerciseType).toBe('timeBased');
+    });
+});
 
 describe('normalizeBlockExercise requireRpe (WEV-05)', () => {
     it('defaults requireRpe to false when the API omits the field', () => {
