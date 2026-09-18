@@ -224,15 +224,16 @@ T6 -> T7 -> T8
 
 **Done when**:
 
-- [ ] Selecting a row without confirm does not fire `onConfirm`
-- [ ] Confirm fires once with the chosen equivalent
-- [ ] Empty list shows an explicit no-alternative message (picker not blank)
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: previous + ≥3 (no silent deletions)
+- [x] Selecting a row without confirm does not fire `onConfirm`
+- [x] Confirm fires once with the chosen equivalent
+- [x] Empty list shows an explicit no-alternative message (picker not blank)
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: previous + ≥3 (no silent deletions)
 
 **Tests**: unit
 **Gate**: full
 **Commit**: `feat(training): add equivalent picker for execution swap`
+**Status**: ✅ Complete
 
 ---
 
