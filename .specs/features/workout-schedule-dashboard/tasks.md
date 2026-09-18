@@ -198,10 +198,10 @@ T6 → T7
 
 **Done when**:
 
-- [ ] Independent create/update body includes `assignedWeekdays`
-- [ ] Tests in the same weekdays body test file cover this builder (export or shared helper used here)
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: at least 2 tests for the Independent builder (no silent deletions)
+- [x] Independent create/update body includes `assignedWeekdays`
+- [x] Tests in the same weekdays body test file cover this builder (export or shared helper used here)
+- [x] Gate check passes: `npm test`
+- [x] Test count: at least 2 tests for the Independent builder (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
@@ -305,7 +305,7 @@ The orchestrating agent's role during Execute:
 | T2: normalizePlan field | 1 function | Done |
 | T3: PlanEditor selector | 1 component | Done |
 | T4: ClientDetail body field | 1 function | Done |
-| T5: Independent body field | 1 function | Granular |
+| T5: Independent body field | 1 function | Done |
 | T6: Markup card guard | 1 component | Granular |
 | T7: AthleteView wiring | 1 cohesive shell change | Granular (same file: today + frequency) |
 
