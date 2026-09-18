@@ -1,4 +1,5 @@
 import { unmapSetType, unmapTechnique, unmapDifficulty, unmapBlockType, unmapIntensityType } from './trainingEnums';
+import { unmapAssignedWeekdays } from './workoutSchedule';
 
 /**
  * Normalizes a single set from API shape to internal PlanEditor shape.
@@ -93,5 +94,6 @@ export const normalizePlan = (plan) => ({
     active: plan.active ?? true,
     blocks: (plan.blocks ?? []).map((b, idx) => normalizeBlock(b, idx)),
     history: plan.history ?? [],
+    assignedWeekdays: unmapAssignedWeekdays(plan.assignedWeekdays),
     _planId: plan.planId,
 });

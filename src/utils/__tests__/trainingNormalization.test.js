@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyRequireRpeToAll, normalizeBlock } from '../trainingNormalization';
+import { applyRequireRpeToAll, normalizeBlock, normalizePlan, normalizeTemplate } from '../trainingNormalization';
 
 describe('normalizeBlockExercise requireRpe (WEV-05)', () => {
     it('defaults requireRpe to false when the API omits the field', () => {
@@ -16,6 +16,38 @@ describe('normalizeBlockExercise requireRpe (WEV-05)', () => {
             exercises: [{ exerciseId: 2, name: 'Bench', requireRpe: true, sets: [] }],
         }, 0);
         expect(block.exercises[0].requireRpe).toBe(true);
+    });
+});
+
+describe('normalizePlan assignedWeekdays (WSD-02, WSD-03)', () => {
+    it('defaults omitted API field to an empty array', () => {
+        const normalized = normalizePlan({ planId: 1, name: 'Legado', blocks: [] });
+        expect(normalized.assignedWeekdays).toEqual([]);
+    });
+
+    it('maps weekday strings to 0–6 indices', () => {
+        const normalized = normalizePlan({
+            planId: 2,
+            assignedWeekdays: ['Monday', 'Thursday'],
+            blocks: [],
+        });
+        expect(normalized.assignedWeekdays).toEqual([1, 4]);
+    });
+
+    it('dedupes numeric weekday values', () => {
+        const normalized = normalizePlan({
+            planId: 3,
+            assignedWeekdays: [1, 1, 4],
+            blocks: [],
+        });
+        expect(normalized.assignedWeekdays).toEqual([1, 4]);
+    });
+});
+
+describe('normalizeTemplate assignedWeekdays (WSD-02)', () => {
+    it('does not add assignedWeekdays on templates', () => {
+        const normalized = normalizeTemplate({ templateId: 9, name: 'Tpl', blocks: [] });
+        expect(normalized.assignedWeekdays).toBeUndefined();
     });
 });
 

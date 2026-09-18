@@ -111,11 +111,11 @@ T6 → T7
 
 **Done when**:
 
-- [ ] `normalizePlan` sets `assignedWeekdays: unmapAssignedWeekdays(plan.assignedWeekdays)`
-- [ ] `normalizeTemplate` permanece sem o campo de agenda
-- [ ] Tests: omitido → `[]`; `["Monday","Thursday"]` → `[1,4]`; `[1,1,4]` → `[1,4]`
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: at least 3 new tests in `src/utils/__tests__/trainingNormalization.test.js`
+- [x] `normalizePlan` sets `assignedWeekdays: unmapAssignedWeekdays(plan.assignedWeekdays)`
+- [x] `normalizeTemplate` permanece sem o campo de agenda
+- [x] Tests: omitido → `[]`; `["Monday","Thursday"]` → `[1,4]`; `[1,1,4]` → `[1,4]`
+- [x] Gate check passes: `npm test`
+- [x] Test count: at least 3 new tests in `src/utils/__tests__/trainingNormalization.test.js`
 
 **Tests**: unit
 **Gate**: quick
@@ -302,7 +302,7 @@ The orchestrating agent's role during Execute:
 | Task | Scope | Status |
 | ---- | ----- | ------ |
 | T1: workoutSchedule helpers | 1 module | Done |
-| T2: normalizePlan field | 1 function | Granular |
+| T2: normalizePlan field | 1 function | Done |
 | T3: PlanEditor selector | 1 component | Granular |
 | T4: ClientDetail body field | 1 function | Granular |
 | T5: Independent body field | 1 function | Granular |
