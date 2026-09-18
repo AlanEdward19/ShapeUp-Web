@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SuggestExerciseModal from '../../components/SuggestExerciseModal';
+import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useExercises } from '../../hooks/useExercises';
+import { mapExerciseEquivalents } from '../../utils/exerciseEquivalents';
 import DashboardShellHost from '../shell-assets/DashboardShellHost';
 import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { ExercisesPublicMarkup, type ExerciseRecord } from './markup/ExercisesPublicMarkup';
@@ -21,7 +23,10 @@ const equipmentName = (ex: ExerciseRecord) =>
 
 export default function ExercisesShell() {
   const { exercises: exerciseList, loading, error, searchTerm, setSearchTerm } = useExercises();
+  const { getExerciseEquivalents } = useTrainingApi();
   const exercises = exerciseList as ExerciseRecord[];
+  const [equivalentRecords, setEquivalentRecords] = useState<ExerciseRecord[]>([]);
+  const inspectRequestRef = useRef(0);
   const [group, setGroup] = useState('all');
   const [equipment, setEquipment] = useState('all');
   const [selected, setSelected] = useState<ExerciseRecord | null>(null);
@@ -44,11 +49,46 @@ export default function ExercisesShell() {
     trigger.current?.focus();
   };
 
+  const loadEquivalentsFor = useCallback(
+    async (exerciseId: number | string) => {
+      const requestId = ++inspectRequestRef.current;
+      try {
+        const payload = await getExerciseEquivalents(exerciseId);
+        if (inspectRequestRef.current !== requestId) return;
+        const { equivalents, records } = mapExerciseEquivalents(payload);
+        if (records.length) {
+          setEquivalentRecords((prev) => {
+            const byId = new Map(prev.map((item) => [String(item.id), item]));
+            records.forEach((rec) => byId.set(String(rec.id), rec));
+            return [...byId.values()];
+          });
+        }
+        setSelected((prev) =>
+          prev && String(prev.id) === String(exerciseId) ? { ...prev, equivalents } : prev,
+        );
+      } catch {
+        if (inspectRequestRef.current !== requestId) return;
+        setSelected((prev) =>
+          prev && String(prev.id) === String(exerciseId) ? { ...prev, equivalents: [] } : prev,
+        );
+      }
+    },
+    [getExerciseEquivalents],
+  );
+
   const inspect = (ex: ExerciseRecord, event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) => {
     trigger.current = event.currentTarget;
-    setSelected(ex);
+    setSelected({ ...ex, equivalents: [] });
     setOpen(true);
+    void loadEquivalentsFor(ex.id);
   };
+
+  const exerciseLookup = useMemo(() => {
+    const byId = new Map<string, ExerciseRecord>();
+    exercises.forEach((ex) => byId.set(String(ex.id), ex));
+    equivalentRecords.forEach((ex) => byId.set(String(ex.id), ex));
+    return [...byId.values()];
+  }, [exercises, equivalentRecords]);
 
   const filtered = useMemo(() => {
     const list = exercises.filter(
@@ -83,6 +123,7 @@ export default function ExercisesShell() {
 
   const shellState = {
     exercises,
+    exerciseLookup,
     filtered,
     loading,
     error,

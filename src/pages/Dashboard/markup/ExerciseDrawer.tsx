@@ -213,7 +213,7 @@ export function ExerciseDrawer({ state }: { state: DrawerState }): ReactElement 
 
           <ExerciseDrawerSubstitutions
             equivalents={active?.equivalents}
-            exercises={state.exercises}
+            exercises={state.exerciseLookup ?? state.exercises}
             onSelect={(ex) => {
               const target = (state.panelRef.current || document.body) as HTMLElement;
               state.inspect(ex, { currentTarget: target } as never);

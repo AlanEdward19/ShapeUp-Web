@@ -5,7 +5,9 @@ vi.mock('../../shell-assets/styles/exercises.css?inline', () => ({ default: '' }
 vi.mock('../../../contexts/AuthContext', () => ({useAuth:()=>({currentUser:{uid:'test'},signOut:vi.fn()})}));
 vi.mock('../../../contexts/UserProfileContext', () => ({useUserProfile:()=>({name:'Test',initials:'T',photo:''})}));
 vi.mock('../../../hooks/useExercises', () => ({useExercises: vi.fn()}));
+vi.mock('../../../hooks/api/useTrainingApi', () => ({ useTrainingApi: vi.fn() }));
 import { useExercises } from '../../../hooks/useExercises';
+import { useTrainingApi } from '../../../hooks/api/useTrainingApi';
 import Exercises from '../ExercisesShell';
 
 const baseExercise = {
@@ -44,7 +46,11 @@ function renderShell() {
   return { container, root, drawer: root.getElementById('exerciseDrawer') };
 }
 
+let getExerciseEquivalents;
+
 beforeEach(() => {
+  getExerciseEquivalents = vi.fn().mockResolvedValue([]);
+  useTrainingApi.mockReturnValue({ getExerciseEquivalents, getExerciseById: vi.fn() });
   mockCatalog([baseExercise]);
 });
 
@@ -89,27 +95,53 @@ describe('ExercisesShell', () => {
     expect(drawer).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('navigates the drawer to an in-memory equivalent on click', () => {
-    mockCatalog([
-      { ...baseExercise, equivalents: [{ exerciseId: 8, matchLabel: '90% similaridade motora' }] },
-      variant,
-    ]);
+  it('loads equivalents from GET when inspecting an exercise', async () => {
+    getExerciseEquivalents.mockResolvedValue([variant]);
+    mockCatalog([baseExercise, variant]);
     const { root, drawer } = renderShell();
     fireEvent.click(root.querySelector('.exercise-item'));
-    fireEvent.click(within(drawer).getByText('Variação em máquina'));
-    expect(drawer).toHaveTextContent('Variação em máquina');
-    expect(drawer).toHaveTextContent('Passo da variação');
-    expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Variação em máquina');
+    expect(getExerciseEquivalents).toHaveBeenCalledWith(7);
+    await within(drawer).findByText('Variação em máquina');
+    expect(drawer).toHaveTextContent('1 opções');
   });
 
-  it('toasts when the equivalent id is missing and keeps the current exercise', () => {
-    mockCatalog([{ ...baseExercise, equivalents: [{ exerciseId: 99 }] }]);
+  it('keeps empty substitutions when GET fails', async () => {
+    getExerciseEquivalents.mockRejectedValue(new Error('network'));
     const { root, drawer } = renderShell();
     fireEvent.click(root.querySelector('.exercise-item'));
-    fireEvent.click(within(drawer).getByRole('button', { name: /EX-99/i }));
-    expect(root.getElementById('toastMessage')).toHaveTextContent(
-      'Exercício não encontrado na lista atual',
-    );
-    expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Exercício real');
+    await vi.waitFor(() => expect(getExerciseEquivalents).toHaveBeenCalled());
+    expect(drawer).toHaveTextContent('Nenhuma substituição cadastrada para este exercício.');
+  });
+
+  it('does not apply a stale GET to a newer inspection', async () => {
+    const second = { ...baseExercise, id: 9, name: 'Outro exercício' };
+    mockCatalog([baseExercise, second]);
+    let resolveFirst;
+    getExerciseEquivalents.mockImplementation((id) => {
+      if (id === 7) {
+        return new Promise((resolve) => {
+          resolveFirst = () => resolve([variant]);
+        });
+      }
+      return Promise.resolve([]);
+    });
+    const { root, drawer } = renderShell();
+    fireEvent.click(root.querySelectorAll('.exercise-item')[0]);
+    fireEvent.click(root.querySelectorAll('.exercise-item')[1]);
+    resolveFirst();
+    await vi.waitFor(() => expect(getExerciseEquivalents).toHaveBeenCalledTimes(2));
+    expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Outro exercício');
+    expect(within(drawer).queryByText('Variação em máquina')).toBeNull();
+  });
+
+  it('navigates the drawer to an equivalent from GET records on click', async () => {
+    getExerciseEquivalents.mockResolvedValue([variant]);
+    mockCatalog([baseExercise]);
+    const { root, drawer } = renderShell();
+    fireEvent.click(root.querySelector('.exercise-item'));
+    await within(drawer).findByText('Variação em máquina');
+    fireEvent.click(within(drawer).getByText('Variação em máquina'));
+    expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Variação em máquina');
+    expect(getExerciseEquivalents).toHaveBeenLastCalledWith(8);
   });
 });

@@ -166,15 +166,16 @@ T6 -> T7 -> T8
 
 **Done when**:
 
-- [ ] `ExercisesShell.test.jsx` mocks GET and asserts mapped equivalents on the active exercise
-- [ ] Failed GET does not throw in UI; equivalents empty
-- [ ] Rapid inspect does not apply a stale response to the wrong exercise
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: previous + ≥2 (no silent deletions)
+- [x] `ExercisesShell.test.jsx` mocks GET and asserts mapped equivalents on the active exercise
+- [x] Failed GET does not throw in UI; equivalents empty
+- [x] Rapid inspect does not apply a stale response to the wrong exercise
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: previous + ≥2 (no silent deletions)
 
 **Tests**: unit
 **Gate**: full
 **Commit**: `feat(training): load equivalents when inspecting an exercise`
+**Status**: ✅ Complete
 
 ---
 
