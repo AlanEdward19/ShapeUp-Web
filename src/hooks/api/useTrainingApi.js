@@ -142,6 +142,10 @@ export const useTrainingApi = () => {
         return await apiClient(`/api/training/exercises/${exerciseId}`);
     }, []);
 
+    const getExerciseEquivalents = useCallback(async (exerciseId) => {
+        return await apiClient(`/api/training/exercises/${exerciseId}/equivalents`);
+    }, []);
+
     const createExercise = useCallback(async (command) => {
         return await apiClient('/api/training/exercises', {
             method: 'POST',
@@ -216,7 +220,7 @@ export const useTrainingApi = () => {
         // Workouts
         startWorkout, finishWorkout, updateWorkoutState, cancelWorkout, getWorkoutById, getWorkoutsByUser, getActiveWorkout,
         // Exercises
-        getExercises, getExerciseById, createExercise, updateExercise, deleteExercise, suggestExercises,
+        getExercises, getExerciseById, getExerciseEquivalents, createExercise, updateExercise, deleteExercise, suggestExercises,
         // Equipments
         getEquipments, getEquipmentById, createEquipment, updateEquipment, deleteEquipment,
         // Dashboard
