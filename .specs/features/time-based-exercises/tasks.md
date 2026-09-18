@@ -107,11 +107,11 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] `parseDurationInput('05:00') === 300`; `'abc'` and `''` return `null`; `'0:00'` returns `null` or 0 treated as invalid for gates (`null` or `<= 0`)
-- [ ] Empty distance parses as `{ ok: true, value: null }`; `'-1'` is not ok; `'1000'` is 1000
-- [ ] `formatDistanceMeters(1000)` uses km; `500` stays meters
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: at least 8 assertions covering AC edge cases (invalid format, negative distance)
+- [x] `parseDurationInput('05:00') === 300`; `'abc'` and `''` return `null`; `'0:00'` returns `null` or 0 treated as invalid for gates (`null` or `<= 0`)
+- [x] Empty distance parses as `{ ok: true, value: null }`; `'-1'` is not ok; `'1000'` is 1000
+- [x] `formatDistanceMeters(1000)` uses km; `500` stays meters
+- [x] Gate check passes: `npm test`
+- [x] Test count: at least 8 assertions covering AC edge cases (invalid format, negative distance)
 
 **Tests**: unit
 **Gate**: quick
