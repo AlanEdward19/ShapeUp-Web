@@ -1,4 +1,5 @@
 import DatePicker from '../../../components/DatePicker';
+import Skeleton from '../../../components/Skeleton';
 import HistoryChart from '../../../components/charts/HistoryChart';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { copy } from '../../shell-assets/copy';
@@ -67,6 +68,9 @@ export type NutritionDiaryViewState = {
     fatG?: number;
   } | null;
   loading: boolean;
+  loadError: string | null;
+  loadData: () => Promise<void>;
+  diary: { date: string; meals: NutritionDiaryViewState['meals']; totals?: Record<MacroKey, number> } | null;
   totals: Record<MacroKey, number>;
   meals: Array<{
     mealSlot: string;
@@ -151,7 +155,7 @@ function MacroMetric({ keyName, consumed, goal, language, tr }: MacroMetricProps
   );
 }
 
-function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement {
+export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement {
   const navigate = useNavigate();
   const { language, translateCopy } = useLanguage();
   const tr = (text: string) =>
@@ -354,8 +358,20 @@ function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8 space-y-7">
-              {state.loading ? (
-                <p className="text-text-muted">Carregando diário…</p>
+              {state.loadError ? (
+                <div className="bg-[#211A17] border border-[color:var(--border-color)] rounded-lg p-5" data-testid="diary-shell-load-error">
+                  <p className="text-error text-sm" role="alert">{state.loadError}</p>
+                  <button
+                    type="button"
+                    className="mt-3 inline-flex items-center px-3 py-1.5 rounded border border-[color:var(--border-color)] text-[13px] text-on-surface hover:bg-[#29211D]"
+                    onClick={() => state.loadData()}
+                    data-testid="diary-shell-retry-btn"
+                  >
+                    Tentar novamente
+                  </button>
+                </div>
+              ) : state.loading && !state.diary ? (
+                <Skeleton variant="table" rows={5} />
               ) : state.meals.length ? (
                 state.meals.map((meal, index) => {
                   const totals = mealTotals(meal.items);
