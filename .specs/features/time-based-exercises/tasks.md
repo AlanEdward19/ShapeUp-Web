@@ -188,9 +188,9 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] File has no local `buildWorkoutPlanBody` function
-- [ ] Save/copy paths call the shared builder
-- [ ] Gate check passes: `npm run gate && npm run lint && npx tsc --noEmit && npm test && npm run build`
+- [x] File has no local `buildWorkoutPlanBody` function
+- [x] Save/copy paths call the shared builder
+- [x] Gate check passes: `npm run gate && npm run lint && npx tsc --noEmit && npm test && npm run build`
 
 **Tests**: none
 **Gate**: build

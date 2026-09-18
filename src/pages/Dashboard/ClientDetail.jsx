@@ -30,49 +30,15 @@ import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
 import { useExercises } from '../../hooks/useExercises';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { enqueueMutation } from '../../services/mutationQueue';
-import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
 import { normalizePlan, flattenBlockExercises, applyRequireRpeToAll } from '../../utils/trainingNormalization';
-import { WEEKDAY_API_NAMES, mapAssignedWeekdaysToApi } from '../../utils/workoutSchedule';
+import { WEEKDAY_API_NAMES } from '../../utils/workoutSchedule';
 
 const PLAN_WEEKDAY_SHORT_LABELS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 
-// Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
-// from a plan object shaped like normalizePlan()'s output (PlanEditor's internal shape) and
-// need the same API request body built from it.
-// eslint-disable-next-line react-refresh/only-export-components -- mapper tested from PlanEditor save path
-export const buildWorkoutPlanBody = (plan, targetUserId) => ({
-    targetUserId,
-    name: plan.name || 'Novo Treino',
-    notes: plan.notes || null,
-    durationInWeeks: parseInt(plan.weeks) || 4,
-    phase: plan.phase || 'Hypertrophy',
-    difficulty: mapDifficulty(plan.difficulty),
-    assignedWeekdays: mapAssignedWeekdaysToApi(plan.assignedWeekdays ?? []),
-    blocks: (plan.blocks || []).map(block => ({
-        type: mapBlockType(block.type),
-        timeCapSeconds: block.timeCapSeconds === '' || block.timeCapSeconds == null ? null : parseInt(block.timeCapSeconds),
-        intervalSeconds: block.intervalSeconds === '' || block.intervalSeconds == null ? null : parseInt(block.intervalSeconds),
-        totalRounds: block.totalRounds === '' || block.totalRounds == null ? null : parseInt(block.totalRounds),
-        restAfterSeconds: block.restAfterSeconds === '' || block.restAfterSeconds == null ? null : parseInt(block.restAfterSeconds),
-        exercises: (block.exercises || []).map(ex => ({
-            exerciseId: parseInt(ex.exerciseId) || 1,
-            requireRpe: Boolean(ex.requireRpe),
-            sets: (ex.sets || []).map(s => ({
-                repetitions: s.reps === '' || s.reps == null ? null : parseInt(s.reps),
-                load: parseFloat(s.load) || 0,
-                loadUnit: mapLoadUnit(s.loadUnit),
-                setType: mapSetType(s.type ?? s.setType),
-                technique: mapTechnique(s.technique),
-                intensity: s.intensityType && s.intensityValue !== ''
-                    ? { type: mapIntensityType(s.intensityType), value: parseInt(s.intensityValue) }
-                    : null,
-                restSeconds: s.rest === '' || s.rest == null ? null : parseInt(s.rest),
-                isExtra: false
-            }))
-        }))
-    }))
-});
+import { buildWorkoutPlanBody } from '../../utils/workoutPlanPayload';
+// eslint-disable-next-line react-refresh/only-export-components -- re-export for existing plan-body tests
+export { buildWorkoutPlanBody };
 
 // ─── Helpers ────────────────────────────────────────────────
 
