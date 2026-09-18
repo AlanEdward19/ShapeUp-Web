@@ -1,11 +1,11 @@
-.st-auth-brand{display:inline-flex;align-items:center;gap:12px;color:#f3eae5;text-decoration:none;margin-bottom:40px;width:fit-content}
+.st-auth-brand{display:inline-flex;align-items:center;gap:12px;color:var(--text-main);text-decoration:none;margin-bottom:40px;width:fit-content}
 .st-auth-brand strong{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;line-height:1}
-.st-auth-mark{width:36px;height:36px;display:grid;place-items:center;border:1px solid #3a2d27;border-radius:4px;background:#211a17;color:#e06c43}
+.st-auth-mark{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--border-color);border-radius:4px;background:var(--bg-card);color:var(--primary)}
 input::-ms-reveal,input::-ms-clear{display:none}
-.st-registration-password{background-color:#1a1412;color:#f3eae5;border-color:#3a2d27;caret-color:#f3eae5;color-scheme:dark}
-.st-registration-password::placeholder{color:#b8aaa2;opacity:1}
-.st-registration-password:focus{border-color:#e06c43;outline-color:#e06c43}
-.st-registration-password:-webkit-autofill,.st-registration-password:-webkit-autofill:hover,.st-registration-password:-webkit-autofill:focus{-webkit-text-fill-color:#f3eae5;caret-color:#f3eae5;box-shadow:0 0 0 1000px #1a1412 inset}
+.st-registration-password{background-color:#1a1412;color:var(--text-main);border-color:var(--border-color);caret-color:var(--text-main);color-scheme:dark}
+.st-registration-password::placeholder{color:var(--text-muted);opacity:1}
+.st-registration-password:focus{border-color:var(--primary);outline-color:var(--primary)}
+.st-registration-password:-webkit-autofill,.st-registration-password:-webkit-autofill:hover,.st-registration-password:-webkit-autofill:focus{-webkit-text-fill-color:var(--text-main);caret-color:var(--text-main);box-shadow:0 0 0 1000px #1a1412 inset}
 .shell-body{--st-ease-out:cubic-bezier(.23,1,.32,1)}
 [data-auth-register] main{max-width:600px;padding:24px 8px}
 [data-auth-register] header{border:0;padding:0;display:block}
@@ -21,5 +21,5 @@ input::-ms-reveal,input::-ms-clear{display:none}
 .shell-body dialog{max-width:calc(100vw - 32px);max-height:calc(100dvh - 32px);overflow:auto}
 .shell-body section[id]{scroll-margin-top:100px}
 @media(max-width:767px){.shell-body>header>div{height:auto;min-height:64px;flex-wrap:wrap;padding:12px 16px;gap:12px}.shell-body>header nav{display:flex;order:3;width:100%;overflow:auto;gap:24px;font-size:14px}.shell-body>header nav a{white-space:nowrap}.shell-body>header a[href="/login"]{display:inline-block}.shell-body>header+main{padding-top:116px}.shell-body>header>div>div:last-child{gap:12px}.shell-body>header a[href="#planos"]{font-size:12px;padding:8px}}
-@media(hover:hover) and (pointer:fine){button,a{transition:background-color 160ms ease,color 160ms ease,opacity 160ms ease}.st-auth-brand:hover{color:#e06c43}}
+@media(hover:hover) and (pointer:fine){button,a{transition:background-color 160ms ease,color 160ms ease,opacity 160ms ease}.st-auth-brand:hover{color:var(--primary)}}
 @media(prefers-reduced-motion:reduce){[data-reveal]{transition:none;transform:none!important;opacity:1!important}[data-auth-register] #setup-form>*{animation:none!important}}

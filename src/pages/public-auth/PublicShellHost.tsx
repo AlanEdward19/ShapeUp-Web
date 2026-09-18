@@ -14,7 +14,7 @@ const styles = import.meta.glob('../shell-assets/styles/*.css', {
 type ManifestEntry = { bodyClass?: string; fonts: string[] };
 const manifestEntries = manifest as Record<string, ManifestEntry>;
 
-const hostBaseCss = `.st-language-picker select,.st-language-picker option{background-color:#211a17!important;color:#f3eae5!important;color-scheme:dark}.st-language-picker select{cursor:pointer}:host{all:initial;display:block;color-scheme:dark}.shell-body{min-height:100dvh;width:100%;box-sizing:border-box}.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased}button,a,input,select,textarea{touch-action:manipulation}[hidden]{display:none!important}button:disabled{opacity:.5;cursor:not-allowed} :focus-visible{outline:2px solid #e06c43;outline-offset:3px}`;
+const hostBaseCss = `.st-language-picker select,.st-language-picker option{background-color:var(--bg-card)!important;color:var(--text-main)!important;color-scheme:dark}.st-language-picker select{cursor:pointer}:host{all:initial;display:block;color-scheme:dark}.shell-body{min-height:100dvh;width:100%;box-sizing:border-box}.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased}button,a,input,select,textarea{touch-action:manipulation}[hidden]{display:none!important}button:disabled{opacity:.5;cursor:not-allowed} :focus-visible{outline:2px solid var(--primary);outline-offset:3px}`;
 
 type PublicShellHostProps = {
   name: 'landing' | 'login' | 'recovery' | 'register' | 'invitation' | 'onboarding';
@@ -135,9 +135,9 @@ export default function PublicShellHost({
                       right: 12,
                       bottom: name === 'login' ? 100 : 12,
                       zIndex: 95,
-                      background: '#211a17',
-                      color: '#f3eae5',
-                      border: '1px solid #3a2d27',
+                      background: 'var(--bg-card)',
+                      color: 'var(--text-main)',
+                      border: '1px solid var(--border-color)',
                       borderRadius: 6,
                       padding: '4px 8px',
                       fontSize: 12,

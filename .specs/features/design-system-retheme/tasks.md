@@ -175,11 +175,11 @@ T8
 
 **Done when**:
 
-- [ ] PNGs `before-login-{1440,390}.png` and `after-login-{1440,390}.png`
-- [ ] Theme toggle behavior unchanged (attribute `data-theme` still switches token blocks)
-- [ ] Retired hex in login markup outside `shell-assets/` moved to tokens if present
-- [ ] Console clean; Gate check passes: `npm test && npm run gate`
-- [ ] Test count: existing Vitest suite stays green
+- [x] PNGs `before-login-{1440,390}.png` and `after-login-{1440,390}.png`
+- [x] Theme toggle behavior unchanged (attribute `data-theme` still switches token blocks)
+- [x] Retired hex in login markup outside `shell-assets/` moved to tokens if present
+- [x] Console clean; Gate check passes: `npm test && npm run gate`
+- [x] Test count: existing Vitest suite stays green
 
 **Tests**: visual
 **Gate**: full
