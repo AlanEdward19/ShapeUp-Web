@@ -203,17 +203,16 @@ correspondentes em `exercises.css`/`professional.css` — batem exatamente.
 
 | Requirement ID | Story | Phase | Status |
 |---|---|---|---|
-| DSRT-01 | P1: Token set global consolidado (modo escuro) | Design | Pending |
-| DSRT-02 | P1: Modo claro derivado e validado por contraste | Design | Pending |
-| DSRT-03 | P1: Método de verificação por tela | Design | Pending |
-| DSRT-04 | P2: Consolidação de fonte de verdade (shell-assets) | Design | Pending |
+| DSRT-01 | P1: Token set global consolidado (modo escuro) | Tasks | Implementing |
+| DSRT-02 | P1: Modo claro derivado e validado por contraste | Tasks | Implementing |
+| DSRT-03 | P1: Método de verificação por tela | Tasks | In Tasks |
+| DSRT-04 | P2: Consolidação de fonte de verdade (shell-assets) | Tasks | Implementing |
 
 **ID format:** `DSRT-NN`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 4 total, 0 mapped to tasks, 4 unmapped ⚠️ (Tasks phase ainda não roda — aguardando
-aprovação do usuário deste par Specify+Design)
+**Coverage:** 4 total, 4 mapped to tasks (T1: DSRT-01/02/04; T2–T8: DSRT-03; T3/T5 also DSRT-01; T4/T7 also DSRT-02)
 
 ---
 
