@@ -1,5 +1,6 @@
 /* eslint-disable */
 import type { FormEvent, ReactElement } from 'react';
+import AuthBrand from '../../../components/AuthBrand';
 
 export type RecoveryShellState = {
   handleSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -33,24 +34,8 @@ export function RecoveryPublicMarkup({ state }: { state: RecoveryShellState }): 
         >
 
 
-          <div
-      className="flex items-center gap-space-sm mb-space-lg select-none"
-          >
-
-            <img
-      alt="ShapeUp Logo"
-      className="w-8 h-8 object-contain"
-      src="https://lh3.googleusercontent.com/aida/AEtjO1UEc9nRoR-8qbPC-MNsHRTEi9BLn6bgtcv2SW5cCTgsOlh4e0BkOpZRKMFbiaY80G3wZctGCfAp3UCrwBaJln9Fdqqy_1Tmy7Nq5WXWkxyJnX3t86ZEZyAoyAoBYmt7GSKrnKqjvJvfVjYpZ7622SGBdljRJw5Ipysr5ChFaG9KHVKOf1QwHjhsMg_3VrD1SiZXvpC74urs6fqq22sprYEof69AQ5hVARwBFtMs5AAh5W6a2mJSAqMdl8M"
-            />
-
-            <span
-      className="font-headline text-headline-sm tracking-wider uppercase text-on-surface"
-            >
-ShapeUp               <span
-      className="font-body text-body-sm tracking-normal text-on-surface-variant font-semibold"
-              >Workspace</span>
-            </span>
-
+          <div className="mb-space-lg">
+            <AuthBrand />
           </div>
 
 

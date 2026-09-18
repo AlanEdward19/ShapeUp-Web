@@ -2,7 +2,7 @@ import { render, fireEvent, within, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { expect, it, vi } from 'vitest';
 import { LanguageProvider } from '../../contexts/LanguageContext';
-import { LandingShell, LoginShell } from '../PublicAuthShell';
+import { LandingShell, LoginShell, RecoveryShell } from '../PublicAuthShell';
 import Registration from '../RegistrationShell';
 import RouteMetadata from '../../components/RouteMetadata';
 
@@ -98,4 +98,18 @@ for (const [language, step, badge, birth, finish, mismatch, title] of [
     expect(form.elements.password).toHaveValue('StrongPassword123!');
   });
 }
+
+it('recovery shell uses AuthBrand and bg-brand-bg like login', () => {
+  const root = mount(<RecoveryShell />);
+  expect(root.querySelector('.st-auth-brand')).toHaveAttribute('href', '/');
+  expect(root.querySelector('.shell-body').className).toMatch(/bg-brand-bg/);
+  expect(root.querySelector('img[src*="googleusercontent"]')).toBeNull();
+});
+
+it('recovery primary submit keeps primary-container tokens', () => {
+  const root = mount(<RecoveryShell />);
+  const submit = root.querySelector('button[type="submit"]');
+  expect(submit.className).toMatch(/bg-primary-container/);
+  expect(submit.className).toMatch(/hover:bg-primary/);
+});
 
