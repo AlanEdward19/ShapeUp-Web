@@ -20,7 +20,7 @@ import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
-import { buildWorkoutPlanBody } from '../../utils/workoutPlanPayload';
+import { buildWorkoutPlanBody, findTimeBasedDurationError } from '../../utils/workoutPlanPayload';
 import { buildWorkoutStatePayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { useExercises } from '../../hooks/useExercises';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
@@ -32,38 +32,15 @@ import {
     execInputClassName,
     INVALID_LOG_FLASH_MS,
     mergeSessionRequireRpe,
+    toRuntimeSets,
 } from './TrainingPlansClient';
 import './TrainingPlansClient.css';
 import './TrainingPlansProfessional.css';
 
 /* eslint-disable react-refresh/only-export-components -- execution helpers tested without mounting the page */
-export { applyToggleLoggedSetComplete, applyUpdateSetLog };
+export { applyToggleLoggedSetComplete, applyUpdateSetLog, toRuntimeSets };
 
 export const independentRestKicker = (t) => t('client.session.timer.rest_label');
-
-export const toRuntimeSets = (ex, exIdx) => ({
-    id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
-    exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
-    name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
-    muscles: ex.muscles || [],
-    target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
-    requireRpe: Boolean(ex.requireRpe),
-    sets: (ex.sets || []).map((s, sIdx) => ({
-        id: s.id || `s_${exIdx}_${sIdx}`,
-        type: s.type,
-        technique: s.technique || 'Straight',
-        target: `${s.reps} reps @ ${s.load}% | ${s.intensityType ? s.intensityType.toUpperCase() + ' ' + s.intensityValue : '—'}`,
-        completed: false,
-        failure: false,
-        prescribedRest: s.rest || 90,
-        prescribedReps: s.reps,
-        prescribedLoad: s.load,
-        prescribedRpe: s.intensityValue,
-        prescribedIntensityType: s.intensityType || 'rpe',
-        log: { weight: '', reps: '', rpe: '' },
-    })),
-});
-
 
 export { buildWorkoutPlanBody };
 
@@ -493,6 +470,11 @@ const TrainingPlansIndependent = () => {
     const handleSavePlan = (updated) => {
         const loggedInUserId = userId;
         if (!loggedInUserId) return;
+        const durationErr = findTimeBasedDurationError(updated);
+        if (durationErr) {
+            addNotification('independent', 'alert', 'Treino não salvo', durationErr, 'danger');
+            return;
+        }
         const workoutBody = buildWorkoutPlanBody(updated, loggedInUserId);
 
         console.log('Enviando treino (Solo) para a API:', workoutBody);
