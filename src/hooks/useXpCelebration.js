@@ -20,8 +20,6 @@ export const useXpCelebration = () => {
     const pollIntervalRef = useRef(null);
     const timeoutRef = useRef(null);
     const abortedRef = useRef(false);
-    const getProfileRef = useRef(getGamificationProfile);
-    getProfileRef.current = getGamificationProfile;
 
     const clearTimers = useCallback(() => {
         if (pollIntervalRef.current !== null) {
@@ -65,7 +63,7 @@ export const useXpCelebration = () => {
             return;
         }
         try {
-            const profile = await getProfileRef.current();
+            const profile = await getGamificationProfile();
             const currentTotalXp = profile?.totalXp ?? 0;
             const snapshot = snapshotRef.current ?? 0;
             if (currentTotalXp > snapshot) {
@@ -74,7 +72,7 @@ export const useXpCelebration = () => {
         } catch {
             // Keep polling until timeout; GET errors do not reset the 15s budget.
         }
-    }, [finishResolved]);
+    }, [finishResolved, getGamificationProfile]);
 
     const startPolling = useCallback((sessionId) => {
         clearTimers();
@@ -98,7 +96,7 @@ export const useXpCelebration = () => {
         let snapshot = snapshotTotalXp;
         if (snapshot === undefined || snapshot === null) {
             try {
-                const profile = await getProfileRef.current();
+                const profile = await getGamificationProfile();
                 snapshot = profile?.totalXp ?? 0;
             } catch {
                 snapshot = 0;
@@ -118,7 +116,7 @@ export const useXpCelebration = () => {
         });
         startPolling(sessionId);
         await pollOnce(sessionId);
-    }, [clearTimers, startPolling, pollOnce]);
+    }, [clearTimers, startPolling, pollOnce, getGamificationProfile]);
 
     const dismiss = useCallback(() => {
         abortedRef.current = true;

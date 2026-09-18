@@ -175,11 +175,11 @@ T4 → T5
 
 **Done when**:
 
-- [ ] `submitFeedback` still enqueues `/api/training/workouts/${workoutSessionId}/finish` and sets `showOverviewModal`
-- [ ] Same function starts the celebration hook with that session id
-- [ ] Popup is mounted; dismiss is wired to hook `dismiss`
-- [ ] No edits to rest timer, set logging, or plan fetch
-- [ ] Gate check passes: `npm test && npm run lint`
+- [x] `submitFeedback` still enqueues `/api/training/workouts/${workoutSessionId}/finish` and sets `showOverviewModal`
+- [x] Same function starts the celebration hook with that session id
+- [x] Popup is mounted; dismiss is wired to hook `dismiss`
+- [x] No edits to rest timer, set logging, or plan fetch
+- [x] Gate check passes: `npm test && npm run lint`
 
 **Tests**: none
 **Gate**: full

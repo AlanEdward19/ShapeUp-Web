@@ -25,6 +25,8 @@ import { mapAssignedWeekdaysToApi } from '../../utils/workoutSchedule';
 import { buildWorkoutStatePayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { useExercises } from '../../hooks/useExercises';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
+import XpCelebrationPopup from '../../components/gamification/XpCelebrationPopup';
+import { useXpCelebration } from '../../hooks/useXpCelebration';
 import {
     applyToggleLoggedSetComplete,
     applyUpdateSetLog,
@@ -250,6 +252,8 @@ const TrainingPlansIndependent = () => {
     const [showSessionDetail, setShowSessionDetail] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [planToDelete, setPlanToDelete] = useState(null);
+
+    const xpCelebration = useXpCelebration();
 
     // 4. Pagination
     const [historyPage] = useState(1);
@@ -692,6 +696,9 @@ const TrainingPlansIndependent = () => {
         }
         setShowFeedbackModal(false);
         setShowOverviewModal(true);
+        if (workoutSessionId) {
+            void xpCelebration.start({ sessionId: String(workoutSessionId) });
+        }
     };
 
     const handleSessionCompleted = () => {
@@ -1097,6 +1104,14 @@ const TrainingPlansIndependent = () => {
                     onClose={() => setShowSessionDetail(null)}
                 />
             )}
+            <XpCelebrationPopup
+                open={xpCelebration.open}
+                status={xpCelebration.status}
+                delta={xpCelebration.delta}
+                mascotImageUrl={xpCelebration.mascotImageUrl}
+                onDismiss={xpCelebration.dismiss}
+            />
+
             {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (
                 <div className="su-modal-overlay su-delete-confirm-overlay" onClick={() => { setShowDeleteConfirm(false); setPlanToDelete(null); }}>
