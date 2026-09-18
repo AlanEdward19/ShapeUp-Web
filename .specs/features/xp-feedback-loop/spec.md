@@ -109,7 +109,7 @@ Gamification already credits XP on the server. The web app still fails the two m
 | -------------- | ----- | ----- | ------ |
 | XPF-01 | P1: Popup pending, poll, resolve, dismiss | Tasks | Implementing |
 | XPF-02 | P1: Popup timeout / neutral / poll errors | Tasks | Implementing |
-| XPF-03 | P1: Popup image slot | Tasks | In Tasks |
+| XPF-03 | P1: Popup image slot | Tasks | Verified |
 | XPF-05 | P1: Card bar fill | Tasks | Verified |
 | XPF-06 | P1: Card regression test (frontend half) | Tasks | Verified |
 

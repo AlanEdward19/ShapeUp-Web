@@ -1,0 +1,67 @@
+.su-xp-celebration-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 1rem;
+    pointer-events: none;
+}
+
+.su-xp-celebration-card {
+    position: relative;
+    pointer-events: auto;
+    width: min(100%, 22rem);
+    padding: 1.25rem 1.5rem 1.5rem;
+    border-radius: var(--radius-lg, 12px);
+    background: var(--surface-elevated, var(--bg-card, #fff));
+    box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, 0.18));
+    text-align: center;
+}
+
+.su-xp-celebration-dismiss {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.65rem;
+    border: 0;
+    background: transparent;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.su-xp-celebration-mascot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary);
+}
+
+.su-xp-celebration-mascot img {
+    max-height: 4rem;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.su-xp-celebration-delta {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.su-xp-celebration-neutral,
+.su-xp-celebration-pending {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.su-xp-celebration-pending {
+    color: var(--text-muted);
+}

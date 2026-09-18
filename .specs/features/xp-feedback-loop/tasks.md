@@ -142,14 +142,14 @@ T4 → T5
 
 **Done when**:
 
-- [ ] `status="pending"` has no `+0 XP` and no numeric `+N XP`
-- [ ] `status="resolved"` `delta={120}` shows `+120 XP`
-- [ ] `status="neutral"` shows `XP em processamento` and not `+0 XP`
-- [ ] Without `mascotImageUrl`, a lucide placeholder is present. With `mascotImageUrl`, that URL is used
-- [ ] Dismiss control calls `onDismiss`
-- [ ] `open={false}` renders nothing
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: at least 5 cases in `src/components/gamification/__tests__/XpCelebrationPopup.test.jsx`
+- [x] `status="pending"` has no `+0 XP` and no numeric `+N XP`
+- [x] `status="resolved"` `delta={120}` shows `+120 XP`
+- [x] `status="neutral"` shows `XP em processamento` and not `+0 XP`
+- [x] Without `mascotImageUrl`, a lucide placeholder is present. With `mascotImageUrl`, that URL is used
+- [x] Dismiss control calls `onDismiss`
+- [x] `open={false}` renders nothing
+- [x] Gate check passes: `npm test`
+- [x] Test count: at least 5 cases in `src/components/gamification/__tests__/XpCelebrationPopup.test.jsx`
 
 **Tests**: unit
 **Gate**: quick
