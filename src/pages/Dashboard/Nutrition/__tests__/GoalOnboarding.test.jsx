@@ -36,6 +36,27 @@ describe('GoalOnboarding', () => {
         });
     });
 
+    it('shows card skeleton while TDEE submit is pending', async () => {
+        let resolveOnboard;
+        mockCompleteOnboarding.mockImplementation(
+            () => new Promise((resolve) => { resolveOnboard = resolve; }),
+        );
+
+        const { getByTestId } = renderOnboarding();
+        fireEvent.change(getByTestId('height-input'), { target: { value: '175' } });
+        fireEvent.change(getByTestId('age-input'), { target: { value: '30' } });
+        fireEvent.click(getByTestId('onboarding-submit-btn'));
+
+        expect(getByTestId('skeleton')).toHaveAttribute('data-variant', 'card');
+        resolveOnboard({
+            activeGoal: { kcal: 2200, proteinG: 165, carbG: 220, fatG: 70 },
+            onboardingSkipped: false,
+        });
+        await waitFor(() => {
+            expect(getByTestId('goal-result')).toBeInTheDocument();
+        });
+    });
+
     it('completes TDEE onboarding flow', async () => {
         const { getByTestId } = renderOnboarding();
 

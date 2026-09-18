@@ -3,6 +3,7 @@ import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import Skeleton from '../../../components/Skeleton';
 import './Nutrition.css';
 
 const ACTIVITY_LEVELS = [
@@ -95,6 +96,9 @@ const GoalOnboarding = () => {
             {mode === 'onboarding' ? (
                 <section className="su-journal-sheet" data-testid="onboarding-form">
                     <h3 className="su-ledger-heading">{t('nutrition.goal.tdee_heading')}</h3>
+                    {loading ? (
+                        <Skeleton variant="card" />
+                    ) : (
                     <form onSubmit={handleOnboarding}>
                         <Input
                             label={t('nutrition.goal.height')}
@@ -137,13 +141,17 @@ const GoalOnboarding = () => {
                         </div>
                         {error && <p className="su-input-error-text" role="alert">{error}</p>}
                         <Button type="submit" disabled={loading} data-testid="onboarding-submit-btn">
-                            {loading ? t('nutrition.goal.calculating') : t('nutrition.goal.calculate')}
+                            {t('nutrition.goal.calculate')}
                         </Button>
                     </form>
+                    )}
                 </section>
             ) : (
                 <section className="su-journal-sheet" data-testid="manual-goal-form">
                     <h3 className="su-ledger-heading">{t('nutrition.goal.manual')}</h3>
+                    {loading ? (
+                        <Skeleton variant="card" />
+                    ) : (
                     <form onSubmit={handleManualGoal}>
                         <div className="su-macro-fields">
                             <Input label={t('nutrition.macro.kcal')} type="number" value={manualGoal.kcal} onChange={(e) => setManualGoalState((p) => ({ ...p, kcal: e.target.value }))} data-testid="manual-kcal-input" />
@@ -153,9 +161,10 @@ const GoalOnboarding = () => {
                         </div>
                         {error && <p className="su-input-error-text" role="alert">{error}</p>}
                         <Button type="submit" disabled={loading} data-testid="manual-submit-btn">
-                            {loading ? t('nutrition.form.saving') : t('nutrition.goal.save')}
+                            {t('nutrition.goal.save')}
                         </Button>
                     </form>
+                    )}
                 </section>
             )}
 
