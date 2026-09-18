@@ -16,6 +16,7 @@ import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormal
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import { buildWorkoutStatePayload as buildWorkoutStateApiPayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { canCompleteLoggedSet, clampRpeLog } from '../../utils/setExecutionValidation';
+import { difficultyLabel, phaseLabel } from '../../utils/translateKnown';
 import './TrainingPlansClient.css';
 
 /* eslint-disable react-refresh/only-export-components -- execution helpers tested without mounting the page */
@@ -71,6 +72,12 @@ export const applyUpdateSetLog = (exercises, exerciseIndex, setIndex, field, val
     }
     return next;
 };
+
+export const clientPlanListingLabels = (t, plan = {}) => ({
+    restKicker: t('client.session.timer.rest_label'),
+    phase: phaseLabel(t, plan.phase),
+    difficulty: difficultyLabel(t, plan.difficulty),
+});
 
 export const mergeSessionRequireRpe = (planExercises, sessionExercises) => {
     if (!Array.isArray(sessionExercises) || sessionExercises.length === 0) return planExercises;
@@ -843,9 +850,9 @@ const ClientView = () => {
                             <div key={plan.id} className="su-ledger-sheet su-mb-4">
                                 <div className="su-plan-hero">
                                     <div className="su-plan-hero-content">
-                                        <span className="su-tag">{plan.phase}</span>
+                                        <span className="su-tag">{phaseLabel(t, plan.phase)}</span>
                                         <h2 className="su-plan-title">{plan.name}</h2>
-                                        <p className="su-coach-credit">{t('client.training.card.difficulty')}: <strong>{plan.difficulty}</strong> · {plan.weeks} {t('client.training.card.weeks')}</p>
+                                        <p className="su-coach-credit">{t('client.training.card.difficulty')}: <strong>{difficultyLabel(t, plan.difficulty)}</strong> · {plan.weeks} {t('client.training.card.weeks')}</p>
 
                                         <div className="su-plan-meta-row">
                                             <div className="su-meta-pill">
@@ -953,7 +960,7 @@ const ClientView = () => {
                         </button>
 
                         <div className="su-rest-clock-display">
-                            <span className="su-timer-kicker">Rest</span>
+                            <span className="su-timer-kicker">{t('client.session.timer.rest_label')}</span>
                             <span className="su-timer-digits">
                                 {formatTime(restTimer)}
                             </span>

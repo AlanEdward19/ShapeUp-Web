@@ -402,9 +402,9 @@ T13
 
 **Done when**:
 
-- [ ] Nenhuma string literal `"Rest"` no kicker
-- [ ] Tag de fase/dificuldade não renderiza chave crua
-- [ ] Gate check passes: `npm test`
+- [x] Nenhuma string literal `"Rest"` no kicker
+- [x] Tag de fase/dificuldade não renderiza chave crua
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit  
 **Gate**: full
