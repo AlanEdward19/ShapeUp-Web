@@ -247,10 +247,10 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] No `NutritionNav` import/render
-- [ ] Create/activate tests still pass
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite does not drop (no silent deletions)
+- [x] No `NutritionNav` import/render
+- [x] Create/activate tests still pass
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite does not drop (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
@@ -272,10 +272,10 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] No `NutritionNav` import/render
-- [ ] TDEE and manual-goal tests still pass
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing suite does not drop (no silent deletions)
+- [x] No `NutritionNav` import/render
+- [x] TDEE and manual-goal tests still pass
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing suite does not drop (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
@@ -297,10 +297,10 @@ T15 -> T16 -> T17 -> T18
 
 **Done when**:
 
-- [ ] Fallback markup has no `NutritionNav`
-- [ ] Existing meal/empty/remove tests still pass
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: existing suite does not drop (no silent deletions)
+- [x] Fallback markup has no `NutritionNav`
+- [x] Existing meal/empty/remove tests still pass
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: existing suite does not drop (no silent deletions)
 
 **Tests**: unit
 **Gate**: full

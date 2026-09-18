@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
-import NutritionNav from './NutritionNav';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import './Nutrition.css';
@@ -70,7 +69,6 @@ const MealPlanManager = () => {
 
     return (
         <div className="su-nutrition-page">
-            <NutritionNav />
             <header className="su-nutrition-masthead">
                 <div>
                     <span className="su-nutrition-kicker">{t('nutrition.plan.kicker')}</span>
