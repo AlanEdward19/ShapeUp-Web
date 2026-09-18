@@ -373,12 +373,12 @@ T13
 
 **Done when**:
 
-- [ ] `requireRpe` true + RPE vazio recusa conclusão
-- [ ] `requireRpe` false permite RPE vazio
-- [ ] Failure RPE 10 passa
-- [ ] Input RPE clampa 1–10 e arredonda não inteiro; vazio opcional permanece vazio
-- [ ] Resume lê `requireRpe` da sessão quando existir
-- [ ] Gate check passes: `npm test`
+- [x] `requireRpe` true + RPE vazio recusa conclusão
+- [x] `requireRpe` false permite RPE vazio
+- [x] Failure RPE 10 passa
+- [x] Input RPE clampa 1–10 e arredonda não inteiro; vazio opcional permanece vazio
+- [x] Resume lê `requireRpe` da sessão quando existir
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit  
 **Gate**: full

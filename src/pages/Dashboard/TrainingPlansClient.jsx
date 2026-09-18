@@ -15,7 +15,7 @@ import { generateObjectId } from '../../utils/objectId';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import { buildWorkoutStatePayload as buildWorkoutStateApiPayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
-import { canCompleteLoggedSet } from '../../utils/setExecutionValidation';
+import { canCompleteLoggedSet, clampRpeLog } from '../../utils/setExecutionValidation';
 import './TrainingPlansClient.css';
 
 /* eslint-disable react-refresh/only-export-components -- execution helpers tested without mounting the page */
@@ -58,7 +58,7 @@ export const applyToggleLoggedSetComplete = (exercises, exerciseIndex, setIndex)
 export const applyUpdateSetLog = (exercises, exerciseIndex, setIndex, field, value) => {
     const next = cloneRuntimeExercises(exercises);
     const set = next[exerciseIndex].sets[setIndex];
-    set.log[field] = value;
+    set.log[field] = field === 'rpe' ? clampRpeLog(value) : value;
     if (set.completed) {
         const gate = canCompleteLoggedSet({
             weight: set.log.weight,
@@ -72,12 +72,28 @@ export const applyUpdateSetLog = (exercises, exerciseIndex, setIndex, field, val
     return next;
 };
 
-const toRuntimeSets = (ex, exIdx) => ({
+export const mergeSessionRequireRpe = (planExercises, sessionExercises) => {
+    if (!Array.isArray(sessionExercises) || sessionExercises.length === 0) return planExercises;
+    return planExercises.map((ex, idx) => {
+        const exId = ex.exerciseId ?? ex.id;
+        const snap = sessionExercises.find((s) => (s.exerciseId ?? s.ExerciseId ?? s.id) === exId)
+            ?? sessionExercises[idx];
+        if (!snap) return ex;
+        if (!Object.prototype.hasOwnProperty.call(snap, 'requireRpe')
+            && !Object.prototype.hasOwnProperty.call(snap, 'RequireRpe')) {
+            return ex;
+        }
+        return { ...ex, requireRpe: Boolean(snap.requireRpe ?? snap.RequireRpe) };
+    });
+};
+
+export const toRuntimeSets = (ex, exIdx) => ({
     id: ex.exerciseId ?? ex.id ?? `ex_${exIdx}`,
     exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
     name: ex.name || ex.exerciseNamePt || ex.exerciseName || 'Exercise',
     muscles: ex.muscles || [],
     target: (ex.muscles && ex.muscles.length > 0) ? ex.muscles.join(', ') : (ex.tags || 'General'),
+    requireRpe: Boolean(ex.requireRpe),
     sets: (ex.sets || []).map((s, sIdx) => ({
         id: s.id || `s_${exIdx}_${sIdx}`,
         type: s.type,
@@ -291,10 +307,14 @@ const ClientView = () => {
 
             if (plan) {
                 // Map exercises to runtime format
-                const runtimeExercises = enrichExercisesFromCatalog(
+                const flattened = enrichExercisesFromCatalog(
                     flattenBlockExercises(plan.blocks),
                     exercisesDB
-                ).map(toRuntimeSets);
+                );
+                const sessionExercises = pendingActiveWorkout.exercises
+                    || pendingActiveWorkout.Exercises;
+                const runtimeExercises = mergeSessionRequireRpe(flattened, sessionExercises)
+                    .map(toRuntimeSets);
 
                 setExercises(runtimeExercises);
                 hasFirstDoneRef.current = false;

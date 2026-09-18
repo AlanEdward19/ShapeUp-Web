@@ -4,6 +4,8 @@ import {
     applyUpdateSetLog,
     execInputClassName,
     INVALID_LOG_FLASH_MS,
+    mergeSessionRequireRpe,
+    toRuntimeSets,
 } from '../TrainingPlansClient';
 
 const setOf = (overrides = {}) => ({
@@ -67,5 +69,55 @@ describe('client execution weight/reps gate (WEV-01)', () => {
         );
         expect(extraOk.exercises[0].sets[0].completed).toBe(true);
         expect(extraOk.startRest).toBe(true);
+    });
+});
+
+describe('client required RPE and clamp (WEV-07, WEV-08)', () => {
+    it('refuses complete when requireRpe is true and RPE is empty', () => {
+        const result = applyToggleLoggedSetComplete(
+            session([setOf({ log: { weight: '60', reps: '8', rpe: '' } })], true),
+            0,
+            0,
+        );
+        expect(result.exercises[0].sets[0].completed).toBe(false);
+        expect(result.startRest).toBe(false);
+        expect(result.missing).toEqual(['rpe']);
+        expect(execInputClassName(result.missing, 'rpe')).toBe('su-exec-input su-exec-input--invalid');
+    });
+
+    it('allows empty RPE when requireRpe is false', () => {
+        const result = applyToggleLoggedSetComplete(
+            session([setOf({ log: { weight: '60', reps: '8', rpe: '' } })], false),
+            0,
+            0,
+        );
+        expect(result.missing).toEqual([]);
+        expect(result.exercises[0].sets[0].completed).toBe(true);
+    });
+
+    it('allows failure with RPE 10 when RPE is required', () => {
+        const result = applyToggleLoggedSetComplete(
+            session([setOf({ failure: true, log: { weight: '60', reps: '8', rpe: '10' } })], true),
+            0,
+            0,
+        );
+        expect(result.exercises[0].sets[0].completed).toBe(true);
+    });
+
+    it('clamps RPE on log update to 1-10 integers and keeps optional empty', () => {
+        const base = session([setOf({ log: { weight: '60', reps: '8', rpe: '' } })], false);
+        expect(applyUpdateSetLog(base, 0, 0, 'rpe', '15')[0].sets[0].log.rpe).toBe('10');
+        expect(applyUpdateSetLog(base, 0, 0, 'rpe', '8.5')[0].sets[0].log.rpe).toBe('9');
+        expect(applyUpdateSetLog(base, 0, 0, 'rpe', '')[0].sets[0].log.rpe).toBe('');
+    });
+
+    it('copies requireRpe into runtime sets and prefers the session snapshot on resume', () => {
+        expect(toRuntimeSets({ exerciseId: 1, requireRpe: true, sets: [] }, 0).requireRpe).toBe(true);
+        expect(toRuntimeSets({ exerciseId: 1, sets: [] }, 0).requireRpe).toBe(false);
+
+        const planExercises = [{ exerciseId: 1, requireRpe: false }];
+        const sessionExercises = [{ exerciseId: 1, requireRpe: true }];
+        expect(mergeSessionRequireRpe(planExercises, sessionExercises)[0].requireRpe).toBe(true);
+        expect(mergeSessionRequireRpe(planExercises, undefined)[0].requireRpe).toBe(false);
     });
 });

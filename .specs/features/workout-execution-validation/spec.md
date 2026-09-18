@@ -188,8 +188,8 @@ Na execução (`TrainingPlansClient.jsx`, `toggleSetComplete`), o aluno marca um
 | WEV-04 | P1: i18n fase/dificuldade | Execute | Implementing |
 | WEV-05 | P1: Toggle requireRpe (UI) | Execute | Implementing |
 | WEV-06 | P1: Bulk requireRpe (UI) | Execute | Implementing |
-| WEV-07 | P1: Gate RPE na execução (UI) | Tasks | Pending |
-| WEV-08 | P2: Clamp RPE 1–10 (UI) | Tasks | Pending |
+| WEV-07 | P1: Gate RPE na execução (UI) | Execute | Implementing |
+| WEV-08 | P2: Clamp RPE 1–10 (UI) | Execute | Implementing |
 
 **ID format:** `WEV-NN` (mesmos IDs do spec canônico; WEV-02 não entra neste repo)
 
