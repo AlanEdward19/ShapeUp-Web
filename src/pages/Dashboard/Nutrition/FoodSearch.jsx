@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import FoodForm from './FoodForm';
+import Skeleton from '../../../components/Skeleton';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { supportsBarcodeDetector } from './nutritionUtils';
@@ -171,10 +172,10 @@ const FoodSearch = () => {
                 />
             )}
 
-            {!selectedFood && !showCreateForm && searched && (
+            {!selectedFood && !showCreateForm && (searched || loading) && (
                 <section className="su-journal-sheet" data-testid="search-results">
                     {loading ? (
-                        <p className="su-text-muted">{t('nutrition.foods.searching')}</p>
+                        <Skeleton variant="list" rows={4} />
                     ) : results.length === 0 ? (
                         <p className="su-text-muted su-empty-ledger" data-testid="empty-state">
                             {t('nutrition.foods.empty')}

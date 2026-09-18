@@ -59,6 +59,36 @@ describe('FoodSearch', () => {
         expect(mockSearchFoods).toHaveBeenCalledWith('arroz');
     });
 
+    it('shows list skeleton while search is pending', async () => {
+        let resolveSearch;
+        mockSearchFoods.mockImplementation(
+            () => new Promise((resolve) => { resolveSearch = resolve; }),
+        );
+
+        const { getByTestId } = renderFoodSearch();
+        fireEvent.change(getByTestId('food-search-input'), { target: { value: 'arroz' } });
+        fireEvent.click(getByTestId('food-search-btn'));
+
+        expect(getByTestId('skeleton')).toHaveAttribute('data-variant', 'list');
+        resolveSearch({ items: [] });
+        await waitFor(() => {
+            expect(getByTestId('empty-state')).toBeInTheDocument();
+        });
+    });
+
+    it('clears skeleton and shows alert when search fails', async () => {
+        mockSearchFoods.mockRejectedValue(new Error('Search failed'));
+
+        const { getByTestId, queryByTestId } = renderFoodSearch();
+        fireEvent.change(getByTestId('food-search-input'), { target: { value: 'arroz' } });
+        fireEvent.click(getByTestId('food-search-btn'));
+
+        await waitFor(() => {
+            expect(document.querySelector('[role="alert"]')).toHaveTextContent('Search failed');
+        });
+        expect(queryByTestId('skeleton')).not.toBeInTheDocument();
+    });
+
     it('shows empty state when search returns no results', async () => {
         mockSearchFoods.mockResolvedValue({ items: [] });
 
