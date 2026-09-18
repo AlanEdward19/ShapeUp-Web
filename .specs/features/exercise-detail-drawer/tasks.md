@@ -116,11 +116,11 @@ T5 ------→ T6 ------→ T7
 
 **Done when**:
 
-- [ ] File, YouTube, Vimeo, empty, malformed, and unknown-host URLs are classified
-- [ ] Unknown hosts never classify as a generic iframe provider
-- [ ] Tests live in `src/pages/Dashboard/__tests__/exerciseVideo.test.js`
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: 6 tests pass (no silent deletions)
+- [x] File, YouTube, Vimeo, empty, malformed, and unknown-host URLs are classified
+- [x] Unknown hosts never classify as a generic iframe provider
+- [x] Tests live in `src/pages/Dashboard/__tests__/exerciseVideo.test.js`
+- [x] Gate check passes: `npm test`
+- [x] Test count: 6 tests pass (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
