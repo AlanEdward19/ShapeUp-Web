@@ -367,10 +367,10 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] Tests cover TBE-03 AC1–AC7 (WeightBased regression, blank duration, duration without distance, bad distance, auto-uncomplete, extra set, RequireRpe)
-- [ ] Invalid duration format is treated as empty
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: at least 7 tests, 1:1 with those ACs (no silent deletions)
+- [x] Tests cover TBE-03 AC1–AC7 (WeightBased regression, blank duration, duration without distance, bad distance, auto-uncomplete, extra set, RequireRpe)
+- [x] Invalid duration format is treated as empty
+- [x] Gate check passes: `npm test`
+- [x] Test count: at least 7 tests, 1:1 with those ACs (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
