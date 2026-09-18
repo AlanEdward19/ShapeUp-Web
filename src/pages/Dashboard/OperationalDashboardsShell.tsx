@@ -11,6 +11,12 @@ import { useGymManagementApi } from '../../hooks/api/useGymManagementApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { normalizePlan } from '../../utils/trainingNormalization';
+import {
+  computeSessionsTargetPerWeek,
+  exercisesForToday,
+  getLocalWeekday,
+  plansForToday,
+} from '../../utils/workoutSchedule';
 import WorkspaceShellPage from '../../components/Workspace/WorkspaceShellPage';
 import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { AthleteDashboardMarkup, type AthleteDashboardState } from './operational-dashboard/AthleteDashboardMarkup';
@@ -128,7 +134,7 @@ export function ProfessionalDashboard() {
   );
 }
 
-function AthleteView(scoreboardState: AthleteDashboardState) {
+export function AthleteView(scoreboardState: AthleteDashboardState) {
   const user = useUserProfile();
   const { language, tr } = useDashboardCopy();
   const navigate = useNavigate();
@@ -140,9 +146,11 @@ function AthleteView(scoreboardState: AthleteDashboardState) {
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [plans, setPlans] = useState<NormalizedPlan[]>([]);
   const [trainingError, setTrainingError] = useState('');
+  const [plansLoadSettled, setPlansLoadSettled] = useState(false);
 
   useEffect(() => {
     let active = true;
+    setPlansLoadSettled(false);
     getMe()
       .then(me =>
         Promise.all([
@@ -164,9 +172,13 @@ function AthleteView(scoreboardState: AthleteDashboardState) {
               volume: parseFloat(workoutHistory(item).totalVol),
             })),
         );
+        setPlansLoadSettled(true);
       })
       .catch(() => {
-        if (active) setTrainingError('Não foi possível carregar seu histórico de treinamento.');
+        if (active) {
+          setTrainingError('Não foi possível carregar seu histórico de treinamento.');
+          setPlansLoadSettled(true);
+        }
       });
     return () => {
       active = false;
@@ -175,16 +187,26 @@ function AthleteView(scoreboardState: AthleteDashboardState) {
 
   const [dashboard, setDashboard] = useState<AthleteDashboardState['dashboard']>(null);
   useEffect(() => {
+    if (!plansLoadSettled || trainingError) {
+      return;
+    }
+    const sessionsTarget = computeSessionsTargetPerWeek(plans);
+    if (sessionsTarget == null) {
+      setDashboard(null);
+      return;
+    }
     let active = true;
-    getDashboardMe(5)
+    getDashboardMe(sessionsTarget)
       .then(data => {
         if (active) setDashboard(data);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (active) setDashboard(null);
+      });
     return () => {
       active = false;
     };
-  }, [getDashboardMe]);
+  }, [plans, plansLoadSettled, trainingError, getDashboardMe]);
 
   const [nutrition, setNutrition] = useState<AthleteDashboardState['nutrition']>({});
   useEffect(() => {
@@ -200,7 +222,10 @@ function AthleteView(scoreboardState: AthleteDashboardState) {
   }, [date, getDiaryDay, getNutritionProfile]);
 
   const plan = plans[0];
-  const exercises = plan?.blocks?.flatMap(block => block.exercises || []) || plan?.exercises || [];
+  const weekday = getLocalWeekday();
+  const todayPlans = plansForToday(plans, weekday);
+  const showTodayCard = todayPlans.length > 0;
+  const exercises = showTodayCard ? exercisesForToday(plans, weekday) : [];
   const messages = read<StoredMessage[]>('shapeup_messages', []).filter(
     message =>
       String(message.clientId) === String(localStorage.getItem('shapeup_client_id') || 1) &&
@@ -211,6 +236,7 @@ function AthleteView(scoreboardState: AthleteDashboardState) {
     ...scoreboardState,
     userName: user.name || 'Minha conta',
     plan,
+    showTodayCard,
     exercises,
     chartData,
     trainingError,

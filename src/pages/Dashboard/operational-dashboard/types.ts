@@ -42,6 +42,7 @@ export type NormalizedPlan = {
   name?: string;
   notes?: string;
   phase?: string;
+  assignedWeekdays?: number[];
   blocks?: { exercises?: NormalizedExercise[] }[];
   exercises?: NormalizedExercise[];
 };

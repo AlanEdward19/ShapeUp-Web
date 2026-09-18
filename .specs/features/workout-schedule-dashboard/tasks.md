@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/workout-schedule-dashboard/design.md`
-**Status**: Draft
+**Status**: Complete
 
 ---
 
@@ -255,13 +255,13 @@ T6 → T7
 
 **Done when**:
 
-- [ ] `showTodayCard` / `exercises` vêm de `plansForToday` / `exercisesForToday` sobre **todos** os planos
-- [ ] Sem treino hoje: markup não recebe card; teste garante `getWorkoutPlanById` não é chamado
-- [ ] `getDashboardMe` não roda no mount com `5`; espera planos
-- [ ] N união / N=`plans.length` / skip se vazio / skip se fetch de planos falhou
-- [ ] `NormalizedPlan` em `types.ts` aceita `assignedWeekdays` (mesmo commit se o typecheck exigir; arquivo extra só se o compilador quebrar)
-- [ ] Gate check passes: `npm test && npm run lint && npm run build`
-- [ ] Test count: at least 4 tests in `src/pages/Dashboard/__tests__/OperationalDashboardsShell.schedule.test.tsx`
+- [x] `showTodayCard` / `exercises` vêm de `plansForToday` / `exercisesForToday` sobre **todos** os planos
+- [x] Sem treino hoje: markup não recebe card; teste garante `getWorkoutPlanById` não é chamado
+- [x] `getDashboardMe` não roda no mount com `5`; espera planos
+- [x] N união / N=`plans.length` / skip se vazio / skip se fetch de planos falhou
+- [x] `NormalizedPlan` em `types.ts` aceita `assignedWeekdays` (mesmo commit se o typecheck exigir; arquivo extra só se o compilador quebrar)
+- [x] Gate check passes: `npm test && npm run lint && npm run build`
+- [x] Test count: at least 4 tests in `src/pages/Dashboard/__tests__/OperationalDashboardsShell.schedule.test.tsx`
 
 **Tests**: unit
 **Gate**: build
@@ -306,8 +306,8 @@ The orchestrating agent's role during Execute:
 | T3: PlanEditor selector | 1 component | Done |
 | T4: ClientDetail body field | 1 function | Done |
 | T5: Independent body field | 1 function | Done |
-| T6: Markup card guard | 1 component | Granular |
-| T7: AthleteView wiring | 1 cohesive shell change | Granular (same file: today + frequency) |
+| T6: Markup card guard | 1 component | Done |
+| T7: AthleteView wiring | 1 cohesive shell change | Done |
 
 **Granularity check**: T7 is two related consumers in one file; splitting would duplicate `OperationalDashboardsShell.tsx` tasks (validator smell). T4 `Where` is ClientDetail again after T3; sequential same-file edits are required because T3 is UI state and T4 is the HTTP body helper.
 
