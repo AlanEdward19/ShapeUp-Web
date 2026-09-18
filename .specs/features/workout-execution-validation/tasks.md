@@ -293,8 +293,8 @@ T13
 
 **Done when**:
 
-- [ ] Body Independent inclui `requireRpe`
-- [ ] Gate check passes: `npm test`
+- [x] Body Independent inclui `requireRpe`
+- [x] Gate check passes: `npm test`
 
 **Tests**: unit  
 **Gate**: full

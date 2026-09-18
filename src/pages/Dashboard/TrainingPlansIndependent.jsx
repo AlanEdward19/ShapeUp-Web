@@ -53,7 +53,8 @@ const toRuntimeSets = (ex, exIdx) => ({
 // Shared by handleSavePlan and the offline-safe path of handleCopyPlan below -- both start
 // from a plan object shaped like normalizePlan()'s output (PlanEditor's internal shape) and
 // need the same API request body built from it.
-const buildWorkoutPlanBody = (plan, targetUserId) => ({
+// eslint-disable-next-line react-refresh/only-export-components -- mapper for independent plan save
+export const buildWorkoutPlanBody = (plan, targetUserId) => ({
     targetUserId,
     name: plan.name || 'Novo Treino',
     notes: plan.notes || null,
@@ -68,6 +69,7 @@ const buildWorkoutPlanBody = (plan, targetUserId) => ({
         restAfterSeconds: block.restAfterSeconds === '' || block.restAfterSeconds == null ? null : parseInt(block.restAfterSeconds),
         exercises: (block.exercises || []).map(ex => ({
             exerciseId: parseInt(ex.exerciseId) || 1,
+            requireRpe: Boolean(ex.requireRpe),
             sets: (ex.sets || []).map(s => ({
                 repetitions: s.reps === '' || s.reps == null ? null : parseInt(s.reps),
                 load: parseFloat(s.load) || 0,
