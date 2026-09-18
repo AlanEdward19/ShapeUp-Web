@@ -15,6 +15,10 @@ import { generateObjectId } from '../../utils/objectId';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import { buildWorkoutStatePayload as buildWorkoutStateApiPayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
+import { mapExerciseEquivalents } from '../../utils/exerciseEquivalents';
+import EquivalentPickerModal from '../../components/training/EquivalentPickerModal';
+import SwapExerciseButton from '../../components/training/SwapExerciseButton';
+import { confirmSessionExerciseSwap } from './confirmSessionExerciseSwap';
 import { canCompleteLoggedSet, clampRpeLog } from '../../utils/setExecutionValidation';
 import { difficultyLabel, phaseLabel } from '../../utils/translateKnown';
 import './TrainingPlansClient.css';
@@ -132,7 +136,7 @@ const ClientView = () => {
     const { setSessionTitle } = useOutletContext();
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const { getWorkoutPlansByUser, getWorkoutsByUser, getActiveWorkout, getWorkoutPlanById } = useTrainingApi();
+    const { getWorkoutPlansByUser, getWorkoutsByUser, getActiveWorkout, getWorkoutPlanById, getExerciseEquivalents } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
 
     // Session State
@@ -165,6 +169,13 @@ const ClientView = () => {
     const [isResumingWorkout, setIsResumingWorkout] = useState(false);
     const [isCancellingActive, setIsCancellingActive] = useState(false);
     const [invalidLogs, setInvalidLogs] = useState({});
+    const [equivalentsCache, setEquivalentsCache] = useState({});
+    const [swapPicker, setSwapPicker] = useState({
+        open: false,
+        exerciseIndex: null,
+        items: [],
+        loading: false,
+    });
 
     const hasFirstDoneRef = useRef(false);
     const lastSyncedHashRef = useRef('');
@@ -172,6 +183,8 @@ const ClientView = () => {
     const doneClickGuardRef = useRef({});
     const exercisesRef = useRef(exercises);
     const workoutTimeRef = useRef(workoutTime);
+    const equivalentsLoadedRef = useRef(new Set());
+    const [sessionSwapNotice, setSessionSwapNotice] = useState('');
 
     // Session History Pagination state
     const [historyPage, setHistoryPage] = useState(1);
@@ -431,6 +444,76 @@ const ClientView = () => {
 
         return () => clearTimeout(timerId);
     }, [exercises, sessionActive, workoutSessionId, syncWorkoutStateIfNeeded]);
+
+    useEffect(() => {
+        if (!sessionActive) {
+            equivalentsLoadedRef.current = new Set();
+            setEquivalentsCache({});
+            return;
+        }
+        exercises.forEach((ex) => {
+            const exId = String(ex.exerciseId ?? ex.id);
+            if (equivalentsLoadedRef.current.has(exId)) return;
+            equivalentsLoadedRef.current.add(exId);
+            getExerciseEquivalents(exId)
+                .then((payload) => {
+                    const { records } = mapExerciseEquivalents(payload);
+                    const items = records.map((r) => ({
+                        exerciseId: r.id,
+                        id: r.id,
+                        name: r.name,
+                        muscles: r.muscles,
+                        subtitle: (r.muscles || []).join(', '),
+                    }));
+                    setEquivalentsCache((prev) => ({ ...prev, [exId]: { items } }));
+                })
+                .catch(() => {
+                    setEquivalentsCache((prev) => ({ ...prev, [exId]: { items: [] } }));
+                });
+        });
+    }, [sessionActive, exercises, getExerciseEquivalents]);
+
+    const openSwapPicker = (exerciseIndex) => {
+        const ex = exercises[exerciseIndex];
+        const exId = String(ex.exerciseId ?? ex.id);
+        const items = equivalentsCache[exId]?.items ?? [];
+        setSwapPicker({ open: true, exerciseIndex, items, loading: false });
+    };
+
+    const closeSwapPicker = () => {
+        setSwapPicker({ open: false, exerciseIndex: null, items: [], loading: false });
+    };
+
+    const handleSwapConfirm = (chosen) => {
+        const exerciseIndex = swapPicker.exerciseIndex;
+        if (exerciseIndex == null || !workoutSessionId) {
+            closeSwapPicker();
+            return;
+        }
+        const originalExercise = exercises[exerciseIndex];
+        const replacement = {
+            exerciseId: chosen.exerciseId ?? chosen.id,
+            id: chosen.id ?? chosen.exerciseId,
+            name: chosen.name,
+            muscles: chosen.muscles || [],
+            target: chosen.subtitle || originalExercise.target,
+        };
+        confirmSessionExerciseSwap({
+            exercises,
+            sessionId: workoutSessionId,
+            originalExercise,
+            replacement,
+            unitSystem,
+            enqueueMutation,
+            onApplied: (next) => {
+                setExercises(next);
+                exercisesRef.current = next;
+            },
+            onDuplicate: () => setSessionSwapNotice(t('client.session.swap.duplicate_warning')),
+            onMissing: () => setSessionSwapNotice(t('client.session.swap.duplicate_warning')),
+        });
+        closeSwapPicker();
+    };
 
     // -- Start A Specific Session --
     // Enqueued (offline foundation): a client-generated session id (see objectId.js) is used
@@ -1149,9 +1232,16 @@ const ClientView = () => {
             })()}
 
             <div className="su-execution-scroll" data-tour="se-exercises">
+                {sessionSwapNotice ? (
+                    <p className="su-text-muted" role="status" style={{ marginBottom: '0.75rem' }}>
+                        {sessionSwapNotice}
+                    </p>
+                ) : null}
                 <WorkoutBodyMap exercises={exercises} compact />
                 {exercises.map((exercise, exIndex) => {
                     const liveSetIndex = exercise.sets.findIndex(s => !s.completed);
+                    const exKey = String(exercise.exerciseId ?? exercise.id);
+                    const equivalentCount = equivalentsCache[exKey]?.items?.length ?? 0;
                     return (
                     <article key={exercise.id} className="su-ledger-exercise">
                         <div className="su-ex-execution-header">
@@ -1162,25 +1252,31 @@ const ClientView = () => {
                                     <span className="su-ex-target">{exercise.target}</span>
                                 </div>
                             </div>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                    const exDef = exercisesDB.find(e => e.name.toLowerCase() === exercise.name.toLowerCase());
-                                    if (exDef) {
-                                        setViewingExerciseDef(exDef);
-                                    } else {
-                                        setViewingExerciseDef({
-                                            name: exercise.name,
-                                            type: 'Unknown',
-                                            equipment: 'Unknown',
-                                            muscles: ['Unknown']
-                                        });
-                                    }
-                                }}
-                            >
-                                {t('client.session.card.details')}
-                            </Button>
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                <SwapExerciseButton
+                                    disabled={equivalentCount === 0}
+                                    onClick={() => openSwapPicker(exIndex)}
+                                />
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                        const exDef = exercisesDB.find(e => e.name.toLowerCase() === exercise.name.toLowerCase());
+                                        if (exDef) {
+                                            setViewingExerciseDef(exDef);
+                                        } else {
+                                            setViewingExerciseDef({
+                                                name: exercise.name,
+                                                type: 'Unknown',
+                                                equipment: 'Unknown',
+                                                muscles: ['Unknown']
+                                            });
+                                        }
+                                    }}
+                                >
+                                    {t('client.session.card.details')}
+                                </Button>
+                            </div>
                         </div>
 
                         <div className="su-sets-execution">
@@ -1311,6 +1407,14 @@ const ClientView = () => {
                     </Button>
                 </div>
             </div>
+
+            <EquivalentPickerModal
+                open={swapPicker.open}
+                equivalents={swapPicker.items}
+                loading={swapPicker.loading}
+                onClose={closeSwapPicker}
+                onConfirm={handleSwapConfirm}
+            />
 
             {/* Exercise Detail Modal Overlay */}
             {

@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/exercise-variations/design.md`
-**Status**: Draft
+**Status**: Complete
 **Scope**: ShapeUp-Web frontend only. Backend CLOSED `1b82672`. Do not implement video player / EDD chrome. Do not commit STATE.md.
 
 ---
@@ -279,16 +279,17 @@ T6 -> T7 -> T8
 
 **Done when**:
 
-- [ ] Button sits in `su-ex-execution-header` next to details
-- [ ] Confirm path uses helpers (grep: `enqueueExerciseSwap` or `enqueueMutation` with `swap-exercise`)
-- [ ] No `apiClient(` call added for swap-exercise
-- [ ] Duplicate-in-session shows a user-visible warning
-- [ ] Gate check passes: `npm test && npm run lint && npx tsc --noEmit && npm run gate`
-- [ ] Test count: previous + ≥1 focused test of the wired confirm (extract a tiny handler under test if the page is too large; do not weaken T3 tests)
+- [x] Button sits in `su-ex-execution-header` next to details
+- [x] Confirm path uses helpers (grep: `enqueueExerciseSwap` or `enqueueMutation` with `swap-exercise`)
+- [x] No `apiClient(` call added for swap-exercise
+- [x] Duplicate-in-session shows a user-visible warning
+- [x] Gate check passes: `npm test && npm run lint && npx tsc --noEmit && npm run gate`
+- [x] Test count: previous + ≥1 focused test of the wired confirm (extract a tiny handler under test if the page is too large; do not weaken T3 tests)
 
 **Tests**: unit
 **Gate**: build
 **Commit**: `feat(training): confirm exercise swap in the live session`
+**Status**: ✅ Complete
 
 ---
 

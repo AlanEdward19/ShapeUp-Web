@@ -149,7 +149,7 @@ export default function ExercisesShell() {
     navOpen,
     setNavOpen,
     equipmentName,
-    onEquivalentMissing: async (exerciseId) => {
+    onEquivalentMissing: async (exerciseId?: number | string) => {
       if (exerciseId == null) {
         setNotice('Exercício não encontrado na lista atual');
         return;

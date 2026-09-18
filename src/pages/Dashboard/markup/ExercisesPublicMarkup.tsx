@@ -1,5 +1,5 @@
 /* eslint-disable */
-import type { KeyboardEvent, MouseEvent, ReactElement } from 'react';
+import type { KeyboardEvent, MouseEvent, ReactElement, RefObject } from 'react';
 import WorkspaceNavigation from '../../shell-assets/WorkspaceNavigation';
 import { ExerciseDrawer } from './ExerciseDrawer';
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Button from '../Button';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -12,16 +12,17 @@ const EquivalentPickerModal = ({
     const { t } = useLanguage();
     const [selectedId, setSelectedId] = useState(null);
 
-    useEffect(() => {
-        if (open) setSelectedId(null);
-    }, [open]);
-
     if (!open) return null;
+
+    const handleClose = () => {
+        setSelectedId(null);
+        onClose();
+    };
 
     const emptyCopy = t('client.session.swap.picker.empty');
 
     return (
-        <div className="su-modal-overlay su-elm-overlay" onClick={onClose} role="presentation">
+        <div className="su-modal-overlay su-elm-overlay" onClick={handleClose} role="presentation">
             <div
                 className="su-modal-box su-elm-box"
                 onClick={(e) => e.stopPropagation()}
@@ -35,7 +36,7 @@ const EquivalentPickerModal = ({
                             {t('client.session.swap.picker.title')}
                         </h2>
                     </div>
-                    <button type="button" className="su-modal-close" onClick={onClose} aria-label="Close">
+                    <button type="button" className="su-modal-close" onClick={handleClose} aria-label="Close">
                         ×
                     </button>
                 </div>
@@ -79,7 +80,7 @@ const EquivalentPickerModal = ({
                 )}
 
                 <div className="su-elm-footer" style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                    <Button variant="outline" fullWidth onClick={onClose}>
+                    <Button variant="outline" fullWidth onClick={handleClose}>
                         {t('client.session.swap.picker.cancel')}
                     </Button>
                     <Button
@@ -89,7 +90,10 @@ const EquivalentPickerModal = ({
                             const chosen = equivalents.find(
                                 (item) => String(item.exerciseId ?? item.id) === selectedId,
                             );
-                            if (chosen) onConfirm(chosen);
+                            if (chosen) {
+                                onConfirm(chosen);
+                                setSelectedId(null);
+                            }
                         }}
                     >
                         {t('client.session.swap.picker.confirm')}
