@@ -1,4 +1,5 @@
-import { mapIntensityType, mapLoadUnit, mapSetType, mapTechnique } from './trainingEnums';
+import { mapIntensityType, mapLoadUnit, mapSetType, mapTechnique, unmapExerciseType } from './trainingEnums';
+import { parseDistanceMeters, parseDurationInput } from './durationDistance';
 
 /**
  * Pull the first positive integer from free-form prescription text ("8-10", "15", "").
@@ -28,6 +29,7 @@ export const buildWorkoutStatePayload = ({ sessionId, exercises, unitSystem }) =
     const loadUnit = mapLoadUnit(unitSystem === 'imperial' ? 'lbs' : 'kg');
 
     const exercisesWithProgress = (exercises || []).map((ex) => {
+        const exerciseType = ex.exerciseType || 'weightBased';
         const sets = (ex.sets || [])
             .filter((s) => !!s.completed)
             .map((s) => {
@@ -35,10 +37,7 @@ export const buildWorkoutStatePayload = ({ sessionId, exercises, unitSystem }) =
                     10,
                     Math.max(1, parsePositiveInt(s.log?.rpe, parsePositiveInt(s.prescribedRpe, 8)))
                 );
-                return {
-                    repetitions: parsePositiveInt(s.log?.reps, parsePositiveInt(s.prescribedReps, 1)),
-                    load: resolveLoad(s),
-                    loadUnit,
+                const base = {
                     setType: mapSetType(s.type),
                     technique: mapTechnique(s.technique || 'Straight'),
                     intensity: {
@@ -47,6 +46,30 @@ export const buildWorkoutStatePayload = ({ sessionId, exercises, unitSystem }) =
                     },
                     restSeconds: parseInt(s.prescribedRest, 10) || 90,
                     isExtra: !!s.isExtra,
+                };
+
+                if (exerciseType === 'timeBased') {
+                    const durationSeconds = parseDurationInput(s.log?.duration)
+                        ?? parseDurationInput(s.prescribedDuration);
+                    const dist = parseDistanceMeters(s.log?.distance);
+                    const distanceMeters = dist.ok ? dist.value : null;
+                    return {
+                        ...base,
+                        durationSeconds,
+                        distanceMeters,
+                        load: null,
+                        repetitions: null,
+                        loadUnit,
+                    };
+                }
+
+                return {
+                    ...base,
+                    repetitions: parsePositiveInt(s.log?.reps, parsePositiveInt(s.prescribedReps, 1)),
+                    load: resolveLoad(s),
+                    loadUnit,
+                    durationSeconds: null,
+                    distanceMeters: null,
                 };
             });
 
@@ -80,9 +103,13 @@ export const enrichExercisesFromCatalog = (exercises, catalog = []) =>
             : null;
         if (!match) return ex;
 
+        const exerciseType = ex.exerciseType
+            ?? (match ? unmapExerciseType(match.exerciseType) : 'weightBased');
+
         return {
             ...ex,
             name: hasName ? ex.name : (match.name || match.namePt || ex.name || ''),
             muscles: hasMuscles ? ex.muscles : (match.muscles || []),
+            exerciseType,
         };
     });

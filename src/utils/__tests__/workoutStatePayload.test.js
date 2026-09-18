@@ -42,6 +42,34 @@ it('falls back to prescribed reps/load/rpe when logs are empty', () => {
     });
 });
 
+it('sends durationSeconds and null load/reps for completed TimeBased sets (TBE-05)', () => {
+    const payload = buildWorkoutStatePayload({
+        sessionId: 'sess-tbe',
+        unitSystem: 'metric',
+        exercises: [{
+            exerciseId: 99,
+            exerciseType: 'timeBased',
+            sets: [{
+                completed: true,
+                type: 'working',
+                technique: 'Straight',
+                prescribedDuration: '05:00',
+                prescribedIntensityType: 'rpe',
+                prescribedRest: '60',
+                log: { duration: '10:00', distance: '1000', rpe: '7' },
+            }],
+        }],
+    });
+
+    expect(payload.exercises[0].sets[0]).toMatchObject({
+        durationSeconds: 600,
+        distanceMeters: 1000,
+        load: null,
+        repetitions: null,
+        intensity: { type: 1, value: 7 },
+    });
+});
+
 it('enriches blank plan exercises from the catalog by exerciseId', () => {
     const enriched = enrichExercisesFromCatalog(
         [{ exerciseId: 1, name: '', muscles: [] }],

@@ -393,10 +393,10 @@ T12 -> T13 -> T14 -> T15 -> T16
 
 **Done when**:
 
-- [ ] TimeBased completed set matches spec AC4 payload
-- [ ] WeightBased fallback-to-prescribed test still passes
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: existing tests stay green plus at least 1 TimeBased test
+- [x] TimeBased completed set matches spec AC4 payload
+- [x] WeightBased fallback-to-prescribed test still passes
+- [x] Gate check passes: `npm test`
+- [x] Test count: existing tests stay green plus at least 1 TimeBased test
 
 **Tests**: unit
 **Gate**: quick
