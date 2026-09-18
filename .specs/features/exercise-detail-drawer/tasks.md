@@ -207,16 +207,16 @@ T5 ------→ T6 ------→ T7
 
 **Done when**:
 
-- [ ] Backdrop (`bg-black/60 backdrop-blur-xs`) calls `state.close` on click
-- [ ] Activation rows use `muscleDetails` percents; never hardcode 95%/75%
-- [ ] Description fallback is a styled `01.` step, not a bare paragraph
-- [ ] Panel class is `w-[460px] max-w-full`; `drawerCode` uses terracotta
-- [ ] Stats use `border-y` without the muted boxed frame
-- [ ] Loose `description`, "Músculos", and raw `muscleDetails` dumps are gone
-- [ ] Primary button copy stays "Adicionar à Ficha do Aluno"
-- [ ] Tests in `src/pages/Dashboard/__tests__/ExerciseDrawer.test.jsx`
-- [ ] Gate check passes: `npm test && npm run lint`
-- [ ] Test count: 6 tests pass (no silent deletions)
+- [x] Backdrop (`bg-black/60 backdrop-blur-xs`) calls `state.close` on click
+- [x] Activation rows use `muscleDetails` percents; never hardcode 95%/75%
+- [x] Description fallback is a styled `01.` step, not a bare paragraph
+- [x] Panel class is `w-[460px] max-w-full`; `drawerCode` uses terracotta
+- [x] Stats use `border-y` without the muted boxed frame
+- [x] Loose `description`, "Músculos", and raw `muscleDetails` dumps are gone
+- [x] Primary button copy stays "Adicionar à Ficha do Aluno"
+- [x] Tests in `src/pages/Dashboard/__tests__/ExerciseDrawer.test.jsx`
+- [x] Gate check passes: `npm test && npm run lint`
+- [x] Test count: 6 tests pass (no silent deletions)
 
 **Tests**: unit
 **Gate**: full

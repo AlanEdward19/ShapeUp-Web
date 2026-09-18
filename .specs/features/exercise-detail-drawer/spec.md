@@ -147,11 +147,11 @@ Cada requisito recebe um ID único para rastreamento entre design, tasks e valid
 | EDD-05 | P1: Lista de substituições — item estruturado + contagem | Tasks | Implementing |
 | EDD-06 | P1: Estado vazio das substituições (sem dado fabricado) | Tasks | Implementing |
 | EDD-07 | P1: Navegação ao clicar num equivalente | Tasks | Implementing |
-| EDD-08 | P1: Backdrop dimming + click-outside-to-close | Tasks | In Tasks |
-| EDD-09 | P1: Barras de ativação primária & sinergista | Tasks | In Tasks |
-| EDD-10 | P1: Numeração consistente das Diretrizes Técnicas | Tasks | In Tasks |
-| EDD-11 | P1: Largura do painel (460px) + destaque visual do código | Tasks | In Tasks |
-| EDD-12 | P1: Remoção de seções duplicadas sem equivalente na referência | Tasks | In Tasks |
+| EDD-08 | P1: Backdrop dimming + click-outside-to-close | Tasks | Implementing |
+| EDD-09 | P1: Barras de ativação primária & sinergista | Tasks | Implementing |
+| EDD-10 | P1: Numeração consistente das Diretrizes Técnicas | Tasks | Implementing |
+| EDD-11 | P1: Largura do painel (460px) + destaque visual do código | Tasks | Implementing |
+| EDD-12 | P1: Remoção de seções duplicadas sem equivalente na referência | Tasks | Implementing |
 
 **ID format:** `EDD-NN`
 
