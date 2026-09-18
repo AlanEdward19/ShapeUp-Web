@@ -184,8 +184,8 @@ Na execução (`TrainingPlansClient.jsx`, `toggleSetComplete`), o aluno marca um
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
 | WEV-01 | P1: Gate peso/reps | Execute | Implementing |
-| WEV-03 | P1: i18n Rest | Tasks | Pending |
-| WEV-04 | P1: i18n fase/dificuldade | Tasks | Pending |
+| WEV-03 | P1: i18n Rest | Execute | Implementing |
+| WEV-04 | P1: i18n fase/dificuldade | Execute | Implementing |
 | WEV-05 | P1: Toggle requireRpe (UI) | Tasks | Pending |
 | WEV-06 | P1: Bulk requireRpe (UI) | Tasks | Pending |
 | WEV-07 | P1: Gate RPE na execução (UI) | Tasks | Pending |

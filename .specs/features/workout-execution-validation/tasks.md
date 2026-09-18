@@ -127,11 +127,11 @@ T13
 
 **Done when**:
 
-- [ ] `translateKnown` devolve fallback se `t` ecoa a chave
-- [ ] `phaseLabel` usa `pro.builder.phase.*`
-- [ ] `difficultyLabel` usa `client.training.difficulty.*`
-- [ ] Fase/dificuldade desconhecida devolve o cru
-- [ ] Test count: at least 5 tests pass
+- [x] `translateKnown` devolve fallback se `t` ecoa a chave
+- [x] `phaseLabel` usa `pro.builder.phase.*`
+- [x] `difficultyLabel` usa `client.training.difficulty.*`
+- [x] Fase/dificuldade desconhecida devolve o cru
+- [x] Test count: at least 5 tests pass
 
 **Tests**: unit  
 **Gate**: quick (`npm test -- src/utils/__tests__/translateKnown.test.js`)
