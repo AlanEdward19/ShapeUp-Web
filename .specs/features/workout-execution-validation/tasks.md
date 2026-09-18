@@ -155,10 +155,10 @@ T13
 
 **Done when**:
 
-- [ ] Cada chave nova existe nos 3 idiomas
-- [ ] pt-BR Rest = `Descanso`; es = `Descanso`; en = `Rest`
-- [ ] Teste de paridade das chaves novas passa
-- [ ] Test count: at least 1 test pass (parity)
+- [x] Cada chave nova existe nos 3 idiomas
+- [x] pt-BR Rest = `Descanso`; es = `Descanso`; en = `Rest`
+- [x] Teste de paridade das chaves novas passa
+- [x] Test count: at least 1 test pass (parity)
 
 **Tests**: unit  
 **Gate**: quick (`npm test -- src/contexts/__tests__/wevI18nKeys.test.jsx`)
