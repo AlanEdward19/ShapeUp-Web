@@ -184,10 +184,10 @@ T13
 
 **Done when**:
 
-- [ ] Ausente na API → `requireRpe === false`
-- [ ] `true` na API → `true` no modelo do editor
-- [ ] `applyRequireRpeToAll` marca todos os exercícios de todos os blocos `true` e sobrescreve mix
-- [ ] Test count: at least 3 tests pass
+- [x] Ausente na API → `requireRpe === false`
+- [x] `true` na API → `true` no modelo do editor
+- [x] `applyRequireRpeToAll` marca todos os exercícios de todos os blocos `true` e sobrescreve mix
+- [x] Test count: at least 3 tests pass
 
 **Tests**: unit  
 **Gate**: quick (`npm test -- src/utils/__tests__/trainingNormalization.test.js`)

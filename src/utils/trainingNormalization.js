@@ -27,6 +27,7 @@ const normalizeBlockExercise = (ex, idx) => ({
         ? ex.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName || m.namePt || m.name) : m)
         : (ex.exercise?.muscles ? ex.exercise.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName) : m) : []),
     sets: (ex.sets ?? []).map((s, sIdx) => normalizeSet(s, sIdx)),
+    requireRpe: Boolean(ex.requireRpe),
 });
 
 /**
@@ -63,6 +64,12 @@ export const normalizeTemplate = (tmpl) => ({
  * displays that don't care which block an exercise came from.
  */
 export const flattenBlockExercises = (blocks) => (blocks ?? []).flatMap(b => b.exercises ?? []);
+
+export const applyRequireRpeToAll = (blocks) =>
+    (blocks ?? []).map((block) => ({
+        ...block,
+        exercises: (block.exercises ?? []).map((ex) => ({ ...ex, requireRpe: true })),
+    }));
 
 /**
  * Total sets across every exercise in every block (for summary displays).
