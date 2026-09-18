@@ -252,14 +252,15 @@ T6 -> T7 -> T8
 
 **Done when**:
 
-- [ ] `disabled` when `equivalents.length === 0`
-- [ ] Click invokes `onClick` only (parent opens picker)
-- [ ] Gate check passes: `npm test`
-- [ ] Test count: previous + ≥2 (no silent deletions)
+- [x] `disabled` when `equivalents.length === 0`
+- [x] Click invokes `onClick` only (parent opens picker)
+- [x] Gate check passes: `npm test`
+- [x] Test count: previous + ≥2 (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
 **Commit**: `feat(training): add swap control on execution exercise header`
+**Status**: ✅ Complete
 
 ---
 
