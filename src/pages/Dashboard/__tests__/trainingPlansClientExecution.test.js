@@ -74,6 +74,46 @@ describe('client execution weight/reps gate (WEV-01)', () => {
     });
 });
 
+describe('client execution duration gate (TBE-03, TBE-04)', () => {
+    const timeSession = (sets, requireRpe = false) => [{
+        exerciseType: 'timeBased',
+        requireRpe,
+        sets,
+    }];
+
+    const timeSet = (overrides = {}) => {
+        const { log: logOverrides, ...rest } = overrides;
+        return {
+            id: 's1',
+            completed: false,
+            failure: false,
+            isExtra: false,
+            prescribedRest: 90,
+            log: { duration: '', distance: '', rpe: '', weight: '', reps: '', ...logOverrides },
+            ...rest,
+        };
+    };
+
+    it('refuses complete, skips rest, and highlights duration when blank', () => {
+        const result = applyToggleLoggedSetComplete(timeSession([timeSet()]), 0, 0);
+        expect(result.exercises[0].sets[0].completed).toBe(false);
+        expect(result.startRest).toBe(false);
+        expect(result.missing).toEqual(expect.arrayContaining(['duration']));
+        expect(execInputClassName(result.missing, 'duration')).toBe('su-exec-input su-exec-input--invalid');
+    });
+
+    it('completes with valid duration and starts rest', () => {
+        const result = applyToggleLoggedSetComplete(
+            timeSession([timeSet({ log: { duration: '05:00' } })]),
+            0,
+            0,
+        );
+        expect(result.exercises[0].sets[0].completed).toBe(true);
+        expect(result.startRest).toBe(true);
+        expect(result.missing).toEqual([]);
+    });
+});
+
 describe('client required RPE and clamp (WEV-07, WEV-08)', () => {
     it('refuses complete when requireRpe is true and RPE is empty', () => {
         const result = applyToggleLoggedSetComplete(
