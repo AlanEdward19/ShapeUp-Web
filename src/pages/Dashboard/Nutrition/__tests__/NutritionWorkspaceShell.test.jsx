@@ -86,6 +86,7 @@ describe('NutritionWorkspaceShell', () => {
   it('renders fasting child route in shell body', () => {
     const { container } = renderShell('/dashboard/nutrition/fasting');
     const { body } = shadowNav(container);
+    expect(body.getByTestId('nutrition-workspace')).toBeInTheDocument();
     expect(body.getByTestId('fasting-child')).toBeInTheDocument();
   });
 

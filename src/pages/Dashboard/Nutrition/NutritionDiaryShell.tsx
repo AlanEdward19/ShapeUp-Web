@@ -223,7 +223,7 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
   const displayName = localStorage.getItem('shapeup_user_name') || 'Diário Nutricional';
 
   return (
-      <div className="pl-64">
+      <div>
         <header
           className="sticky top-0 z-40 h-16 bg-[#211A17]/95 backdrop-blur border-b border-[color:var(--border-color)] px-8 flex items-center justify-between"
         >

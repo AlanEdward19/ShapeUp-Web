@@ -219,7 +219,7 @@ const FastingPage = () => {
                 </div>
             </header>
 
-            <p className="su-text-muted" data-testid="fasting-disclaimer">
+            <p className="su-text-muted su-fasting-disclaimer" data-testid="fasting-disclaimer">
                 {t('nutrition.fasting.disclaimer')}
             </p>
 
@@ -237,6 +237,7 @@ const FastingPage = () => {
                         </p>
                     )}
 
+                    <section className="su-journal-sheet su-fasting-clock">
                     {showCountdown && (
                         <p
                             className="su-fasting-countdown"
@@ -249,97 +250,6 @@ const FastingPage = () => {
                             {countdownText}
                         </p>
                     )}
-
-                    <section className="su-journal-sheet">
-                        <form onSubmit={handleSave}>
-                            <fieldset>
-                                <legend>{t('nutrition.fasting.protocolLegend')}</legend>
-                                {PRESET_PROTOCOLS.map((value) => (
-                                    <label key={value} className="su-fasting-protocol">
-                                        <input
-                                            type="radio"
-                                            name="fasting-protocol"
-                                            value={value}
-                                            checked={protocol === value}
-                                            onChange={() => setProtocol(value)}
-                                        />
-                                        {value}
-                                    </label>
-                                ))}
-                                <label className="su-fasting-protocol">
-                                    <input
-                                        type="radio"
-                                        name="fasting-protocol"
-                                        value={CUSTOM_PROTOCOL}
-                                        checked={protocol === CUSTOM_PROTOCOL}
-                                        onChange={() => setProtocol(CUSTOM_PROTOCOL)}
-                                    />
-                                    {t('nutrition.fasting.custom')}
-                                </label>
-                            </fieldset>
-
-                            {protocol === CUSTOM_PROTOCOL && (
-                                <label htmlFor="fasting-custom-hours">
-                                    {t('nutrition.fasting.customHours')}
-                                    <input
-                                        id="fasting-custom-hours"
-                                        type="number"
-                                        min={12}
-                                        max={23}
-                                        value={customFastHours}
-                                        onChange={(e) => setCustomFastHours(e.target.value)}
-                                        data-testid="fasting-custom-hours"
-                                    />
-                                </label>
-                            )}
-
-                            <label htmlFor="fasting-eating-start">
-                                {t('nutrition.fasting.eatingStart')}
-                            </label>
-                            <select
-                                id="fasting-eating-start"
-                                value={eatingStart}
-                                onChange={(e) => setEatingStart(e.target.value)}
-                            >
-                                {EATING_START_OPTIONS.map((slot) => (
-                                    <option key={slot} value={slot}>
-                                        {slot}
-                                    </option>
-                                ))}
-                            </select>
-
-                            {(fieldError || actionError) && (
-                                <p className="su-input-error-text" role="alert">
-                                    {fieldError || actionError}
-                                </p>
-                            )}
-
-                            <Button
-                                type="submit"
-                                disabled={saving}
-                                data-testid="fasting-save"
-                            >
-                                {t('nutrition.fasting.save')}
-                            </Button>
-                        </form>
-                    </section>
-
-                    <section className="su-journal-sheet" data-testid="fasting-history">
-                        <h3 className="su-ledger-heading">{t('nutrition.fasting.historyTitle')}</h3>
-                        {historyItems == null ? (
-                            <Skeleton variant="list" rows={2} />
-                        ) : historyItems.length === 0 ? (
-                            <p className="su-text-muted">{t('nutrition.fasting.historyEmpty')}</p>
-                        ) : (
-                            <ul className="su-fasting-history-list">
-                                {historyItems.map((item) => (
-                                    <li key={item.id}>
-                                        {item.protocol} — {item.outcome}
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </section>
 
                     <div className="su-fasting-actions">
                         <Button
@@ -373,6 +283,100 @@ const FastingPage = () => {
                             </>
                         )}
                     </div>
+                    </section>
+
+                    <section className="su-journal-sheet">
+                        <form className="su-fasting-form" onSubmit={handleSave}>
+                            <fieldset className="su-fasting-protocols">
+                                <legend>{t('nutrition.fasting.protocolLegend')}</legend>
+                                {PRESET_PROTOCOLS.map((value) => (
+                                    <label key={value} className="su-fasting-protocol">
+                                        <input
+                                            type="radio"
+                                            name="fasting-protocol"
+                                            value={value}
+                                            checked={protocol === value}
+                                            onChange={() => setProtocol(value)}
+                                        />
+                                        {value}
+                                    </label>
+                                ))}
+                                <label className="su-fasting-protocol">
+                                    <input
+                                        type="radio"
+                                        name="fasting-protocol"
+                                        value={CUSTOM_PROTOCOL}
+                                        checked={protocol === CUSTOM_PROTOCOL}
+                                        onChange={() => setProtocol(CUSTOM_PROTOCOL)}
+                                    />
+                                    {t('nutrition.fasting.custom')}
+                                </label>
+                            </fieldset>
+
+                            {protocol === CUSTOM_PROTOCOL && (
+                                <label className="su-fasting-field" htmlFor="fasting-custom-hours">
+                                    {t('nutrition.fasting.customHours')}
+                                    <input
+                                        id="fasting-custom-hours"
+                                        className="su-input"
+                                        type="number"
+                                        min={12}
+                                        max={23}
+                                        value={customFastHours}
+                                        onChange={(e) => setCustomFastHours(e.target.value)}
+                                        data-testid="fasting-custom-hours"
+                                    />
+                                </label>
+                            )}
+
+                            <label className="su-fasting-field" htmlFor="fasting-eating-start">
+                                {t('nutrition.fasting.eatingStart')}
+                            <select
+                                id="fasting-eating-start"
+                                className="su-input"
+                                value={eatingStart}
+                                onChange={(e) => setEatingStart(e.target.value)}
+                            >
+                                {EATING_START_OPTIONS.map((slot) => (
+                                    <option key={slot} value={slot}>
+                                        {slot}
+                                    </option>
+                                ))}
+                            </select>
+                            </label>
+
+                            {(fieldError || actionError) && (
+                                <p className="su-input-error-text" role="alert">
+                                    {fieldError || actionError}
+                                </p>
+                            )}
+
+                            <Button
+                                type="submit"
+                                disabled={saving}
+                                data-testid="fasting-save"
+                            >
+                                {t('nutrition.fasting.save')}
+                            </Button>
+                        </form>
+                    </section>
+
+                    <section className="su-journal-sheet" data-testid="fasting-history">
+                        <h3 className="su-ledger-heading">{t('nutrition.fasting.historyTitle')}</h3>
+                        {historyItems == null ? (
+                            <Skeleton variant="list" rows={2} />
+                        ) : historyItems.length === 0 ? (
+                            <p className="su-text-muted">{t('nutrition.fasting.historyEmpty')}</p>
+                        ) : (
+                            <ul className="su-fasting-history-list">
+                                {historyItems.map((item) => (
+                                    <li key={item.id}>
+                                        {item.protocol} — {item.outcome}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </section>
                 </>
             )}
         </div>

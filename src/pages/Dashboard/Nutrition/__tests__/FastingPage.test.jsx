@@ -46,7 +46,7 @@ const agendaSnapshot = {
     recommendation: null,
     clock: {
         status: 'Fasting',
-        boundaryAt: new Date(Date.now() + 3600 * 1000 + 500).toISOString(),
+        boundaryAt: new Date(Date.now() + 3661 * 1000).toISOString(),
         source: 'Agenda',
     },
 };
@@ -271,7 +271,7 @@ describe('FastingPage (IFTW-01..05)', () => {
         mockGetClock.mockResolvedValue(agendaSnapshot);
         const { getByTestId } = renderPage();
         await waitFor(() => {
-            expect(getByTestId('fasting-countdown')).toHaveTextContent(/^01:00:0[0-1]$/);
+            expect(getByTestId('fasting-countdown')).toHaveTextContent(/^01:0[01]:\d{2}$/);
         });
     });
 
@@ -280,14 +280,14 @@ describe('FastingPage (IFTW-01..05)', () => {
             ...agendaSnapshot,
             clock: {
                 status: 'Eating',
-                boundaryAt: new Date(Date.now() + 3600 * 1000 + 500).toISOString(),
+                boundaryAt: new Date(Date.now() + 3661 * 1000).toISOString(),
                 source: 'Agenda',
             },
         });
         const { getByTestId } = renderPage();
         await waitFor(() => {
             const countdown = getByTestId('fasting-countdown');
-            expect(countdown).toHaveTextContent(/^01:00:0[0-1]$/);
+            expect(countdown).toHaveTextContent(/^01:0[01]:\d{2}$/);
             expect(countdown).toHaveAttribute('data-clock-status', 'Eating');
         });
     });

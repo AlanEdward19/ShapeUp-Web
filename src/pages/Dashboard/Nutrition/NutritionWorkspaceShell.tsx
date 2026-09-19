@@ -6,7 +6,7 @@ import NutritionNav from './NutritionNav';
 import nutritionCss from './Nutrition.css?inline';
 
 const diaryLayoutCss =
-  'article table{min-width:520px}article{overflow:auto}@media(max-width:767px){.shell-body .pl-64{padding-left:0!important}}';
+  'article table{min-width:520px}article{overflow:auto}@media(max-width:767px){.shell-body .pl-64,.shell-body .su-nutrition-workspace{padding-left:0!important}}';
 
 const tokenBridgeCss = `:host,.shell-body{
 color-scheme:dark;
@@ -61,10 +61,14 @@ function CachedOutlet(): ReactElement {
 export default function NutritionWorkspaceShell(): ReactElement {
   return (
     <WorkspaceShellPage name="nutrition" css={shellCss}>
-      <NutritionNav />
-      <Suspense fallback={<Skeleton variant="card" rows={2} />}>
-        <CachedOutlet />
-      </Suspense>
+      <div className="su-nutrition-workspace" data-testid="nutrition-workspace">
+        <div className="su-nutrition-workspace-inner">
+          <NutritionNav />
+          <Suspense fallback={<Skeleton variant="card" rows={2} />}>
+            <CachedOutlet />
+          </Suspense>
+        </div>
+      </div>
     </WorkspaceShellPage>
   );
 }
