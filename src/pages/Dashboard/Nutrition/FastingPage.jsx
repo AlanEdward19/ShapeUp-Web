@@ -26,6 +26,15 @@ const eatingStartOptions = () => {
 
 const EATING_START_OPTIONS = eatingStartOptions();
 
+export const maybeNotifyEatingWindow = (previousStatus, nextStatus, t) => {
+    if (typeof Notification === 'undefined') return;
+    if (Notification.permission !== 'granted') return;
+    if (nextStatus !== 'Eating' || previousStatus === 'Eating') return;
+    void new Notification(t('nutrition.fasting.notifyTitle'), {
+        body: t('nutrition.fasting.notifyBody'),
+    });
+};
+
 export const eatingStartLabelFromMinutes = (minutes) => {
     if (minutes == null || Number.isNaN(minutes)) return '12:00';
     const hours = Math.floor(minutes / 60);
@@ -58,6 +67,7 @@ const FastingPage = () => {
     const [actionPending, setActionPending] = useState(false);
     const [tick, setTick] = useState(0);
     const loadVersion = useRef(0);
+    const previousClockStatus = useRef(null);
 
     const applySnapshotToForm = useCallback((data) => {
         if (data?.agenda) {
@@ -83,6 +93,8 @@ const FastingPage = () => {
         try {
             const data = await getClock();
             if (version !== loadVersion.current) return null;
+            maybeNotifyEatingWindow(previousClockStatus.current, data?.clock?.status, t);
+            previousClockStatus.current = data?.clock?.status ?? null;
             setSnapshot(data);
             applySnapshotToForm(data);
             return data;

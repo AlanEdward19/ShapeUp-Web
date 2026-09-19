@@ -2,7 +2,7 @@ import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { withLang } from '../../../../test/withLang';
-import FastingPage from '../FastingPage';
+import FastingPage, { maybeNotifyEatingWindow } from '../FastingPage';
 
 const mockGetClock = vi.fn();
 const mockPutAgenda = vi.fn();
@@ -61,6 +61,38 @@ const renderPage = () =>
             </MemoryRouter>,
         ),
     );
+
+describe('maybeNotifyEatingWindow (IFTW-10)', () => {
+    it('fires one notification when status becomes Eating and permission granted', () => {
+        const calls = [];
+        class MockNotification {
+            constructor(title, options) {
+                calls.push([title, options]);
+            }
+        }
+        MockNotification.permission = 'granted';
+        vi.stubGlobal('Notification', MockNotification);
+        maybeNotifyEatingWindow('Fasting', 'Eating', (key) => key);
+        expect(calls).toEqual([
+            ['nutrition.fasting.notifyTitle', { body: 'nutrition.fasting.notifyBody' }],
+        ]);
+        vi.unstubAllGlobals();
+    });
+
+    it('does nothing when permission is denied', () => {
+        const calls = [];
+        class MockNotification {
+            constructor(title, options) {
+                calls.push([title, options]);
+            }
+        }
+        MockNotification.permission = 'denied';
+        vi.stubGlobal('Notification', MockNotification);
+        maybeNotifyEatingWindow('Fasting', 'Eating', (key) => key);
+        expect(calls).toHaveLength(0);
+        vi.unstubAllGlobals();
+    });
+});
 
 describe('FastingPage (IFTW-01..05)', () => {
     beforeEach(() => {
