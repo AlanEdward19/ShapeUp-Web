@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { withLang } from '../../../../test/withLang';
 import { AthleteDashboardMarkup, type AthleteDashboardState } from '../AthleteDashboardMarkup';
@@ -53,5 +53,16 @@ describe('AthleteDashboardMarkup today card (WSD-03)', () => {
     expect(screen.getByText('Agachamento')).toBeInTheDocument();
     expect(screen.getByText('Supino')).toBeInTheDocument();
     expect(screen.getByText('2 exercícios')).toBeInTheDocument();
+  });
+});
+
+describe('AthleteDashboardMarkup Frequência empty state (WSD-06)', () => {
+  it('shows em-dash for alvo and taxa when dashboard is null', () => {
+    render(withLang(<AthleteDashboardMarkup state={baseState} />));
+    const headerRow = screen.getByText('Frequência').parentElement!;
+    expect(within(headerRow).getByText('—')).toBeInTheDocument();
+    const freqColumn = screen.getByText('Frequência').closest('div.py-2') as HTMLElement;
+    const rateEl = freqColumn.querySelector('.mb-2 .font-headline') as HTMLElement;
+    expect(rateEl).toHaveTextContent('—');
   });
 });

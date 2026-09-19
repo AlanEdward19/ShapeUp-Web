@@ -149,6 +149,7 @@ describe('AthleteView schedule wiring (WSD-03..WSD-06)', () => {
       </MemoryRouter>,
     );
     await waitFor(() => expect(lastAthleteState).not.toBeNull());
+    expect(lastAthleteState?.dashboard).toBeNull();
     expect(getDashboardMe).not.toHaveBeenCalled();
   });
 
