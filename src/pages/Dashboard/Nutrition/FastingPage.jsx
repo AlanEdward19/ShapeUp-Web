@@ -12,6 +12,7 @@ import { formatFastingCountdown, fastingRemainingSeconds } from '../../../utils/
 import './Nutrition.css';
 
 const PRESET_PROTOCOLS = ['14:10', '16:8', '18:6', '20:4'];
+const CUSTOM_PROTOCOL = 'custom';
 
 const eatingStartOptions = () => {
     const options = [];
@@ -40,6 +41,7 @@ const FastingPage = () => {
         startOverride,
         endOverrideEarly,
         cancelOverride,
+        getHistory,
     } = useFastingApi();
 
     const [snapshot, setSnapshot] = useState(null);
@@ -47,7 +49,9 @@ const FastingPage = () => {
     const [loadError, setLoadError] = useState('');
     const [disabledRedirect, setDisabledRedirect] = useState(false);
     const [protocol, setProtocol] = useState('16:8');
+    const [customFastHours, setCustomFastHours] = useState('16');
     const [eatingStart, setEatingStart] = useState('12:00');
+    const [historyItems, setHistoryItems] = useState(null);
     const [fieldError, setFieldError] = useState('');
     const [actionError, setActionError] = useState('');
     const [saving, setSaving] = useState(false);
@@ -58,7 +62,17 @@ const FastingPage = () => {
     const applySnapshotToForm = useCallback((data) => {
         if (data?.agenda) {
             setProtocol(data.agenda.protocol);
+            if (data.agenda.protocol === CUSTOM_PROTOCOL) {
+                setCustomFastHours(String(data.agenda.fastHours ?? 16));
+            }
             setEatingStart(eatingStartLabelFromMinutes(data.agenda.eatingStartMinutes));
+            return;
+        }
+        if (data?.recommendation?.protocol) {
+            setProtocol(data.recommendation.protocol);
+            if (data.recommendation.protocol === CUSTOM_PROTOCOL) {
+                setCustomFastHours(String(data.recommendation.fastHours ?? 16));
+            }
         }
     }, []);
 
@@ -86,12 +100,22 @@ const FastingPage = () => {
         }
     }, [applySnapshotToForm, getClock, t]);
 
+    const loadHistory = useCallback(async () => {
+        try {
+            const data = await getHistory();
+            setHistoryItems(Array.isArray(data?.items) ? data.items : []);
+        } catch {
+            setHistoryItems([]);
+        }
+    }, [getHistory]);
+
     useEffect(() => {
         loadSnapshot();
+        loadHistory();
         return () => {
             loadVersion.current += 1;
         };
-    }, [loadSnapshot]);
+    }, [loadSnapshot, loadHistory]);
 
     useEffect(() => {
         const onVisibility = () => {
@@ -127,14 +151,24 @@ const FastingPage = () => {
             setFieldError(t('nutrition.fasting.validation.eatingStart'));
             return;
         }
+        let fastHours;
+        if (protocol === CUSTOM_PROTOCOL) {
+            fastHours = parseInt(customFastHours, 10);
+            if (!Number.isInteger(fastHours) || fastHours < 12 || fastHours > 23) {
+                setFieldError(t('nutrition.fasting.validation.customHours'));
+                return;
+            }
+        }
         setSaving(true);
         try {
             const body = buildPutAgendaBody({
                 protocol,
                 eatingStartLabel: eatingStart,
+                fastHours: protocol === CUSTOM_PROTOCOL ? fastHours : undefined,
             });
             await putAgenda(body);
             await loadSnapshot();
+            await loadHistory();
         } catch (err) {
             setActionError(err.message || t('nutrition.fasting.error.save'));
         } finally {
@@ -231,7 +265,32 @@ const FastingPage = () => {
                                         {value}
                                     </label>
                                 ))}
+                                <label className="su-fasting-protocol">
+                                    <input
+                                        type="radio"
+                                        name="fasting-protocol"
+                                        value={CUSTOM_PROTOCOL}
+                                        checked={protocol === CUSTOM_PROTOCOL}
+                                        onChange={() => setProtocol(CUSTOM_PROTOCOL)}
+                                    />
+                                    {t('nutrition.fasting.custom')}
+                                </label>
                             </fieldset>
+
+                            {protocol === CUSTOM_PROTOCOL && (
+                                <label htmlFor="fasting-custom-hours">
+                                    {t('nutrition.fasting.customHours')}
+                                    <input
+                                        id="fasting-custom-hours"
+                                        type="number"
+                                        min={12}
+                                        max={23}
+                                        value={customFastHours}
+                                        onChange={(e) => setCustomFastHours(e.target.value)}
+                                        data-testid="fasting-custom-hours"
+                                    />
+                                </label>
+                            )}
 
                             <label htmlFor="fasting-eating-start">
                                 {t('nutrition.fasting.eatingStart')}
@@ -262,6 +321,23 @@ const FastingPage = () => {
                                 {t('nutrition.fasting.save')}
                             </Button>
                         </form>
+                    </section>
+
+                    <section className="su-journal-sheet" data-testid="fasting-history">
+                        <h3 className="su-ledger-heading">{t('nutrition.fasting.historyTitle')}</h3>
+                        {historyItems == null ? (
+                            <Skeleton variant="list" rows={2} />
+                        ) : historyItems.length === 0 ? (
+                            <p className="su-text-muted">{t('nutrition.fasting.historyEmpty')}</p>
+                        ) : (
+                            <ul className="su-fasting-history-list">
+                                {historyItems.map((item) => (
+                                    <li key={item.id}>
+                                        {item.protocol} — {item.outcome}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </section>
 
                     <div className="su-fasting-actions">

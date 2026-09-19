@@ -172,6 +172,38 @@ describe('FastingPage (IFTW-01..05)', () => {
         await waitFor(() => expect(getByTestId('diary-redirect')).toBeInTheDocument());
     });
 
+    it('preselects recommendation protocol when agenda is null', async () => {
+        mockGetClock.mockResolvedValue({
+            ...idleSnapshot,
+            recommendation: { protocol: '18:6', fastHours: 18 },
+        });
+        const { getByLabelText } = renderPage();
+        await waitFor(() => expect(getByLabelText(/18:6/)).toBeChecked());
+    });
+
+    it('PUTs custom protocol with fastHours', async () => {
+        mockGetClock.mockResolvedValue(idleSnapshot);
+        const { getByTestId, getByLabelText } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-save')).toBeInTheDocument());
+        fireEvent.click(getByLabelText(/custom|personalizado/i));
+        fireEvent.change(getByTestId('fasting-custom-hours'), { target: { value: '15' } });
+        fireEvent.click(getByTestId('fasting-save'));
+        await waitFor(() => {
+            expect(mockPutAgenda).toHaveBeenCalledWith(
+                expect.objectContaining({ protocol: 'custom', fastHours: 15 }),
+            );
+        });
+    });
+
+    it('shows empty history state without placeholder zeros', async () => {
+        mockGetHistory.mockResolvedValue({ items: [] });
+        const { getByTestId } = renderPage();
+        await waitFor(() => {
+            expect(getByTestId('fasting-history')).toHaveTextContent(/No completed fasts|Nenhum jejum/i);
+        });
+        expect(getByTestId('fasting-history')).not.toHaveTextContent('0');
+    });
+
     it('posts end-early and cancel during override', async () => {
         mockGetClock.mockResolvedValue({
             ...agendaSnapshot,

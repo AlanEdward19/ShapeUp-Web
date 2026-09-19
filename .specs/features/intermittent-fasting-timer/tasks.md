@@ -137,7 +137,7 @@ T6 → T7 → T8
 **Requirement**: IFTW-06, IFTW-08, IFTW-09
 **Tools**: Skill tlc-spec-driven Execute
 **Done when**:
-- [ ] Tests for preselect, custom PUT body, empty history
+- [x] Tests for preselect, custom PUT body, empty history
 **Tests**: unit
 **Gate**: quick
 **Commit**: `feat(nutrition): add fasting recommendation custom hours and history`
