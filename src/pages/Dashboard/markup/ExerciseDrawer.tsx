@@ -1,4 +1,5 @@
 import type { ReactElement, RefObject } from 'react';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { ExerciseDrawerSubstitutions } from './ExerciseDrawerSubstitutions';
 import { ExerciseDrawerVideo } from './ExerciseDrawerVideo';
 import type { ExerciseRecord, ExercisesShellState } from './ExercisesPublicMarkup';
@@ -32,6 +33,7 @@ function ExerciseDrawerActivation({
   muscles: string[];
   muscleDetails?: ExerciseRecord['muscleDetails'];
 }): ReactElement {
+  const { t } = useLanguage();
   const details = (muscleDetails || []).filter(
     (muscle) => typeof muscle === 'object' && Number.isFinite(muscle.activationPercent),
   );
@@ -71,9 +73,9 @@ function ExerciseDrawerActivation({
   return (
     <div className="space-y-2 pt-1 border-t border-border-subtle">
       <div className="flex items-center justify-between text-text-secondary font-mono text-[10px] uppercase tracking-wider">
-        <span>Ativação Primária &amp; Sinergistas</span>
+        <span>{t('exlib.drawer.activation')}</span>
         <span className="text-text-muted" id="drawerUsageBadge">
-          Biblioteca de exercícios
+          {t('exlib.drawer.library_badge')}
         </span>
       </div>
       {row('drawerAgonist', agonistName, agonistPct, 'terracotta')}
@@ -89,15 +91,16 @@ function ExerciseDrawerSteps({
   steps?: ExerciseRecord['steps'];
   fallbackText?: string;
 }): ReactElement {
+  const { t } = useLanguage();
   const items =
     steps?.length
       ? steps.map((step) => (typeof step === 'string' ? step : step.description || ''))
-      : [fallbackText || 'Orientação não cadastrada.'];
+      : [fallbackText || t('exlib.drawer.no_steps')];
 
   return (
     <section>
       <h4 className="font-mono text-[10px] uppercase tracking-wider text-text-muted mb-2">
-        Diretrizes Técnicas de Execução
+        {t('exlib.drawer.steps')}
       </h4>
       <ol className="space-y-2">
         {items.map((text, index) => {
@@ -115,17 +118,19 @@ function ExerciseDrawerSteps({
 }
 
 export function ExerciseDrawer({ state }: { state: DrawerState }): ReactElement {
+  const { t } = useLanguage();
   const active = state.active;
+  const prescribe = t('exlib.drawer.prescribe');
   const drawer = {
     drawerCode: active ? `EX-${active.id}` : '—',
-    drawerTitle: active?.name || 'Selecione um exercício',
-    drawerPattern: active?.type || 'Exercício',
+    drawerTitle: active?.name || t('exlib.drawer.select'),
+    drawerPattern: active?.type || t('exlib.drawer.exercise'),
     drawerPrimaryMuscle: active?.muscles?.join(', ') || '—',
-    drawerSets: 'Definir na ficha',
-    drawerReps: 'Definir na ficha',
-    drawerRest: 'Definir na ficha',
+    drawerSets: prescribe,
+    drawerReps: prescribe,
+    drawerRest: prescribe,
     drawerError: active?.precautions || '—',
-    drawerStep1: active?.descriptionPt || active?.description || 'Orientação não cadastrada.',
+    drawerStep1: active?.descriptionPt || active?.description || t('exlib.drawer.no_steps'),
   };
 
   return (
@@ -164,7 +169,7 @@ export function ExerciseDrawer({ state }: { state: DrawerState }): ReactElement 
           <button
             type="button"
             className="p-1 text-text-muted hover:text-text-primary transition-colors"
-            title="Fechar Painel"
+            title={t('exlib.drawer.close')}
             onClick={state.close}
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
@@ -179,19 +184,19 @@ export function ExerciseDrawer({ state }: { state: DrawerState }): ReactElement 
             className="border-y divide-x divide-border-subtle grid grid-cols-3 py-2 text-center"
           >
             <div>
-              <span className="block font-mono text-[10px] uppercase text-text-muted">Séries</span>
+              <span className="block font-mono text-[10px] uppercase text-text-muted">{t('exlib.drawer.sets')}</span>
               <span className="font-mono text-xs font-semibold text-text-primary" id="drawerSets">
                 {drawer.drawerSets}
               </span>
             </div>
             <div>
-              <span className="block font-mono text-[10px] uppercase text-text-muted">Repetições</span>
+              <span className="block font-mono text-[10px] uppercase text-text-muted">{t('exlib.drawer.reps')}</span>
               <span className="font-mono text-xs font-semibold text-text-primary" id="drawerReps">
                 {drawer.drawerReps}
               </span>
             </div>
             <div>
-              <span className="block font-mono text-[10px] uppercase text-text-muted">Descanso</span>
+              <span className="block font-mono text-[10px] uppercase text-text-muted">{t('exlib.drawer.rest')}</span>
               <span className="font-mono text-xs font-semibold text-text-primary" id="drawerRest">
                 {drawer.drawerRest}
               </span>
@@ -204,7 +209,7 @@ export function ExerciseDrawer({ state }: { state: DrawerState }): ReactElement 
 
           <div className="p-3 rounded-md bg-surface-muted border-l-2 border-brand-ochre space-y-1">
             <span className="font-mono text-[10px] uppercase tracking-wider text-brand-ochre font-semibold block">
-              Ponto Crítico &amp; Compensações
+              {t('exlib.drawer.critical')}
             </span>
             <p className="text-text-secondary text-[11px] leading-relaxed" id="drawerError">
               {drawer.drawerError}
@@ -229,16 +234,16 @@ export function ExerciseDrawer({ state }: { state: DrawerState }): ReactElement 
             onClick={() => state.add(active)}
           >
             <span className="material-symbols-outlined text-[16px]">playlist_add</span>
-            <span>Adicionar à Ficha do Aluno</span>
+            <span>{t('exlib.drawer.add')}</span>
           </button>
           <button
             type="button"
             className="h-8 px-2.5 border border-border-subtle hover:border-border-strong text-text-secondary hover:text-text-primary rounded text-xs transition-colors flex items-center gap-1"
-            title="Copiar Parâmetros"
+            title={t('exlib.drawer.copy_title')}
             onClick={state.onCopyDetails}
           >
             <span className="material-symbols-outlined text-[16px]">content_copy</span>
-            <span>Copiar</span>
+            <span>{t('exlib.drawer.copy')}</span>
           </button>
         </div>
       </aside>

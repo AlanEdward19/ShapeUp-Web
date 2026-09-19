@@ -193,9 +193,9 @@ T8
 
 **Done when**:
 
-- [ ] `ExerciseDrawer.tsx`, `ExerciseDrawerVideo.tsx`, `ExerciseDrawerSubstitutions.tsx` have no user-visible Portuguese literals
-- [ ] `ExercisesShell.test.jsx` still passes with `pt-BR`
-- [ ] Gate passes
+- [x] `ExerciseDrawer.tsx`, `ExerciseDrawerVideo.tsx`, `ExerciseDrawerSubstitutions.tsx` have no user-visible Portuguese literals
+- [x] `ExercisesShell.test.jsx` still passes with `pt-BR`
+- [x] Gate passes
 
 **Tests**: unit
 **Gate**: full

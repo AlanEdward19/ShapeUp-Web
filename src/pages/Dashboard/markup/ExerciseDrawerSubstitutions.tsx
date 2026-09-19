@@ -1,13 +1,12 @@
 import type { ReactElement } from 'react';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import type { ExerciseEquivalent, ExerciseRecord } from './ExercisesPublicMarkup';
 
-const EMPTY_COPY = 'Nenhuma substituição cadastrada para este exercício.';
-
-function equipmentLabel(ex: ExerciseRecord): string {
+function equipmentLabel(ex: ExerciseRecord, unknownLabel: string): string {
   return (
     ex.equipment ||
     ex.equipments?.map((item) => item.equipmentName || item.equipmentNamePt).filter(Boolean).join(', ') ||
-    'Não informado'
+    unknownLabel
   );
 }
 
@@ -26,6 +25,7 @@ export function ExerciseDrawerSubstitutions({
   onSelect: (ex: ExerciseRecord) => void;
   onNotFound: (exerciseId: number | string) => void;
 }): ReactElement {
+  const { t } = useLanguage();
   const items = equivalents ?? [];
 
   return (
@@ -33,10 +33,10 @@ export function ExerciseDrawerSubstitutions({
       <div className="flex items-center gap-1.5">
         <span className="material-symbols-outlined text-brand-terracotta text-[16px]">sync_alt</span>
         <span className="font-mono text-[10px] uppercase tracking-wider text-text-muted">
-          Substituições Mecânicas Equivalentes
+          {t('exlib.subs.title')}
         </span>
         {items.length ? (
-          <span className="font-mono text-[10px] text-brand-olive">{items.length} opções</span>
+          <span className="font-mono text-[10px] text-brand-olive">{t('exlib.subs.options', { n: items.length })}</span>
         ) : null}
       </div>
       {items.length ? (
@@ -58,7 +58,9 @@ export function ExerciseDrawerSubstitutions({
                     <p className="text-[11px] text-text-muted truncate">
                       {match ? primaryMuscleLabel(match) : '—'}
                     </p>
-                    <p className="text-[11px] text-text-muted truncate">{match ? equipmentLabel(match) : '—'}</p>
+                    <p className="text-[11px] text-text-muted truncate">
+                      {match ? equipmentLabel(match, t('exlib.equipment.unknown')) : '—'}
+                    </p>
                     {item.matchLabel ? (
                       <p className="text-[11px] text-brand-olive">{item.matchLabel}</p>
                     ) : null}
@@ -72,7 +74,7 @@ export function ExerciseDrawerSubstitutions({
         </ul>
       ) : (
         <p className="text-text-secondary text-[11px]" id="drawerSubs">
-          {EMPTY_COPY}
+          {t('exlib.subs.empty')}
         </p>
       )}
     </div>

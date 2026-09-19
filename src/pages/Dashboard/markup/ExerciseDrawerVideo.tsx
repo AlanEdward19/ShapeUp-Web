@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { detectVideoKind } from './exerciseVideo';
-
-const EMPTY_COPY = 'Vídeo de execução não cadastrado';
 
 function youtubeId(url: string): string | null {
   try {
@@ -41,6 +40,7 @@ export function ExerciseDrawerVideo({
   videoUrl?: string;
   title: string;
 }): ReactElement {
+  const { t } = useLanguage();
   const url = String(videoUrl ?? '').trim();
   const kind = detectVideoKind(url || undefined);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -64,7 +64,7 @@ export function ExerciseDrawerVideo({
   if (kind === 'invalid' || !url) {
     return (
       <div className="aspect-square rounded-md bg-surface-muted border border-border-subtle flex items-center justify-center px-4 text-center">
-        <p className="text-text-secondary text-[11px]">{EMPTY_COPY}</p>
+        <p className="text-text-secondary text-[11px]">{t('exlib.video.empty')}</p>
       </div>
     );
   }
@@ -74,7 +74,7 @@ export function ExerciseDrawerVideo({
     if (!id) {
       return (
         <div className="aspect-square rounded-md bg-surface-muted border border-border-subtle flex items-center justify-center px-4 text-center">
-          <p className="text-text-secondary text-[11px]">{EMPTY_COPY}</p>
+          <p className="text-text-secondary text-[11px]">{t('exlib.video.empty')}</p>
         </div>
       );
     }
@@ -105,7 +105,7 @@ export function ExerciseDrawerVideo({
             )}
             <button
               type="button"
-              title="Reproduzir"
+              title={t('exlib.video.play')}
               className="absolute inset-0 flex items-center justify-center"
               onClick={() => setHostedOpen(true)}
             >
@@ -144,7 +144,7 @@ export function ExerciseDrawerVideo({
       />
       <button
         type="button"
-        title={playing ? 'Pausar' : 'Reproduzir'}
+        title={playing ? t('exlib.video.pause') : t('exlib.video.play')}
         className="absolute inset-x-0 top-0 bottom-10 flex items-center justify-center"
         onClick={togglePlay}
       >
@@ -157,7 +157,7 @@ export function ExerciseDrawerVideo({
           max={duration || 0}
           step={0.1}
           value={current}
-          aria-label="Progresso do vídeo"
+          aria-label={t('exlib.video.progress')}
           className="w-full"
           onChange={(event) => {
             const next = Number(event.target.value);
@@ -168,7 +168,7 @@ export function ExerciseDrawerVideo({
         <div className="flex items-center justify-between text-white text-[10px] font-mono">
           <button
             type="button"
-            title="Replay"
+            title={t('exlib.video.replay')}
             onClick={() => {
               if (videoRef.current) {
                 videoRef.current.currentTime = 0;
@@ -185,7 +185,7 @@ export function ExerciseDrawerVideo({
           </span>
           <button
             type="button"
-            title="Tela cheia"
+            title={t('exlib.video.fullscreen')}
             onClick={() => {
               void videoRef.current?.requestFullscreen?.();
             }}

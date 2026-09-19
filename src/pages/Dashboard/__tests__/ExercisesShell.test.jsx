@@ -13,6 +13,7 @@ vi.mock('../../../utils/exerciseEquivalents', async (importOriginal) => {
     mapExerciseEquivalents: vi.fn((...args) => actual.mapExerciseEquivalents(...args)),
   };
 });
+import { LanguageProvider } from '../../../contexts/LanguageContext';
 import { useExercises } from '../../../hooks/useExercises';
 import { useTrainingApi } from '../../../hooks/api/useTrainingApi';
 import { mapExerciseEquivalents } from '../../../utils/exerciseEquivalents';
@@ -46,9 +47,11 @@ function mockCatalog(exercises) {
 function renderShell() {
   localStorage.setItem('shapeup_language', 'pt-BR');
   const { container } = render(
-    <MemoryRouter>
-      <Exercises />
-    </MemoryRouter>,
+    <LanguageProvider>
+      <MemoryRouter>
+        <Exercises />
+      </MemoryRouter>
+    </LanguageProvider>,
   );
   const root = container.querySelector('[data-shell]').shadowRoot;
   return { container, root, drawer: root.getElementById('exerciseDrawer') };

@@ -1,15 +1,21 @@
 import { render, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { LanguageProvider } from '../../../contexts/LanguageContext';
 import { ExerciseDrawerVideo } from '../markup/ExerciseDrawerVideo';
 
 beforeEach(() => {
+  localStorage.setItem('shapeup_language', 'pt-BR');
   HTMLMediaElement.prototype.play = vi.fn().mockResolvedValue(undefined);
   HTMLMediaElement.prototype.pause = vi.fn();
 });
 
+function renderVideo(ui) {
+  return render(<LanguageProvider>{ui}</LanguageProvider>);
+}
+
 describe('ExerciseDrawerVideo', () => {
   it('renders a square native player with play, progress, replay, timestamp, and fullscreen for file URLs', () => {
-    const { container, getByTitle, getByRole } = render(
+    const { container, getByTitle, getByRole } = renderVideo(
       <ExerciseDrawerVideo videoUrl="https://cdn.example.com/clip.mp4" title="Supino" />,
     );
     const wrap = container.querySelector('[data-video-player]');
@@ -24,7 +30,7 @@ describe('ExerciseDrawerVideo', () => {
   });
 
   it('shows a YouTube poster and loads the iframe only after play', () => {
-    const { container, getByTitle, queryByTitle } = render(
+    const { container, getByTitle, queryByTitle } = renderVideo(
       <ExerciseDrawerVideo videoUrl="https://www.youtube.com/watch?v=dQw4w9wgGcQ" title="Supino" />,
     );
     expect(container.querySelector('iframe')).toBeNull();
@@ -39,7 +45,7 @@ describe('ExerciseDrawerVideo', () => {
   });
 
   it('shows a Vimeo lite-embed and loads the iframe only after play', () => {
-    const { container, getByTitle } = render(
+    const { container, getByTitle } = renderVideo(
       <ExerciseDrawerVideo videoUrl="https://vimeo.com/123456789" title="Supino" />,
     );
     expect(container.querySelector('iframe')).toBeNull();
@@ -51,24 +57,24 @@ describe('ExerciseDrawerVideo', () => {
   });
 
   it('shows empty copy for missing, invalid, and unknown-host URLs instead of a player', () => {
-    const empty = render(<ExerciseDrawerVideo title="Supino" />);
+    const empty = renderVideo(<ExerciseDrawerVideo title="Supino" />);
     expect(empty.container).toHaveTextContent('Vídeo de execução não cadastrado');
     expect(empty.container.querySelector('video')).toBeNull();
     expect(empty.container.querySelector('iframe')).toBeNull();
     empty.unmount();
 
-    const invalid = render(<ExerciseDrawerVideo videoUrl="not a url" title="Supino" />);
+    const invalid = renderVideo(<ExerciseDrawerVideo videoUrl="not a url" title="Supino" />);
     expect(invalid.container).toHaveTextContent('Vídeo de execução não cadastrado');
     invalid.unmount();
 
-    const unknown = render(
+    const unknown = renderVideo(
       <ExerciseDrawerVideo videoUrl="https://player.example.com/embed/abc" title="Supino" />,
     );
     expect(unknown.container).toHaveTextContent('Vídeo de execução não cadastrado');
     expect(unknown.container.querySelector('iframe')).toBeNull();
     unknown.unmount();
 
-    const whitespace = render(<ExerciseDrawerVideo videoUrl="   " title="Supino" />);
+    const whitespace = renderVideo(<ExerciseDrawerVideo videoUrl="   " title="Supino" />);
     expect(whitespace.container).toHaveTextContent('Vídeo de execução não cadastrado');
     expect(whitespace.container.querySelector('video')).toBeNull();
     expect(whitespace.container.querySelector('iframe')).toBeNull();
@@ -76,12 +82,16 @@ describe('ExerciseDrawerVideo', () => {
   });
 
   it('resets to paused start when videoUrl changes', () => {
-    const { container, getByTitle, rerender } = render(
+    const { container, getByTitle, rerender } = renderVideo(
       <ExerciseDrawerVideo videoUrl="https://www.youtube.com/watch?v=dQw4w9wgGcQ" title="A" />,
     );
     fireEvent.click(getByTitle('Reproduzir'));
     expect(container.querySelector('iframe')).toBeTruthy();
-    rerender(<ExerciseDrawerVideo videoUrl="https://cdn.example.com/clip.mp4" title="B" />);
+    rerender(
+      <LanguageProvider>
+        <ExerciseDrawerVideo videoUrl="https://cdn.example.com/clip.mp4" title="B" />
+      </LanguageProvider>,
+    );
     expect(container.querySelector('iframe')).toBeNull();
     const video = container.querySelector('video');
     expect(video).toBeTruthy();
