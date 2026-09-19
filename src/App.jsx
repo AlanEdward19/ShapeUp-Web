@@ -35,6 +35,7 @@ const NutritionDiaryShell = lazy(() => import('./pages/Dashboard/Nutrition/Nutri
 const FoodSearch = lazy(() => import('./pages/Dashboard/Nutrition/FoodSearch'));
 const MealPlanManager = lazy(() => import('./pages/Dashboard/Nutrition/MealPlanManager'));
 const GoalOnboarding = lazy(() => import('./pages/Dashboard/Nutrition/GoalOnboarding'));
+const FastingPage = lazy(() => import('./pages/Dashboard/Nutrition/FastingPage'));
 import FoodModerationQueue from './pages/Admin/ModerationShell';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
 import ExploreGyms from './pages/Dashboard/GymsExploreShell';
@@ -122,6 +123,7 @@ function App() {
               <Route path="foods" element={<FoodSearch />} />
               <Route path="meal-plans" element={<MealPlanManager />} />
               <Route path="goal" element={<GoalOnboarding />} />
+              <Route path="fasting" element={<FastingPage />} />
             </Route>
             <Route path="admin/food-moderation" element={<FoodModerationQueue />} />
             <Route path="admin/feature-flags" element={<FeatureFlagsPanel />} />

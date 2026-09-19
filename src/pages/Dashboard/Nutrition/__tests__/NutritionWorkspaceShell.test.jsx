@@ -36,6 +36,7 @@ function NutritionRoutes({ lazyFoods = false }) {
         />
         <Route path="meal-plans" element={<div data-testid="plans-child">Plans</div>} />
         <Route path="goal" element={<div data-testid="goal-child">Goal</div>} />
+        <Route path="fasting" element={<div data-testid="fasting-child">Fasting</div>} />
       </Route>
     </Routes>
   );
@@ -80,6 +81,12 @@ describe('NutritionWorkspaceShell', () => {
     const { nav: navAfter } = shadowNav(container);
     expect(navAfter).toBe(navBefore);
     expect(body.getByTestId('foods-child')).toBeInTheDocument();
+  });
+
+  it('renders fasting child route in shell body', () => {
+    const { container } = renderShell('/dashboard/nutrition/fasting');
+    const { body } = shadowNav(container);
+    expect(body.getByTestId('fasting-child')).toBeInTheDocument();
   });
 
   it('uses Skeleton as Suspense fallback while lazy child loads', async () => {

@@ -101,9 +101,9 @@ T6 → T7 → T8
 **Requirement**: IFTW-01
 **Tools**: Skill tlc-spec-driven Execute
 **Done when**:
-- [ ] GET success shows Jejum link to `/dashboard/nutrition/fasting`
-- [ ] GET 404 disabled omits the link
-- [ ] Layout bypass includes fasting URL
+- [x] GET success shows Jejum link to `/dashboard/nutrition/fasting`
+- [x] GET 404 disabled omits the link
+- [x] Layout bypass includes fasting URL
 **Tests**: unit
 **Gate**: quick
 **Commit**: `feat(nutrition): add jejum tab and fasting route`
