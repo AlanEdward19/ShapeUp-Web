@@ -34,16 +34,16 @@ function ExerciseDrawerActivation({
   muscleDetails?: ExerciseRecord['muscleDetails'];
 }): ReactElement {
   const { t } = useLanguage();
-  const details = (muscleDetails || []).filter(
-    (muscle) => typeof muscle === 'object' && Number.isFinite(muscle.activationPercent),
-  );
-  const agonistDetail = details[0];
-  const synergyDetails = details.slice(1);
-  const agonistName = muscles[0] || agonistDetail?.muscleName || agonistDetail?.muscleNamePt || '—';
-  const synergistName =
-    muscles.slice(1).join(', ') ||
-    synergyDetails.map((item) => item.muscleName || item.muscleNamePt).filter(Boolean).join(', ') ||
-    '—';
+  const ranked = [...(muscleDetails || [])]
+    .filter((muscle) => typeof muscle === 'object' && Number.isFinite(muscle.activationPercent))
+    .sort((a, b) => Number(b.activationPercent) - Number(a.activationPercent));
+  const rankedNames = ranked.map((item) => item.muscleName || item.muscleNamePt).filter(Boolean);
+  const agonistDetail = ranked[0];
+  const synergyDetails = ranked.slice(1);
+  const agonistName = rankedNames[0] || muscles[0] || '—';
+  const synergistsFromDetails = rankedNames.slice(1);
+  const synergistsFromMuscles = muscles.filter((name) => name && name !== agonistName);
+  const synergistName = [...new Set([...synergistsFromDetails, ...synergistsFromMuscles])].join(', ') || '—';
   const agonistPct = agonistDetail?.activationPercent;
   const synergyPct =
     synergyDetails.length > 0

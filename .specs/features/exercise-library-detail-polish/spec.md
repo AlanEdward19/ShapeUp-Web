@@ -108,7 +108,7 @@ O painel de detalhe da Biblioteca de Exercícios (drawer em `ExercisesPublicMark
 | -------------- | ----- | ----- | ------ |
 | ELP-01 | P1: Slot de vídeo estável | Tasks | Verified |
 | ELP-02 | P1: Biblioteca e drawer traduzíveis | Tasks | Verified |
-| ELP-03 | P1: Vários músculos alvo | Tasks | In Tasks |
+| ELP-03 | P1: Vários músculos alvo | Tasks | Verified |
 
 **ID format:** `ELP-NN`
 

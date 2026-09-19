@@ -77,6 +77,7 @@ describe('ExercisesShell', () => {
     expect(drawer).toHaveTextContent('Instrução da API');
     expect(drawer).toHaveTextContent('62%');
     expect(drawer).not.toHaveTextContent('95%');
+    expect(drawer.querySelector('#drawerSynergist')).toHaveTextContent('—');
     expect(root.querySelector('.shell-body')).not.toHaveTextContent('PÁGINA 1 DE 15');
     expect(row).not.toHaveTextContent('Glúteo Máximo, Adutores, Lombar');
     fireEvent.keyDown(within(drawer).getByTitle('Fechar Painel'), { key: 'Escape' });
@@ -164,6 +165,31 @@ describe('ExercisesShell', () => {
       );
     });
     expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Exercício real');
+  });
+
+  it('shows agonist and synergist when multiple muscle details are present', () => {
+    mockCatalog([
+      {
+        ...baseExercise,
+        muscleDetails: [
+          { muscleGroup: 1, muscleNamePt: 'Peitoral', activationPercent: 80 },
+          { muscleGroup: 2, muscleNamePt: 'Tríceps', activationPercent: 55 },
+        ],
+      },
+    ]);
+    const { root, drawer } = renderShell();
+    fireEvent.click(root.querySelector('.exercise-item'));
+    expect(drawer.querySelector('#drawerAgonist')).toHaveTextContent('Peitoral');
+    expect(drawer.querySelector('#drawerSynergist')).toHaveTextContent('Tríceps');
+    expect(drawer).toHaveTextContent('80%');
+    expect(drawer).toHaveTextContent('55%');
+  });
+
+  it('lists every muscle label on the catalog row', () => {
+    mockCatalog([{ ...baseExercise, muscles: ['Peitoral', 'Tríceps'], muscleDetails: [] }]);
+    const { root } = renderShell();
+    const row = root.querySelector('.exercise-item');
+    expect(row).toHaveTextContent('Peitoral, Tríceps');
   });
 
   it('navigates the drawer to an equivalent from GET records on click', async () => {
