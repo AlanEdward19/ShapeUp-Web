@@ -106,7 +106,7 @@ export default function UnifiedNavigation({ flow, open, close }: UnifiedNavigati
               navigate('/login');
             }}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>logout</span>
+            <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: 18 }}>logout</span>
           </button>
         </div>
       </aside>

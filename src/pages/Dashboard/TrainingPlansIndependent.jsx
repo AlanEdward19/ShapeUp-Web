@@ -95,7 +95,7 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, owned, c
 const TrainingPlansIndependent = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { setSessionTitle } = useOutletContext();
+    const { setSessionTitle } = useOutletContext() || {};
     const { t, language, unitSystem, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const {
@@ -349,7 +349,7 @@ const TrainingPlansIndependent = () => {
                 setActivePlan(plan);
                 setSessionActive(true);
                 setWorkoutTime(0);
-                setSessionTitle(`${plan.name} \u00b7 ${plan.phase}`);
+                setSessionTitle?.(`${plan.name} \u00b7 ${plan.phase}`);
             }
 
             setPendingActiveWorkout(null);
@@ -614,7 +614,7 @@ const TrainingPlansIndependent = () => {
         setActivePlan(plan);
         setSessionActive(true);
         setWorkoutTime(0);
-        setSessionTitle(`${plan.name} · ${plan.phase}`);
+        setSessionTitle?.(`${plan.name} · ${plan.phase}`);
     };
 
     const finishSession = async () => {
@@ -624,7 +624,7 @@ const TrainingPlansIndependent = () => {
         await syncWorkoutStateIfNeeded({ force: true });
 
         setShowFeedbackModal(true);
-        setSessionTitle(null);
+        setSessionTitle?.(null);
         setIsFinishingSession(false);
     };
 
@@ -720,7 +720,7 @@ const TrainingPlansIndependent = () => {
         hasFirstDoneRef.current = false;
         lastSyncedHashRef.current = '';
         doneClickGuardRef.current = {};
-        setSessionTitle(null);
+        setSessionTitle?.(null);
     };
 
     // ─── COMPUTED ──────────────────────────────────────────────────

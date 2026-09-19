@@ -214,7 +214,7 @@ const formatTime = (totalSeconds) => {
 
 const ClientView = () => {
     const { exercises: exercisesDB } = useExercises();
-    const { setSessionTitle } = useOutletContext();
+    const { setSessionTitle } = useOutletContext() || {};
     const { t, unitSystem, convertWeight, formatWeight } = useLanguage();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const { getWorkoutPlansByUser, getWorkoutsByUser, getActiveWorkout, getWorkoutPlanById, getExerciseEquivalents } = useTrainingApi();
@@ -428,7 +428,7 @@ const ClientView = () => {
                 setActivePlan(plan);
                 setSessionActive(true);
                 setWorkoutTime(0);
-                setSessionTitle(`${plan.name} · ${plan.phase}`);
+                setSessionTitle?.(`${plan.name} · ${plan.phase}`);
             }
 
             setPendingActiveWorkout(null);
@@ -640,7 +640,7 @@ const ClientView = () => {
         setActivePlan(plan);
         setSessionActive(true);
         setWorkoutTime(0);
-        setSessionTitle(`${plan.name} · ${plan.phase}`);
+        setSessionTitle?.(`${plan.name} · ${plan.phase}`);
     };
 
     // -- Timers Effect --
@@ -781,7 +781,7 @@ const ClientView = () => {
 
         // Instead of directly ending, trigger feedback flow
         setShowFeedbackModal(true);
-        setSessionTitle(null);
+        setSessionTitle?.(null);
         setIsFinishingSession(false);
     };
 

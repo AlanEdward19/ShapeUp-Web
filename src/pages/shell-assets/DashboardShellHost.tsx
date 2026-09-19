@@ -37,6 +37,7 @@ type DashboardShellHostProps = {
   after?: ReactNode;
   onBodyClick?: (event: MouseEvent<HTMLDivElement>) => void;
   onBodySubmit?: (event: FormEvent<HTMLDivElement>) => void;
+  adoptDocumentStyles?: boolean;
 };
 
 export default function DashboardShellHost({
@@ -47,6 +48,7 @@ export default function DashboardShellHost({
   after,
   onBodyClick,
   onBodySubmit,
+  adoptDocumentStyles = false,
 }: DashboardShellHostProps) {
   const navigate = useNavigate();
   const auth = useAuth() as unknown as { currentUser?: unknown } | undefined;
@@ -73,6 +75,22 @@ export default function DashboardShellHost({
       window.document.head.appendChild(link);
     }
   }, [name, entry.fonts]);
+
+  useEffect(() => {
+    if (!root || !adoptDocumentStyles) return;
+    const extra: Node[] = [];
+    document.querySelectorAll('link[rel="stylesheet"], style').forEach((node) => {
+      const clone = node.cloneNode(true);
+      extra.push(root.appendChild(clone));
+    });
+    if (document.adoptedStyleSheets?.length) {
+      root.adoptedStyleSheets = [...root.adoptedStyleSheets, ...document.adoptedStyleSheets];
+    }
+    return () => {
+      extra.forEach((node) => node.parentNode?.removeChild(node));
+      root.adoptedStyleSheets = [];
+    };
+  }, [root, adoptDocumentStyles]);
 
   const click = (event: MouseEvent<HTMLDivElement>) => {
     onBodyClick?.(event);

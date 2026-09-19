@@ -1,7 +1,12 @@
 import { render, fireEvent } from '@testing-library/react';
 import { createRef } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { withLang } from '../../../test/withLang';
 import { ExerciseDrawer } from '../markup/ExerciseDrawer';
+
+beforeEach(() => {
+  localStorage.setItem('shapeup_language', 'pt-BR');
+});
 
 function mockState(active, extra = {}) {
   return {
@@ -38,7 +43,7 @@ function mockState(active, extra = {}) {
 describe('ExerciseDrawer', () => {
   it('renders a dimming backdrop that closes the drawer on click', () => {
     const state = mockState({ id: 1, name: 'Supino', muscles: ['Peitoral'] });
-    const { getByTestId } = render(<ExerciseDrawer state={state} />);
+    const { getByTestId } = render(withLang(<ExerciseDrawer state={state} />));
     const backdrop = getByTestId('drawer-backdrop');
     expect(backdrop.className).toMatch(/bg-black\/60/);
     expect(backdrop.className).toMatch(/backdrop-blur-xs/);
@@ -53,7 +58,7 @@ describe('ExerciseDrawer', () => {
       muscles: ['Peitoral', 'Tríceps'],
       muscleDetails: [{ muscleGroup: 1, muscleNamePt: 'Peitoral', activationPercent: 62 }],
     });
-    const { container } = render(<ExerciseDrawer state={state} />);
+    const { container } = render(withLang(<ExerciseDrawer state={state} />));
     expect(container).toHaveTextContent('62%');
     expect(container).not.toHaveTextContent('95%');
     expect(container).not.toHaveTextContent('75%');
@@ -68,7 +73,7 @@ describe('ExerciseDrawer', () => {
       muscles: ['Peitoral'],
       descriptionPt: 'Desça controlado até o peito.',
     });
-    const { container, getByText } = render(<ExerciseDrawer state={state} />);
+    const { container, getByText } = render(withLang(<ExerciseDrawer state={state} />));
     expect(getByText('01.')).toBeTruthy();
     expect(getByText('01.').className).toMatch(/terracotta/);
     expect(container.querySelector('#drawerStep1')).toHaveTextContent('Desça controlado até o peito.');
@@ -77,7 +82,7 @@ describe('ExerciseDrawer', () => {
 
   it('uses a 460px panel and terracotta drawer code', () => {
     const state = mockState({ id: 7, name: 'Supino', muscles: ['Peitoral'] });
-    const { container } = render(<ExerciseDrawer state={state} />);
+    const { container } = render(withLang(<ExerciseDrawer state={state} />));
     const panel = container.querySelector('#exerciseDrawer');
     expect(panel.className).toMatch(/w-\[460px\]/);
     expect(panel.className).toMatch(/max-w-full/);
@@ -88,7 +93,7 @@ describe('ExerciseDrawer', () => {
 
   it('renders series stats with hairline border-y and no muted boxed frame', () => {
     const state = mockState({ id: 1, name: 'Supino', muscles: ['Peitoral'] });
-    const { container } = render(<ExerciseDrawer state={state} />);
+    const { container } = render(withLang(<ExerciseDrawer state={state} />));
     const stats = container.querySelector('#drawerSets').closest('[data-drawer-stats]');
     expect(stats.className).toMatch(/border-y/);
     expect(stats.className).not.toMatch(/bg-surface-muted/);
@@ -103,7 +108,7 @@ describe('ExerciseDrawer', () => {
       description: 'Texto solto duplicado',
       muscleDetails: [{ muscleGroup: 1, muscleNamePt: 'Peitoral', activationPercent: 62 }],
     });
-    const { container, getByText, queryByRole } = render(<ExerciseDrawer state={state} />);
+    const { container, getByText, queryByRole } = render(withLang(<ExerciseDrawer state={state} />));
     expect(queryByRole('heading', { name: 'Músculos' })).toBeNull();
     expect(container.textContent).not.toMatch(/Peitoral: 62%/);
     expect(getByText('Adicionar à Ficha do Aluno')).toBeTruthy();

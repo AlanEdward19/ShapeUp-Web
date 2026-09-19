@@ -8,15 +8,17 @@ type WorkspaceShellPageProps = {
   css?: string;
   children: ReactNode;
   onBodyClick?: (event: MouseEvent<HTMLDivElement>) => void;
+  adoptDocumentStyles?: boolean;
 };
 
-export default function WorkspaceShellPage({ name, css = '', children, onBodyClick }: WorkspaceShellPageProps) {
+export default function WorkspaceShellPage({ name, css = '', children, onBodyClick, adoptDocumentStyles }: WorkspaceShellPageProps) {
   const [open, setOpen] = useState(false);
 
   return (
     <DashboardShellHost
       name={name}
       css={unifiedNavigationCss + css}
+      adoptDocumentStyles={adoptDocumentStyles}
       onBodyClick={onBodyClick}
       after={
         <button

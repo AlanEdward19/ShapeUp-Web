@@ -1,7 +1,8 @@
 import { render, fireEvent } from '@testing-library/react';
 import { createRef } from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { withLang } from '../../../test/withLang';
 
 vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({ currentUser: { uid: 'test' }, signOut: vi.fn() }),
@@ -53,11 +54,16 @@ function state(extra = {}) {
 }
 
 describe('ExercisesPublicMarkup', () => {
+  beforeEach(() => {
+    localStorage.setItem('shapeup_language', 'pt-BR');
+  });
   it('mounts ExerciseDrawer with the stable drawer ids', () => {
     const { container } = render(
-      <MemoryRouter>
-        <ExercisesPublicMarkup state={state()} />
-      </MemoryRouter>,
+      withLang(
+        <MemoryRouter>
+          <ExercisesPublicMarkup state={state()} />
+        </MemoryRouter>,
+      ),
     );
     expect(container.querySelector('#exerciseDrawer')).toBeTruthy();
     expect(container.querySelector('#drawerCode')).toHaveTextContent('EX-7');
@@ -67,9 +73,11 @@ describe('ExercisesPublicMarkup', () => {
 
   it('does not inline the old video link, static subs copy, or muscle dump', () => {
     const { container } = render(
-      <MemoryRouter>
-        <ExercisesPublicMarkup state={state()} />
-      </MemoryRouter>,
+      withLang(
+        <MemoryRouter>
+          <ExercisesPublicMarkup state={state()} />
+        </MemoryRouter>,
+      ),
     );
     expect(container).not.toHaveTextContent('Vídeo do exercício');
     expect(container).not.toHaveTextContent('Consulte a biblioteca para selecionar uma substituição.');
@@ -88,15 +96,17 @@ describe('ExercisesPublicMarkup', () => {
     };
     const inspect = vi.fn();
     const { container, getByText } = render(
-      <MemoryRouter>
-        <ExercisesPublicMarkup
-          state={state({
-            active: { ...active, equivalents: [{ exerciseId: 8 }] },
-            exerciseLookup: [active, equivalent],
-            inspect,
-          })}
-        />
-      </MemoryRouter>,
+      withLang(
+        <MemoryRouter>
+          <ExercisesPublicMarkup
+            state={state({
+              active: { ...active, equivalents: [{ exerciseId: 8 }] },
+              exerciseLookup: [active, equivalent],
+              inspect,
+            })}
+          />
+        </MemoryRouter>,
+      ),
     );
     expect(container).toHaveTextContent('Variação em máquina');
     expect(container).toHaveTextContent('1 opções');
@@ -107,9 +117,11 @@ describe('ExercisesPublicMarkup', () => {
 
   it('shows sibling empty copy when GET equivalents are empty', () => {
     const { container } = render(
-      <MemoryRouter>
-        <ExercisesPublicMarkup state={state({ active: { ...active, equivalents: [] } })} />
-      </MemoryRouter>,
+      withLang(
+        <MemoryRouter>
+          <ExercisesPublicMarkup state={state({ active: { ...active, equivalents: [] } })} />
+        </MemoryRouter>,
+      ),
     );
     expect(container.querySelector('#drawerSubs')).toHaveTextContent(
       'Nenhuma substituição cadastrada para este exercício.',

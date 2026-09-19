@@ -30,6 +30,7 @@ import TurnstileGym from './pages/Dashboard/TurnstileGym';
 import GymManagement from './pages/Dashboard/GymManagement';
 const FinancialGym = () => <GymManagement mode="plans" />;
 import NutritionWorkspaceShell from './pages/Dashboard/Nutrition/NutritionWorkspaceShell';
+import WorkspaceRoutedPage from './components/Workspace/WorkspaceRoutedPage';
 
 const NutritionDiaryShell = lazy(() => import('./pages/Dashboard/Nutrition/NutritionDiaryShell'));
 const FoodSearch = lazy(() => import('./pages/Dashboard/Nutrition/FoodSearch'));
@@ -109,7 +110,7 @@ function App() {
           <Route path="/dashboard/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
-            <Route path="training" element={<TrainingPlans />} />
+            <Route path="training" element={<WorkspaceRoutedPage><TrainingPlans /></WorkspaceRoutedPage>} />
             <Route path="clients" element={<Clients />} />
             <Route path="clients/:id" element={<ClientDetail />} />
             <Route path="exercises" element={<Exercises />} />
@@ -117,7 +118,7 @@ function App() {
             <Route path="analytics" element={<Analytics />} />
             <Route path="reports" element={<Reports />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="objectives" element={<ObjectivesClient />} />
+            <Route path="objectives" element={<WorkspaceRoutedPage><ObjectivesClient /></WorkspaceRoutedPage>} />
             <Route path="nutrition" element={<NutritionWorkspaceShell />}>
               <Route path="diary" element={<NutritionDiaryShell />} />
               <Route path="foods" element={<FoodSearch />} />

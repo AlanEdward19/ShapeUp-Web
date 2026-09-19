@@ -4,7 +4,7 @@ import TrainingPlansProfessional from './Dashboard/TrainingPlansProfessional';
 import TrainingPlansIndependent from './Dashboard/TrainingPlansIndependent';
 
 const TrainingPlans = () => {
-    const { isProfessional } = useOutletContext();
+    const { isProfessional } = useOutletContext() || {};
 
     if (isProfessional) return <TrainingPlansProfessional />;
     return <TrainingPlansIndependent />;

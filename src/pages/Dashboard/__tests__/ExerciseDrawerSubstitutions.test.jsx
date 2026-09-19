@@ -1,6 +1,11 @@
 import { render, fireEvent } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { withLang } from '../../../test/withLang';
 import { ExerciseDrawerSubstitutions } from '../markup/ExerciseDrawerSubstitutions';
+
+beforeEach(() => {
+  localStorage.setItem('shapeup_language', 'pt-BR');
+});
 
 const loaded = [
   { id: 1, name: 'Supino reto', muscles: ['Peitoral'], equipment: 'Barra' },
@@ -10,6 +15,7 @@ const loaded = [
 describe('ExerciseDrawerSubstitutions', () => {
   it('renders name, equipment, similarity, chevron, and count for equivalents', () => {
     const { container, getByText } = render(
+      withLang(
       <ExerciseDrawerSubstitutions
         exercises={loaded}
         equivalents={[
@@ -18,6 +24,7 @@ describe('ExerciseDrawerSubstitutions', () => {
         onSelect={vi.fn()}
         onNotFound={vi.fn()}
       />,
+      ),
     );
     expect(getByText('1 opções')).toBeTruthy();
     expect(container).toHaveTextContent('Supino machine');
@@ -32,19 +39,23 @@ describe('ExerciseDrawerSubstitutions', () => {
   it('renders the empty state when equivalents are absent or empty', () => {
     const copy = 'Nenhuma substituição cadastrada para este exercício.';
     const missing = render(
-      <ExerciseDrawerSubstitutions exercises={loaded} onSelect={vi.fn()} onNotFound={vi.fn()} />,
+      withLang(
+        <ExerciseDrawerSubstitutions exercises={loaded} onSelect={vi.fn()} onNotFound={vi.fn()} />,
+      ),
     );
     expect(missing.container).toHaveTextContent(copy);
     expect(missing.container.querySelector('button')).toBeNull();
     missing.unmount();
 
     const empty = render(
-      <ExerciseDrawerSubstitutions
-        exercises={loaded}
-        equivalents={[]}
-        onSelect={vi.fn()}
-        onNotFound={vi.fn()}
-      />,
+      withLang(
+        <ExerciseDrawerSubstitutions
+          exercises={loaded}
+          equivalents={[]}
+          onSelect={vi.fn()}
+          onNotFound={vi.fn()}
+        />,
+      ),
     );
     expect(empty.container).toHaveTextContent(copy);
   });
@@ -53,12 +64,14 @@ describe('ExerciseDrawerSubstitutions', () => {
     const onSelect = vi.fn();
     const onNotFound = vi.fn();
     const { getByText } = render(
-      <ExerciseDrawerSubstitutions
-        exercises={loaded}
-        equivalents={[{ exerciseId: 2 }]}
-        onSelect={onSelect}
-        onNotFound={onNotFound}
-      />,
+      withLang(
+        <ExerciseDrawerSubstitutions
+          exercises={loaded}
+          equivalents={[{ exerciseId: 2 }]}
+          onSelect={onSelect}
+          onNotFound={onNotFound}
+        />,
+      ),
     );
     fireEvent.click(getByText('Supino machine'));
     expect(onSelect).toHaveBeenCalledWith(loaded[1]);
@@ -69,12 +82,14 @@ describe('ExerciseDrawerSubstitutions', () => {
     const onSelect = vi.fn();
     const onNotFound = vi.fn();
     const { getByRole } = render(
-      <ExerciseDrawerSubstitutions
-        exercises={loaded}
-        equivalents={[{ exerciseId: 99 }]}
-        onSelect={onSelect}
-        onNotFound={onNotFound}
-      />,
+      withLang(
+        <ExerciseDrawerSubstitutions
+          exercises={loaded}
+          equivalents={[{ exerciseId: 99 }]}
+          onSelect={onSelect}
+          onNotFound={onNotFound}
+        />,
+      ),
     );
     fireEvent.click(getByRole('button'));
     expect(onNotFound).toHaveBeenCalledWith(99);

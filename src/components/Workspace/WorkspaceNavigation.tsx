@@ -1,11 +1,17 @@
-import { useEffect, type ReactElement } from 'react';
+import { useCallback, useEffect, useState, type ReactElement } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../Logo/Logo';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 
+const sidebarIconCss = `
+[data-unified-sidebar] .material-symbols-outlined{font-family:'Material Symbols Outlined'!important;font-weight:400!important;font-style:normal!important;font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20!important;display:inline-block!important;line-height:1!important;letter-spacing:normal!important;text-transform:none!important;white-space:nowrap!important;direction:ltr;-webkit-font-feature-settings:'liga'!important;font-feature-settings:'liga'!important}
+[data-unified-sidebar] .sn-profile button{background:none;border:0;padding:4px;cursor:pointer;color:inherit;text-transform:none;letter-spacing:normal;font:inherit}
+`;
+
 export const navStyle = `
-.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:'liga';font-feature-settings:'liga'}
+${sidebarIconCss}
 [data-unified-sidebar]{position:fixed;inset:0 auto 0 0;width:256px;background:var(--bg-main);border-right:1px solid var(--border-color);z-index:60;display:flex;flex-direction:column;justify-content:space-between;font:14px/1.5 'Source Sans 3',sans-serif;color:var(--text-main);box-sizing:border-box}
 [data-unified-sidebar] .sn-brand{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border-color)}
 [data-unified-sidebar] .sn-brand strong{font:700 20px 'Barlow Condensed';letter-spacing:1px;text-transform:uppercase}
@@ -93,8 +99,8 @@ export function UnifiedSidebarNavigation({ flow, open, close }: UnifiedSidebarNa
             <strong>{name}</strong>
             <small>{role === 'gym' ? 'Dono de academia' : pro ? 'Personal Trainer' : 'Atleta ShapeUp'}</small>
           </div>
-          <button title="Encerrar sessão" type="button" onClick={async () => { await signOut(); navigate('/login'); }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>logout</span>
+          <button title="Encerrar sessão" type="button" data-testid="sidebar-logout" onClick={async () => { await signOut(); navigate('/login'); }}>
+            <span className="material-symbols-outlined" aria-hidden="true" style={{ fontSize: 18 }}>logout</span>
           </button>
         </div>
       </aside>
@@ -112,10 +118,31 @@ export type WorkspaceNavigationProps = {
 };
 
 export function WorkspaceNavigation({ isOpen, onClose }: WorkspaceNavigationProps): ReactElement {
+  const [root, setRoot] = useState<ShadowRoot | null>(null);
+  const attach = useCallback((node: HTMLDivElement | null) => {
+    if (!node) return;
+    setRoot(node.shadowRoot ?? node.attachShadow({ mode: 'open' }));
+  }, []);
+
   return (
-    <div style={{ position: 'fixed', inset: '0 auto 0 0', width: 256, zIndex: 60, pointerEvents: 'none' }}>
-      <style>{`${navStyle}[data-unified-sidebar]{pointer-events:auto}`}</style>
-      <UnifiedSidebarNavigation flow={false} open={isOpen} close={onClose} />
+    <div
+      ref={attach}
+      data-layout-sidebar
+      style={{ position: 'fixed', inset: '0 auto 0 0', width: 256, zIndex: 60 }}
+    >
+      {root
+        ? createPortal(
+            <>
+              <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+              />
+              <style>{`${navStyle}[data-unified-sidebar]{position:relative;inset:auto;height:100%;width:100%;pointer-events:auto}`}</style>
+              <UnifiedSidebarNavigation flow={false} open={isOpen} close={onClose} />
+            </>,
+            root,
+          )
+        : null}
     </div>
   );
 }

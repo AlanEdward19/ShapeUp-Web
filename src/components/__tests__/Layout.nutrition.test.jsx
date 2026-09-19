@@ -24,19 +24,23 @@ const renderAt = (path) =>
           <Route path="nutrition/meal-plans" element={<div data-testid="page">plans</div>} />
           <Route path="nutrition/goal" element={<div data-testid="page">goal</div>} />
           <Route path="nutrition/fasting" element={<div data-testid="page">fasting</div>} />
+          <Route path="training" element={<div data-testid="page">training</div>} />
+          <Route path="objectives" element={<div data-testid="page">objectives</div>} />
           <Route path="clients" element={<div data-testid="page">clients</div>} />
         </Route>
       </Routes>
     </MemoryRouter>,
   );
 
-describe('Layout nutrition bypass', () => {
+describe('Layout workspace chrome bypass', () => {
   it.each([
     '/dashboard/nutrition/diary',
     '/dashboard/nutrition/foods',
     '/dashboard/nutrition/meal-plans',
     '/dashboard/nutrition/goal',
     '/dashboard/nutrition/fasting',
+    '/dashboard/training',
+    '/dashboard/objectives',
   ])('bypasses legacy chrome for %s', (path) => {
     const { queryByTestId } = renderAt(path);
     expect(queryByTestId('legacy-sidebar')).not.toBeInTheDocument();

@@ -28,7 +28,7 @@ const Layout = () => {
 
     const bypassLegacyChrome =
         location.pathname.startsWith('/dashboard/nutrition') ||
-        ['/dashboard', '/dashboard/exercises', '/dashboard/settings', '/dashboard/admin/food-moderation', '/dashboard/messages', '/dashboard/feedback', '/dashboard/gyms'].includes(location.pathname);
+        ['/dashboard', '/dashboard/exercises', '/dashboard/settings', '/dashboard/admin/food-moderation', '/dashboard/messages', '/dashboard/feedback', '/dashboard/gyms', '/dashboard/training', '/dashboard/objectives'].includes(location.pathname);
     if (!(isGym && location.pathname === '/dashboard') && bypassLegacyChrome) return <Outlet context={{ isProfessional, isIndependent, isGym, coachProfile, setCoachProfile, clientProfile, setClientProfile, gymProfile, setGymProfile, setSessionTitle }} />;
     return (
         <div className="su-layout-wrapper">
