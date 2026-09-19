@@ -11,7 +11,7 @@ import DashboardShellHost from '../shell-assets/DashboardShellHost';
 import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { ExercisesPublicMarkup, type ExerciseRecord } from './markup/ExercisesPublicMarkup';
 
-const drawerCss = `#exerciseDrawer{position:fixed;right:0;top:0;bottom:0;width:min(460px,100vw);height:100dvh;z-index:90;transform:translateX(100%);visibility:hidden;transition:transform 240ms cubic-bezier(.32,.72,0,1),visibility 0s 240ms}#exerciseDrawer[data-open=true]{transform:translateX(0);visibility:visible;transition-delay:0s}#drawerBackdrop{position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}#drawerBackdrop[hidden]{display:none}@media(prefers-reduced-motion:reduce){#exerciseDrawer{transform:none;opacity:0;transition:opacity 150ms ease,visibility 0s 150ms}#exerciseDrawer[data-open=true]{opacity:1;transition-delay:0s}}`;
+const drawerCss = `#exerciseDrawer{position:fixed;right:0;top:0;bottom:0;width:min(460px,100vw);height:100dvh;z-index:90;transform:translateX(100%);visibility:hidden;transition:transform 240ms cubic-bezier(.32,.72,0,1),visibility 0s 240ms}#exerciseDrawer[data-open=true]{transform:translateX(0);visibility:visible;transition-delay:0s}#exerciseDrawer .aspect-square{aspect-ratio:1/1;width:100%}#drawerBackdrop{position:fixed;inset:0;z-index:85;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}#drawerBackdrop[hidden]{display:none}@media(prefers-reduced-motion:reduce){#exerciseDrawer{transform:none;opacity:0;transition:opacity 150ms ease,visibility 0s 150ms}#exerciseDrawer[data-open=true]{opacity:1;transition-delay:0s}}`;
 
 const normalize = (value: string) =>
   String(value || '')

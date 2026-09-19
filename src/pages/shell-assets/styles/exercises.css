@@ -741,6 +741,9 @@ select {
 .hidden {
   display: none;
 }
+.aspect-square {
+  aspect-ratio: 1 / 1;
+}
 .h-1 {
   height: 0.25rem;
 }
@@ -1037,6 +1040,10 @@ select {
 .bg-surface-muted {
   --tw-bg-opacity: 1;
   background-color: rgb(26 21 19 / var(--tw-bg-opacity, 1));
+}
+.bg-text-muted {
+  --tw-bg-opacity: 1;
+  background-color: rgb(133 118 111 / var(--tw-bg-opacity, 1));
 }
 .bg-surface-subtle {
   --tw-bg-opacity: 1;

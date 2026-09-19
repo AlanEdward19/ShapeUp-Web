@@ -183,6 +183,10 @@ describe('ExercisesShell', () => {
     expect(drawer.querySelector('#drawerSynergist')).toHaveTextContent('Tríceps');
     expect(drawer).toHaveTextContent('80%');
     expect(drawer).toHaveTextContent('55%');
+    const bars = [...drawer.querySelectorAll('[data-activation-bar]')];
+    expect(bars).toHaveLength(2);
+    expect(bars[0].style.width).toBe('80%');
+    expect(bars[1].style.width).toBe('55%');
   });
 
   it('lists every muscle label on the catalog row', () => {

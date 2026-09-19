@@ -61,7 +61,10 @@ describe('ExerciseDrawerVideo', () => {
   it('shows empty copy for missing, invalid, and unknown-host URLs instead of a player', () => {
     const empty = renderVideo(<ExerciseDrawerVideo title="Supino" />);
     expect(empty.container).toHaveTextContent('Vídeo de execução não cadastrado');
-    expect(empty.container.querySelector('.aspect-square')).toBeTruthy();
+    const slot = empty.container.querySelector('[data-video-empty]');
+    expect(slot).toHaveClass('aspect-square');
+    expect(slot).toHaveClass('w-full');
+    expect(slot.style.aspectRatio).toBe('1 / 1');
     expect(empty.container.querySelector('video')).toBeNull();
     expect(empty.container.querySelector('iframe')).toBeNull();
     empty.unmount();

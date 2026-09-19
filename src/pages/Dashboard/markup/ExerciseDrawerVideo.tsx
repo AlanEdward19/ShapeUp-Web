@@ -61,22 +61,24 @@ export function ExerciseDrawerVideo({
     }
   }, [url]);
 
+  const emptySlot = (
+    <div
+      data-video-empty
+      className="aspect-square w-full rounded-md bg-surface-muted border border-border-subtle flex items-center justify-center px-4 text-center"
+      style={{ aspectRatio: '1 / 1' }}
+    >
+      <p className="text-text-secondary text-[11px]">{t('exlib.video.empty')}</p>
+    </div>
+  );
+
   if (kind === 'invalid' || !url) {
-    return (
-      <div className="aspect-square rounded-md bg-surface-muted border border-border-subtle flex items-center justify-center px-4 text-center">
-        <p className="text-text-secondary text-[11px]">{t('exlib.video.empty')}</p>
-      </div>
-    );
+    return emptySlot;
   }
 
   if (kind === 'youtube' || kind === 'vimeo') {
     const id = kind === 'youtube' ? youtubeId(url) : vimeoId(url);
     if (!id) {
-      return (
-        <div className="aspect-square rounded-md bg-surface-muted border border-border-subtle flex items-center justify-center px-4 text-center">
-          <p className="text-text-secondary text-[11px]">{t('exlib.video.empty')}</p>
-        </div>
-      );
+      return emptySlot;
     }
     const embed =
       kind === 'youtube'
@@ -85,7 +87,7 @@ export function ExerciseDrawerVideo({
     const poster = kind === 'youtube' ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : undefined;
 
     return (
-      <div data-video-player className="aspect-square relative rounded-md overflow-hidden bg-black">
+      <div data-video-player className="aspect-square w-full relative rounded-md overflow-hidden bg-black" style={{ aspectRatio: '1 / 1' }}>
         {hostedOpen ? (
           <iframe
             title={title}
@@ -130,7 +132,7 @@ export function ExerciseDrawerVideo({
   };
 
   return (
-    <div data-video-player className="aspect-square relative rounded-md overflow-hidden bg-black">
+    <div data-video-player className="aspect-square w-full relative rounded-md overflow-hidden bg-black" style={{ aspectRatio: '1 / 1' }}>
       <video
         ref={videoRef}
         src={url}

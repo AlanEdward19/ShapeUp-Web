@@ -62,8 +62,32 @@ describe('ExerciseDrawer', () => {
     expect(container).toHaveTextContent('62%');
     expect(container).not.toHaveTextContent('95%');
     expect(container).not.toHaveTextContent('75%');
-    const bar = container.querySelector('[data-activation-bar]');
-    expect(bar.style.width).toBe('62%');
+    const bars = container.querySelectorAll('[data-activation-bar]');
+    expect(bars).toHaveLength(2);
+    expect(bars[0].style.width).toBe('62%');
+    expect(Number.parseFloat(bars[1].style.width)).toBeGreaterThan(0);
+  });
+
+  it('fills a bar for every listed muscle even when only the agonist has activationPercent', () => {
+    const state = mockState({
+      id: 1,
+      name: 'Supino',
+      muscles: ['Peitoral', 'Tríceps', 'Deltóide anterior'],
+      muscleDetails: [
+        { muscleGroup: 1, muscleNamePt: 'Peitoral', activationPercent: 80 },
+        { muscleGroup: 2, muscleNamePt: 'Tríceps', activationPercent: 0 },
+      ],
+    });
+    const { container } = render(withLang(<ExerciseDrawer state={state} />));
+    expect(container.querySelector('#drawerAgonist')).toHaveTextContent('Peitoral');
+    expect(container.querySelector('#drawerSynergist')).toHaveTextContent('Tríceps');
+    expect(container).toHaveTextContent('Deltóide anterior');
+    const bars = [...container.querySelectorAll('[data-activation-bar]')];
+    expect(bars).toHaveLength(3);
+    bars.forEach((bar) => expect(Number.parseFloat(bar.style.width)).toBeGreaterThan(0));
+    expect(bars[0].style.backgroundColor).toBe('rgb(224, 108, 67)');
+    expect(bars[1].style.backgroundColor).toBe('rgb(133, 118, 111)');
+    expect(bars[2].style.backgroundColor).toBe('rgb(133, 118, 111)');
   });
 
   it('renders description fallback as a styled 01. step, not a bare paragraph', () => {

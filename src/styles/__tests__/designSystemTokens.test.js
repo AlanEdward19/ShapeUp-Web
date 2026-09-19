@@ -139,6 +139,14 @@ describe('design-system Warm Oxide token contract', () => {
     expect(tokenValue(dark, '--primary')).toBe('#e06c43')
   })
 
+  it('keeps the exercise drawer media slot square in shadow CSS', () => {
+    expect(exercisesCss).toMatch(/\.aspect-square\s*\{[^}]*aspect-ratio:\s*1\s*\/\s*1/)
+  })
+
+  it('includes bg-text-muted so synergist activation bars can fill', () => {
+    expect(exercisesCss).toMatch(/\.bg-text-muted\s*\{[^}]*background-color:/)
+  })
+
   it('aligns at least three dark color tokens with shell-assets exercises hex', () => {
     expect(exercisesCss).toContain('rgb(224 108 67')
     expect(exercisesCss).toContain('rgb(33 26 23')

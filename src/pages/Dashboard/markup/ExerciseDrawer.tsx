@@ -26,6 +26,45 @@ function ExerciseDrawerBackdrop({
   );
 }
 
+type MuscleDetail = NonNullable<ExerciseRecord['muscleDetails']>[number] & {
+  ActivationPercent?: number;
+};
+
+function readActivationPercent(muscle: MuscleDetail | undefined): number | undefined {
+  const raw = muscle?.activationPercent ?? muscle?.ActivationPercent;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value <= 0) return undefined;
+  return value <= 1 ? Math.round(value * 100) : Math.round(value);
+}
+
+function muscleDetailName(muscle: MuscleDetail): string {
+  return String(muscle.muscleName || muscle.muscleNamePt || '').trim();
+}
+
+function activationRows(muscles: string[], muscleDetails: ExerciseRecord['muscleDetails']) {
+  const details = [...(muscleDetails || [])].filter((item): item is MuscleDetail => typeof item === 'object');
+  const ranked = [...details].sort(
+    (a, b) => (readActivationPercent(b) ?? -1) - (readActivationPercent(a) ?? -1),
+  );
+  const rows: { name: string; percent?: number; tone: 'terracotta' | 'muted' }[] = [];
+  const seen = new Set<string>();
+  const push = (name: string, percent?: number) => {
+    const label = name.trim();
+    if (!label || seen.has(label)) return;
+    seen.add(label);
+    rows.push({
+      name: label,
+      percent,
+      tone: rows.length === 0 ? 'terracotta' : 'muted',
+    });
+  };
+  ranked.forEach((item, index) =>
+    push(muscleDetailName(item) || muscles[index] || '', readActivationPercent(item)),
+  );
+  muscles.forEach((name) => push(name));
+  return rows;
+}
+
 function ExerciseDrawerActivation({
   muscles,
   muscleDetails,
@@ -34,36 +73,31 @@ function ExerciseDrawerActivation({
   muscleDetails?: ExerciseRecord['muscleDetails'];
 }): ReactElement {
   const { t } = useLanguage();
-  const ranked = [...(muscleDetails || [])]
-    .filter((muscle) => typeof muscle === 'object' && Number.isFinite(muscle.activationPercent))
-    .sort((a, b) => Number(b.activationPercent) - Number(a.activationPercent));
-  const rankedNames = ranked.map((item) => item.muscleName || item.muscleNamePt).filter(Boolean);
-  const agonistDetail = ranked[0];
-  const synergyDetails = ranked.slice(1);
-  const agonistName = rankedNames[0] || muscles[0] || '—';
-  const synergistsFromDetails = rankedNames.slice(1);
-  const synergistsFromMuscles = muscles.filter((name) => name && name !== agonistName);
-  const synergistName = [...new Set([...synergistsFromDetails, ...synergistsFromMuscles])].join(', ') || '—';
-  const agonistPct = agonistDetail?.activationPercent;
-  const synergyPct =
-    synergyDetails.length > 0
-      ? Math.round(
-          synergyDetails.reduce((sum, item) => sum + Number(item.activationPercent), 0) / synergyDetails.length,
-        )
-      : undefined;
+  const rows = activationRows(muscles, muscleDetails);
+  const agonist = rows[0] || { name: '—', percent: undefined, tone: 'terracotta' as const };
+  const rest = rows.slice(1);
 
-  const row = (id: string, label: string, percent: number | undefined, tone: 'terracotta' | 'muted') => (
+  const row = (
+    id: string,
+    label: string,
+    percent: number | undefined,
+    tone: 'terracotta' | 'muted',
+    filled: boolean,
+  ) => (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-[11px]">
         <span id={id}>{label}</span>
         {typeof percent === 'number' ? <span className="font-mono text-text-muted">{percent}%</span> : null}
       </div>
-      {typeof percent === 'number' ? (
+      {filled ? (
         <div className="h-1.5 rounded-full bg-surface-muted overflow-hidden">
           <div
             data-activation-bar
             className={`h-full rounded-full ${tone === 'terracotta' ? 'bg-brand-terracotta' : 'bg-text-muted'}`}
-            style={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+            style={{
+              width: `${Math.min(100, Math.max(0, percent ?? (tone === 'terracotta' ? 100 : 70)))}%`,
+              backgroundColor: tone === 'terracotta' ? 'rgb(224, 108, 67)' : 'rgb(133, 118, 111)',
+            }}
           />
         </div>
       ) : null}
@@ -78,8 +112,12 @@ function ExerciseDrawerActivation({
           {t('exlib.drawer.library_badge')}
         </span>
       </div>
-      {row('drawerAgonist', agonistName, agonistPct, 'terracotta')}
-      {row('drawerSynergist', synergistName, synergyPct, 'muted')}
+      {row('drawerAgonist', agonist.name, agonist.percent, 'terracotta', agonist.name !== '—')}
+      {rest.length
+        ? rest.map((item, index) =>
+            row(index === 0 ? 'drawerSynergist' : `drawerSynergist-${index}`, item.name, item.percent, 'muted', true),
+          )
+        : row('drawerSynergist', '—', undefined, 'muted', false)}
     </div>
   );
 }
