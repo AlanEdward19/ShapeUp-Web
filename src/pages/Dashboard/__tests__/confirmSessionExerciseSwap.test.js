@@ -1,6 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 import { confirmSessionExerciseSwap } from '../confirmSessionExerciseSwap';
 
+vi.mock('../../../services/apiClient', () => ({
+    default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
+}));
+
+import apiClient from '../../../services/apiClient';
+
 const set = (completed) => ({
     completed,
     type: 'work',
@@ -36,6 +42,33 @@ describe('confirmSessionExerciseSwap', () => {
                 dedupeKey: 'workout-swap-sess-1-1',
             }),
         );
+        expect(apiClient.get).not.toHaveBeenCalled();
+        expect(apiClient.post).not.toHaveBeenCalled();
+    });
+
+    it('updates session exercises only and leaves the prescribed plan document untouched', () => {
+        const enqueueMutation = vi.fn();
+        const planDocument = {
+            id: 'plan-a',
+            blocks: [{ exercises: [{ exerciseId: 1, name: 'Bench', sets: [{ reps: 10 }] }] }],
+        };
+        const exercises = [{ id: 1, exerciseId: 1, name: 'Bench', sets: [set(true), set(false)] }];
+        const planBefore = JSON.stringify(planDocument);
+        confirmSessionExerciseSwap({
+            exercises,
+            sessionId: 'sess-1',
+            originalExercise: exercises[0],
+            replacement: { exerciseId: 2, id: 2, name: 'DB Bench' },
+            unitSystem: 'metric',
+            enqueueMutation,
+            onApplied: (next) => {
+                expect(next).toHaveLength(2);
+                expect(next[0].sets.filter((s) => s.completed)).toHaveLength(1);
+                expect(next[1].sets).toEqual([]);
+            },
+        });
+        expect(JSON.stringify(planDocument)).toBe(planBefore);
+        expect(enqueueMutation).toHaveBeenCalledTimes(1);
     });
 
     it('surfaces duplicate-in-session without enqueueing', () => {
