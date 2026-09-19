@@ -121,8 +121,8 @@ T6 → T7 → T8
 **Requirement**: IFTW-01, IFTW-02, IFTW-03, IFTW-04, IFTW-05
 **Tools**: Skill tlc-spec-driven Execute
 **Done when**:
-- [ ] ACs for those IDs covered in FastingPage.test.jsx with mocked useFastingApi
-- [ ] Gate quick passes
+- [x] ACs for those IDs covered in FastingPage.test.jsx with mocked useFastingApi
+- [x] Gate quick passes
 **Tests**: unit
 **Gate**: quick
 **Commit**: `feat(nutrition): build intermittent fasting jejum page`
