@@ -219,9 +219,9 @@ T8
 
 **Done when**:
 
-- [ ] Header, search placeholder, filters, sort options, column headers, row titles use `t`
-- [ ] Markup still types `ExercisesShellState` unchanged except passing `t` or calling the hook inside
-- [ ] Gate passes
+- [x] Header, search placeholder, filters, sort options, column headers, row titles use `t`
+- [x] Markup still types `ExercisesShellState` unchanged except passing `t` or calling the hook inside
+- [x] Gate passes
 
 **Tests**: unit
 **Gate**: full

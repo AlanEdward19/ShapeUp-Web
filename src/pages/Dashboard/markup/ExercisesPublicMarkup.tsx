@@ -1,5 +1,6 @@
 /* eslint-disable */
 import type { KeyboardEvent, MouseEvent, ReactElement, RefObject } from 'react';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import WorkspaceNavigation from '../../shell-assets/WorkspaceNavigation';
 import { ExerciseDrawer } from './ExerciseDrawer';
 
@@ -70,6 +71,7 @@ function ExerciseRow({
   ex: ExerciseRecord;
   state: ExercisesShellState;
 }) {
+  const { t } = useLanguage();
   const active = state.active?.id === ex.id;
   const cardStyle =
     state.view === 'cards'
@@ -114,7 +116,7 @@ function ExerciseRow({
         <button
           type="button"
           className="p-1 rounded text-text-muted hover:text-brand-terracotta hover:bg-surface transition-colors"
-          title="Inserir na Ficha"
+          title={t('exlib.row.insert')}
           onClick={(event) => {
             event.stopPropagation();
             state.add(ex);
@@ -122,7 +124,7 @@ function ExerciseRow({
         >
           <span className="material-symbols-outlined text-[17px]">playlist_add</span>
         </button>
-        <button type="button" className="p-1 rounded text-brand-terracotta transition-colors" title="Inspecionar">
+        <button type="button" className="p-1 rounded text-brand-terracotta transition-colors" title={t('exlib.row.inspect')}>
           <span className="material-symbols-outlined text-[17px]">chevron_right</span>
         </button>
       </div>
@@ -131,6 +133,7 @@ function ExerciseRow({
 }
 
 export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState }): ReactElement {
+  const { t } = useLanguage();
   const muscleOptions = ['all', ...new Set(state.exercises.flatMap((ex) => (ex.muscles || []).filter(Boolean)))];
   const equipmentOptions = ['all', ...new Set(state.exercises.map(state.equipmentName))];
 
@@ -141,7 +144,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
         <header className="h-14 bg-surface border-b border-border-subtle flex items-center justify-between px-6 shrink-0 z-30">
           <div className="flex items-center gap-3">
             <h1 className="font-condensed text-xl font-bold uppercase tracking-wider text-text-primary flex items-center gap-2">
-              <span>Biblioteca de Exercícios</span>
+              <span>{t('exlib.title')}</span>
               <span className="text-xs font-mono font-normal text-text-muted">({state.exercises.length})</span>
             </h1>
           </div>
@@ -153,7 +156,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
                 id="viewModeList"
                 onClick={() => state.setView('list')}
               >
-                Lista
+                {t('exlib.view.list')}
               </button>
               <button
                 type="button"
@@ -161,7 +164,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
                 id="viewModeCards"
                 onClick={() => state.setView('cards')}
               >
-                Cards
+                {t('exlib.view.cards')}
               </button>
             </div>
             <div className="h-4 w-px bg-border-subtle" />
@@ -171,7 +174,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
               onClick={state.onSuggestOpen}
             >
               <span className="material-symbols-outlined text-[16px]">add</span>
-              <span>Novo Exercício</span>
+              <span>{t('exlib.new')}</span>
             </button>
           </div>
         </header>
@@ -182,7 +185,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
             <input
               className="w-full h-9 pl-10 pr-20 bg-bg-base border border-border-subtle focus:border-brand-terracotta rounded text-xs text-text-primary placeholder:text-text-muted focus:ring-0 focus:outline-none transition-all"
               id="globalExerciseSearch"
-              placeholder="Buscar exercício por nome, músculo ou equipamento..."
+              placeholder={t('exlib.search.placeholder')}
               type="text"
               value={state.searchTerm}
               onChange={(event) => state.setSearchTerm(event.target.value)}
@@ -190,7 +193,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
           </div>
           <div className="flex flex-col gap-2 pt-0.5">
             <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-              <span className="font-mono text-[10px] uppercase text-text-muted shrink-0 mr-1.5">Grupo:</span>
+              <span className="font-mono text-[10px] uppercase text-text-muted shrink-0 mr-1.5">{t('exlib.filter.group')}</span>
               {muscleOptions.map((value) => (
                 <button
                   key={value}
@@ -206,13 +209,13 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
                     color: state.group === value ? '#fff' : undefined,
                   }}
                 >
-                  {value === 'all' ? 'Todos' : value}
+                  {value === 'all' ? t('exlib.filter.all') : value}
                 </button>
               ))}
             </div>
             <div className="flex items-center justify-between text-xs pt-1.5 border-t border-border-subtle flex-wrap gap-2">
               <div className="flex items-center gap-1 flex-wrap">
-                <span className="font-mono text-[10px] uppercase text-text-muted mr-1.5">Equipamento:</span>
+                <span className="font-mono text-[10px] uppercase text-text-muted mr-1.5">{t('exlib.filter.equipment')}</span>
                 {equipmentOptions.map((value) => (
                   <button
                     key={value}
@@ -226,19 +229,19 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
                       background: state.equipment === value ? 'var(--border-color)' : 'transparent',
                     }}
                   >
-                    {value === 'all' ? 'Todos' : value}
+                    {value === 'all' ? t('exlib.filter.all') : value}
                   </button>
                 ))}
               </div>
               <div className="flex items-center gap-3 font-mono text-[11px] text-text-muted">
-                <span>ORDENAR:</span>
+                <span>{t('exlib.sort')}</span>
                 <select
                   className="bg-transparent text-text-secondary hover:text-text-primary focus:outline-none cursor-pointer"
                   value={state.sort}
                   onChange={(event) => state.setSort(event.target.value)}
                 >
-                  <option value="name">Ordem Alfabética (A-Z)</option>
-                  <option value="muscles">Grupo Muscular</option>
+                  <option value="name">{t('exlib.sort.name')}</option>
+                  <option value="muscles">{t('exlib.sort.muscles')}</option>
                 </select>
               </div>
             </div>
@@ -250,37 +253,37 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
             <div className="px-6 py-2 border-b border-border-subtle bg-surface/50 flex items-center justify-between text-xs shrink-0">
               <div className="flex items-center gap-3">
                 <span className="text-text-secondary font-medium font-mono text-xs" id="exerciseCountLabel">
-                  {`${state.filtered.length} exercícios encontrados`}
+                  {t('exlib.count', { n: state.filtered.length })}
                 </span>
                 <span className="text-border-subtle">|</span>
                 <span className="text-[11px] text-text-muted flex items-center gap-1">
                   <span className="material-symbols-outlined text-[15px] text-brand-terracotta">info</span>
-                  Selecione uma linha para inspecionar guia biomecânico
+                  {t('exlib.hint.select')}
                 </span>
               </div>
               <div className="flex items-center gap-2 font-mono text-[11px] text-text-muted">
-                <span>ORDENAR:</span>
+                <span>{t('exlib.sort')}</span>
                 <select
                   className="bg-surface-subtle border border-border-subtle rounded px-2 py-0.5 text-xs text-text-primary focus:ring-0 focus:outline-none"
                   value={state.sort}
                   onChange={(event) => state.setSort(event.target.value)}
                 >
-                  <option value="name">Ordem Alfabética (A-Z)</option>
-                  <option value="muscles">Grupo Muscular</option>
+                  <option value="name">{t('exlib.sort.name')}</option>
+                  <option value="muscles">{t('exlib.sort.muscles')}</option>
                 </select>
               </div>
             </div>
 
             <div className="px-6 py-2 bg-surface-muted border-b border-border-subtle flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-text-muted select-none shrink-0">
               <div className="flex items-center gap-4 flex-1 min-w-0">
-                <span className="w-16">CÓDIGO</span>
-                <span className="flex-1">EXERCÍCIO &amp; MÚSCULO ALVO</span>
+                <span className="w-16">{t('exlib.col.code')}</span>
+                <span className="flex-1">{t('exlib.col.exercise')}</span>
               </div>
               <div className="hidden md:flex items-center gap-4 w-2/5 justify-between px-2">
-                <span className="w-24">EQUIPAMENTO</span>
-                <span className="w-28">PADRÃO MOTOR</span>
+                <span className="w-24">{t('exlib.col.equipment')}</span>
+                <span className="w-28">{t('exlib.col.pattern')}</span>
               </div>
-              <div className="w-20 text-right pr-2">AÇÕES</div>
+              <div className="w-20 text-right pr-2">{t('exlib.col.actions')}</div>
             </div>
 
             <div
@@ -293,13 +296,13 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
               }
             >
               {state.error ? (
-                <p role="alert" className="p-6 text-text-muted">Não foi possível carregar a biblioteca. Tente novamente.</p>
+                <p role="alert" className="p-6 text-text-muted">{t('exlib.error')}</p>
               ) : state.loading ? (
-                <p className="p-6 text-text-muted">Carregando biblioteca…</p>
+                <p className="p-6 text-text-muted">{t('exlib.loading')}</p>
               ) : state.filtered.length ? (
                 state.filtered.map((ex) => <ExerciseRow key={ex.id} ex={ex} state={state} />)
               ) : (
-                <p className="p-6 text-text-muted">Nenhum exercício encontrado.</p>
+                <p className="p-6 text-text-muted">{t('exlib.empty')}</p>
               )}
             </div>
           </section>
