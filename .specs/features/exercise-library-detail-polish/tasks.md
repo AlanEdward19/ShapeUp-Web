@@ -167,9 +167,9 @@ T8
 
 **Done when**:
 
-- [ ] Keys cover title, search, filters, sort, counts, drawer sections, video empty, substitutions, buttons, close
-- [ ] `exlibI18nKeys.test.jsx` asserts keys resolve in three languages and EN values are not the listed Portuguese literals
-- [ ] Gate passes
+- [x] Keys cover title, search, filters, sort, counts, drawer sections, video empty, substitutions, buttons, close
+- [x] `exlibI18nKeys.test.jsx` asserts keys resolve in three languages and EN values are not the listed Portuguese literals
+- [x] Gate passes
 
 **Tests**: unit
 **Gate**: full
