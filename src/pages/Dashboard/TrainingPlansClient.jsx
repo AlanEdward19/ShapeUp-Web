@@ -14,8 +14,9 @@ import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
-import XpCelebrationPopup from '../../components/gamification/XpCelebrationPopup';
 import { useXpCelebration } from '../../hooks/useXpCelebration';
+import { runWorkoutSubmitFeedback } from './workoutSubmitFeedback';
+import WorkoutFinishXpPopup from './WorkoutFinishXpPopup';
 import { buildWorkoutStatePayload as buildWorkoutStateApiPayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { mapExerciseEquivalents } from '../../utils/exerciseEquivalents';
 import EquivalentPickerModal from '../../components/training/EquivalentPickerModal';
@@ -713,27 +714,18 @@ const ClientView = () => {
     };
 
     const submitFeedback = () => {
-        if (workoutSessionId) {
-            // Enqueued (offline foundation): the session summary shown next is built entirely
-            // from local exercises/workoutTime, not from this response.
-            const payload = buildWorkoutStatePayload(exercises, workoutTime);
-            enqueueMutation({
-                endpoint: `/api/training/workouts/${workoutSessionId}/finish`,
-                method: 'POST',
-                body: {
-                    sessionId: String(workoutSessionId),
-                    endedAtUtc: new Date().toISOString(),
-                    perceivedExertion: parseFloat(sessionFeedback.rpe) || 5,
-                    exercises: payload.exercises || []
-                },
-                dedupeKey: `workout-finish-${workoutSessionId}`,
-            });
-        }
-        setShowFeedbackModal(false);
-        setShowOverviewModal(true);
-        if (workoutSessionId) {
-            void xpCelebration.start({ sessionId: String(workoutSessionId) });
-        }
+        // Enqueued (offline foundation): the session summary shown next is built entirely
+        // from local exercises/workoutTime, not from this response.
+        const payload = buildWorkoutStatePayload(exercises, workoutTime);
+        runWorkoutSubmitFeedback({
+            workoutSessionId,
+            perceivedExertion: parseFloat(sessionFeedback.rpe) || 5,
+            finishExercises: payload.exercises || [],
+            enqueueMutation,
+            setShowFeedbackModal,
+            setShowOverviewModal,
+            xpCelebrationStart: xpCelebration.start,
+        });
     };
 
     const skipOverviewAndFinish = () => {
@@ -1244,13 +1236,7 @@ const ClientView = () => {
                 );
             })()}
 
-            <XpCelebrationPopup
-                open={xpCelebration.open}
-                status={xpCelebration.status}
-                delta={xpCelebration.delta}
-                mascotImageUrl={xpCelebration.mascotImageUrl}
-                onDismiss={xpCelebration.dismiss}
-            />
+            <WorkoutFinishXpPopup xpCelebration={xpCelebration} />
 
             <div className="su-execution-scroll" data-tour="se-exercises">
                 {sessionSwapNotice ? (

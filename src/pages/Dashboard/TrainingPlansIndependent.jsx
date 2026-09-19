@@ -24,8 +24,9 @@ import { buildWorkoutPlanBody, findTimeBasedDurationError } from '../../utils/wo
 import { buildWorkoutStatePayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { useExercises } from '../../hooks/useExercises';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
-import XpCelebrationPopup from '../../components/gamification/XpCelebrationPopup';
 import { useXpCelebration } from '../../hooks/useXpCelebration';
+import { runWorkoutSubmitFeedback } from './workoutSubmitFeedback';
+import WorkoutFinishXpPopup from './WorkoutFinishXpPopup';
 import {
     applyToggleLoggedSetComplete,
     applyUpdateSetLog,
@@ -625,27 +626,18 @@ const TrainingPlansIndependent = () => {
     };
 
     const submitFeedback = () => {
-        if (workoutSessionId) {
-            // Enqueued (offline foundation): the session summary shown next (handleSessionCompleted)
-            // is built entirely from local sessionExercises/workoutTime, not from this response.
-            const payload = buildWorkoutStatePayloadLocal(sessionExercises, workoutTime);
-            enqueueMutation({
-                endpoint: `/api/training/workouts/${workoutSessionId}/finish`,
-                method: 'POST',
-                body: {
-                    sessionId: String(workoutSessionId),
-                    endedAtUtc: new Date().toISOString(),
-                    perceivedExertion: parseFloat(sessionFeedback.rpe) || 5,
-                    exercises: payload.exercises || []
-                },
-                dedupeKey: `workout-finish-${workoutSessionId}`,
-            });
-        }
-        setShowFeedbackModal(false);
-        setShowOverviewModal(true);
-        if (workoutSessionId) {
-            void xpCelebration.start({ sessionId: String(workoutSessionId) });
-        }
+        // Enqueued (offline foundation): the session summary shown next (handleSessionCompleted)
+        // is built entirely from local sessionExercises/workoutTime, not from this response.
+        const payload = buildWorkoutStatePayloadLocal(sessionExercises, workoutTime);
+        runWorkoutSubmitFeedback({
+            workoutSessionId,
+            perceivedExertion: parseFloat(sessionFeedback.rpe) || 5,
+            finishExercises: payload.exercises || [],
+            enqueueMutation,
+            setShowFeedbackModal,
+            setShowOverviewModal,
+            xpCelebrationStart: xpCelebration.start,
+        });
     };
 
     const handleSessionCompleted = () => {
@@ -1051,13 +1043,7 @@ const TrainingPlansIndependent = () => {
                     onClose={() => setShowSessionDetail(null)}
                 />
             )}
-            <XpCelebrationPopup
-                open={xpCelebration.open}
-                status={xpCelebration.status}
-                delta={xpCelebration.delta}
-                mascotImageUrl={xpCelebration.mascotImageUrl}
-                onDismiss={xpCelebration.dismiss}
-            />
+            <WorkoutFinishXpPopup xpCelebration={xpCelebration} />
 
             {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (
