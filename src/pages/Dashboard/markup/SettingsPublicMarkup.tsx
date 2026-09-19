@@ -1,6 +1,6 @@
 /* eslint-disable */
 import type { ChangeEvent, ReactElement } from 'react';
-import WorkspaceNavigation from '../../shell-assets/WorkspaceNavigation';
+import { ProfilePhoto } from '../../../components/ProfileControls';
 
 export type SettingsValues = Record<string, string | boolean | undefined>;
 
@@ -17,8 +17,6 @@ export type SettingsShellState = {
   onStubAction: () => void;
   langTitle: string;
   langDesc: string;
-  navOpen: boolean;
-  setNavOpen: (open: boolean) => void;
 };
 
 const profileField = (state: SettingsShellState, name: string, label: string) => ({
@@ -31,10 +29,10 @@ const profileField = (state: SettingsShellState, name: string, label: string) =>
 export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): ReactElement {
   const pf = (name: string, label: string) => profileField(state, name, label);
   return (
-    <>
-      <WorkspaceNavigation flow open={state.navOpen} close={() => state.setNavOpen(false)} />
-<div
-      className="flex-1 flex flex-col min-h-screen"
+    <div
+      className="sn-space flex min-h-screen flex-1 min-w-0 flex-col"
+      data-shell-content
+      style={{ marginLeft: 256 }}
     >
       <header
       className="sticky top-0 z-40 h-14 bg-[color-mix(in_srgb,var(--bg-main)_90%,transparent)] backdrop-blur border-b border-[color:var(--border-color)] px-8 flex items-center justify-between"
@@ -163,38 +161,8 @@ export function SettingsPublicMarkup({ state }: { state: SettingsShellState }): 
       className="md:col-span-2 flex flex-col gap-5"
               >
 
-                <div
-      className="flex items-center gap-4 pb-2"
-                >
-
-                  <img
-      alt="Foto de perfil"
-      className="w-16 h-16 rounded-full object-cover border border-[color:var(--border-color)]"
-      src="https://lh3.googleusercontent.com/aida/AEtjO1VcvgpwuiKK3hu_9KYWEBUt-1aZ49wRlSA9fG1EtilO7V9ZDiiFFEkVBgIoCzTxFBOB_OwzR4bVoXlT70LtBOGsIQWG3fN3Yq5-ICGZ4S71s7wt2LjVQBQBtj2jjY28UYwGK8oQqeS78lkVqXPMMEmnRXggU_6fuR7SD96PsABn-V5KP8huPLxEpLe9k4raV85qjTF2aPzTyaPHkj8WgbwfrOOemCKKxn1xZYcFt6oDCiIqNmEtN9Je4A"
-                  />
-
-                  <div
-      className="flex items-center gap-2"
-                  >
-
-                    <button
-      className="px-3 py-1.5 text-xs font-medium rounded border border-[color:var(--border-color)] bg-[#211A17] text-[color:var(--text-main)] hover:bg-[#29211D] transition-colors"
-      type="button"
-                    >
-
-                    Alterar foto
-                                      </button>
-
-                    <button
-      className="px-3 py-1.5 text-xs font-medium text-[#968882] hover:text-[#f28b82] transition-colors"
-      type="button"
-                    >
-
-                    Remover
-                                      </button>
-
-                  </div>
-
+                <div className="flex items-center gap-4 pb-2">
+                  <ProfilePhoto />
                 </div>
 
                 <div
@@ -890,8 +858,6 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
         </div>
 
       </div>
-    </div>
-
 
     <div
       className={`fixed bottom-6 right-6 z-50 bg-[#231c19] text-[color:var(--text-main)] border border-[#332822] px-4 py-2.5 rounded text-xs items-center gap-2.5 shadow-lg ${state.notice ? 'flex' : 'hidden'}`}
@@ -907,6 +873,6 @@ Notificação imediata se um atleta reportar RPE acima de 9 por 3 sessões segui
       <span className="">{state.notice}</span>
 
     </div>
-    </>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useUserManagementApi } from '../../hooks/api/useUserManagementApi';
-import DashboardShellHost from '../shell-assets/DashboardShellHost';
+import WorkspaceShellPage from '../../components/Workspace/WorkspaceShellPage';
 import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { useEffect, useState } from 'react';
 import {
@@ -23,7 +23,6 @@ export default function SettingsShell() {
     }
   });
   const [notice, setNotice] = useState('');
-  const [navOpen, setNavOpen] = useState(false);
   const { getMe } = useUserManagementApi();
   useEffect(() => {
     let active = true;
@@ -60,8 +59,6 @@ export default function SettingsShell() {
     setUnitSystem,
     langTitle: t('preferences.lang.title'),
     langDesc: t('preferences.lang.desc'),
-    navOpen,
-    setNavOpen,
     onSave: () => {
       localStorage.setItem(key, JSON.stringify(values));
       localStorage.setItem('shapeup_user_name', String(values.name || ''));
@@ -82,21 +79,8 @@ export default function SettingsShell() {
   };
 
   return (
-    <DashboardShellHost
-      name="settings"
-      css={workspaceNavStyle}
-      after={
-        <button
-          type="button"
-          className="sn-mobile"
-          aria-label={navOpen ? 'Fechar menu' : 'Abrir menu'}
-          onClick={() => setNavOpen(!navOpen)}
-        >
-          <span className="material-symbols-outlined">{navOpen ? 'close' : 'menu'}</span>
-        </button>
-      }
-    >
+    <WorkspaceShellPage name="settings" css={workspaceNavStyle}>
       <SettingsPublicMarkup state={shellState} />
-    </DashboardShellHost>
+    </WorkspaceShellPage>
   );
 }
