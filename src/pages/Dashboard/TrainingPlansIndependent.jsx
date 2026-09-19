@@ -31,6 +31,8 @@ import {
     applyToggleLoggedSetComplete,
     applyUpdateSetLog,
     execInputClassName,
+    ExecutionLogHeaderCells,
+    ExecutionLogInputCells,
     INVALID_LOG_FLASH_MS,
     mergeSessionRequireRpe,
     toRuntimeSets,
@@ -757,6 +759,7 @@ const TrainingPlansIndependent = () => {
                     <WorkoutBodyMap exercises={sessionExercises} compact />
                     {sessionExercises.map((ex, exIdx) => {
                         const liveSetIndex = ex.sets.findIndex(s => !s.completed);
+                        const isTimeBased = ex.exerciseType === 'timeBased';
                         return (
                         <article key={ex.id} className="su-ledger-exercise">
                             <div className="su-ex-execution-header">
@@ -773,8 +776,7 @@ const TrainingPlansIndependent = () => {
                                     <div className="col-set">{t('client.session.table.set')}</div>
                                     <div className="col-target">{t('client.session.table.target')}</div>
                                     <div className="col-rest">{t('client.session.table.rest')}</div>
-                                    <div className="col-log">{unitSystem === 'imperial' ? 'lbs' : 'kg'}</div>
-                                    <div className="col-log">{t('client.session.table.reps')}</div>
+                                    <ExecutionLogHeaderCells isTimeBased={isTimeBased} t={t} />
                                     <div className="col-log">{t('client.session.table.rpe')}</div>
                                     <div className="col-failure">{t('client.session.table.failure')}</div>
                                     <div className="col-done">{t('client.session.table.done')}</div>
@@ -801,12 +803,15 @@ const TrainingPlansIndependent = () => {
                                                 <span>{s.prescribedRest}s</span>
                                             </div>
                                         </div>
-                                        <div className="col-log">
-                                            <input type="number" className={execInputClassName(invalidLogs[`${exIdx}-${sIdx}`], 'weight')} value={s.log.weight} onChange={e => setSessionExercises(applyUpdateSetLog(sessionExercisesRef.current, exIdx, sIdx, 'weight', e.target.value))} placeholder="--" disabled={s.completed} />
-                                        </div>
-                                        <div className="col-log">
-                                            <input type="number" className={execInputClassName(invalidLogs[`${exIdx}-${sIdx}`], 'reps')} value={s.log.reps} onChange={e => setSessionExercises(applyUpdateSetLog(sessionExercisesRef.current, exIdx, sIdx, 'reps', e.target.value))} placeholder="--" disabled={s.completed} />
-                                        </div>
+                                        <ExecutionLogInputCells
+                                            isTimeBased={isTimeBased}
+                                            set={s}
+                                            invalidFields={invalidLogs[`${exIdx}-${sIdx}`]}
+                                            onFieldChange={(field, value) => setSessionExercises(
+                                                applyUpdateSetLog(sessionExercisesRef.current, exIdx, sIdx, field, value),
+                                            )}
+                                            disabled={s.completed}
+                                        />
                                         <div className="col-log">
                                             <input type="number" className={execInputClassName(invalidLogs[`${exIdx}-${sIdx}`], 'rpe')} value={s.log.rpe} onChange={e => setSessionExercises(applyUpdateSetLog(sessionExercisesRef.current, exIdx, sIdx, 'rpe', e.target.value))} placeholder="--" disabled={s.completed} />
                                         </div>

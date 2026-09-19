@@ -22,6 +22,7 @@ import { mapExerciseEquivalents } from '../../utils/exerciseEquivalents';
 import EquivalentPickerModal from '../../components/training/EquivalentPickerModal';
 import SwapExerciseButton from '../../components/training/SwapExerciseButton';
 import { confirmSessionExerciseSwap } from './confirmSessionExerciseSwap';
+import { isSessionSwapDisabled } from './sessionSwapUi';
 import { clampRpeLog } from '../../utils/setExecutionValidation';
 import { canCompleteSet } from '../../utils/setCompletionGate';
 import { formatDistanceMeters, formatDurationSeconds } from '../../utils/durationDistance';
@@ -129,6 +130,76 @@ export const toRuntimeSets = (ex, exIdx) => {
         })),
     };
 };
+
+export const ExecutionLogHeaderCells = ({ isTimeBased, t }) => (
+    isTimeBased ? (
+        <>
+            <div className="col-log">{t('client.session.table.duration')}</div>
+            <div className="col-log">{t('client.session.table.distance')}</div>
+        </>
+    ) : (
+        <>
+            <div className="col-log" title="Actual weight logged for this set">{t('client.session.table.weight')}</div>
+            <div className="col-log" title="Actual reps logged for this set">{t('client.session.table.reps')}</div>
+        </>
+    )
+);
+
+export const ExecutionLogInputCells = ({
+    isTimeBased,
+    set,
+    invalidFields,
+    onFieldChange,
+    disabled,
+}) => (
+    isTimeBased ? (
+        <>
+            <div className="col-log">
+                <input
+                    type="text"
+                    className={execInputClassName(invalidFields, 'duration')}
+                    value={set.log.duration}
+                    onChange={(e) => onFieldChange('duration', e.target.value)}
+                    placeholder={set.prescribedDuration || 'mm:ss'}
+                    disabled={disabled}
+                />
+            </div>
+            <div className="col-log">
+                <input
+                    type="number"
+                    className={execInputClassName(invalidFields, 'distance')}
+                    value={set.log.distance}
+                    onChange={(e) => onFieldChange('distance', e.target.value)}
+                    placeholder="--"
+                    disabled={disabled}
+                />
+            </div>
+        </>
+    ) : (
+        <>
+            <div className="col-log">
+                <input
+                    type="number"
+                    className={execInputClassName(invalidFields, 'weight')}
+                    value={set.log.weight}
+                    onChange={(e) => onFieldChange('weight', e.target.value)}
+                    placeholder="--"
+                    disabled={disabled}
+                />
+            </div>
+            <div className="col-log">
+                <input
+                    type="number"
+                    className={execInputClassName(invalidFields, 'reps')}
+                    value={set.log.reps}
+                    onChange={(e) => onFieldChange('reps', e.target.value)}
+                    placeholder="--"
+                    disabled={disabled}
+                />
+            </div>
+        </>
+    )
+);
 
 const formatTime = (totalSeconds) => {
     const hours = Math.floor(totalSeconds / 3600);
@@ -1247,8 +1318,6 @@ const ClientView = () => {
                 <WorkoutBodyMap exercises={exercises} compact />
                 {exercises.map((exercise, exIndex) => {
                     const liveSetIndex = exercise.sets.findIndex(s => !s.completed);
-                    const exKey = String(exercise.exerciseId ?? exercise.id);
-                    const equivalentCount = equivalentsCache[exKey]?.items?.length ?? 0;
                     const isTimeBased = exercise.exerciseType === 'timeBased';
                     return (
                     <article key={exercise.id} className="su-ledger-exercise">
@@ -1262,7 +1331,7 @@ const ClientView = () => {
                             </div>
                             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                 <SwapExerciseButton
-                                    disabled={equivalentCount === 0}
+                                    disabled={isSessionSwapDisabled(equivalentsCache, exercise)}
                                     onClick={() => openSwapPicker(exIndex)}
                                 />
                                 <Button
@@ -1293,17 +1362,7 @@ const ClientView = () => {
                                 <div className="col-set" title="The current set sequence or type">{t('client.session.table.set')}</div>
                                 <div className="col-target" title="Prescribed target range and load">{t('client.session.table.target')}</div>
                                 <div className="col-rest" title="Prescribed rest time">{t('client.session.table.rest')}</div>
-                                {isTimeBased ? (
-                                    <>
-                                        <div className="col-log">{t('client.session.table.duration')}</div>
-                                        <div className="col-log">{t('client.session.table.distance')}</div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div className="col-log" title="Actual weight logged for this set">{t('client.session.table.weight')}</div>
-                                        <div className="col-log" title="Actual reps logged for this set">{t('client.session.table.reps')}</div>
-                                    </>
-                                )}
+                                <ExecutionLogHeaderCells isTimeBased={isTimeBased} t={t} />
                                 <div className="col-log" title="Rate of Perceived Exertion (1-10)">{t('client.session.table.rpe')}</div>
                                 <div className="col-failure" title="Check if muscular failure was reached">{t('client.session.table.failure')}</div>
                                 <div className="col-done" title="Mark this set as complete">{t('client.session.table.done')}</div>
@@ -1344,53 +1403,13 @@ const ClientView = () => {
                                             <span>{set.prescribedRest}s</span>
                                         </div>
                                     </div>
-                                    {isTimeBased ? (
-                                        <>
-                                            <div className="col-log">
-                                                <input
-                                                    type="text"
-                                                    className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'duration')}
-                                                    value={set.log.duration}
-                                                    onChange={(e) => updateSetLog(exIndex, setIndex, 'duration', e.target.value)}
-                                                    placeholder={set.prescribedDuration || 'mm:ss'}
-                                                    disabled={set.completed}
-                                                />
-                                            </div>
-                                            <div className="col-log">
-                                                <input
-                                                    type="number"
-                                                    className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'distance')}
-                                                    value={set.log.distance}
-                                                    onChange={(e) => updateSetLog(exIndex, setIndex, 'distance', e.target.value)}
-                                                    placeholder="--"
-                                                    disabled={set.completed}
-                                                />
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="col-log">
-                                                <input
-                                                    type="number"
-                                                    className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'weight')}
-                                                    value={set.log.weight}
-                                                    onChange={(e) => updateSetLog(exIndex, setIndex, 'weight', e.target.value)}
-                                                    placeholder="--"
-                                                    disabled={set.completed}
-                                                />
-                                            </div>
-                                            <div className="col-log">
-                                                <input
-                                                    type="number"
-                                                    className={execInputClassName(invalidLogs[`${exIndex}-${setIndex}`], 'reps')}
-                                                    value={set.log.reps}
-                                                    onChange={(e) => updateSetLog(exIndex, setIndex, 'reps', e.target.value)}
-                                                    placeholder="--"
-                                                    disabled={set.completed}
-                                                />
-                                            </div>
-                                        </>
-                                    )}
+                                    <ExecutionLogInputCells
+                                        isTimeBased={isTimeBased}
+                                        set={set}
+                                        invalidFields={invalidLogs[`${exIndex}-${setIndex}`]}
+                                        onFieldChange={(field, value) => updateSetLog(exIndex, setIndex, field, value)}
+                                        disabled={set.completed}
+                                    />
                                     <div className="col-log">
                                         <input
                                             type="number"
@@ -1482,7 +1501,7 @@ const SetTypeBadge = ({ type }) => {
     );
 };
 
-const SessionDetailModal = ({ session, planName, onClose, planExercises = [] }) => {
+export const SessionDetailModal = ({ session, planName, onClose, planExercises = [] }) => {
     const { t, unitSystem, convertWeight } = useLanguage();
 
     // We infer the original scale from the session's totalVol
