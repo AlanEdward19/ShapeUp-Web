@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 
 export const navStyle = `
+.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;direction:ltr;-webkit-font-feature-settings:'liga';font-feature-settings:'liga'}
 [data-unified-sidebar]{position:fixed;inset:0 auto 0 0;width:256px;background:var(--bg-main);border-right:1px solid var(--border-color);z-index:60;display:flex;flex-direction:column;justify-content:space-between;font:14px/1.5 'Source Sans 3',sans-serif;color:var(--text-main);box-sizing:border-box}
 [data-unified-sidebar] .sn-brand{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border-color)}
 [data-unified-sidebar] .sn-brand strong{font:700 20px 'Barlow Condensed';letter-spacing:1px;text-transform:uppercase}

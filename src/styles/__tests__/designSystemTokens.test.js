@@ -179,6 +179,13 @@ describe('design-system Warm Oxide token contract', () => {
     expect(tokenValue(light, '--primary')).toBe(tokenValue(dark, '--primary'))
   })
 
+  it('loads Material Symbols for ligature icons outside the shell shadow', () => {
+    expect(css).toContain('family=Material+Symbols+Outlined')
+    expect(css).toMatch(/\.material-symbols-outlined\s*\{[\s\S]*font-family:\s*'Material Symbols Outlined'/)
+    expect(css).toMatch(/img\s*\{[\s\S]*max-width:\s*100%/)
+    expect(css).not.toMatch(/img,\s*svg\s*\{/)
+  })
+
   it('declares --link-color and uses it on anchors, with light contrast for body text', () => {
     expect(tokenValue(light, '--link-color')).toMatch(/^#[0-9a-f]{6}$/i)
     expect(tokenValue(dark, '--link-color')).toBeTruthy()
