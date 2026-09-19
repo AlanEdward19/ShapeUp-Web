@@ -61,7 +61,15 @@
 - **Validation report**: `.specs/features/exercise-library-detail-polish/validation.md`
 - **Cross-repo**: ShapeUpV2 `ebff5a9`, `02c5684`, `a62e1c5`
 
-- **Feature (queued)**: intermittent-fasting-timer (Web slice) — specs drafted, not this push
+- **Feature**: intermittent-fasting-timer (Web slice)
+- **Phase / Task**: Closed — Verified (PASS, second verifier pass)
+- **Completed**: T1–T8 + F1–F5 test evidence; fasting-scoped 68/68
+- **In-progress**: none
+- **Next step**: none for this feature (no push; browser UAT needs a logged-in session)
+- **Blockers**: none
+- **Validation report**: `.specs/features/intermittent-fasting-timer/validation.md`
+- **Cross-repo**: ShapeUpV2 fasting API already Verified PASS
+- **Precision**: IFTW-07 diary persist date is the viewed day, not calendar-today (L-021)
 
 ---
 

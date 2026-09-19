@@ -206,16 +206,16 @@ The API will store agenda + override. The athlete still needs a Jejum screen: pi
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| IFTW-01 | P1: Jejum tab and agenda form | Design | Complete |
-| IFTW-02 | P1: Agenda-driven countdown | Design | Complete |
-| IFTW-03 | P1: Override controls | Design | Complete |
-| IFTW-04 | P1: Reload | Design | Complete |
-| IFTW-05 | P1: Disclaimer | Design | Complete |
-| IFTW-06 | P2: Recommendation preselect | Design | Complete |
-| IFTW-07 | P2: Diary warning | Design | Complete |
-| IFTW-08 | P2: Custom hours UI | Design | Complete |
-| IFTW-09 | P3: History list | Design | Complete |
-| IFTW-10 | P3: Browser notification | Design | Complete |
+| IFTW-01 | P1: Jejum tab and agenda form | Execute | ✅ Verified |
+| IFTW-02 | P1: Agenda-driven countdown | Execute | ✅ Verified |
+| IFTW-03 | P1: Override controls | Execute | ✅ Verified |
+| IFTW-04 | P1: Reload | Execute | ✅ Verified |
+| IFTW-05 | P1: Disclaimer | Execute | ✅ Verified |
+| IFTW-06 | P2: Recommendation preselect | Execute | ✅ Verified |
+| IFTW-07 | P2: Diary warning | Execute | ✅ Verified (persist date = viewed diary day) |
+| IFTW-08 | P2: Custom hours UI | Execute | ✅ Verified |
+| IFTW-09 | P3: History list | Execute | ✅ Verified |
+| IFTW-10 | P3: Browser notification | Execute | ✅ Verified |
 
 **ID format:** `IFTW-NN`. Backend: `IFTA-NN`.
 
@@ -225,8 +225,8 @@ The API will store agenda + override. The athlete still needs a Jejum screen: pi
 
 ## Success Criteria
 
-- [ ] Save agenda → GET → countdown without Start
-- [ ] Start → refresh → override; Cancel → agenda
-- [ ] GET fail → no invented state
-- [ ] Disclaimer in pt-BR, en, es
-- [ ] 404 disabled → no Jejum tab
+- [x] Save agenda → GET → countdown without Start
+- [x] Start → refresh → override; Cancel → agenda
+- [x] GET fail → no invented state
+- [x] Disclaimer in pt-BR, en, es
+- [x] 404 disabled → no Jejum tab
