@@ -41,7 +41,8 @@ export function ExerciseDrawerVideo({
   videoUrl?: string;
   title: string;
 }): ReactElement {
-  const kind = detectVideoKind(videoUrl);
+  const url = String(videoUrl ?? '').trim();
+  const kind = detectVideoKind(url || undefined);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [hostedOpen, setHostedOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -58,21 +59,21 @@ export function ExerciseDrawerVideo({
       node.pause();
       node.currentTime = 0;
     }
-  }, [videoUrl]);
+  }, [url]);
 
-  if (kind === 'invalid' || !videoUrl) {
+  if (kind === 'invalid' || !url) {
     return (
-      <div className="aspect-video rounded-md bg-surface-muted border border-border-subtle flex items-center justify-center px-4 text-center">
+      <div className="aspect-square rounded-md bg-surface-muted border border-border-subtle flex items-center justify-center px-4 text-center">
         <p className="text-text-secondary text-[11px]">{EMPTY_COPY}</p>
       </div>
     );
   }
 
   if (kind === 'youtube' || kind === 'vimeo') {
-    const id = kind === 'youtube' ? youtubeId(videoUrl) : vimeoId(videoUrl);
+    const id = kind === 'youtube' ? youtubeId(url) : vimeoId(url);
     if (!id) {
       return (
-        <div className="aspect-video rounded-md bg-surface-muted border border-border-subtle flex items-center justify-center px-4 text-center">
+        <div className="aspect-square rounded-md bg-surface-muted border border-border-subtle flex items-center justify-center px-4 text-center">
           <p className="text-text-secondary text-[11px]">{EMPTY_COPY}</p>
         </div>
       );
@@ -84,7 +85,7 @@ export function ExerciseDrawerVideo({
     const poster = kind === 'youtube' ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : undefined;
 
     return (
-      <div data-video-player className="aspect-video relative rounded-md overflow-hidden bg-black">
+      <div data-video-player className="aspect-square relative rounded-md overflow-hidden bg-black">
         {hostedOpen ? (
           <iframe
             title={title}
@@ -129,10 +130,10 @@ export function ExerciseDrawerVideo({
   };
 
   return (
-    <div data-video-player className="aspect-video relative rounded-md overflow-hidden bg-black">
+    <div data-video-player className="aspect-square relative rounded-md overflow-hidden bg-black">
       <video
         ref={videoRef}
-        src={videoUrl}
+        src={url}
         preload="metadata"
         className="absolute inset-0 w-full h-full object-cover"
         onTimeUpdate={(event) => setCurrent(event.currentTarget.currentTime)}

@@ -8,12 +8,12 @@ beforeEach(() => {
 });
 
 describe('ExerciseDrawerVideo', () => {
-  it('renders a 16:9 native player with play, progress, replay, timestamp, and fullscreen for file URLs', () => {
+  it('renders a square native player with play, progress, replay, timestamp, and fullscreen for file URLs', () => {
     const { container, getByTitle, getByRole } = render(
       <ExerciseDrawerVideo videoUrl="https://cdn.example.com/clip.mp4" title="Supino" />,
     );
     const wrap = container.querySelector('[data-video-player]');
-    expect(wrap).toHaveClass('aspect-video');
+    expect(wrap).toHaveClass('aspect-square');
     const video = container.querySelector('video');
     expect(video).toHaveAttribute('src', 'https://cdn.example.com/clip.mp4');
     expect(getByTitle('Reproduzir')).toBeTruthy();
@@ -66,6 +66,13 @@ describe('ExerciseDrawerVideo', () => {
     );
     expect(unknown.container).toHaveTextContent('Vídeo de execução não cadastrado');
     expect(unknown.container.querySelector('iframe')).toBeNull();
+    unknown.unmount();
+
+    const whitespace = render(<ExerciseDrawerVideo videoUrl="   " title="Supino" />);
+    expect(whitespace.container).toHaveTextContent('Vídeo de execução não cadastrado');
+    expect(whitespace.container.querySelector('video')).toBeNull();
+    expect(whitespace.container.querySelector('iframe')).toBeNull();
+    expect(whitespace.container.querySelector('.aspect-square')).toBeTruthy();
   });
 
   it('resets to paused start when videoUrl changes', () => {

@@ -140,10 +140,10 @@ T8
 
 **Done when**:
 
-- [ ] Empty/invalid/unknown/whitespace cases have `aspect-square` and no video/iframe
-- [ ] Valid file/YouTube/Vimeo wrappers have `aspect-square`
-- [ ] `ExerciseDrawerVideo.test.jsx` updated to those classes and edges
-- [ ] Gate passes
+- [x] Empty/invalid/unknown/whitespace cases have `aspect-square` and no video/iframe
+- [x] Valid file/YouTube/Vimeo wrappers have `aspect-square`
+- [x] `ExerciseDrawerVideo.test.jsx` updated to those classes and edges
+- [x] Gate passes
 
 **Tests**: unit
 **Gate**: full
