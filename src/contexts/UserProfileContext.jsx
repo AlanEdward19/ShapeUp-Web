@@ -23,7 +23,8 @@ export function UserProfileProvider({ children }) {
   }, [currentUser, getMe]);
   const profile = record?.uid === currentUser?.uid ? record?.profile : null;
   const name = profile?.displayName || currentUser?.displayName || currentUser?.email?.split('@')[0] || '';
-  const value = { id: profile?.userId, name, email: profile?.email || currentUser?.email || '', photo: currentUser?.photoURL || '', initials: name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || '—' };
+  const initial = name.trim().charAt(0).toUpperCase() || '?';
+  const value = { id: profile?.userId, name, email: profile?.email || currentUser?.email || '', photo: currentUser?.photoURL || '', initials: initial, initial };
   return <UserProfileContext.Provider value={value}>{children}</UserProfileContext.Provider>;
 }
 // eslint-disable-next-line react-refresh/only-export-components
@@ -31,5 +32,6 @@ export function useUserProfile() {
   const context = useContext(UserProfileContext);
   const auth = useAuth();
   const name = auth?.currentUser?.displayName || auth?.currentUser?.email?.split('@')[0] || '';
-  return context || { name, photo: auth?.currentUser?.photoURL || '', email: auth?.currentUser?.email || '', initials: name.slice(0, 2).toUpperCase() || '—' };
+  const initial = name.trim().charAt(0).toUpperCase() || '?';
+  return context || { name, photo: auth?.currentUser?.photoURL || '', email: auth?.currentUser?.email || '', initials: initial, initial };
 }

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useGymManagementApi } from '../hooks/api/useGymManagementApi';
+import ProfileAvatar from './ProfileAvatar';
 
 const roles = { Trainer: 'professional', GymOwner: 'gym', IndependentClient: 'independent', Client: 'client', GymClient: 'client' };
 const labels = {
@@ -25,5 +26,5 @@ export function ProfilePhoto() {
  const { language }=useLanguage();const text=labels[language] || labels['pt-BR'];const profile=useUserProfile();const { updateProfilePhoto }=useAuth();const input=useRef(null);
  const [busy,setBusy]=useState(false);const [notice,setNotice]=useState(null);
  const upload=async file=>{setBusy(true);setNotice(null);try{await updateProfilePhoto(file);setNotice(13);}catch(error){setNotice(error.message==='profile/invalid-photo'?11:12);}finally{setBusy(false);if(input.current)input.current.value='';}};
- return <div><div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}>{profile.photo ? <img src={profile.photo} alt="" style={{width:64,height:64,borderRadius:'50%',objectFit:'cover'}}/> : <span style={{width:64,height:64,borderRadius:'50%',display:'grid',placeItems:'center',background:'#29211d',color:'#e06c43'}}>{profile.initials}</span>}<input ref={input} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={event=>{const file=event.target.files?.[0];if(file)upload(file);}}/><button type="button" style={buttonStyle} disabled={busy} onClick={()=>input.current.click()}>{busy?text[10]:text[8]}</button>{profile.photo && <button type="button" style={buttonStyle} disabled={busy} onClick={()=>upload(null)}>{text[9]}</button>}</div><p style={{fontSize:12,color:'#968882',marginTop:8}}>{text[11]}</p>{notice!==null && <p role={notice===13?'status':'alert'}>{text[notice]}</p>}</div>;
+ return <div><div style={{display:'flex',alignItems:'center',gap:16,flexWrap:'wrap'}}><ProfileAvatar name={profile.name} photo={profile.photo} size={64} style={{border:'1px solid var(--border-color)'}}/><input ref={input} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={event=>{const file=event.target.files?.[0];if(file)upload(file);}}/><button type="button" style={buttonStyle} disabled={busy} onClick={()=>input.current.click()}>{busy?text[10]:text[8]}</button>{profile.photo && <button type="button" style={buttonStyle} disabled={busy} onClick={()=>upload(null)}>{text[9]}</button>}</div><p style={{fontSize:12,color:'#968882',marginTop:8}}>{text[11]}</p>{notice!==null && <p role={notice===13?'status':'alert'}>{text[notice]}</p>}</div>;
 }

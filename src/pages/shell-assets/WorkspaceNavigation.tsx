@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Logo from '../../components/Logo/Logo';
+import ProfileAvatar from '../../components/ProfileAvatar';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 
@@ -82,12 +83,8 @@ export default function WorkspaceNavigation({ flow, open, close }: WorkspaceNavi
           ))}
         </nav>
         <div className="sn-profile">
-          <span style={{ background: '#29211d', borderRadius: 6, padding: 6, color: '#e06c43' }}>
-            {profile.photo ? (
-              <img src={profile.photo} alt="" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 4 }} />
-            ) : (
-              profile.initials
-            )}
+          <span style={{ background: '#29211d', borderRadius: 6, padding: 6 }}>
+            <ProfileAvatar name={profile.name} photo={profile.photo} size={32} />
           </span>
           <div style={{ flex: 1 }}>
             <strong>{name}</strong>

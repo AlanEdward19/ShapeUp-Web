@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import Logo from '../Logo/Logo';
+import ProfileAvatar from '../ProfileAvatar';
 
 type UnifiedNavigationProps = {
   flow: boolean;
@@ -90,12 +91,8 @@ export default function UnifiedNavigation({ flow, open, close }: UnifiedNavigati
           ))}
         </nav>
         <div className="sn-profile">
-          <span style={{ background: '#29211d', borderRadius: 6, padding: 6, color: '#e06c43' }}>
-            {profile.photo ? (
-              <img src={profile.photo} alt="" style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: 4 }} />
-            ) : (
-              profile.initials
-            )}
+          <span style={{ background: '#29211d', borderRadius: 6, padding: 6 }}>
+            <ProfileAvatar name={profile.name} photo={profile.photo} size={32} />
           </span>
           <div style={{ flex: 1 }}>
             <strong>{name}</strong>
