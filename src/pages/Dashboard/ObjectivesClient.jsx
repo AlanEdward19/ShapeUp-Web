@@ -9,6 +9,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useTour } from '@reactour/tour';
 import { useNutritionApi } from '../../hooks/api/useNutritionApi';
 import { enqueueMutation } from '../../services/mutationQueue';
+import { collapseSameDayWeight, localDateKey, localDayUtcNoonIso, upsertSameDayWeight } from '../../utils/weightHistory';
 import './DashboardClient.css';
 
 const ObjectivesClient = () => {
@@ -20,11 +21,14 @@ const ObjectivesClient = () => {
     // --- Objectives State ---
     const [objectives, setObjectives] = useState(() => {
         const stored = localStorage.getItem(`shapeup_client_objectives_${clientId}`);
-        if (stored) return JSON.parse(stored);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            return { ...parsed, history: collapseSameDayWeight(parsed.history || []) };
+        }
         return {
             goalWeight: '',
             goalUnit: 'metric', // Stored origin unit for the goal
-            history: [] // { id, date, weight, unit }
+            history: [] // { id, date, day, weight, unit }
         };
     });
 
@@ -88,21 +92,25 @@ const ObjectivesClient = () => {
             if (!data) return;
 
             const mappedHistory = (Array.isArray(data) ? data : data.items || []).map(entry => {
-                const dateObj = new Date(entry.dateUtc || `${entry.date}T12:00:00`);
+                const dateObj = new Date(entry.updatedAtUtc || entry.dateUtc || `${entry.date}T12:00:00`);
+                const day = localDateKey(dateObj);
                 return {
-                    id: entry.id || dateObj.getTime(),
+                    id: entry.id || day,
+                    day,
                     date: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                    originalDateObj: dateObj,
+                    originalDateObj: dateObj.toISOString(),
+                    updatedAtUtc: entry.updatedAtUtc,
                     weight: entry.weight,
                     unit: 'metric'
                 };
             });
-            
-            mappedHistory.sort((a, b) => b.originalDateObj - a.originalDateObj);
 
             setObjectives(prev => ({
                 ...prev,
-                history: mappedHistory,
+                history: collapseSameDayWeight([
+                    ...mappedHistory,
+                    ...(prev.history || []),
+                ]),
                 ...(data.targetWeight != null ? { goalWeight: data.targetWeight, goalUnit: 'metric' } : {})
             }));
         } catch (err) {
@@ -178,32 +186,31 @@ const ObjectivesClient = () => {
         const parsedWeight = parseFloat(newWeightEntry);
         if (isNaN(parsedWeight) || parsedWeight <= 0) return;
 
-        const dateUtc = new Date().toISOString();
+        const dateObj = new Date();
+        const day = localDateKey(dateObj);
+        const dateUtc = localDayUtcNoonIso(dateObj);
 
-        // Enqueued (offline foundation). Each register is a distinct day's entry, not an
-        // update -- no dedupeKey, every log is its own queued write. We add an optimistic
-        // local entry instead of the old await-then-refetch: a refetch right now would just
-        // overwrite `history` with server data that doesn't have this entry yet (it hasn't
-        // synced), making the just-logged weight flicker in and back out.
+        // Enqueued (offline foundation). The API keeps one register per calendar day
+        // (latest wins). Send local noon UTC so DateOnly matches the user's day, not
+        // the UTC date of "now" (which rolls over at 21:00 in Brazil).
         enqueueMutation({
             endpoint: '/api/nutrition/weight/registers',
             method: 'POST',
             body: { weight: unitSystem === 'imperial' ? parsedWeight / 2.2046226218 : parsedWeight, dateUtc },
+            dedupeKey: `weight-register-${clientId}-${day}`,
         });
 
-        const dateObj = new Date(dateUtc);
         setObjectives(prev => ({
             ...prev,
-            history: [
-                {
-                    id: `local-${Date.now()}`,
-                    date: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-                    originalDateObj: dateObj,
-                    weight: parsedWeight,
-                    unit: unitSystem
-                },
-                ...prev.history
-            ]
+            history: upsertSameDayWeight(prev.history, {
+                id: `local-${day}`,
+                day,
+                date: dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+                originalDateObj: dateObj.toISOString(),
+                updatedAtUtc: dateObj.toISOString(),
+                weight: parsedWeight,
+                unit: unitSystem
+            })
         }));
         setNewWeightEntry('');
     };
@@ -216,7 +223,7 @@ const ObjectivesClient = () => {
     }
 
     // Chart Data (Ascending dates)
-    const chartData = [...objectives.history].sort((a, b) => (a.originalDateObj || a.id) - (b.originalDateObj || b.id)).map((h, i) => ({
+    const chartData = [...objectives.history].sort((a, b) => new Date(a.originalDateObj || 0) - new Date(b.originalDateObj || 0)).map((h, i) => ({
         session: `Entry ${i + 1}`,
         weight: parseFloat(convertWeight(h.weight, h.unit || 'metric').toFixed(1)), // Fix precision
         date: h.date
