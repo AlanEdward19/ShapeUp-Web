@@ -21,6 +21,7 @@ describe('ExerciseDrawerSubstitutions', () => {
     );
     expect(getByText('1 opções')).toBeTruthy();
     expect(container).toHaveTextContent('Supino machine');
+    expect(container).toHaveTextContent('Peitoral');
     expect(container).toHaveTextContent('Máquina');
     expect(container).toHaveTextContent('96% similaridade motora');
     expect(

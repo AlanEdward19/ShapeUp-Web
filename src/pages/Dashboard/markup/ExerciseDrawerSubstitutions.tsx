@@ -11,6 +11,11 @@ function equipmentLabel(ex: ExerciseRecord): string {
   );
 }
 
+function primaryMuscleLabel(ex: ExerciseRecord): string {
+  const agonist = ex.muscleDetails?.[0];
+  return agonist?.muscleNamePt || agonist?.muscleName || ex.muscles?.[0] || '—';
+}
+
 export function ExerciseDrawerSubstitutions({
   equivalents,
   exercises,
@@ -51,6 +56,9 @@ export function ExerciseDrawerSubstitutions({
                 >
                   <div className="min-w-0">
                     <p className="text-sm text-text-primary truncate">{match?.name || `EX-${item.exerciseId}`}</p>
+                    <p className="text-[11px] text-text-muted truncate">
+                      {match ? primaryMuscleLabel(match) : '—'}
+                    </p>
                     <p className="text-[11px] text-text-muted truncate">{match ? equipmentLabel(match) : '—'}</p>
                     {item.matchLabel ? (
                       <p className="text-[11px] text-brand-olive">{item.matchLabel}</p>
