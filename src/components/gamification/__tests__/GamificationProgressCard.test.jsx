@@ -38,14 +38,37 @@ describe('GamificationProgressCard XP bar', () => {
         shapeScore: 120,
     };
 
-    it('shows non-zero fill and aria-valuenow for in-level remainder', () => {
+    it('shows proportional fill and aria-valuenow for in-level remainder 250', () => {
         const { getByRole } = render(<GamificationProgressCard profile={activeProfile} />);
         const bar = getByRole('progressbar');
         expect(bar).toHaveAttribute('aria-valuenow', '250');
         const fill = bar.querySelector('.su-gamification-progress-fill');
-        expect(fill?.style.width).not.toBe('0%');
-        expect(parseFloat(fill?.style.width ?? '0')).toBeGreaterThan(0);
+        expect(fill?.style.width).toBe('50%');
     });
+
+    it.each([
+        [1, '1', '0.2%'],
+        [2, '2', '0.4%'],
+        [499, '499', '99.8%'],
+    ])(
+        'totalXp %i keeps exact fill width (Math.round would zero 1–2 XP)',
+        (totalXp, ariaValuenow, expectedWidth) => {
+            const { getByRole } = render(
+                <GamificationProgressCard
+                    profile={{
+                        ...activeProfile,
+                        totalXp,
+                        level: 1,
+                    }}
+                />
+            );
+            const bar = getByRole('progressbar');
+            expect(bar).toHaveAttribute('aria-valuenow', ariaValuenow);
+            expect(bar.querySelector('.su-gamification-progress-fill')?.style.width).toBe(
+                expectedWidth
+            );
+        }
+    );
 
     it('shows 0% fill at level boundary without empty-state copy', () => {
         const { getByRole, queryByText } = render(
