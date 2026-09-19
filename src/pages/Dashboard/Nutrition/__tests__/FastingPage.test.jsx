@@ -2,7 +2,8 @@ import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { withLang } from '../../../../test/withLang';
-import FastingPage, { maybeNotifyEatingWindow } from '../FastingPage';
+import FastingPage from '../FastingPage';
+import { maybeNotifyEatingWindow } from '../fastingPageNotify';
 
 const mockGetClock = vi.fn();
 const mockPutAgenda = vi.fn();

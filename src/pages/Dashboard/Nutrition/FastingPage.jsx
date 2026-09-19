@@ -9,6 +9,8 @@ import {
     useFastingApi,
 } from '../../../hooks/api/useFastingApi';
 import { formatFastingCountdown, fastingRemainingSeconds } from '../../../utils/fastingCountdown';
+import { eatingStartLabelFromMinutes } from './fastingFormUtils';
+import { maybeNotifyEatingWindow } from './fastingPageNotify';
 import './Nutrition.css';
 
 const PRESET_PROTOCOLS = ['14:10', '16:8', '18:6', '20:4'];
@@ -25,22 +27,6 @@ const eatingStartOptions = () => {
 };
 
 const EATING_START_OPTIONS = eatingStartOptions();
-
-export const maybeNotifyEatingWindow = (previousStatus, nextStatus, t) => {
-    if (typeof Notification === 'undefined') return;
-    if (Notification.permission !== 'granted') return;
-    if (nextStatus !== 'Eating' || previousStatus === 'Eating') return;
-    void new Notification(t('nutrition.fasting.notifyTitle'), {
-        body: t('nutrition.fasting.notifyBody'),
-    });
-};
-
-export const eatingStartLabelFromMinutes = (minutes) => {
-    if (minutes == null || Number.isNaN(minutes)) return '12:00';
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
-};
 
 const FastingPage = () => {
     const { t } = useLanguage();
@@ -255,6 +241,7 @@ const FastingPage = () => {
                         <p
                             className="su-fasting-countdown"
                             data-testid="fasting-countdown"
+                            data-tick={tick}
                             aria-live="polite"
                         >
                             {countdownText}

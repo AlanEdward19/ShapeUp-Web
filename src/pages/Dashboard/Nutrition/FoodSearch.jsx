@@ -7,7 +7,7 @@ import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
 import { useFastingApi } from '../../../hooks/api/useFastingApi';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useSearchParams } from 'react-router-dom';
-import { persistDiaryEntryWithFastingWarning } from './DiaryDay';
+import { persistDiaryEntryWithFastingWarning } from './diaryFastingPersist';
 import { supportsBarcodeDetector } from './nutritionUtils';
 import './Nutrition.css';
 

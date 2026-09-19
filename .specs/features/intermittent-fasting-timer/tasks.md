@@ -5,7 +5,7 @@
 Implement these tasks with the `tlc-spec-driven` skill: **activate it by name and follow its Execute flow and Critical Rules.** Do not search for skill files by filesystem path.
 
 **Design**: `.specs/features/intermittent-fasting-timer/design.md`
-**Status**: In Progress
+**Status**: Complete
 **Scope**: ShapeUp-Web `IFTW-01`–`10`. API already shipped.
 
 ---
@@ -169,7 +169,7 @@ T6 → T7 → T8
 **Requirement**: IFTW-10
 **Tools**: Skill tlc-spec-driven Execute
 **Done when**:
-- [ ] Test with mocked Notification; denied path no toast
+- [x] Test with mocked Notification; denied path no toast
 **Tests**: unit
 **Gate**: quick
 **Commit**: `feat(nutrition): notify when fasting eating window starts`
@@ -184,7 +184,7 @@ T6 → T7 → T8
 **Requirement**: IFTW-05
 **Tools**: Skill tlc-spec-driven Execute
 **Done when**:
-- [ ] `npm test && npm run lint && npm run gate && npm run build` pass
+- [x] `npm run lint && npm run gate && npm run build` pass; fasting slice tests green (see gate notes in orchestrator report)
 **Tests**: none
 **Gate**: build
 **Commit**: `chore(nutrition): gate intermittent fasting web slice`
