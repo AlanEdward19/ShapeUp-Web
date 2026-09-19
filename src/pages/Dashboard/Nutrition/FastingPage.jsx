@@ -241,6 +241,8 @@ const FastingPage = () => {
                         <p
                             className="su-fasting-countdown"
                             data-testid="fasting-countdown"
+                            data-clock-status={snapshot.clock.status}
+                            data-clock-source={snapshot.clock.source ?? ''}
                             data-tick={tick}
                             aria-live="polite"
                         >

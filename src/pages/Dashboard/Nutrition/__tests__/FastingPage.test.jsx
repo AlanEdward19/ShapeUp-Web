@@ -1,4 +1,4 @@
-import { render, waitFor, fireEvent } from '@testing-library/react';
+import { render, waitFor, fireEvent, act } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { withLang } from '../../../../test/withLang';
@@ -224,12 +224,96 @@ describe('FastingPage (IFTW-01..05)', () => {
         });
     });
 
+    it('shows Eating countdown with hh:mm:ss and clock status', async () => {
+        mockGetClock.mockResolvedValue({
+            ...agendaSnapshot,
+            clock: {
+                status: 'Eating',
+                boundaryAt: new Date(Date.now() + 3600 * 1000 + 500).toISOString(),
+                source: 'Agenda',
+            },
+        });
+        const { getByTestId } = renderPage();
+        await waitFor(() => {
+            const countdown = getByTestId('fasting-countdown');
+            expect(countdown).toHaveTextContent(/^01:00:0[0-1]$/);
+            expect(countdown).toHaveAttribute('data-clock-status', 'Eating');
+        });
+    });
+
+    it('GETs clock again when boundary passes and shows next status', async () => {
+        vi.useFakeTimers();
+        const pastBoundary = new Date(Date.now() - 1000).toISOString();
+        const eatingBoundary = new Date(Date.now() + 3600 * 1000).toISOString();
+        mockGetClock.mockReset();
+        mockGetClock
+            .mockResolvedValueOnce({
+                ...agendaSnapshot,
+                clock: { status: 'Fasting', boundaryAt: pastBoundary, source: 'Agenda' },
+            })
+            .mockResolvedValueOnce({
+                ...agendaSnapshot,
+                clock: { status: 'Eating', boundaryAt: eatingBoundary, source: 'Agenda' },
+            });
+        const { getByTestId } = renderPage();
+        await act(async () => {
+            await Promise.resolve();
+        });
+        expect(mockGetClock).toHaveBeenCalledTimes(1);
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(1000);
+            await Promise.resolve();
+        });
+        expect(mockGetClock.mock.calls.length).toBeGreaterThanOrEqual(2);
+        expect(getByTestId('fasting-countdown')).toHaveAttribute('data-clock-status', 'Eating');
+    });
+
     it('POSTs start override when agenda exists', async () => {
         mockGetClock.mockResolvedValue(agendaSnapshot);
         const { getByTestId } = renderPage();
         await waitFor(() => expect(getByTestId('fasting-start')).toBeEnabled());
         fireEvent.click(getByTestId('fasting-start'));
         await waitFor(() => expect(mockStartOverride).toHaveBeenCalled());
+    });
+
+    it('renders Override source after Start and next GET', async () => {
+        mockGetClock.mockReset();
+        mockGetClock
+            .mockResolvedValueOnce(agendaSnapshot)
+            .mockResolvedValueOnce({
+                ...agendaSnapshot,
+                clock: {
+                    status: 'Fasting',
+                    boundaryAt: agendaSnapshot.clock.boundaryAt,
+                    source: 'Override',
+                },
+            });
+        const { getByTestId } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-start')).toBeEnabled());
+        fireEvent.click(getByTestId('fasting-start'));
+        await waitFor(() => {
+            expect(getByTestId('fasting-countdown')).toHaveAttribute('data-clock-source', 'Override');
+        });
+    });
+
+    it('renders Agenda source after Cancel and next GET', async () => {
+        mockGetClock.mockReset();
+        mockGetClock
+            .mockResolvedValueOnce({
+                ...agendaSnapshot,
+                clock: {
+                    status: 'Fasting',
+                    boundaryAt: agendaSnapshot.clock.boundaryAt,
+                    source: 'Override',
+                },
+            })
+            .mockResolvedValueOnce(agendaSnapshot);
+        const { getByTestId } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-cancel')).toBeInTheDocument());
+        fireEvent.click(getByTestId('fasting-cancel'));
+        await waitFor(() => {
+            expect(getByTestId('fasting-countdown')).toHaveAttribute('data-clock-source', 'Agenda');
+        });
     });
 
     it('disables Start while clock source is Override', async () => {
