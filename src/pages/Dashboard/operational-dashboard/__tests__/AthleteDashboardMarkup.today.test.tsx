@@ -57,6 +57,13 @@ describe('AthleteDashboardMarkup today card (WSD-03)', () => {
 });
 
 describe('AthleteDashboardMarkup Frequência empty state (WSD-06)', () => {
+  it('keeps data-tour anchors for empty dashboard sections', () => {
+    const { container } = render(withLang(<AthleteDashboardMarkup state={baseState} />));
+    expect(container.querySelector('[data-tour="client-header"]')).toBeTruthy();
+    expect(container.querySelector('[data-tour="client-metrics"]')).toBeTruthy();
+    expect(container.querySelector('[data-tour="client-chart"]')).toBeTruthy();
+  });
+
   it('shows em-dash for alvo and taxa when dashboard is null', () => {
     render(withLang(<AthleteDashboardMarkup state={baseState} />));
     const headerRow = screen.getByText('Frequência').parentElement!;

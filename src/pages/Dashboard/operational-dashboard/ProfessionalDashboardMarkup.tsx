@@ -108,7 +108,7 @@ export function ProfessionalDashboardMarkup({ state }: { state: ProfessionalDash
       <main className="mx-auto w-full max-w-7xl flex-1 space-y-6 p-8">
         {loadError ? <p role="alert">{loadError}</p> : null}
 
-        <div className="flex flex-col justify-between gap-2 border-b border-brand-border/60 pb-1 sm:flex-row sm:items-baseline">
+        <div className="flex flex-col justify-between gap-2 border-b border-brand-border/60 pb-1 sm:flex-row sm:items-baseline" data-tour="pro-header">
           <div>
             <h1 className="font-condensed text-3xl font-bold uppercase tracking-wide text-brand-text">Painel do Treinador</h1>
             <p className="mt-0.5 text-xs text-brand-secondary">
@@ -121,7 +121,7 @@ export function ProfessionalDashboardMarkup({ state }: { state: ProfessionalDash
           </div>
         </div>
 
-        <section className="grid grid-cols-1 divide-y divide-brand-border rounded-lg border border-brand-border bg-brand-surface sm:grid-cols-2 lg:grid-cols-4 sm:divide-x sm:divide-y-0">
+        <section className="grid grid-cols-1 divide-y divide-brand-border rounded-lg border border-brand-border bg-brand-surface sm:grid-cols-2 lg:grid-cols-4 sm:divide-x sm:divide-y-0" data-tour="pro-metrics">
           <div className="flex flex-col justify-between p-4">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">Treinamento Hoje</span>
             <div className="mt-2 flex items-baseline gap-2">
@@ -162,7 +162,7 @@ export function ProfessionalDashboardMarkup({ state }: { state: ProfessionalDash
         </section>
 
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-          <section className="flex flex-col rounded-lg border border-brand-border bg-brand-surface lg:col-span-8">
+          <section className="flex flex-col rounded-lg border border-brand-border bg-brand-surface lg:col-span-8" data-tour="pro-clients">
             <div className="flex flex-col justify-between gap-3 border-b border-brand-border p-4 sm:flex-row sm:items-center">
               <div>
                 <h2 className="text-sm font-bold uppercase tracking-wider text-brand-text">Carteira de Alunos &amp; Status Semanal</h2>

@@ -128,6 +128,7 @@ const DashboardClient = ({ renderView } = {}) => {
 
     // ─── Tour Trigger ─────────────────────────────────────────────────
     useEffect(() => {
+        if (renderView) return;
         const hasSeenTour = localStorage.getItem('shapeup_client_dashboard_tour_seen');
         if (!hasSeenTour) {
             const tourSteps = [
@@ -154,7 +155,7 @@ const DashboardClient = ({ renderView } = {}) => {
 
             localStorage.setItem('shapeup_client_dashboard_tour_seen', 'true');
         }
-    }, [setIsOpen, setSteps, setCurrentStep, t]);
+    }, [renderView, setIsOpen, setSteps, setCurrentStep, t]);
 
     const currentWeekKey = getWeekKey(new Date());
 

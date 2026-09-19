@@ -3,6 +3,8 @@ import RouteMetadata from './components/RouteMetadata';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { TourProvider } from '@reactour/tour';
 import './styles/Tour.css';
+import { TourAnchorProvider } from './components/tour/tourAnchorContext';
+import TourShadowAnchor from './components/tour/TourShadowAnchor';
 import { LoginShell as Login, LandingShell as LandingPage, RecoveryShell as ForgotPassword } from './pages/PublicAuthShell';
 import RegistrationShell from './pages/RegistrationShell';
 
@@ -89,6 +91,8 @@ function App() {
         arrow: (base) => ({ ...base, color: 'var(--text-main)' }),
       }}
     >
+      <TourAnchorProvider>
+        <TourShadowAnchor />
       <BrowserRouter>
         <RouteMetadata />
         <CookieConsent />
@@ -132,6 +136,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      </TourAnchorProvider>
     </TourProvider>
   );
 }

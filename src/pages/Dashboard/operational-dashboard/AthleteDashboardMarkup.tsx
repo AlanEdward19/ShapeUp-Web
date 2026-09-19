@@ -1,3 +1,5 @@
+import FadeUp from '../../../components/motion/FadeUp';
+import NumberFlow from '../../../components/motion/NumberFlow';
 import AthleteScoreboard from '../../../components/gamification/AthleteScoreboard';
 import type { AthleteScoreboardState } from '../../../components/gamification/AthleteScoreboard';
 import HistoryChart from '../../../components/charts/HistoryChart';
@@ -116,7 +118,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
       <main className="mx-auto w-full max-w-7xl flex-1 space-y-8 px-8 py-7">
         {trainingError ? <p role="alert">{trainingError}</p> : null}
 
-        <section className="border-b border-[#2a201b] pb-6">
+        <section className="border-b border-[#2a201b] pb-6" data-tour="client-header">
           <div className="flex flex-col justify-between gap-3 md:flex-row md:items-baseline">
             <div>
               <div className="mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[#d4a359]">
@@ -133,7 +135,8 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
           <AthleteScoreboard state={state} />
         </section>
 
-        <section className="grid grid-cols-2 divide-y divide-[#2a201b] border-y border-[#2a201b] py-4 md:grid-cols-4 md:divide-x md:divide-y-0">
+        <FadeUp>
+        <section className="grid grid-cols-2 divide-y divide-[#2a201b] border-y border-[#2a201b] py-4 md:grid-cols-4 md:divide-x md:divide-y-0" data-tour="client-metrics">
           <div className="py-2 first:pl-0 md:px-5 md:py-0">
             <div className="mb-1 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-[#82736b]">
               <span>Frequência</span>
@@ -142,9 +145,10 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
               </span>
             </div>
             <div className="mb-2 flex items-baseline gap-2">
-              <span className="font-headline text-2xl font-bold text-[#eee0da]">
-                {Number.isFinite(dashboard?.sessionsCompletionRate) ? `${dashboard!.sessionsCompletionRate}%` : '—'}
-              </span>
+              <NumberFlow
+                className="font-headline text-2xl font-bold text-[#eee0da]"
+                value={Number.isFinite(dashboard?.sessionsCompletionRate) ? `${dashboard!.sessionsCompletionRate}%` : '—'}
+              />
             </div>
             <div className="flex items-center gap-1">{weekdayTitles.map((_, index) => weekdayPill(index))}</div>
           </div>
@@ -158,9 +162,10 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
               </span>
             </div>
             <div className="mb-1.5 flex items-baseline gap-1.5">
-              <span className="font-headline text-2xl font-bold text-[#eee0da]">
-                {dashboard ? Number(dashboard.weeklyVolume || 0).toLocaleString(language) : '—'}
-              </span>
+              <NumberFlow
+                className="font-headline text-2xl font-bold text-[#eee0da]"
+                value={dashboard ? Number(dashboard.weeklyVolume || 0).toLocaleString(language) : '—'}
+              />
               <span className="text-xs text-[#82736b]">kg tonelagem</span>
             </div>
           </div>
@@ -179,9 +184,10 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
                 Proteína: <strong className="text-[#eee0da]">{nutrition.totals?.proteinG || 0}g</strong>{' '}
                 <span className="text-[#82736b]">/ {nutrition.goal?.proteinG || '—'}g</span>
               </span>
-              <span className="font-medium text-[#7d986b]">
-                {nutrition.goal?.kcal ? `${nutritionPercent}%` : '—'}
-              </span>
+              <NumberFlow
+                className="font-medium text-[#7d986b]"
+                value={nutrition.goal?.kcal ? `${nutritionPercent}%` : '—'}
+              />
             </div>
           </div>
           <div className="py-2 last:pr-0 md:px-5 md:py-0">
@@ -208,6 +214,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
             <div className="text-[11px] text-[#82736b]">Registro diário neste dispositivo</div>
           </div>
         </section>
+        </FadeUp>
 
         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
           <div id="tabela-exercicios" className="space-y-8 lg:col-span-8">
@@ -257,7 +264,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
               </div>
             ) : null}
 
-            <div className="border-t border-[#2a201b] pt-4">
+            <div className="border-t border-[#2a201b] pt-4" data-tour="client-chart">
               <h3 className="font-headline text-lg font-bold uppercase">Histórico de Volume</h3>
               <HistoryChart data={chartData} />
             </div>

@@ -58,6 +58,14 @@ vi.mock('../../../components/Workspace/WorkspaceShellPage', () => ({
   default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
+vi.mock('../../../components/tour/useWorkspaceDashboardTour', () => ({
+  useWorkspaceDashboardTour: vi.fn(),
+}));
+
+vi.mock('../../../contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (key: string) => key }),
+}));
+
 let lastAthleteState: Record<string, unknown> | null = null;
 vi.mock('../operational-dashboard/AthleteDashboardMarkup', () => ({
   AthleteDashboardMarkup: ({ state }: { state: Record<string, unknown> }) => {

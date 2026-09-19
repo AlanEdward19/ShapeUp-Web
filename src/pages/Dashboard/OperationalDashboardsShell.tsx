@@ -2,7 +2,9 @@
 import { readAllPages } from '../../utils/readAllPages';
 import { workoutHistory } from '../../utils/workoutHistory';
 import { useUserProfile } from '../../contexts/UserProfileContext';
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { useWorkspaceDashboardTour } from '../../components/tour/useWorkspaceDashboardTour';
 import { useNavigate } from 'react-router-dom';
 import LegacyDashboardClient from './DashboardClient';
 import useHydration from '../../hooks/useHydration';
@@ -37,7 +39,17 @@ function read<T>(key: string, fallback: T): T {
 
 export function ProfessionalDashboard() {
   const user = useUserProfile();
+  const { t } = useLanguage();
   const { language, tr } = useDashboardCopy();
+  const proTourSteps = useMemo(
+    () => [
+      { targetSelector: '[data-tour="pro-header"]', content: t('tour.dashboard_pro.1'), required: true },
+      { targetSelector: '[data-tour="pro-metrics"]', content: t('tour.dashboard_pro.2'), required: true },
+      { targetSelector: '[data-tour="pro-clients"]', content: t('tour.dashboard_pro.3'), required: true },
+    ],
+    [t],
+  );
+  useWorkspaceDashboardTour('shapeup_pro_dashboard_tour_seen', proTourSteps);
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('Todos');
@@ -136,7 +148,17 @@ export function ProfessionalDashboard() {
 
 export function AthleteView(scoreboardState: AthleteDashboardState) {
   const user = useUserProfile();
+  const { t } = useLanguage();
   const { language, tr } = useDashboardCopy();
+  const athleteTourSteps = useMemo(
+    () => [
+      { targetSelector: '[data-tour="client-header"]', content: t('tour.dashboard_client.1'), required: true },
+      { targetSelector: '[data-tour="client-metrics"]', content: t('tour.dashboard_client.3'), required: true },
+      { targetSelector: '[data-tour="client-chart"]', content: t('tour.dashboard_client.4'), required: true },
+    ],
+    [t],
+  );
+  useWorkspaceDashboardTour('shapeup_client_dashboard_tour_seen', athleteTourSteps);
   const navigate = useNavigate();
   const date = new Date().toLocaleDateString('en-CA');
   const { water, addWater } = useHydration(date);
