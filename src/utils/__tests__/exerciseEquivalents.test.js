@@ -26,16 +26,17 @@ describe('unwrapEquivalentsPayload', () => {
 });
 
 describe('mapExerciseEquivalents', () => {
-    it('maps id to exerciseId without matchLabel', () => {
-        const { equivalents, records } = mapExerciseEquivalents([sampleResponse]);
+    it('maps id to exerciseId without matchLabel and localizes names', () => {
+        const { equivalents, records } = mapExerciseEquivalents([sampleResponse], 'en');
         expect(equivalents).toEqual([{ exerciseId: 2 }]);
         expect(equivalents[0]).not.toHaveProperty('matchLabel');
         expect(records[0]).toMatchObject({
             id: 2,
-            name: 'Supino inclinado halteres',
-            muscles: ['Peitoral'],
+            name: 'Incline DB Press',
+            muscles: ['Chest'],
             equipments: [{ equipmentNamePt: 'Halteres', equipmentName: 'Dumbbell' }],
         });
+        expect(mapExerciseEquivalents([sampleResponse], 'pt-BR').records[0].name).toBe('Supino inclinado halteres');
     });
 
     it('unwraps { items } shape', () => {

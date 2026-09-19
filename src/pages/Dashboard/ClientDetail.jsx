@@ -30,13 +30,13 @@ import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
 import { useExercises } from '../../hooks/useExercises';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { enqueueMutation } from '../../services/mutationQueue';
-import { normalizePlan, flattenBlockExercises, applyRequireRpeToAll } from '../../utils/trainingNormalization';
+import { normalizePlan, flattenBlockExercises, applyRequireRpeToAll, moveBlockExercise } from '../../utils/trainingNormalization';
 import { WEEKDAY_API_NAMES } from '../../utils/workoutSchedule';
 
-const PLAN_WEEKDAY_SHORT_LABELS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 
-import { unmapExerciseType } from '../../utils/trainingEnums';
+import { unmapExerciseType, unmapSetType } from '../../utils/trainingEnums';
+import { executedExercisesForMap } from '../../utils/workoutHistory';
 import { buildWorkoutPlanBody, createDefaultPlannedSet, findTimeBasedDurationError } from '../../utils/workoutPlanPayload';
 // eslint-disable-next-line react-refresh/only-export-components -- re-export for existing plan-body tests
 export { buildWorkoutPlanBody };
@@ -44,15 +44,16 @@ export { buildWorkoutPlanBody };
 // ─── Helpers ────────────────────────────────────────────────
 
 // eslint-disable-next-line react-refresh/only-export-components -- shared constant co-located with the components that use it
-export const SET_TYPE_COLORS = { warmup: '#94a3b8', feeder: '#a78bfa', working: '#60a5fa', topset: '#f59e0b', backoff: '#34d399' };
+export const SET_TYPE_COLORS = { warmup: '#94a3b8', feeder: '#a78bfa', working: '#60a5fa', topset: '#f59e0b', dropset: '#f97316', backoff: '#34d399' };
 export const SetTypeBadge = ({ type }) => {
     const { t } = useLanguage();
+    const kind = unmapSetType(type);
     return (
         <span style={{
             fontSize: '0.7rem', fontWeight: 700, padding: '0.15rem 0.5rem',
-            borderRadius: 999, color: '#fff', background: SET_TYPE_COLORS[type] || '#94a3b8',
+            borderRadius: 999, color: '#fff', background: SET_TYPE_COLORS[kind] || '#94a3b8',
             textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap'
-        }}>{t(`client.session.set_type.${type}`) || type}</span>
+        }}>{t(`client.session.set_type.${kind}`) || kind}</span>
     );
 };
 
@@ -77,6 +78,7 @@ export const SET_TYPES = ['warmup', 'feeder', 'working', 'topset', 'backoff'];
 // Native BlockCard/SetRow path (WOED UI ACs). Builder removed in T19 → PlanEditorShell.
 export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = false }) => {
     const { t } = useLanguage();
+    const { exercises: exerciseCatalog = [] } = useExercises();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
     const [name, setName] = useState(plan.name);
     const [phase, setPhase] = useState(plan.phase);
@@ -155,7 +157,11 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             id: `e${Date.now()}`,
             exerciseId: ex.id,
             name: ex.name,
+            nameEn: ex.nameEn,
+            namePt: ex.namePt,
             muscles: Array.isArray(ex.muscles) ? ex.muscles : [],
+            muscleDetails: Array.isArray(ex.muscleDetails) ? ex.muscleDetails : [],
+            muscleActivations: ex.muscleActivations || {},
             tags: tagsParts.join(' • '),
             notes: '',
             requireRpe: false,
@@ -269,10 +275,10 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
 
     return (
         <div className="su-builder-layout su-prescription-editor">
-            <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">Prescrição & periodização</span><h1>{name || t('pro.builder.name')}</h1><p>{phase} · {weeks} semanas · {difficulty}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> exercícios</span><span><b>{totalSets}</b> séries</span><span><b>{estMins}</b> duração estimada</span></div><Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button></header>
+            <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">{t('pro.builder.kicker')}</span><h1>{name || t('pro.builder.name')}</h1><p>{t(`pro.builder.phase.${phase.toLowerCase().split(' ')[0]}`) || phase} · {weeks} {t('client.training.card.weeks')} · {t(`pro.builder.diff.${difficulty.toLowerCase()}`) || difficulty}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> {t('pro.builder.stat.exercises')}</span><span><b>{totalSets}</b> {t('pro.builder.stat.sets')}</span><span><b>{estMins}</b> {t('pro.builder.stat.duration')}</span></div><Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button></header>
             {/* LEFT: Plan builder */}
             <div className="su-plan-builder">
-                <details className="su-plan-header-card su-prescription-settings" data-tour="pe-settings" open={!plan.name}><summary>Parâmetros do plano <span>Nome, objetivo, duração e orientações</span></summary>
+                <details className="su-plan-header-card su-prescription-settings" data-tour="pe-settings" open={!plan.name}><summary>{t('pro.builder.params')} <span>{t('pro.builder.params.hint')}</span></summary>
                     <div className="su-plan-meta-grid">
                         <Input label={t('pro.builder.name')} value={name} onChange={e => setName(e.target.value)} />
                         <Input label={t('pro.builder.weeks')} type="number" min="1" max="52" value={weeks} onChange={e => setWeeks(e.target.value)} />
@@ -298,19 +304,19 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                     </div>
                     {!plan._templateId && (
                         <div className="su-mt-4">
-                            <span className="su-input-label">{t('pro.builder.weekdays') || 'Dias da semana'}</span>
-                            <div className="su-weekday-toggle-row" role="group" data-testid="weekday-selector" aria-label={t('pro.builder.weekdays') || 'Dias da semana'}>
-                                {PLAN_WEEKDAY_SHORT_LABELS.map((label, day) => (
+                            <span className="su-input-label">{t('pro.builder.weekdays')}</span>
+                            <div className="su-weekday-toggle-row" role="group" data-testid="weekday-selector" aria-label={t('pro.builder.weekdays')}>
+                                {WEEKDAY_API_NAMES.map((name, day) => (
                                     <button
                                         key={day}
                                         type="button"
                                         data-testid={`weekday-${day}`}
-                                        aria-label={WEEKDAY_API_NAMES[day]}
+                                        aria-label={name}
                                         aria-pressed={assignedWeekdays.includes(day)}
                                         className={assignedWeekdays.includes(day) ? 'su-weekday-toggle is-on' : 'su-weekday-toggle'}
                                         onClick={() => toggleWeekday(day)}
                                     >
-                                        {label}
+                                        {t(`pro.builder.weekday.${day}`)}
                                     </button>
                                 ))}
                             </div>
@@ -318,10 +324,10 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                     )}
                 </details>
 
-                <div className="su-plan-session-strip"><span aria-current="true"><b>Treino</b><strong>{name}</strong><small>{totalSets} séries · {phase}</small></span></div>
+                <div className="su-plan-session-strip"><span aria-current="true"><b>{t('pro.builder.session')}</b><strong>{name}</strong><small>{totalSets} {t('pro.builder.stat.sets')} · {t(`pro.builder.phase.${phase.toLowerCase().split(' ')[0]}`) || phase}</small></span></div>
                 <div className="su-exercise-stack" data-tour="pe-stack">
                     <div className="su-stack-header">
-                        <h2>Exercícios prescritos <small>{allExercises.length} exercícios · {estMins}</small></h2>
+                        <h2>{t('pro.builder.prescribed')} <small>{allExercises.length} {t('pro.builder.stat.exercises')} · {estMins}</small></h2>
                         <Button
                             variant="outline"
                             disabled={allExercises.length === 0}
@@ -337,9 +343,13 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                             <BlockCard
                                 key={block.id ?? blockIdx}
                                 block={block}
+                                blockIdx={blockIdx}
                                 onChange={(field, value) => updateBlock(blockIdx, field, value)}
                                 onRemove={() => removeBlock(blockIdx)}
                                 onAddExercise={() => addExerciseToBlock(blockIdx)}
+                                onMoveExercise={(fromBlock, fromEx, toEx) =>
+                                    setCurrentBlocks((prev) => moveBlockExercise(prev, fromBlock, fromEx, blockIdx, toEx))
+                                }
                             />
                         ))}
                     </div>
@@ -351,7 +361,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             </div>
 
             {/* RIGHT: Sticky summary sidebar */}
-            <details className="su-structural-analytics su-prescription-analytics" data-tour="pe-summary"><summary>Análise da prescrição e distribuição muscular</summary>
+            <details className="su-structural-analytics su-prescription-analytics" data-tour="pe-summary"><summary>{t('pro.builder.analytics')}</summary>
                 <Card className="su-sticky-card">
                     <div className="su-card-header-flex">
                         <h3 className="su-card-title">
@@ -359,7 +369,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                         </h3>
                     </div>
 
-                    <WorkoutBodyMap exercises={allExercises} compact />
+                    <WorkoutBodyMap exercises={allExercises} catalog={exerciseCatalog} />
 
                     <div className="su-intelligence-metrics">
                         <div className="su-metric-item">
@@ -470,16 +480,14 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     );
 };
 
-export const SessionDetailModal = ({ session, planName, onClose, planExercises = [] }) => {
+export const SessionDetailModal = ({ session, planName, onClose, planExercises = [], catalog: catalogProp = [] }) => {
     const { t, unitSystem, convertWeight } = useLanguage();
+    const { exercises: fetchedCatalog = [] } = useExercises();
+    const catalog = catalogProp.length ? catalogProp : fetchedCatalog;
 
     // Inflate original unit based on string
     const originUnit = (session.totalVol || '').includes('lbs') ? 'imperial' : 'metric';
-    const mapExercises = (session.exercises || []).map(ex => {
-        if ((ex.muscles && ex.muscles.length) || ex.target) return ex;
-        const match = planExercises.find(p => p.name === ex.name);
-        return match ? { ...ex, muscles: match.muscles || [] } : ex;
-    });
+    const mapExercises = executedExercisesForMap(session);
 
     return (
         <div className="su-modal-overlay" onClick={onClose}>
@@ -489,7 +497,7 @@ export const SessionDetailModal = ({ session, planName, onClose, planExercises =
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem', lineHeight: '1.4' }}>
                     {session.date} &middot; {session.duration} &middot; {session.totalVol} {t('pro.plan.history.vol')} &middot; {t('pro.builder.summary.avg_rpe')} {session.rpe}
                 </p>
-                <WorkoutBodyMap exercises={mapExercises} compact />
+                <WorkoutBodyMap exercises={mapExercises} catalog={[...catalog, ...planExercises]} compact />
                 <div className="su-sd-exercises">
                     {session.exercises.map((ex, i) => (
                         <div key={i} className="su-sd-ex-block">
@@ -526,7 +534,7 @@ export const SessionDetailModal = ({ session, planName, onClose, planExercises =
 };
 
 // ─── PLAN CARD (with expandable history) ────────────────────
-export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighlightedSessionId }) => {
+export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighlightedSessionId, catalog = [] }) => {
     const { t } = useLanguage();
     const [historyOpen, setHistoryOpen] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
@@ -665,6 +673,7 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
                     session={selectedSession}
                     planName={plan.name}
                     planExercises={flattenBlockExercises(plan.blocks)}
+                    catalog={catalog}
                     onClose={() => setSelectedSession(null)}
                 />
             )}
@@ -1391,6 +1400,7 @@ const ClientDetail = () => {
                                         onCopy={handleCopyPlan}
                                         onDelete={handleDeletePlan}
                                         initialHighlightedSessionId={location.state?.highlightSessionId}
+                                        catalog={exercisesDB}
                                     />
                                 ))}
                             </div>

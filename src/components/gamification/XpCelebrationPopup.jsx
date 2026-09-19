@@ -14,7 +14,7 @@ const XpCelebrationPopup = ({
     }
 
     return (
-        <div className="su-xp-celebration-overlay" role="dialog" aria-modal="true" aria-label="XP ganho">
+        <div className="su-xp-celebration-overlay" role="dialog" aria-modal="true" aria-label="XP ganho" data-testid="xp-celebration-overlay">
             <div className="su-xp-celebration-card">
                 <button
                     type="button"
@@ -29,7 +29,7 @@ const XpCelebrationPopup = ({
                     {mascotImageUrl ? (
                         <img src={mascotImageUrl} alt="" />
                     ) : (
-                        <Sparkles aria-hidden="true" size={48} strokeWidth={1.5} />
+                        <Sparkles aria-hidden="true" size={28} strokeWidth={1.75} />
                     )}
                 </div>
 

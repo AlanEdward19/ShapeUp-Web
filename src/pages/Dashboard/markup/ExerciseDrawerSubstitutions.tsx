@@ -6,14 +6,13 @@ const EMPTY_COPY = 'Nenhuma substituição cadastrada para este exercício.';
 function equipmentLabel(ex: ExerciseRecord): string {
   return (
     ex.equipment ||
-    ex.equipments?.map((item) => item.equipmentNamePt || item.equipmentName).join(', ') ||
+    ex.equipments?.map((item) => item.equipmentName || item.equipmentNamePt).filter(Boolean).join(', ') ||
     'Não informado'
   );
 }
 
 function primaryMuscleLabel(ex: ExerciseRecord): string {
-  const agonist = ex.muscleDetails?.[0];
-  return agonist?.muscleNamePt || agonist?.muscleName || ex.muscles?.[0] || '—';
+  return ex.muscles?.[0] || ex.muscleDetails?.[0]?.muscleName || ex.muscleDetails?.[0]?.muscleNamePt || '—';
 }
 
 export function ExerciseDrawerSubstitutions({

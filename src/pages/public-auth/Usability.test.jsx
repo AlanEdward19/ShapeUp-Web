@@ -1,5 +1,5 @@
 import { render, fireEvent, within, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { expect, it, vi } from 'vitest';
 import { LanguageProvider } from '../../contexts/LanguageContext';
 import { LandingShell, LoginShell, RecoveryShell } from '../PublicAuthShell';
@@ -49,6 +49,24 @@ it('renders one working password toggle and a home link in login', () => {
   expect(button).toHaveAttribute('aria-label','Ocultar senha');
   fireEvent.click(button);
   expect(root.getElementById('password')).toHaveAttribute('type','password');
+});
+
+it('sends the landing sign-in control to the login screen', () => {
+  const { container } = render(
+    <LanguageProvider>
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route path="/" element={<LandingShell />} />
+          <Route path="/login" element={<div>LOGIN_SCREEN</div>} />
+        </Routes>
+      </MemoryRouter>
+    </LanguageProvider>,
+  );
+  const root = container.querySelector('[data-shell]').shadowRoot;
+  const signIn = [...root.querySelectorAll('a')].find(anchor => (anchor.getAttribute('href') === '/login') && /entrar/i.test(anchor.textContent));
+  expect(signIn).toBeTruthy();
+  fireEvent.click(signIn);
+  expect(container).toHaveTextContent('LOGIN_SCREEN');
 });
 
 it('translates the landing headline and navigation to English and Spanish', async () => {

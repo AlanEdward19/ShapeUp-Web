@@ -1,15 +1,20 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 
+export type TourAnchor = {
+  id: string;
+  selector: string;
+};
+
 type TourAnchorContextValue = {
-  targetSelector: string | null;
-  setAnchorTarget: (selector: string | null) => void;
+  anchors: TourAnchor[];
+  setAnchors: (anchors: TourAnchor[]) => void;
 };
 
 const TourAnchorContext = createContext<TourAnchorContextValue | null>(null);
 
 export function TourAnchorProvider({ children }: { children: ReactNode }) {
-  const [targetSelector, setAnchorTarget] = useState<string | null>(null);
-  const value = useMemo(() => ({ targetSelector, setAnchorTarget }), [targetSelector]);
+  const [anchors, setAnchors] = useState<TourAnchor[]>([]);
+  const value = useMemo(() => ({ anchors, setAnchors }), [anchors]);
   return <TourAnchorContext.Provider value={value}>{children}</TourAnchorContext.Provider>;
 }
 

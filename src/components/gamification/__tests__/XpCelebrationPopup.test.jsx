@@ -57,4 +57,9 @@ describe('XpCelebrationPopup', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
         expect(onDismiss).toHaveBeenCalledTimes(1);
     });
+
+    it('anchors the toast to the bottom-right', () => {
+        render(<XpCelebrationPopup open status="resolved" delta={80} onDismiss={() => {}} />);
+        expect(screen.getByTestId('xp-celebration-overlay')).toHaveClass('su-xp-celebration-overlay');
+    });
 });

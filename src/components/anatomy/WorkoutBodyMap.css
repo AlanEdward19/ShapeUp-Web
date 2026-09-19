@@ -11,7 +11,6 @@
 .su-body-map-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 0.75rem;
 }
 
@@ -25,48 +24,41 @@
     margin: 0;
 }
 
-.su-body-map-toggle {
-    display: inline-flex;
+.su-body-map-figure {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    background: var(--bg-main);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
+    padding: 0.5rem 0.4rem 0.65rem;
+    max-width: 28rem;
 }
 
-.su-body-map-toggle button {
-    appearance: none;
-    background: transparent;
-    border: 0;
-    color: var(--text-muted);
+.su-body-map-pane {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    gap: 0.35rem;
+}
+
+.su-body-map-pane-label {
     font-family: var(--font-display);
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 0.35rem 0.65rem;
-    cursor: pointer;
-}
-
-.su-body-map-toggle button.is-active {
-    background: var(--text-main);
-    color: var(--bg-card);
-}
-
-.su-body-map-figure {
-    display: flex;
-    justify-content: center;
-    background: var(--bg-main);
-    border: 1px solid var(--border-color);
-    padding: 0.5rem 0.25rem;
+    color: var(--text-muted);
 }
 
 .su-body-map-svg {
     width: 100%;
-    max-width: 220px;
-    height: auto;
+    height: 360px;
+    max-width: none;
 }
 
 .su-body-map.is-compact .su-body-map-svg {
-    max-width: 160px;
+    height: 340px;
 }
 
 .su-body-map-svg .silhouette path {
@@ -84,7 +76,7 @@
 
 .su-body-map-svg .muscles .is-hit path {
     fill: var(--map-hit);
-    fill-opacity: calc(0.5 + (var(--hit, 1) * 0.5));
+    fill-opacity: 1;
 }
 
 .su-body-map-hint {

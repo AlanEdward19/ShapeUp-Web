@@ -2,39 +2,43 @@ import { useCallback, useEffect, useLayoutEffect, useState, type CSSProperties }
 import { useTourAnchor } from './tourAnchorContext';
 import { findWorkspaceTarget } from './workspaceTour';
 
+function hiddenStyle(): CSSProperties {
+  return { display: 'none' };
+}
+
+function boxStyle(el: Element): CSSProperties {
+  const rect = el.getBoundingClientRect();
+  return {
+    display: 'block',
+    position: 'fixed',
+    top: rect.top,
+    left: rect.left,
+    width: rect.width,
+    height: rect.height,
+    pointerEvents: 'none',
+    zIndex: 9998,
+  };
+}
+
 export default function TourShadowAnchor() {
-  const { targetSelector } = useTourAnchor();
-  const [style, setStyle] = useState<CSSProperties>({ display: 'none' });
+  const { anchors } = useTourAnchor();
+  const [styles, setStyles] = useState<CSSProperties[]>([]);
 
   const sync = useCallback(() => {
-    if (!targetSelector) {
-      setStyle({ display: 'none' });
-      return;
-    }
-    const el = findWorkspaceTarget(targetSelector);
-    if (!el) {
-      setStyle({ display: 'none' });
-      return;
-    }
-    const rect = el.getBoundingClientRect();
-    setStyle({
-      display: 'block',
-      position: 'fixed',
-      top: rect.top,
-      left: rect.left,
-      width: rect.width,
-      height: rect.height,
-      pointerEvents: 'none',
-      zIndex: 9998,
-    });
-  }, [targetSelector]);
+    setStyles(
+      anchors.map(anchor => {
+        const el = findWorkspaceTarget(anchor.selector);
+        return el ? boxStyle(el) : hiddenStyle();
+      }),
+    );
+  }, [anchors]);
 
   useLayoutEffect(() => {
     sync();
   }, [sync]);
 
   useEffect(() => {
-    if (!targetSelector) return undefined;
+    if (anchors.length === 0) return undefined;
     const capture = { capture: true };
     window.addEventListener('resize', sync);
     window.addEventListener('scroll', sync, capture);
@@ -46,7 +50,19 @@ export default function TourShadowAnchor() {
       window.removeEventListener('scroll', sync, capture);
       shadow?.removeEventListener('scroll', sync, capture);
     };
-  }, [targetSelector, sync]);
+  }, [anchors, sync]);
 
-  return <div id="tour-anchor" aria-hidden="true" data-testid="tour-anchor" style={style} />;
+  return (
+    <>
+      {anchors.map((anchor, index) => (
+        <div
+          key={anchor.id}
+          id={anchor.id}
+          aria-hidden="true"
+          data-testid="tour-anchor"
+          style={styles[index] ?? hiddenStyle()}
+        />
+      ))}
+    </>
+  );
 }

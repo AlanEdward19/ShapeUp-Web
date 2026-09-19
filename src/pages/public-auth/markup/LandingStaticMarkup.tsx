@@ -65,11 +65,13 @@ export function LandingStaticMarkup(): ReactElement {
 
           <a
       className="hidden sm:inline-block font-body text-sm text-text-sub hover:text-text-main transition-colors"
-      href="#login"
+      href="/login"
+      data-nav="signin"
           >
 
           Entrar
                   </a>
+
 
           <a
       className="inline-flex items-center font-headline font-semibold text-[16px] uppercase tracking-wide px-4 py-2 bg-terracotta hover:bg-terracotta-hover text-surface-base rounded transition-colors"
@@ -1648,7 +1650,7 @@ Sem download de arquivos pesados. O treino sincroniza na hora com vídeos e nota
 
             <a
       className="hover:text-text-main transition-colors"
-      href="#login"
+      href="/login"
             >Área do Cliente</a>
 
             <a

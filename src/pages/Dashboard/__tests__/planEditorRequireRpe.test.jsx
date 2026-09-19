@@ -83,4 +83,15 @@ describe('PlanEditor bulk require RPE (WEV-06)', () => {
         expect(saved.blocks[1].exercises[0].requireRpe).toBe(true);
         expect(applyRequireRpeToAll(twoBlockPlan.blocks)[0].exercises[0].requireRpe).toBe(true);
     });
+
+    it('localizes plan builder chrome instead of keeping Portuguese copy', () => {
+        render(withLang(<PlanEditor plan={twoBlockPlan} onSave={vi.fn()} onCancel={vi.fn()} />));
+        expect(screen.getByText('Plan parameters')).toBeInTheDocument();
+        expect(screen.getByText('Name, goal, duration and notes')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /Prescribed exercises/i })).toBeInTheDocument();
+        expect(screen.getByText('Prescription analysis and muscle distribution')).toBeInTheDocument();
+        expect(screen.queryByText('Parâmetros do plano')).not.toBeInTheDocument();
+        expect(screen.queryByText('Exercícios prescritos')).not.toBeInTheDocument();
+        expect(screen.queryByText('Análise da prescrição e distribuição muscular')).not.toBeInTheDocument();
+    });
 });

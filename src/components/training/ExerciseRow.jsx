@@ -4,7 +4,17 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { createDefaultPlannedSet } from '../../utils/workoutPlanPayload';
 import SetRow from './SetRow';
 
-const ExerciseRow = ({ exercise, blockType, onChange, onRemove, index = 0 }) => {
+const ExerciseRow = ({
+    exercise,
+    blockType,
+    onChange,
+    onRemove,
+    index = 0,
+    blockIdx = 0,
+    isDropTarget = false,
+    onDragOverIndex,
+    onDropAt,
+}) => {
     const { t } = useLanguage();
     const exerciseType = exercise.exerciseType || 'weightBased';
     const isTimeBased = exerciseType === 'timeBased';
@@ -19,8 +29,30 @@ const ExerciseRow = ({ exercise, blockType, onChange, onRemove, index = 0 }) => 
     const removeSet = (sIdx) => onChange('sets', exercise.sets.filter((_, i) => i !== sIdx));
 
     return (
-        <div className="su-exercise-builder-card">
-            <div className="su-drag-handle-vertical" aria-hidden="true" />
+        <div
+            className={`su-exercise-builder-card${isDropTarget ? ' is-drop-target' : ''}`}
+            data-ex-drop={index}
+            onDragOver={(event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+                onDragOverIndex?.();
+            }}
+            onDrop={onDropAt}
+        >
+            <button
+                type="button"
+                className="su-drag-handle-vertical"
+                draggable
+                aria-label={t('pro.builder.ex.reorder')}
+                onDragStart={(event) => {
+                    event.dataTransfer.setData('text/plain', JSON.stringify({ blockIdx, exIdx: index }));
+                    event.dataTransfer.effectAllowed = 'move';
+                    event.currentTarget.closest('.su-exercise-builder-card')?.classList.add('is-dragging');
+                }}
+                onDragEnd={(event) => {
+                    event.currentTarget.closest('.su-exercise-builder-card')?.classList.remove('is-dragging');
+                }}
+            />
             <div className="su-exercise-content">
                 <div className="su-ex-header">
                     <span className="su-prescription-exercise-number">{String(index + 1).padStart(2, '0')}</span><div className="su-ex-title-row">
@@ -46,7 +78,13 @@ const ExerciseRow = ({ exercise, blockType, onChange, onRemove, index = 0 }) => 
                         >
                             {t('pro.builder.require_rpe')}
                         </button>
-                        <button className="su-icon-btn su-error-text" onClick={onRemove}>
+                        <button
+                            type="button"
+                            className="su-icon-btn su-error-text su-ex-remove"
+                            onClick={onRemove}
+                            aria-label={t('pro.builder.ex.remove')}
+                            title={t('pro.builder.ex.remove')}
+                        >
                             ×
                         </button>
                     </div>

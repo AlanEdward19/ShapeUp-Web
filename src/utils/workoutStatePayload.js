@@ -88,28 +88,52 @@ export const buildWorkoutStatePayload = ({ sessionId, exercises, unitSystem }) =
     };
 };
 
+const catalogItemId = (item) => Number(item?.exerciseId ?? item?.id);
+
+const catalogHasMuscles = (item) =>
+    (Array.isArray(item?.muscles) && item.muscles.length > 0)
+    || (Array.isArray(item?.muscleDetails) && item.muscleDetails.length > 0);
+
+const foldCatalogName = (value) => String(value || '')
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '');
+
+const catalogNameKeys = (item) =>
+    [item?.name, item?.nameEn, item?.namePt, item?.exerciseName, item?.exerciseNamePt]
+        .map(foldCatalogName)
+        .filter(Boolean);
+
 /**
  * Fill blank name/muscles from the exercise library so body-map SVG can paint.
  */
 export const enrichExercisesFromCatalog = (exercises, catalog = []) =>
     (exercises || []).map((ex) => {
-        const hasMuscles = Array.isArray(ex.muscles) && ex.muscles.length > 0;
-        const hasName = Boolean(ex.name && String(ex.name).trim());
-        if (hasMuscles && hasName) return ex;
-
-        const id = Number(ex.exerciseId ?? ex.id);
-        const match = Number.isFinite(id)
-            ? catalog.find((item) => Number(item.id) === id)
-            : null;
+        const id = catalogItemId(ex);
+        const byId = Number.isFinite(id)
+            ? catalog.filter((item) => catalogItemId(item) === id)
+            : [];
+        const names = catalogNameKeys(ex);
+        const byName = names.length
+            ? catalog.filter((item) => catalogNameKeys(item).some((name) => names.includes(name)))
+            : [];
+        const match = byId.find(catalogHasMuscles) || byName.find(catalogHasMuscles) || byId[0] || byName[0];
         if (!match) return ex;
 
-        const exerciseType = ex.exerciseType
-            ?? (match ? unmapExerciseType(match.exerciseType) : 'weightBased');
-
+        const hasName = Boolean(ex.name && String(ex.name).trim());
         return {
             ...ex,
             name: hasName ? ex.name : (match.name || match.namePt || ex.name || ''),
-            muscles: hasMuscles ? ex.muscles : (match.muscles || []),
-            exerciseType,
+            muscles: [
+                ...(Array.isArray(ex.muscles) ? ex.muscles : []),
+                ...(Array.isArray(match.muscles) ? match.muscles : []),
+            ],
+            muscleDetails: [
+                ...(Array.isArray(ex.muscleDetails) ? ex.muscleDetails : []),
+                ...(Array.isArray(match.muscleDetails) ? match.muscleDetails : []),
+            ],
+            muscleActivations: { ...match.muscleActivations, ...ex.muscleActivations },
+            exerciseType: ex.exerciseType ?? unmapExerciseType(match.exerciseType),
         };
     });

@@ -63,13 +63,6 @@ function wrapGroups(svg, map) {
 }
 
 function fileFor(name, svg, map, aria, extraMuscle = '') {
-    const silhouette = toJsxPaths(extract(svg, 'Stroke'));
-    let neck = '';
-    try {
-        neck = toJsxPaths(extract(svg, 'neck'));
-    } catch {
-        neck = '';
-    }
     return `import React from 'react';
 import { RegionGroup } from './AnatomyPrimitives';
 
@@ -81,14 +74,29 @@ export default function ${name}({ hits, maxHits, labels }) {
             role="img"
             aria-label={${aria}}
         >
-            <g className="silhouette">
-${silhouette}
-            </g>
             <g className="muscles">
-                ${neck ? `<g className="is-idle">
-${neck}
-                </g>` : ''}
 ${extraMuscle}
+${wrapGroups(svg, map)}
+            </g>
+        </svg>
+    );
+}
+`;
+}
+
+function fileForBack(svg, map) {
+    return `import React from 'react';
+import { RegionGroup } from './AnatomyPrimitives';
+
+export default function BodyMapBack({ hits, maxHits, labels }) {
+    return (
+        <svg
+            className="su-body-map-svg"
+            viewBox="205 40 380 960"
+            role="img"
+            aria-label={labels?.back || 'Back body map'}
+        >
+            <g className="muscles">
 ${wrapGroups(svg, map)}
             </g>
         </svg>
@@ -107,5 +115,5 @@ const extraFrontCalves = `                <RegionGroup id="Calves" hits={hits} m
                 </RegionGroup>`;
 
 fs.writeFileSync(new URL('BodyMapFront.jsx', outDir), fileFor('BodyMapFront', front, FRONT_MAP, "labels?.front || 'Front body map'", extraFrontCalves));
-fs.writeFileSync(new URL('BodyMapBack.jsx', outDir), fileFor('BodyMapBack', back, BACK_MAP, "labels?.back || 'Back body map'"));
+fs.writeFileSync(new URL('BodyMapBack.jsx', outDir), fileForBack(back, BACK_MAP));
 console.log('wrote BodyMapFront.jsx and BodyMapBack.jsx');

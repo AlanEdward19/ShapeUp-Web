@@ -131,7 +131,7 @@ function ExerciseRow({
 }
 
 export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState }): ReactElement {
-  const muscleOptions = ['all', ...new Set(state.exercises.flatMap((ex) => ex.muscles))];
+  const muscleOptions = ['all', ...new Set(state.exercises.flatMap((ex) => (ex.muscles || []).filter(Boolean)))];
   const equipmentOptions = ['all', ...new Set(state.exercises.map(state.equipmentName))];
 
   return (

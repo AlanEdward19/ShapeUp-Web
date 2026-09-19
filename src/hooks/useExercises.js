@@ -1,5 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useTrainingApi } from './api/useTrainingApi';
+import {
+    exerciseMatchesAnyMuscle,
+    getCatalogLanguage,
+    localizeExercise,
+    pageItems,
+    pickLocalized,
+} from '../utils/exerciseCatalog';
 
 /**
  * Custom hook for managing exercises: fetching, filtering and muscle selection.
@@ -7,59 +15,33 @@ import { useTrainingApi } from './api/useTrainingApi';
  */
 export const useExercises = () => {
     const { getExercises } = useTrainingApi();
+    const language = useLanguage()?.language || getCatalogLanguage();
 
-    const [exercises, setExercises] = useState([]);
-    const [availableMuscles, setAvailableMuscles] = useState([]);
+    const [rawExercises, setRawExercises] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
-    // Filtering states
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMuscles, setSelectedMuscles] = useState([]);
 
-    // Fetch exercises via useTrainingApi
     useEffect(() => {
         const fetchExercises = async () => {
             try {
                 const responseData = await getExercises();
-                const pages = [...(Array.isArray(responseData) ? responseData : responseData?.data || responseData?.exercises || responseData?.items || [])];
+                const pages = [...pageItems(responseData)];
                 let cursor = responseData?.nextCursor;
                 const seen = new Set();
                 while (cursor && !seen.has(cursor)) {
                     seen.add(cursor);
                     const page = await getExercises(cursor);
-                    pages.push(...(page.items || []));
+                    pages.push(...pageItems(page));
                     cursor = page.nextCursor;
                 }
-
-                const rawData = pages;
-
-                // Normalize results for the UI
-                const data = rawData.map(ex => ({
-                    ...ex,
-                    muscleDetails: ex.muscles,
-                    muscleActivations: Object.fromEntries((ex.muscles || []).filter(m => typeof m === 'object' && Number.isFinite(m.activationPercent)).map(m => [m.muscleNamePt || m.muscleName, m.activationPercent / 100])),
-                    name: ex.namePt || ex.name,
-                    muscles: Array.isArray(ex.muscles)
-                        ? ex.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName) : m)
-                        : []
-                }));
-
-                setExercises(data);
-
-                // Dynamically extract unique muscles
-                const muscleSet = new Set();
-                data.forEach(ex => {
-                    if (Array.isArray(ex.muscles)) {
-                        ex.muscles.forEach(m => muscleSet.add(m));
-                    }
-                });
-                setAvailableMuscles(Array.from(muscleSet).sort());
-            } catch (error) {
-                console.error("Falha ao buscar exercícios da API.", error);
+                setRawExercises(pages);
+            } catch (err) {
+                console.error('Falha ao buscar exercícios da API.', err);
                 setError(true);
-                setExercises([]);
-                setAvailableMuscles([]);
+                setRawExercises([]);
             } finally {
                 setLoading(false);
             }
@@ -68,18 +50,38 @@ export const useExercises = () => {
         fetchExercises();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Filter logic memoized to avoid unnecessary re-calculations
-    const filteredExercises = useMemo(() => {
-        return exercises.filter(ex => {
-            const matchesSearch = [ex.name, ...ex.muscles, ex.equipment, ...(ex.equipments || []).map(item => item.equipmentNamePt || item.equipmentName)].filter(Boolean).join(' ').toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesMuscle = selectedMuscles.length === 0 || selectedMuscles.some(m => ex.muscles.includes(m));
-            return matchesSearch && matchesMuscle;
+    const exercises = useMemo(
+        () => rawExercises.map((ex) => localizeExercise(ex, language)),
+        [rawExercises, language],
+    );
+
+    const availableMuscles = useMemo(() => {
+        const muscleSet = new Set();
+        exercises.forEach((ex) => {
+            (ex.muscles || []).filter(Boolean).forEach((m) => muscleSet.add(m));
         });
-    }, [exercises, searchTerm, selectedMuscles]);
+        return Array.from(muscleSet).sort((a, b) => a.localeCompare(b));
+    }, [exercises]);
+
+    const filteredExercises = useMemo(() => {
+        const query = searchTerm.toLowerCase();
+        return exercises.filter((ex) => {
+            const equipmentHaystack = [
+                ex.equipment,
+                ...(ex.equipments || []).map((item) => pickLocalized(language, item.equipmentName, item.equipmentNamePt)),
+            ];
+            const matchesSearch = [ex.name, ex.nameEn, ex.namePt, ...ex.muscles, ...equipmentHaystack]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase()
+                .includes(query);
+            return matchesSearch && exerciseMatchesAnyMuscle(ex, selectedMuscles);
+        });
+    }, [exercises, searchTerm, selectedMuscles, language]);
 
     const toggleMuscle = (muscle) => {
         if (selectedMuscles.includes(muscle)) {
-            setSelectedMuscles(selectedMuscles.filter(m => m !== muscle));
+            setSelectedMuscles(selectedMuscles.filter((m) => m !== muscle));
         } else {
             setSelectedMuscles([...selectedMuscles, muscle]);
         }
@@ -99,6 +101,6 @@ export const useExercises = () => {
         selectedMuscles,
         toggleMuscle,
         clearFilters,
-        availableMuscles
+        availableMuscles,
     };
 };

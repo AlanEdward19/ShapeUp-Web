@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import SuggestExerciseModal from '../../components/SuggestExerciseModal';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useExercises } from '../../hooks/useExercises';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { exerciseMatchesMuscleFilter, getCatalogLanguage, pickLocalized } from '../../utils/exerciseCatalog';
 import { mapExerciseEquivalents } from '../../utils/exerciseEquivalents';
 import { resolveEquivalentSelection } from './resolveEquivalentSelection';
 import DashboardShellHost from '../shell-assets/DashboardShellHost';
@@ -17,15 +19,18 @@ const normalize = (value: string) =>
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase();
 
-const equipmentName = (ex: ExerciseRecord) =>
-  ex.equipment ||
-  ex.equipments?.map((item) => item.equipmentNamePt || item.equipmentName).join(', ') ||
-  'Não informado';
-
 export default function ExercisesShell() {
+  const language = useLanguage()?.language || getCatalogLanguage();
   const { exercises: exerciseList, loading, error, searchTerm, setSearchTerm } = useExercises();
   const { getExerciseEquivalents, getExerciseById } = useTrainingApi();
   const exercises = exerciseList as ExerciseRecord[];
+  const equipmentName = useCallback(
+    (ex: ExerciseRecord) =>
+      ex.equipment ||
+      ex.equipments?.map((item) => pickLocalized(language, item.equipmentName, item.equipmentNamePt)).filter(Boolean).join(', ') ||
+      'Não informado',
+    [language],
+  );
   const [equivalentRecords, setEquivalentRecords] = useState<ExerciseRecord[]>([]);
   const inspectRequestRef = useRef(0);
   const [group, setGroup] = useState('all');
@@ -56,7 +61,7 @@ export default function ExercisesShell() {
       try {
         const payload = await getExerciseEquivalents(exerciseId);
         if (inspectRequestRef.current !== requestId) return;
-        const { equivalents, records } = mapExerciseEquivalents(payload);
+        const { equivalents, records } = mapExerciseEquivalents(payload, language);
         if (records.length) {
           setEquivalentRecords((prev) => {
             const byId = new Map(prev.map((item) => [String(item.id), item]));
@@ -74,7 +79,7 @@ export default function ExercisesShell() {
         );
       }
     },
-    [getExerciseEquivalents],
+    [getExerciseEquivalents, language],
   );
 
   const inspect = (ex: ExerciseRecord, event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) => {
@@ -95,7 +100,7 @@ export default function ExercisesShell() {
     const list = exercises.filter(
       (ex) =>
         normalize([ex.name, ...ex.muscles, equipmentName(ex)].join(' ')).includes(normalize(searchTerm)) &&
-        (group === 'all' || normalize(ex.muscles.join(' ')).includes(normalize(group))) &&
+        (group === 'all' || exerciseMatchesMuscleFilter(ex, group)) &&
         (equipment === 'all' || normalize(equipmentName(ex)).includes(normalize(equipment))),
     );
     list.sort((a, b) =>
@@ -104,7 +109,7 @@ export default function ExercisesShell() {
       ),
     );
     return list;
-  }, [exercises, searchTerm, group, equipment, sort]);
+  }, [exercises, searchTerm, group, equipment, sort, equipmentName]);
 
   const add = (ex: ExerciseRecord | null | undefined) => {
     if (ex) navigate('/dashboard/training', { state: { create: true, exercise: ex } });

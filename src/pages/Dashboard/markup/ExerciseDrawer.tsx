@@ -37,10 +37,10 @@ function ExerciseDrawerActivation({
   );
   const agonistDetail = details[0];
   const synergyDetails = details.slice(1);
-  const agonistName = agonistDetail?.muscleNamePt || agonistDetail?.muscleName || muscles[0] || '—';
+  const agonistName = muscles[0] || agonistDetail?.muscleName || agonistDetail?.muscleNamePt || '—';
   const synergistName =
-    synergyDetails.map((item) => item.muscleNamePt || item.muscleName).filter(Boolean).join(', ') ||
     muscles.slice(1).join(', ') ||
+    synergyDetails.map((item) => item.muscleName || item.muscleNamePt).filter(Boolean).join(', ') ||
     '—';
   const agonistPct = agonistDetail?.activationPercent;
   const synergyPct =

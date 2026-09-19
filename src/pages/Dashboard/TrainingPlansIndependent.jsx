@@ -19,7 +19,8 @@ import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { generateObjectId } from '../../utils/objectId';
-import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
+import { flattenBlockExercises, normalizePlan } from '../../utils/trainingNormalization';
+import { unmapSetType } from '../../utils/trainingEnums';
 import { buildWorkoutPlanBody, findTimeBasedDurationError } from '../../utils/workoutPlanPayload';
 import { buildWorkoutStatePayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { useExercises } from '../../hooks/useExercises';
@@ -792,7 +793,7 @@ const TrainingPlansIndependent = () => {
                                                     updated[exIdx].sets[sIdx].type = next;
                                                 });
                                             }} style={{ cursor: 'pointer' }}>
-                                                {t(`client.session.set_type.${s.type}`) !== `client.session.set_type.${s.type}` ? t(`client.session.set_type.${s.type}`) : (s.type.charAt(0).toUpperCase() + s.type.slice(1))}
+                                                {t(`client.session.set_type.${unmapSetType(s.type)}`)}
                                             </span>
                                         </div>
                                         <div className="col-target">
@@ -1045,6 +1046,7 @@ const TrainingPlansIndependent = () => {
                     session={showSessionDetail}
                     planName={showSessionDetail.planName}
                     planExercises={flattenBlockExercises(plans.find(p => p.name === showSessionDetail.planName)?.blocks)}
+                    catalog={exercisesDB}
                     onClose={() => setShowSessionDetail(null)}
                 />
             )}

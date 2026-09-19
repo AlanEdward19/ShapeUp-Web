@@ -19,15 +19,21 @@ export function RegionGroup({ id, ids, hits, maxHits, label, children }) {
     const regionIds = ids?.length ? ids : [id];
     const n = Math.max(0, ...regionIds.map(regionId => hits[regionId] || 0));
     const active = n > 0;
+    const fill = active ? 'var(--map-hit, #e06c43)' : 'var(--map-idle, #9a8b82)';
     const intensity = maxHits > 0 ? n / maxHits : 0;
     return (
         <g
             data-region={regionIds.join(' ')}
             className={active ? 'is-hit' : undefined}
-            style={active ? { ['--hit']: String(intensity) } : undefined}
+            fill={fill}
+            style={{ fill, ...(active ? { ['--hit']: String(intensity) } : {}) }}
         >
             {label ? <title>{label}</title> : null}
-            {children}
+            {React.Children.map(children, (child) => (
+                React.isValidElement(child) && child.type === 'path'
+                    ? React.cloneElement(child, { fill, style: { fill } })
+                    : child
+            ))}
         </g>
     );
 }

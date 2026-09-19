@@ -1,10 +1,10 @@
 /** Leaf regions painted on the body maps — matches MuscleGroup flags (not composites). */
 export const LEAF_MUSCLES = [
-    'UpperChest',
     'MiddleChest',
+    'UpperChest',
     'LowerChest',
-    'Biceps',
     'Triceps',
+    'Biceps',
     'Forearms',
     'DeltoidAnterior',
     'DeltoidLateral',
@@ -56,6 +56,12 @@ const ALIAS_TO_LEAVES = {
     chest: CHEST,
     peito: CHEST,
     pecho: CHEST,
+    peitoral: CHEST,
+    peitorais: CHEST,
+    peitoralmaior: CHEST,
+    peitoralmenor: ['UpperChest'],
+    pectoral: CHEST,
+    pectorales: CHEST,
 
     biceps: ['Biceps'],
     bicep: ['Biceps'],
@@ -135,6 +141,9 @@ const ALIAS_TO_LEAVES = {
     latissimus: ['Lats'],
     latissimusdorsi: ['Lats'],
     latissimo: ['Lats'],
+    latissimododorso: ['Lats'],
+    grandedorsal: ['Lats'],
+    dorsallargo: ['Lats'],
     dorsal: ['Lats'],
     dorsales: ['Lats'],
     dorsais: ['Lats'],
@@ -210,6 +219,46 @@ const ALIAS_TO_LEAVES = {
     cuerpocompleto: [...CHEST, ...ARMS, ...SHOULDERS, ...BACK, ...ABS, ...LEGS],
 };
 
+const LEAF_PT = {
+    UpperChest: 'Peito superior',
+    MiddleChest: 'Peito médio',
+    LowerChest: 'Peito inferior',
+    Biceps: 'Bíceps',
+    Triceps: 'Tríceps',
+    Forearms: 'Antebraços',
+    DeltoidAnterior: 'Deltóide anterior',
+    DeltoidLateral: 'Deltóide lateral',
+    DeltoidPosterior: 'Deltóide posterior',
+    Traps: 'Trapézio',
+    UpperBack: 'Costas superior',
+    MiddleBack: 'Costas média',
+    LowerBack: 'Costas inferior',
+    Lats: 'Latíssimo',
+    AbsUpper: 'Abdômen superior',
+    AbsLower: 'Abdômen inferior',
+    AbsObliques: 'Oblíquos',
+    Quadriceps: 'Quadríceps',
+    Hamstrings: 'Isquiotibiais',
+    Glutes: 'Glúteos',
+    Calves: 'Panturrilhas',
+    HipFlexors: 'Flexores de quadril',
+};
+
+export function leafDisplayName(id, language = 'en') {
+    if (language === 'pt-BR') return LEAF_PT[id] || id;
+    return String(id || '').replace(/([a-z])([A-Z])/g, '$1 $2');
+}
+
+/** API MuscleGroup is a [Flags] int aligned with LEAF_MUSCLES bit order. */
+export function leavesFromMuscleGroup(value) {
+    if (value == null || value === '') return [];
+    const raw = String(value).trim();
+    if (!/^-?\d+$/.test(raw)) return leavesForFolded(foldToken(raw));
+    const n = Number(raw);
+    if (!Number.isFinite(n) || n === 0) return [];
+    return LEAF_MUSCLES.filter((_, i) => n & (1 << i));
+}
+
 function foldToken(value) {
     return String(value || '')
         .normalize('NFD')
@@ -218,21 +267,51 @@ function foldToken(value) {
         .replace(/[^a-z0-9]+/g, '');
 }
 
-export function resolveMuscleToken(token) {
-    const key = foldToken(token);
+function leavesForFolded(key) {
     if (!key) return [];
-    if (LEAF_MUSCLES.includes(token)) return [token];
     if (ALIAS_TO_LEAVES[key]) return ALIAS_TO_LEAVES[key];
     const pascal = LEAF_MUSCLES.find(id => foldToken(id) === key);
     return pascal ? [pascal] : [];
+}
+
+export function resolveMuscleToken(token) {
+    if (LEAF_MUSCLES.includes(token)) return [token];
+    const raw = String(token ?? '');
+    const key = foldToken(raw);
+    if (!key) return [];
+
+    const direct = leavesForFolded(key);
+    if (direct.length) return direct;
+
+    const ids = new Set();
+    raw.split(/[\s/_-]+/).forEach((part) => {
+        leavesForFolded(foldToken(part)).forEach(id => ids.add(id));
+    });
+    if (ids.size) return [...ids];
+
+    const contained = Object.keys(ALIAS_TO_LEAVES)
+        .filter(alias => alias.length >= 4 && key.includes(alias))
+        .sort((a, b) => b.length - a.length)[0];
+    if (contained) return ALIAS_TO_LEAVES[contained];
+
+    if (/^-?\d+$/.test(key)) return leavesFromMuscleGroup(key);
+    return [];
 }
 
 function tokensFromExercise(ex) {
     const raw = [];
     const push = (item) => {
         if (item == null || item === '') return;
+        if (Array.isArray(item) || Array.isArray(item?.$values)) {
+            (Array.isArray(item) ? item : item.$values).forEach(push);
+            return;
+        }
         if (typeof item === 'object') {
-            raw.push(item.muscleName, item.muscleNamePt, item.name, item.namePt, item.muscleGroup);
+            push(item.muscleGroup ?? item.MuscleGroup);
+            push(item.muscleName ?? item.MuscleName);
+            push(item.muscleNamePt ?? item.MuscleNamePt);
+            push(item.name ?? item.Name);
+            push(item.namePt ?? item.NamePt);
             return;
         }
         String(item)
@@ -240,11 +319,19 @@ function tokensFromExercise(ex) {
             .forEach(part => raw.push(part.trim()));
     };
 
-    if (Array.isArray(ex?.muscles)) ex.muscles.forEach(push);
-    else push(ex?.muscles);
-    if (Array.isArray(ex?.muscleGroups)) ex.muscleGroups.forEach(push);
+    push(ex?.muscles);
+    push(ex?.Muscles);
+    push(ex?.muscleDetails);
+    push(ex?.muscleGroups);
+    push(ex?.muscleGroup);
+    push(ex?.exercise?.muscles);
     push(ex?.tags);
     push(ex?.target);
+    if (ex?.muscleActivations && typeof ex.muscleActivations === 'object' && !Array.isArray(ex.muscleActivations)) {
+        Object.keys(ex.muscleActivations).forEach((key) => {
+            if (key !== '$id' && key !== '$values') raw.push(key);
+        });
+    }
     return raw.filter(Boolean);
 }
 

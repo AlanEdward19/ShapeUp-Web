@@ -1,5 +1,6 @@
 import { readAllPages } from '../../utils/readAllPages';
-import { workoutHistory } from '../../utils/workoutHistory';
+import { executedExercisesForMap, workoutHistory } from '../../utils/workoutHistory';
+import { unmapSetType } from '../../utils/trainingEnums';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useTour } from '@reactour/tour';
@@ -1087,6 +1088,7 @@ const ClientView = () => {
                         session={selectedSession}
                         planName={selectedSession.planName}
                         planExercises={flattenBlockExercises(assignedPlans.find(p => p.name === selectedSession.planName)?.blocks)}
+                        catalog={exercisesDB}
                         onClose={() => {
                             setShowSessionModal(false);
                             setSelectedSession(null);
@@ -1385,8 +1387,8 @@ const ClientView = () => {
                                                 <option value="dropset">{t('client.session.set_type.dropset')}</option>
                                             </select>
                                         ) : (
-                                            <span className={`su-set-badge ${set.type}`}>
-                                                {t(`client.session.set_type.${set.type}`) !== `client.session.set_type.${set.type}` ? t(`client.session.set_type.${set.type}`) : (set.type.charAt(0).toUpperCase() + set.type.slice(1))}
+                                            <span className={`su-set-badge ${unmapSetType(set.type)}`}>
+                                                {t(`client.session.set_type.${unmapSetType(set.type)}`)}
                                             </span>
                                         )}
                                     </div>
@@ -1494,15 +1496,18 @@ const ClientView = () => {
 
 const SetTypeBadge = ({ type }) => {
     const { t } = useLanguage();
+    const kind = unmapSetType(type);
     return (
-        <span className={`su-set-type-chip ${type}`}>
-            {t(`client.session.set_type.${type}`) || type}
+        <span className={`su-set-type-chip ${kind}`}>
+            {t(`client.session.set_type.${kind}`) || kind}
         </span>
     );
 };
 
-export const SessionDetailModal = ({ session, planName, onClose, planExercises = [] }) => {
+export const SessionDetailModal = ({ session, planName, onClose, planExercises = [], catalog: catalogProp = [] }) => {
     const { t, unitSystem, convertWeight } = useLanguage();
+    const { exercises: fetchedCatalog = [] } = useExercises();
+    const catalog = catalogProp.length ? catalogProp : fetchedCatalog;
 
     // We infer the original scale from the session's totalVol
     const originUnit = (session.totalVol || '').includes('lbs') ? 'imperial' : 'metric';
@@ -1511,11 +1516,7 @@ export const SessionDetailModal = ({ session, planName, onClose, planExercises =
         const match = planExercises.find((p) => p.name === ex.name || p.exerciseId === ex.exerciseId);
         return match?.exerciseType || 'weightBased';
     };
-    const mapExercises = (session.exercises || []).map(ex => {
-        if ((ex.muscles && ex.muscles.length) || ex.target) return ex;
-        const match = planExercises.find(p => p.name === ex.name);
-        return match ? { ...ex, muscles: match.muscles || [] } : ex;
-    });
+    const mapExercises = executedExercisesForMap(session);
 
     return (
         <div className="su-modal-overlay" onClick={onClose} style={{ zIndex: 10000 }}>
@@ -1525,7 +1526,7 @@ export const SessionDetailModal = ({ session, planName, onClose, planExercises =
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: '0 0 1.5rem' }}>
                     {session.date} · {session.duration} · {session.convertedVol || session.totalVol} {t('client.training.history.vol')} · RPE {session.rpe}
                 </p>
-                <WorkoutBodyMap exercises={mapExercises} compact />
+                <WorkoutBodyMap exercises={mapExercises} catalog={[...catalog, ...planExercises]} compact />
                 <div className="su-sd-exercises" style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
                     {session.exercises.map((ex, i) => {
                         const isTimeBased = resolveExerciseType(ex) === 'timeBased';

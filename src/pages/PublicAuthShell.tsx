@@ -31,6 +31,11 @@ function landingBodyClick(event: MouseEvent<HTMLDivElement>, navigate: (path: st
     navigate(/assinatura/i.test(text) ? '/register?role=independent' : '/register?role=professional');
     return;
   }
+  if (href === '#login' || href === '/login') {
+    event.preventDefault();
+    navigate('/login');
+    return;
+  }
   if (/consultor/i.test(text)) {
     event.preventDefault();
     navigate('/register?role=gym');
@@ -58,7 +63,7 @@ function landingBodyClick(event: MouseEvent<HTMLDivElement>, navigate: (path: st
     navigate('/terms');
     return;
   }
-  if (/entrar|login|área do cliente|voltar ao acesso/.test(lower)) {
+  if (/entrar|sign in|iniciar sesi[oó]n|área do cliente|voltar ao acesso/.test(lower)) {
     event.preventDefault();
     navigate('/login');
   }

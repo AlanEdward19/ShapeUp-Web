@@ -1,15 +1,17 @@
+import { useState } from 'react';
 import Input from '../Input';
 import Button from '../Button';
 import { useLanguage } from '../../contexts/LanguageContext';
 import ExerciseRow from './ExerciseRow';
 import { BLOCK_TYPES } from '../../utils/trainingEnums';
+import { parseExerciseDragPayload } from '../../utils/trainingNormalization';
 
-// Superset needs 2+ exercises to mean anything -- block the switch instead of silently
-// creating an invalid block the backend would reject on save.
 const canSwitchTo = (type, exerciseCount) => type !== 'superset' || exerciseCount >= 2;
 
-const BlockCard = ({ block, onChange, onRemove, onAddExercise }) => {
+const BlockCard = ({ block, blockIdx = 0, onChange, onRemove, onAddExercise, onMoveExercise }) => {
     const { t } = useLanguage();
+    const [confirmDissolve, setConfirmDissolve] = useState(false);
+    const [dropAt, setDropAt] = useState(null);
 
     const updateExercise = (exIdx, field, value) => {
         const exercises = [...block.exercises];
@@ -17,7 +19,18 @@ const BlockCard = ({ block, onChange, onRemove, onAddExercise }) => {
         onChange('exercises', exercises);
     };
 
-    const removeExercise = (exIdx) => onChange('exercises', block.exercises.filter((_, i) => i !== exIdx));
+    const removeExercise = (exIdx) => {
+        if (block.exercises.length <= 1) {
+            setConfirmDissolve(true);
+            return;
+        }
+        onChange('exercises', block.exercises.filter((_, i) => i !== exIdx));
+    };
+
+    const confirmRemoveLast = () => {
+        setConfirmDissolve(false);
+        onRemove();
+    };
 
     const handleTypeChange = (e) => {
         const nextType = e.target.value;
@@ -26,6 +39,15 @@ const BlockCard = ({ block, onChange, onRemove, onAddExercise }) => {
             return;
         }
         onChange('type', nextType);
+    };
+
+    const acceptDrop = (event, toEx) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setDropAt(null);
+        const from = parseExerciseDragPayload(event.dataTransfer.getData('text/plain'));
+        if (!from || !onMoveExercise) return;
+        onMoveExercise(from.blockIdx, from.exIdx, toEx);
     };
 
     return (
@@ -70,20 +92,38 @@ const BlockCard = ({ block, onChange, onRemove, onAddExercise }) => {
                     </div>
                 )}
 
-                <button className="su-icon-btn su-error-text" onClick={onRemove} title={t('pro.builder.block.remove')}>
+                <button type="button" className="su-icon-btn su-error-text" onClick={onRemove} title={t('pro.builder.block.remove')}>
                     ×
                 </button>
             </div>
 
-            <div className="su-block-exercises">
+            <div
+                className={`su-block-exercises${dropAt === block.exercises.length ? ' is-drop-target' : ''}`}
+                onDragOver={(event) => {
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = 'move';
+                    if (!event.target.closest('[data-ex-drop]')) setDropAt(block.exercises.length);
+                }}
+                onDragLeave={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget)) setDropAt(null);
+                }}
+                onDrop={(event) => {
+                    if (event.target.closest('[data-ex-drop]')) return;
+                    acceptDrop(event, block.exercises.length);
+                }}
+            >
                 {block.exercises.map((ex, exIdx) => (
                     <ExerciseRow
                         key={ex.id ?? exIdx}
                         exercise={ex}
                         index={exIdx}
+                        blockIdx={blockIdx}
                         blockType={block.type}
+                        isDropTarget={dropAt === exIdx}
                         onChange={(field, value) => updateExercise(exIdx, field, value)}
                         onRemove={() => removeExercise(exIdx)}
+                        onDragOverIndex={() => setDropAt(exIdx)}
+                        onDropAt={(event) => acceptDrop(event, exIdx)}
                     />
                 ))}
             </div>
@@ -91,6 +131,23 @@ const BlockCard = ({ block, onChange, onRemove, onAddExercise }) => {
             <Button variant="outline" className="su-mt-2" onClick={onAddExercise}>
                 {t('pro.builder.block.add_exercise')}
             </Button>
+
+            {confirmDissolve && (
+                <div className="su-modal-overlay" onClick={() => setConfirmDissolve(false)}>
+                    <div className="su-modal-box su-confirm-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="su-block-dissolve-title">
+                        <h3 id="su-block-dissolve-title" className="su-confirm-title">{t('pro.builder.block.remove_last.title')}</h3>
+                        <p className="su-confirm-body">{t('pro.builder.block.remove_last.body')}</p>
+                        <div className="su-confirm-actions">
+                            <Button variant="outline" onClick={() => setConfirmDissolve(false)}>
+                                {t('pro.builder.btn.cancel')}
+                            </Button>
+                            <Button onClick={confirmRemoveLast}>
+                                {t('pro.builder.block.remove_last.confirm')}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

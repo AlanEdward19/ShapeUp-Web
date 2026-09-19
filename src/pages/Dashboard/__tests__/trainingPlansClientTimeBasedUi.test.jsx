@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { withLang } from '../../../test/withLang';
+
+vi.mock('../../../hooks/useExercises', () => ({
+    useExercises: () => ({ exercises: [] }),
+}));
 import {
     ExecutionLogHeaderCells,
     ExecutionLogInputCells,
@@ -121,5 +125,45 @@ describe('SessionDetailModal summary columns (TBE-05)', () => {
         expect(screen.getByText('Reps')).toBeInTheDocument();
         expect(screen.getByText('Weight')).toBeInTheDocument();
         expect(screen.getByText('8 reps')).toBeInTheDocument();
+    });
+
+    it('lights the map from executed exercises only and shows Working for API set type 3', () => {
+        localStorage.setItem('shapeup_language', 'en');
+        const { container } = render(withLang(
+            <SessionDetailModal
+                planName="Plan C"
+                onClose={vi.fn()}
+                planExercises={[
+                    { exerciseId: 1, name: 'Bench', muscles: [] },
+                    { exerciseId: 9, name: 'Lat Pulldown', muscles: [] },
+                ]}
+                catalog={[
+                    { id: 1, name: 'Bench Press', muscles: ['Chest'] },
+                    { id: 9, name: 'Lat Pulldown', muscles: ['Lats'] },
+                ]}
+                session={{
+                    date: '2026-01-01',
+                    duration: '30:00',
+                    totalVol: '1000 kg',
+                    rpe: 8,
+                    exercises: [
+                        {
+                            name: 'Lat Pulldown',
+                            skipped: true,
+                            sets: [],
+                        },
+                        {
+                            name: 'Bench',
+                            exerciseId: 1,
+                            exerciseType: 'weightBased',
+                            sets: [{ set: 1, type: 3, reps: 8, weight: 100, rpe: 8 }],
+                        },
+                    ],
+                }}
+            />,
+        ));
+        expect(screen.getByText('Working')).toBeInTheDocument();
+        expect(container.querySelector('[data-region="MiddleChest"]')?.classList.contains('is-hit')).toBe(true);
+        expect(container.querySelector('[data-region="Lats"]')?.classList.contains('is-hit')).toBe(false);
     });
 });

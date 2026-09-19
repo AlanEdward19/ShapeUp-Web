@@ -1,15 +1,19 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { collectMuscleHits, LEAF_MUSCLES, maxHitCount } from './muscleRegions';
 import BodyMapFront from './BodyMapFront';
 import BodyMapBack from './BodyMapBack';
 import './WorkoutBodyMap.css';
 
-export default function WorkoutBodyMap({ exercises = [], compact = false }) {
+export default function WorkoutBodyMap({ exercises = [], compact = false, catalog = [] }) {
     const { t } = useLanguage();
-    const [view, setView] = useState('front');
 
-    const hits = useMemo(() => collectMuscleHits(exercises), [exercises]);
+    const resolved = useMemo(
+        () => (catalog.length ? enrichExercisesFromCatalog(exercises, catalog) : exercises),
+        [exercises, catalog],
+    );
+    const hits = useMemo(() => collectMuscleHits(resolved), [resolved]);
     const maxHits = maxHitCount(hits);
     const hitCount = Object.keys(hits).length;
 
@@ -24,31 +28,20 @@ export default function WorkoutBodyMap({ exercises = [], compact = false }) {
         return map;
     }, [t]);
 
-    const Map = view === 'back' ? BodyMapBack : BodyMapFront;
-
     return (
         <section className={`su-body-map ${compact ? 'is-compact' : ''}`} aria-label={t('anatomy.map.title')}>
             <header className="su-body-map-head">
                 <h4 className="su-body-map-title">{t('anatomy.map.title')}</h4>
-                <div className="su-body-map-toggle" role="group" aria-label={t('anatomy.map.title')}>
-                    <button
-                        type="button"
-                        className={view === 'front' ? 'is-active' : ''}
-                        onClick={() => setView('front')}
-                    >
-                        {t('anatomy.map.front')}
-                    </button>
-                    <button
-                        type="button"
-                        className={view === 'back' ? 'is-active' : ''}
-                        onClick={() => setView('back')}
-                    >
-                        {t('anatomy.map.back')}
-                    </button>
-                </div>
             </header>
             <div className="su-body-map-figure">
-                <Map hits={hits} maxHits={maxHits} labels={labels} />
+                <div className="su-body-map-pane">
+                    <span className="su-body-map-pane-label">{t('anatomy.map.front')}</span>
+                    <BodyMapFront hits={hits} maxHits={maxHits} labels={labels} />
+                </div>
+                <div className="su-body-map-pane">
+                    <span className="su-body-map-pane-label">{t('anatomy.map.back')}</span>
+                    <BodyMapBack hits={hits} maxHits={maxHits} labels={labels} />
+                </div>
             </div>
             <p className="su-body-map-hint">
                 {hitCount === 0 ? t('anatomy.map.empty') : t('anatomy.map.hint').replace('{n}', String(hitCount))}

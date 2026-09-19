@@ -13,6 +13,8 @@ describe('resolveMuscleToken', () => {
 
     it('expands composite groups into leaf muscles', () => {
         expect(resolveMuscleToken('Chest')).toEqual(['UpperChest', 'MiddleChest', 'LowerChest']);
+        expect(resolveMuscleToken('Peitoral')).toEqual(['UpperChest', 'MiddleChest', 'LowerChest']);
+        expect(resolveMuscleToken('Peitoral maior')).toEqual(['UpperChest', 'MiddleChest', 'LowerChest']);
         expect(resolveMuscleToken('Shoulders')).toEqual(['DeltoidAnterior', 'DeltoidLateral', 'DeltoidPosterior']);
     });
 
@@ -36,5 +38,42 @@ describe('collectMuscleHits', () => {
         expect(hits.DeltoidAnterior).toBe(1);
         expect(hits.Hamstrings).toBe(1);
         expect(hits.Glutes).toBe(1);
+    });
+
+    it('reads muscleDetails and compound PT names like Peitoral maior', () => {
+        const hits = collectMuscleHits([
+            { muscles: ['Peitoral maior'] },
+            { muscleDetails: [{ muscleNamePt: 'Peitoral', muscleName: 'Chest' }] },
+        ]);
+        expect(hits.UpperChest).toBe(2);
+        expect(hits.MiddleChest).toBe(2);
+        expect(hits.LowerChest).toBe(2);
+    });
+
+    it('decodes numeric muscleGroup flags onto leaf regions', () => {
+        const hits = collectMuscleHits([
+            { muscleDetails: [{ muscleGroup: 1 }] },
+        ]);
+        expect(hits.MiddleChest).toBe(1);
+    });
+
+    it('reads muscleActivations keys and leftover object fields', () => {
+        const hits = collectMuscleHits([
+            { muscles: [], muscleActivations: { Chest: 1, Triceps: 0.4 } },
+            { muscles: [{ grupo: 'Peitoral', muscleName: 'Chest' }] },
+        ]);
+        expect(hits.MiddleChest).toBe(2);
+        expect(hits.Triceps).toBe(1);
+    });
+
+    it('does not infer muscles from the exercise name', () => {
+        expect(collectMuscleHits([{ name: 'Lat Pulldown', muscles: [] }])).toEqual({});
+    });
+
+    it('lights lats from API muscleGroup flags', () => {
+        const hits = collectMuscleHits([
+            { name: 'Lat Pulldown', muscles: [{ muscleGroup: 1 << 13, activationPercent: 80 }] },
+        ]);
+        expect(hits.Lats).toBe(1);
     });
 });

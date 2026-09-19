@@ -1,11 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useTour } from '@reactour/tour';
 import { useTourAnchor } from './tourAnchorContext';
-import { startWorkspaceTour, type WorkspaceTourStepDef } from './workspaceTour';
+import { findWorkspaceTarget, startWorkspaceTour, type WorkspaceTourStepDef } from './workspaceTour';
 
 export function useWorkspaceDashboardTour(storageKey: string, stepDefs: WorkspaceTourStepDef[]) {
   const { setIsOpen, setSteps, setCurrentStep, currentStep, isOpen } = useTour();
-  const { setAnchorTarget } = useTourAnchor();
+  const { setAnchors } = useTourAnchor();
   const activeSteps = useRef<WorkspaceTourStepDef[]>([]);
 
   useEffect(() => {
@@ -14,7 +14,7 @@ export function useWorkspaceDashboardTour(storageKey: string, stepDefs: Workspac
       setSteps,
       setCurrentStep,
       setIsOpen,
-      setAnchorTarget,
+      setAnchors,
       steps: stepDefs,
       storageKey,
     }).then(resolved => {
@@ -23,11 +23,17 @@ export function useWorkspaceDashboardTour(storageKey: string, stepDefs: Workspac
     return () => {
       cancelled = true;
     };
-  }, [storageKey, stepDefs, setAnchorTarget, setIsOpen, setCurrentStep, setSteps]);
+  }, [storageKey, stepDefs, setAnchors, setIsOpen, setCurrentStep, setSteps]);
 
   useEffect(() => {
+    if (!isOpen) return undefined;
+    return () => setAnchors([]);
+  }, [isOpen, setAnchors]);
+
+  useLayoutEffect(() => {
     if (!isOpen) return;
     const step = activeSteps.current[currentStep];
-    if (step) setAnchorTarget(step.targetSelector);
-  }, [currentStep, isOpen, setAnchorTarget]);
+    const el = step && findWorkspaceTarget(step.targetSelector);
+    el?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [currentStep, isOpen]);
 }

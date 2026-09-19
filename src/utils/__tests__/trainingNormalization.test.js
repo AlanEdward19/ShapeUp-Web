@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyRequireRpeToAll, normalizeBlock, normalizePlan, normalizeSet, normalizeTemplate } from '../trainingNormalization';
+import { applyRequireRpeToAll, moveBlockExercise, normalizeBlock, normalizePlan, normalizeSet, normalizeTemplate } from '../trainingNormalization';
 
 describe('normalizeSet duration and distance (TBE-02, TBE-05)', () => {
     it('maps API durationSeconds and distanceMeters to editor strings', () => {
@@ -30,6 +30,22 @@ describe('normalizeBlockExercise exerciseType (TBE-02)', () => {
             exercises: [{ exerciseId: 2, exerciseType: 2, name: 'Run', sets: [] }],
         }, 0);
         expect(block.exercises[0].exerciseType).toBe('timeBased');
+    });
+
+    it('prefers English catalog names when UI language is en', () => {
+        localStorage.setItem('shapeup_language', 'en');
+        const block = normalizeBlock({
+            type: 1,
+            exercises: [{
+                exerciseId: 3,
+                name: 'Bench Press',
+                namePt: 'Supino reto',
+                muscles: [{ muscleName: 'Chest', muscleNamePt: 'Peitoral' }],
+                sets: [],
+            }],
+        }, 0);
+        expect(block.exercises[0].name).toBe('Bench Press');
+        expect(block.exercises[0].muscles).toEqual(['Chest']);
     });
 });
 
@@ -103,5 +119,40 @@ describe('applyRequireRpeToAll (WEV-06)', () => {
         expect(blocks[0].exercises[0].requireRpe).toBe(false);
         expect(next[0].exercises[0].exerciseId).toBe(1);
         expect(next[1].exercises[0].exerciseId).toBe(3);
+    });
+});
+
+describe('moveBlockExercise', () => {
+    const blocks = [
+        { id: 'b1', type: 'straight', exercises: [{ id: 'a' }, { id: 'b' }, { id: 'c' }] },
+        { id: 'b2', type: 'straight', exercises: [{ id: 'd' }] },
+    ];
+
+    it('reorders inside the same block', () => {
+        const next = moveBlockExercise(blocks, 0, 0, 0, 2);
+        expect(next[0].exercises.map((ex) => ex.id)).toEqual(['b', 'a', 'c']);
+        expect(blocks[0].exercises[0].id).toBe('a');
+    });
+
+    it('moves an exercise onto another block and dissolves an emptied source', () => {
+        const next = moveBlockExercise(blocks, 1, 0, 0, 0);
+        expect(next).toHaveLength(1);
+        expect(next[0].exercises.map((ex) => ex.id)).toEqual(['d', 'a', 'b', 'c']);
+    });
+
+    it('downgrades a 1-exercise leftover superset to straight', () => {
+        const next = moveBlockExercise(
+            [
+                { id: 'b1', type: 'superset', exercises: [{ id: 'a' }, { id: 'b' }] },
+                { id: 'b2', type: 'straight', exercises: [{ id: 'c' }] },
+            ],
+            0,
+            0,
+            1,
+            1,
+        );
+        expect(next[0].type).toBe('straight');
+        expect(next[0].exercises.map((ex) => ex.id)).toEqual(['b']);
+        expect(next[1].exercises.map((ex) => ex.id)).toEqual(['c', 'a']);
     });
 });

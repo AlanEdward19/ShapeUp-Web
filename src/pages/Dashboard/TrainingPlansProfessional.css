@@ -95,6 +95,21 @@
     overflow: visible;
     box-shadow: none;
     padding-top: 1rem;
+    transition: opacity 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.su-exercise-builder-card.is-dragging {
+    opacity: 0.4;
+}
+
+.su-exercise-builder-card.is-drop-target {
+    border-top-color: var(--primary);
+    box-shadow: inset 0 2px 0 var(--primary);
+}
+
+.su-block-exercises.is-drop-target {
+    box-shadow: inset 0 -2px 0 var(--primary);
+    min-height: 2.5rem;
 }
 
 .su-exercise-builder-card:focus-within {
@@ -110,6 +125,9 @@
     cursor: grab;
     font-family: var(--font-display);
     letter-spacing: 0.12em;
+    background: none;
+    border: 0;
+    user-select: none;
 }
 
 .su-drag-handle-vertical::before {
@@ -133,6 +151,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .su-ex-title-row {
@@ -190,7 +210,23 @@
 .su-ex-toggles {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 0.75rem;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.su-ex-toggles .su-toggle-btn {
+    padding: 0.4rem 0.7rem;
+}
+
+.su-ex-remove {
+    font-size: 1.35rem;
+    line-height: 1;
+    min-width: 2rem;
+    min-height: 2rem;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
 }
 
 .su-checkbox {

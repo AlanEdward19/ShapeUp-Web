@@ -66,18 +66,20 @@ describe('ExerciseRow requireRpe toggle (WEV-05)', () => {
 
     it('renders on when exercise.requireRpe is true and click sends false', () => {
         const onChange = vi.fn();
+        const onRemove = vi.fn();
         localStorage.setItem('shapeup_language', 'en');
         render(withLang(
             <ExerciseRow
                 exercise={{ ...baseExercise, requireRpe: true }}
                 blockType="straight"
                 onChange={onChange}
-                onRemove={() => {}}
+                onRemove={onRemove}
             />
         ));
         const toggle = screen.getByRole('button', { name: 'Required RPE' });
         expect(toggle).toHaveAttribute('aria-pressed', 'true');
         fireEvent.click(toggle);
         expect(onChange).toHaveBeenCalledWith('requireRpe', false);
+        expect(onRemove).not.toHaveBeenCalled();
     });
 });

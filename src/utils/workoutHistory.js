@@ -1,8 +1,15 @@
+import { unmapSetType } from './trainingEnums';
+
+export function executedExercisesForMap(session) {
+    return (session?.exercises || []).filter((ex) => !ex.skipped && (ex.sets || []).length > 0);
+}
+
 export function workoutHistory(session) {
  const exercises = (session.exercises || []).map(ex => ({
   ...ex, id: ex.exerciseId, name: ex.exerciseName, skipped: !(ex.sets || []).length,
   sets: (ex.sets || []).map(set => ({
    ...set,
+   type: unmapSetType(set.setType ?? set.type),
    reps: set.repetitions,
    weight: set.load,
    duration: set.durationSeconds,

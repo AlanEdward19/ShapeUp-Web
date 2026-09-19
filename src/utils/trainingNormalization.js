@@ -1,6 +1,7 @@
 import { unmapSetType, unmapTechnique, unmapDifficulty, unmapBlockType, unmapIntensityType, unmapExerciseType } from './trainingEnums';
 import { formatDurationSeconds } from './durationDistance';
 import { unmapAssignedWeekdays } from './workoutSchedule';
+import { getCatalogLanguage, localizeExercise } from './exerciseCatalog';
 
 /**
  * Normalizes a single set from API shape to internal PlanEditor shape.
@@ -30,18 +31,23 @@ export const normalizeSet = (s, idx) => ({
     isExtra: s.isExtra ?? false,
 });
 
-const normalizeBlockExercise = (ex, idx) => ({
-    ...ex,
-    id: ex.exerciseId ?? ex.id ?? `ex_${idx}`,
-    exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
-    name: ex.namePt ?? ex.exerciseNamePt ?? ex.name ?? ex.exerciseName ?? ex.exercise?.namePt ?? ex.exercise?.translatedName ?? ex.exercise?.name ?? '',
-    muscles: Array.isArray(ex.muscles)
-        ? ex.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName || m.namePt || m.name) : m)
-        : (ex.exercise?.muscles ? ex.exercise.muscles.map(m => typeof m === 'object' ? (m.muscleNamePt || m.muscleName) : m) : []),
-    sets: (ex.sets ?? []).map((s, sIdx) => normalizeSet(s, sIdx)),
-    requireRpe: Boolean(ex.requireRpe),
-    exerciseType: unmapExerciseType(ex.exerciseType ?? 1),
-});
+const normalizeBlockExercise = (ex, idx) => {
+    const localized = localizeExercise({
+        ...ex,
+        name: ex.name ?? ex.exerciseName ?? ex.exercise?.name,
+        namePt: ex.namePt ?? ex.exerciseNamePt ?? ex.exercise?.namePt ?? ex.exercise?.translatedName,
+        muscles: Array.isArray(ex.muscles) ? ex.muscles : (ex.exercise?.muscles ?? []),
+    }, getCatalogLanguage());
+    return {
+        ...ex,
+        ...localized,
+        id: ex.exerciseId ?? ex.id ?? `ex_${idx}`,
+        exerciseId: ex.exerciseId ?? (typeof ex.id === 'number' ? ex.id : null),
+        sets: (ex.sets ?? []).map((s, sIdx) => normalizeSet(s, sIdx)),
+        requireRpe: Boolean(ex.requireRpe),
+        exerciseType: unmapExerciseType(ex.exerciseType ?? 1),
+    };
+};
 
 /**
  * Normalizes a single block from API shape to internal PlanEditor shape.
@@ -83,6 +89,33 @@ export const applyRequireRpeToAll = (blocks) =>
         ...block,
         exercises: (block.exercises ?? []).map((ex) => ({ ...ex, requireRpe: true })),
     }));
+
+export function parseExerciseDragPayload(raw) {
+    try {
+        const parsed = JSON.parse(raw);
+        if (!Number.isInteger(parsed?.blockIdx) || !Number.isInteger(parsed?.exIdx)) return null;
+        return parsed;
+    } catch {
+        return null;
+    }
+}
+
+export function moveBlockExercise(blocks, fromBlock, fromEx, toBlock, toEx) {
+    if (!Array.isArray(blocks)) return blocks;
+    const source = blocks[fromBlock]?.exercises;
+    const dest = blocks[toBlock]?.exercises;
+    if (!source || !dest || fromEx < 0 || fromEx >= source.length) return blocks;
+    const insertAt = Math.max(0, Math.min(toEx, dest.length));
+    if (fromBlock === toBlock && (insertAt === fromEx || insertAt === fromEx + 1)) return blocks;
+
+    const next = blocks.map((block) => ({ ...block, exercises: [...(block.exercises ?? [])] }));
+    const [moved] = next[fromBlock].exercises.splice(fromEx, 1);
+    next[toBlock].exercises.splice(fromBlock === toBlock && fromEx < insertAt ? insertAt - 1 : insertAt, 0, moved);
+
+    return next
+        .filter((block) => block.exercises.length > 0)
+        .map((block) => (block.type === 'superset' && block.exercises.length < 2 ? { ...block, type: 'straight' } : block));
+}
 
 /**
  * Total sets across every exercise in every block (for summary displays).

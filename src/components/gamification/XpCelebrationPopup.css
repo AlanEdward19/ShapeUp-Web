@@ -4,29 +4,45 @@
     z-index: 1200;
     display: flex;
     align-items: flex-end;
-    justify-content: center;
-    padding: 1rem;
+    justify-content: flex-end;
+    padding: 1.5rem;
     pointer-events: none;
 }
 
 .su-xp-celebration-card {
     position: relative;
     pointer-events: auto;
-    width: min(100%, 22rem);
-    padding: 1.25rem 1.5rem 1.5rem;
-    border-radius: var(--radius-lg, 12px);
-    background: var(--surface-elevated, var(--bg-card, #fff));
-    box-shadow: var(--shadow-lg, 0 12px 40px rgba(0, 0, 0, 0.18));
-    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: min(100%, 18rem);
+    padding: 0.85rem 2.1rem 0.85rem 0.9rem;
+    border: 1px solid var(--text-main);
+    border-radius: 0;
+    background: var(--bg-main);
+    box-shadow: none;
+    text-align: left;
+    animation: su-xp-celebrate-in 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes su-xp-celebrate-in {
+    from {
+        opacity: 0;
+        transform: translate3d(1.25rem, 0.65rem, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
 }
 
 .su-xp-celebration-dismiss {
     position: absolute;
-    top: 0.5rem;
-    right: 0.65rem;
+    top: 0.25rem;
+    right: 0.4rem;
     border: 0;
     background: transparent;
-    font-size: 1.5rem;
+    font-size: 1.35rem;
     line-height: 1;
     cursor: pointer;
     color: var(--text-muted);
@@ -36,29 +52,33 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 3.5rem;
-    margin-bottom: 0.75rem;
+    flex-shrink: 0;
     color: var(--primary);
 }
 
 .su-xp-celebration-mascot img {
-    max-height: 4rem;
-    max-width: 100%;
+    max-height: 2.25rem;
+    max-width: 2.25rem;
     object-fit: contain;
 }
 
 .su-xp-celebration-delta {
     margin: 0;
     font-family: var(--font-display);
-    font-size: 1.75rem;
+    font-size: 1.15rem;
     font-weight: 800;
+    letter-spacing: 0.06em;
     color: var(--primary);
 }
 
 .su-xp-celebration-neutral,
 .su-xp-celebration-pending {
     margin: 0;
-    font-size: 1rem;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     color: var(--text-main);
 }
 

@@ -1,3 +1,5 @@
+import { getCatalogLanguage, localizeExercise } from './exerciseCatalog';
+
 /**
  * Unwrap GET /exercises/{id}/equivalents payload (array or paginated `{ items }`).
  */
@@ -8,26 +10,25 @@ export const unwrapEquivalentsPayload = (payload) => {
     return [];
 };
 
-const muscleStrings = (muscles) =>
-    (Array.isArray(muscles) ? muscles : []).map((m) =>
-        typeof m === 'object' ? (m.muscleNamePt || m.muscleName || '') : m
-    ).filter(Boolean);
-
-const toInspectRecord = (ex) => ({
-    id: ex.id,
-    name: ex.namePt || ex.name || '',
-    muscles: muscleStrings(ex.muscles),
-    equipments: ex.equipments || [],
-    muscleDetails: Array.isArray(ex.muscles) ? ex.muscles : [],
-    description: ex.description,
-    descriptionPt: ex.descriptionPt,
-    videoUrl: ex.videoUrl,
-});
+const toInspectRecord = (ex, language) => {
+    const localized = localizeExercise(ex, language);
+    return {
+        id: ex.id,
+        name: localized.name,
+        muscles: localized.muscles,
+        equipments: ex.equipments || [],
+        equipment: localized.equipment,
+        muscleDetails: Array.isArray(ex.muscles) ? ex.muscles : [],
+        description: ex.description,
+        descriptionPt: ex.descriptionPt,
+        videoUrl: ex.videoUrl,
+    };
+};
 
 /**
  * Map API ExerciseResponse[] to drawer equivalents + inspect records (no fabricated matchLabel).
  */
-export const mapExerciseEquivalents = (payload) => {
+export const mapExerciseEquivalents = (payload, language = getCatalogLanguage()) => {
     const raw = unwrapEquivalentsPayload(payload);
     if (raw.length === 0) {
         return { equivalents: [], records: [] };
@@ -39,7 +40,7 @@ export const mapExerciseEquivalents = (payload) => {
     for (const ex of raw) {
         if (!ex || ex.id == null) continue;
         equivalents.push({ exerciseId: ex.id });
-        records.push(toInspectRecord(ex));
+        records.push(toInspectRecord(ex, language));
     }
 
     return { equivalents, records };

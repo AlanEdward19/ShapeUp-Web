@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useExercises } from '../hooks/useExercises';
+import { useLanguage } from '../contexts/LanguageContext';
 import './ExerciseLibraryModal.css';
 
 const ExerciseLibraryModal = ({ onClose, onSelect }) => {
+    const { t } = useLanguage();
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const {
@@ -13,111 +15,98 @@ const ExerciseLibraryModal = ({ onClose, onSelect }) => {
         selectedMuscles,
         toggleMuscle,
         clearFilters,
-        availableMuscles
+        availableMuscles,
     } = useExercises();
 
     return (
         <div className="su-modal-overlay su-elm-overlay" onClick={onClose}>
-            <div className="su-modal-box su-elm-box" onClick={e => e.stopPropagation()}>
-
-                {/* Header */}
+            <div className="su-modal-box su-elm-box" onClick={(e) => e.stopPropagation()}>
                 <div className="su-elm-header">
                     <div>
-                        <h2 className="su-elm-title">Select Exercise</h2>
-                        <p className="su-elm-subtitle">Choose an exercise to add to the training plan.</p>
+                        <h2 className="su-elm-title">{t('pro.library.title')}</h2>
+                        <p className="su-elm-subtitle">{t('pro.library.subtitle')}</p>
                     </div>
-                    <button className="su-modal-close" onClick={onClose} aria-label="Close">×</button>
+                    <button className="su-modal-close" onClick={onClose} aria-label={t('common.cancel')} type="button">×</button>
                 </div>
 
-                {/* Toolbar: Search + Filter */}
                 <div className="su-elm-toolbar">
                     <div className="su-elm-search">
                         <input
                             type="text"
-                            placeholder="Search by name..."
+                            placeholder={t('pro.library.search')}
                             value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                             autoFocus
                         />
                     </div>
 
-                    <div className="su-elm-filter-wrap">
-                        <button
-                            className={`su-elm-filter-btn ${selectedMuscles.length > 0 ? 'active' : ''}`}
-                            onClick={() => setIsFilterOpen(!isFilterOpen)}
-                        >
-                            Muscle Groups
-                            {selectedMuscles.length > 0 && (
-                                <span className="su-elm-filter-badge">{selectedMuscles.length}</span>
-                            )}
-                        </button>
-
-                        {isFilterOpen && (
-                            <div className="su-elm-filter-dropdown">
-                                {/* Dropdown Header */}
-                                <div className="su-elm-filter-header">
-                                    <span className="su-elm-filter-title">Filter by Muscle Group</span>
-                                </div>
-
-                                {/* Muscle grid - pill toggles */}
-                                <div className="su-elm-filter-body">
-                                    <div className="su-elm-filter-grid">
-                                        {availableMuscles.map(m => (
-                                            <button
-                                                key={m}
-                                                className={`su-elm-muscle-pill ${selectedMuscles.includes(m) ? 'selected' : ''}`}
-                                                onClick={() => toggleMuscle(m)}
-                                                type="button"
-                                            >
-                                                {selectedMuscles.includes(m) && <span className="su-elm-pill-check">✓</span>}
-                                                {m}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Footer */}
-                                {selectedMuscles.length > 0 && (
-                                    <div className="su-elm-filter-footer">
-                                        <button className="su-elm-clear-btn" onClick={clearFilters}>
-                                            Clear all filters
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
+                    <button
+                        type="button"
+                        className={`su-elm-filter-btn ${selectedMuscles.length > 0 || isFilterOpen ? 'active' : ''}`}
+                        onClick={() => setIsFilterOpen(!isFilterOpen)}
+                        aria-expanded={isFilterOpen}
+                    >
+                        {t('pro.library.muscles')}
+                        {selectedMuscles.length > 0 && (
+                            <span className="su-elm-filter-badge">{selectedMuscles.length}</span>
                         )}
-                    </div>
+                    </button>
                 </div>
 
-                {/* Exercise List */}
+                {isFilterOpen && (
+                    <div className="su-elm-filter-panel">
+                        <div className="su-elm-filter-header">
+                            <span className="su-elm-filter-title">{t('pro.library.filter_title')}</span>
+                            {selectedMuscles.length > 0 && (
+                                <button type="button" className="su-elm-clear-btn" onClick={clearFilters}>
+                                    {t('pro.library.clear')}
+                                </button>
+                            )}
+                        </div>
+                        <div className="su-elm-filter-grid">
+                            {availableMuscles.map((m) => (
+                                <button
+                                    key={m}
+                                    className={`su-elm-muscle-pill ${selectedMuscles.includes(m) ? 'selected' : ''}`}
+                                    onClick={() => toggleMuscle(m)}
+                                    type="button"
+                                >
+                                    {m}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div className="su-elm-list">
                     {loading ? (
                         <div className="su-elm-empty">
-                            <p>Loading exercises...</p>
+                            <p>{t('pro.library.loading')}</p>
                         </div>
                     ) : (
                         <>
-                            <div className="su-elm-count">{filteredExercises.length} exercise{filteredExercises.length !== 1 ? 's' : ''}</div>
-                            {filteredExercises.map(ex => (
-                                <div key={ex.id} className="su-elm-item" onClick={() => onSelect(ex)}>
+                            <div className="su-elm-count">{t('pro.library.count', { n: filteredExercises.length })}</div>
+                            {filteredExercises.map((ex) => (
+                                <button key={ex.id} type="button" className="su-elm-item" onClick={() => onSelect(ex)}>
                                     <div className="su-elm-item-info">
                                         <strong>{ex.name}</strong>
                                         <div className="su-elm-item-tags">
-                                            {ex.type && <span className="su-elm-tag type">{ex.type}</span>}
-                                            {ex.muscles.slice(0, 3).map(m => <span key={m} className="su-elm-tag muscle">{m}</span>)}
+                                            {ex.muscles.slice(0, 3).map((m) => (
+                                                <span key={m} className="su-elm-tag muscle">{m}</span>
+                                            ))}
                                         </div>
                                     </div>
-                                </div>
+                                    <span className="su-elm-item-arrow" aria-hidden="true">→</span>
+                                </button>
                             ))}
                             {filteredExercises.length === 0 && (
                                 <div className="su-elm-empty">
-                                    <p>No exercises match your filters.</p>
+                                    <p>{t('pro.library.empty')}</p>
                                 </div>
                             )}
                         </>
                     )}
                 </div>
-
             </div>
         </div>
     );

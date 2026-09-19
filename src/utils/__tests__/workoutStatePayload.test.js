@@ -80,3 +80,14 @@ it('enriches blank plan exercises from the catalog by exerciseId', () => {
         muscles: ['Chest', 'Triceps'],
     });
 });
+
+it('uses catalog muscles when a same-id plan row has none', () => {
+    const enriched = enrichExercisesFromCatalog(
+        [{ exerciseId: 1, name: 'Bench', muscles: [] }],
+        [
+            { id: 1, name: 'Bench', muscles: [] },
+            { id: 1, nameEn: 'Bench Press', namePt: 'Supino', muscles: ['Chest'] },
+        ]
+    );
+    expect(enriched[0].muscles).toEqual(['Chest']);
+});

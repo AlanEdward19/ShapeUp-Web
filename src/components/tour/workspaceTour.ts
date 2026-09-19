@@ -43,11 +43,22 @@ export async function resolveWorkspaceTourSteps(
   return resolved;
 }
 
+export function tourAnchorId(index: number) {
+  return `tour-anchor-${index}`;
+}
+
+export function toReactourSteps(steps: WorkspaceTourStepDef[]): StepType[] {
+  return steps.map((step, index) => ({
+    selector: `#${tourAnchorId(index)}`,
+    content: step.content,
+  }));
+}
+
 type StartWorkspaceTourArgs = {
   setSteps: (steps: StepType[]) => void;
   setCurrentStep: (index: number) => void;
   setIsOpen: (open: boolean) => void;
-  setAnchorTarget: (selector: string | null) => void;
+  setAnchors: (anchors: { id: string; selector: string }[]) => void;
   steps: WorkspaceTourStepDef[];
   storageKey: string;
 };
@@ -56,7 +67,7 @@ export async function startWorkspaceTour({
   setSteps,
   setCurrentStep,
   setIsOpen,
-  setAnchorTarget,
+  setAnchors,
   steps,
   storageKey,
 }: StartWorkspaceTourArgs): Promise<WorkspaceTourStepDef[]> {
@@ -65,8 +76,13 @@ export async function startWorkspaceTour({
   if (resolved.length === 0) return [];
 
   localStorage.setItem(storageKey, 'true');
-  setAnchorTarget(resolved[0].targetSelector);
-  setSteps(resolved.map(step => ({ selector: '#tour-anchor', content: step.content })));
+  setAnchors(
+    resolved.map((step, index) => ({
+      id: tourAnchorId(index),
+      selector: step.targetSelector,
+    })),
+  );
+  setSteps(toReactourSteps(resolved));
   setCurrentStep(0);
   setTimeout(() => setIsOpen(true), 600);
   return resolved;
