@@ -154,7 +154,7 @@ T6 → T7 → T8
 **Requirement**: IFTW-07
 **Tools**: Skill tlc-spec-driven Execute
 **Done when**:
-- [ ] Test add meal + fasting GET Fasting → warning; no cancel POST
+- [x] Test add meal + fasting GET Fasting → warning; no cancel POST
 **Tests**: unit
 **Gate**: quick
 **Commit**: `feat(nutrition): warn when logging food during a fast`

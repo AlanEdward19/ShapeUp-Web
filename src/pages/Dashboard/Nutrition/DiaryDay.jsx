@@ -3,6 +3,22 @@ import Skeleton from '../../../components/Skeleton';
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import SubstituteItemModal from './SubstituteItemModal';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
+import { useFastingApi } from '../../../hooks/api/useFastingApi';
+
+export function persistDiaryEntryWithFastingWarning({
+    addDiaryEntry,
+    getClock,
+    setWarning,
+    command,
+}) {
+    const id = addDiaryEntry(command);
+    void getClock()
+        .then((snapshot) => {
+            if (snapshot?.clock?.status === 'Fasting') setWarning(true);
+        })
+        .catch(() => {});
+    return id;
+}
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { isMacroGoalMet } from './nutritionUtils';
 import './Nutrition.css';
@@ -52,7 +68,9 @@ const MacroProgressBar = ({ label, consumed, goal, color, informational, infoLab
 
 const DiaryDay = ({ renderView } = {}) => {
     const { t } = useLanguage();
-    const { getDiaryDay, getNutritionProfile, removeDiaryEntry } = useNutritionApi();
+    const { getDiaryDay, getNutritionProfile, removeDiaryEntry, addDiaryEntry } = useNutritionApi();
+    const { getClock } = useFastingApi();
+    const [fastingDiaryWarning, setFastingDiaryWarning] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const date = /^\d{4}-\d{2}-\d{2}$/.test(searchParams.get('date') || '') ? searchParams.get('date') : toDateKey();
     const setDate = next => setSearchParams(previous => { const params=new URLSearchParams(previous);params.set('date',next);return params; }, { replace:true });
@@ -101,6 +119,17 @@ const DiaryDay = ({ renderView } = {}) => {
         await loadData();
     };
 
+    const persistDiaryEntry = useCallback(
+        (command) =>
+            persistDiaryEntryWithFastingWarning({
+                addDiaryEntry,
+                getClock,
+                setWarning: setFastingDiaryWarning,
+                command,
+            }),
+        [addDiaryEntry, getClock],
+    );
+
     if (renderView) {
         return renderView({
             date,
@@ -114,6 +143,9 @@ const DiaryDay = ({ renderView } = {}) => {
             handleRemove,
             setSubstituteEntry,
             loadData,
+            persistDiaryEntry,
+            fastingDiaryWarning,
+            dismissFastingDiaryWarning: () => setFastingDiaryWarning(false),
         });
     }
     return (
@@ -130,6 +162,15 @@ const DiaryDay = ({ renderView } = {}) => {
                     data-testid="diary-date-input"
                 />
             </header>
+
+            {fastingDiaryWarning && (
+                <div className="su-warning-banner" role="status" data-testid="fasting-diary-warning">
+                    <p>{t('nutrition.diary.fastingWarning')}</p>
+                    <button type="button" className="su-btn su-btn-secondary" onClick={() => setFastingDiaryWarning(false)}>
+                        {t('nutrition.diary.fastingWarningDismiss')}
+                    </button>
+                </div>
+            )}
 
             {goalMet && (
                 <div className="su-goal-banner" data-testid="goal-celebration">

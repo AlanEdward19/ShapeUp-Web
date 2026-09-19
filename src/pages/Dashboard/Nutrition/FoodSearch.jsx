@@ -4,13 +4,21 @@ import Button from '../../../components/Button';
 import FoodForm from './FoodForm';
 import Skeleton from '../../../components/Skeleton';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
+import { useFastingApi } from '../../../hooks/api/useFastingApi';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useSearchParams } from 'react-router-dom';
+import { persistDiaryEntryWithFastingWarning } from './DiaryDay';
 import { supportsBarcodeDetector } from './nutritionUtils';
 import './Nutrition.css';
 
 const FoodSearch = () => {
     const { t } = useLanguage();
-    const { searchFoods, getFoodByBarcode } = useNutritionApi();
+    const [searchParams] = useSearchParams();
+    const diaryDate = searchParams.get('date');
+    const mealSlot = searchParams.get('mealSlot') || 'Breakfast';
+    const { searchFoods, getFoodByBarcode, addDiaryEntry } = useNutritionApi();
+    const { getClock } = useFastingApi();
+    const [fastingDiaryWarning, setFastingDiaryWarning] = useState(false);
     const [query, setQuery] = useState('');
     const [barcodeInput, setBarcodeInput] = useState('');
     const [results, setResults] = useState([]);
@@ -96,8 +104,29 @@ const FoodSearch = () => {
         setSearched(true);
     };
 
+    const handleAddToDiary = (food) => {
+        if (!diaryDate || !/^\d{4}-\d{2}-\d{2}$/.test(diaryDate)) return;
+        persistDiaryEntryWithFastingWarning({
+            addDiaryEntry,
+            getClock,
+            setWarning: setFastingDiaryWarning,
+            command: {
+                date: diaryDate,
+                mealSlot,
+                foodId: food.id,
+                quantityGramsOrMl: 100,
+            },
+        });
+    };
+
     return (
         <div className="su-nutrition-page">
+            {fastingDiaryWarning && (
+                <div className="su-warning-banner" role="status" data-testid="fasting-diary-warning">
+                    <p>{t('nutrition.diary.fastingWarning')}</p>
+                </div>
+            )}
+
             <header className="su-nutrition-masthead">
                 <div>
                     <span className="su-nutrition-kicker">{t('nutrition.foods.kicker')}</span>
@@ -200,6 +229,16 @@ const FoodSearch = () => {
                                             {t('nutrition.foods.kcal100', { n: food.macrosPer100?.kcal })}
                                         </span>
                                     </button>
+                                    {diaryDate && (
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            data-testid={`food-add-diary-${food.id}`}
+                                            onClick={() => handleAddToDiary(food)}
+                                        >
+                                            {t('nutrition.foods.addToDiary')}
+                                        </Button>
+                                    )}
                                 </li>
                             ))}
                         </ul>

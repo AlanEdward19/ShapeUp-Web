@@ -9,6 +9,9 @@ const mockGetDiaryDay = vi.fn();
 const mockGetNutritionProfile = vi.fn();
 const mockRemoveDiaryEntry = vi.fn();
 const mockSuggestSubstitutes = vi.fn();
+const mockAddDiaryEntry = vi.fn();
+const mockGetFastingClock = vi.fn();
+const mockCancelOverride = vi.fn();
 
 vi.mock('../../../../hooks/api/useNutritionApi', () => ({
     useNutritionApi: () => ({
@@ -18,6 +21,15 @@ vi.mock('../../../../hooks/api/useNutritionApi', () => ({
         suggestSubstitutes: mockSuggestSubstitutes,
         substituteDiaryItem: vi.fn(),
         searchFoods: vi.fn(),
+        addDiaryEntry: mockAddDiaryEntry,
+    }),
+}));
+
+vi.mock('../../../../hooks/api/useFastingApi', () => ({
+    useFastingApi: () => ({
+        getClock: mockGetFastingClock,
+        cancelOverride: mockCancelOverride,
+        endOverrideEarly: vi.fn(),
     }),
 }));
 
@@ -56,6 +68,49 @@ describe('DiaryDay', () => {
         });
         mockRemoveDiaryEntry.mockResolvedValue(null);
         mockSuggestSubstitutes.mockResolvedValue({ suggestions: [] });
+        mockAddDiaryEntry.mockReturnValue('entry-new');
+        mockGetFastingClock.mockResolvedValue({ clock: { status: 'Eating' } });
+    });
+
+    it('persists diary entry and shows fasting warning without cancel POST', async () => {
+        mockGetFastingClock.mockResolvedValue({ clock: { status: 'Fasting' } });
+        mockGetDiaryDay.mockResolvedValue(sampleDiary);
+        render(
+            withLang(
+                <MemoryRouter>
+                    <DiaryDay
+                        renderView={(state) => (
+                            <div>
+                                {state.fastingDiaryWarning ? (
+                                    <div data-testid="fasting-diary-warning">warn</div>
+                                ) : null}
+                                <button
+                                    type="button"
+                                    data-testid="persist-diary-entry"
+                                    onClick={() =>
+                                        state.persistDiaryEntry({
+                                            date: '2026-09-10',
+                                            mealSlot: 'Breakfast',
+                                            foodId: 'food-rice',
+                                            quantityGramsOrMl: 100,
+                                        })
+                                    }
+                                >
+                                    add
+                                </button>
+                            </div>
+                        )}
+                    />
+                </MemoryRouter>,
+            ),
+        );
+        await waitFor(() => expect(mockGetDiaryDay).toHaveBeenCalled());
+        fireEvent.click(document.querySelector('[data-testid="persist-diary-entry"]'));
+        await waitFor(() => {
+            expect(mockAddDiaryEntry).toHaveBeenCalled();
+            expect(document.querySelector('[data-testid="fasting-diary-warning"]')).toBeTruthy();
+        });
+        expect(mockCancelOverride).not.toHaveBeenCalled();
     });
 
     it('renders meals and macro progress with data', async () => {
