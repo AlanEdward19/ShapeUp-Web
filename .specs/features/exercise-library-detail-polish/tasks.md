@@ -245,8 +245,8 @@ T8
 
 **Done when**:
 
-- [ ] Fallback uses `t('exlib.equipment.unknown')`
-- [ ] Gate passes
+- [x] Fallback uses `t('exlib.equipment.unknown')`
+- [x] Gate passes
 
 **Tests**: unit
 **Gate**: full

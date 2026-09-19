@@ -5,10 +5,11 @@ export async function resolveEquivalentSelection({
   mapExerciseEquivalents,
   inspect,
   setNotice,
+  missingNotice = 'Exercício não encontrado na lista atual',
   inspectEventTarget,
 }) {
   if (exerciseId == null) {
-    setNotice('Exercício não encontrado na lista atual');
+    setNotice(missingNotice);
     return;
   }
   const fromLookup = exerciseLookup.find((item) => String(item.id) === String(exerciseId));
@@ -27,5 +28,5 @@ export async function resolveEquivalentSelection({
   } catch {
     /* toast below */
   }
-  setNotice('Exercício não encontrado na lista atual');
+  setNotice(missingNotice);
 }

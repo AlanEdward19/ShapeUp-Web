@@ -20,7 +20,9 @@ const normalize = (value: string) =>
     .toLowerCase();
 
 export default function ExercisesShell() {
-  const language = useLanguage()?.language || getCatalogLanguage();
+  const langCtx = useLanguage();
+  const language = langCtx?.language || getCatalogLanguage();
+  const t = langCtx?.t ?? ((key: string) => key);
   const { exercises: exerciseList, loading, error, searchTerm, setSearchTerm } = useExercises();
   const { getExerciseEquivalents, getExerciseById } = useTrainingApi();
   const exercises = exerciseList as ExerciseRecord[];
@@ -28,8 +30,8 @@ export default function ExercisesShell() {
     (ex: ExerciseRecord) =>
       ex.equipment ||
       ex.equipments?.map((item) => pickLocalized(language, item.equipmentName, item.equipmentNamePt)).filter(Boolean).join(', ') ||
-      'Não informado',
-    [language],
+      t('exlib.equipment.unknown'),
+    [language, t],
   );
   const [equivalentRecords, setEquivalentRecords] = useState<ExerciseRecord[]>([]);
   const inspectRequestRef = useRef(0);
@@ -163,6 +165,7 @@ export default function ExercisesShell() {
         mapExerciseEquivalents,
         inspect,
         setNotice,
+        missingNotice: t('exlib.toast.missing_equivalent'),
         inspectEventTarget: (panel.current || document.body) as HTMLElement,
       });
     },
