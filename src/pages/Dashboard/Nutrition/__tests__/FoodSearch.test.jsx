@@ -8,6 +8,8 @@ import { supportsBarcodeDetector } from '../nutritionUtils';
 
 const mockSearchFoods = vi.fn();
 const mockGetFoodByBarcode = vi.fn();
+const mockAddDiaryEntry = vi.fn();
+const mockGetFastingClock = vi.fn();
 
 vi.mock('../../../../hooks/api/useNutritionApi', () => ({
     useNutritionApi: () => ({
@@ -16,13 +18,20 @@ vi.mock('../../../../hooks/api/useNutritionApi', () => ({
         createFood: vi.fn(),
         createFoodOverride: vi.fn(),
         setActiveFoodVersion: vi.fn(),
+        addDiaryEntry: mockAddDiaryEntry,
     }),
 }));
 
-const renderFoodSearch = () =>
+vi.mock('../../../../hooks/api/useFastingApi', () => ({
+    useFastingApi: () => ({
+        getClock: mockGetFastingClock,
+    }),
+}));
+
+const renderFoodSearch = (initialEntry = '/dashboard/nutrition/foods') =>
         render(
             withLang(
-            <MemoryRouter>
+            <MemoryRouter initialEntries={[initialEntry]}>
                 <FoodSearch />
             </MemoryRouter>
             )
@@ -32,6 +41,8 @@ describe('FoodSearch', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         delete window.BarcodeDetector;
+        mockAddDiaryEntry.mockReturnValue('entry-new');
+        mockGetFastingClock.mockResolvedValue({ clock: { status: 'Eating' } });
     });
 
     it('renders search form', () => {
@@ -106,6 +117,34 @@ describe('FoodSearch', () => {
         const { getByTestId, queryByTestId } = renderFoodSearch();
         expect(getByTestId('barcode-manual-input')).toBeInTheDocument();
         expect(queryByTestId('barcode-scan-btn')).not.toBeInTheDocument();
+    });
+
+    it('shows fasting diary warning when adding food during a fast', async () => {
+        mockGetFastingClock.mockResolvedValue({ clock: { status: 'Fasting' } });
+        mockSearchFoods.mockResolvedValue({
+            items: [{
+                id: 'food-1',
+                name: 'Arroz branco',
+                macrosPer100: { kcal: 130, proteinG: 2, carbG: 28, fatG: 0 },
+                isPersonalOverride: false,
+            }],
+        });
+
+        const { getByTestId } = renderFoodSearch(
+            '/dashboard/nutrition/foods?date=2026-09-10&mealSlot=Breakfast',
+        );
+        fireEvent.change(getByTestId('food-search-input'), { target: { value: 'arroz' } });
+        fireEvent.click(getByTestId('food-search-btn'));
+
+        await waitFor(() => expect(getByTestId('food-add-diary-food-1')).toBeInTheDocument());
+        fireEvent.click(getByTestId('food-add-diary-food-1'));
+
+        await waitFor(() => {
+            expect(mockAddDiaryEntry).toHaveBeenCalledWith(
+                expect.objectContaining({ date: '2026-09-10', foodId: 'food-1' }),
+            );
+            expect(getByTestId('fasting-diary-warning')).toBeInTheDocument();
+        });
     });
 
     it('offers create form when barcode is not found', async () => {

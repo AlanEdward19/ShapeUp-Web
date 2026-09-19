@@ -114,6 +114,9 @@ describe('FastingPage (IFTW-01..05)', () => {
         mockGetClock.mockResolvedValue(agendaSnapshot);
         const { getByTestId } = renderPage();
         await waitFor(() => expect(getByTestId('fasting-disclaimer')).toBeInTheDocument());
+        const disclaimer = getByTestId('fasting-disclaimer');
+        expect(disclaimer).toHaveTextContent(/not medical advice/i);
+        expect(disclaimer).toHaveTextContent(/pregnant|under 18|eating disorder|clinician/i);
         expect(getByTestId('fasting-save')).toBeEnabled();
     });
 
@@ -360,6 +363,37 @@ describe('FastingPage (IFTW-01..05)', () => {
         });
         const { getByLabelText } = renderPage();
         await waitFor(() => expect(getByLabelText(/18:6/)).toBeChecked());
+    });
+
+    it('PUTs a protocol different from recommendation when athlete saves', async () => {
+        mockGetClock.mockResolvedValue({
+            ...idleSnapshot,
+            recommendation: { protocol: '18:6', fastHours: 18 },
+        });
+        const { getByTestId, getByLabelText } = renderPage();
+        await waitFor(() => expect(getByLabelText(/18:6/)).toBeChecked());
+        fireEvent.click(getByLabelText(/16:8/));
+        fireEvent.click(getByTestId('fasting-save'));
+        await waitFor(() => {
+            expect(mockPutAgenda).toHaveBeenCalledWith(
+                expect.objectContaining({ protocol: '16:8' }),
+            );
+        });
+    });
+
+    it('GETs history on load and lists at most 14 items', async () => {
+        mockGetClock.mockResolvedValue(idleSnapshot);
+        const items = Array.from({ length: 15 }, (_, i) => ({
+            id: `fast-${i}`,
+            protocol: '16:8',
+            outcome: 'completed',
+        }));
+        mockGetHistory.mockResolvedValue({ items });
+        const { getByTestId } = renderPage();
+        await waitFor(() => expect(mockGetHistory).toHaveBeenCalled());
+        await waitFor(() => {
+            expect(getByTestId('fasting-history').querySelectorAll('li')).toHaveLength(14);
+        });
     });
 
     it('PUTs custom protocol with fastHours', async () => {

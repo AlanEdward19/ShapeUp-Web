@@ -101,7 +101,7 @@ const FastingPage = () => {
     const loadHistory = useCallback(async () => {
         try {
             const data = await getHistory();
-            setHistoryItems(Array.isArray(data?.items) ? data.items : []);
+            setHistoryItems((Array.isArray(data?.items) ? data.items : []).slice(0, 14));
         } catch {
             setHistoryItems([]);
         }

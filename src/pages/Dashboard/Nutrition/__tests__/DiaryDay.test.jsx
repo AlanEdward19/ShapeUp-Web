@@ -12,6 +12,7 @@ const mockSuggestSubstitutes = vi.fn();
 const mockAddDiaryEntry = vi.fn();
 const mockGetFastingClock = vi.fn();
 const mockCancelOverride = vi.fn();
+const mockEndOverrideEarly = vi.fn();
 
 vi.mock('../../../../hooks/api/useNutritionApi', () => ({
     useNutritionApi: () => ({
@@ -29,7 +30,7 @@ vi.mock('../../../../hooks/api/useFastingApi', () => ({
     useFastingApi: () => ({
         getClock: mockGetFastingClock,
         cancelOverride: mockCancelOverride,
-        endOverrideEarly: vi.fn(),
+        endOverrideEarly: mockEndOverrideEarly,
     }),
 }));
 
@@ -107,10 +108,13 @@ describe('DiaryDay', () => {
         await waitFor(() => expect(mockGetDiaryDay).toHaveBeenCalled());
         fireEvent.click(document.querySelector('[data-testid="persist-diary-entry"]'));
         await waitFor(() => {
-            expect(mockAddDiaryEntry).toHaveBeenCalled();
+            expect(mockAddDiaryEntry).toHaveBeenCalledWith(
+                expect.objectContaining({ date: '2026-09-10' }),
+            );
             expect(document.querySelector('[data-testid="fasting-diary-warning"]')).toBeTruthy();
         });
         expect(mockCancelOverride).not.toHaveBeenCalled();
+        expect(mockEndOverrideEarly).not.toHaveBeenCalled();
     });
 
     it('renders meals and macro progress with data', async () => {
