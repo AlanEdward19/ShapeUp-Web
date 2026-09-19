@@ -29,6 +29,27 @@ describe('useXpCelebration', () => {
         expect(XP_POLL_TIMEOUT_MS).toBe(15000);
     });
 
+    it('polls GET again on each 2000 ms tick while still pending', async () => {
+        mockGetGamificationProfile.mockResolvedValue({ totalXp: 100 });
+        const { result } = renderHook(() => useXpCelebration());
+
+        await act(async () => {
+            await result.current.start({ sessionId: 'session-poll', snapshotTotalXp: 100 });
+        });
+        expect(mockGetGamificationProfile).toHaveBeenCalledTimes(1);
+
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(XP_POLL_INTERVAL_MS);
+        });
+        expect(mockGetGamificationProfile).toHaveBeenCalledTimes(2);
+
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(XP_POLL_INTERVAL_MS);
+        });
+        expect(mockGetGamificationProfile).toHaveBeenCalledTimes(3);
+        expect(result.current.status).toBe('pending');
+    });
+
     it('resolves with delta when totalXp increases', async () => {
         mockGetGamificationProfile.mockResolvedValue({ totalXp: 220 });
         const { result } = renderHook(() => useXpCelebration());
