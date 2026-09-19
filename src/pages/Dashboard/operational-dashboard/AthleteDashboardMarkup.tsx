@@ -87,7 +87,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
         className="flex h-5 w-5 items-center justify-center rounded text-[10px] font-bold"
         style={style}
       >
-        {weekday === 2 ? '—' : letter}
+        {letter}
       </span>
     );
   };

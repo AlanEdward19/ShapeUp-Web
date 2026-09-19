@@ -64,6 +64,13 @@ describe('AthleteDashboardMarkup Frequência empty state (WSD-06)', () => {
     expect(container.querySelector('[data-tour="client-chart"]')).toBeTruthy();
   });
 
+  it('renders weekday initials including Wednesday instead of a rest dash', () => {
+    const { container } = render(withLang(<AthleteDashboardMarkup state={baseState} />));
+    const pills = container.querySelectorAll('[data-tour="client-metrics"] [data-workout-completed]');
+    expect(pills).toHaveLength(7);
+    expect([...pills].map(pill => pill.textContent)).toEqual(['S', 'T', 'Q', 'Q', 'S', 'S', 'D']);
+  });
+
   it('shows em-dash for alvo and taxa when dashboard is null', () => {
     render(withLang(<AthleteDashboardMarkup state={baseState} />));
     const headerRow = screen.getByText('Frequência').parentElement!;
