@@ -4,6 +4,7 @@ import SuggestExerciseModal from '../../components/SuggestExerciseModal';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useExercises } from '../../hooks/useExercises';
 import { mapExerciseEquivalents } from '../../utils/exerciseEquivalents';
+import { resolveEquivalentSelection } from './resolveEquivalentSelection';
 import DashboardShellHost from '../shell-assets/DashboardShellHost';
 import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { ExercisesPublicMarkup, type ExerciseRecord } from './markup/ExercisesPublicMarkup';
@@ -23,7 +24,7 @@ const equipmentName = (ex: ExerciseRecord) =>
 
 export default function ExercisesShell() {
   const { exercises: exerciseList, loading, error, searchTerm, setSearchTerm } = useExercises();
-  const { getExerciseEquivalents } = useTrainingApi();
+  const { getExerciseEquivalents, getExerciseById } = useTrainingApi();
   const exercises = exerciseList as ExerciseRecord[];
   const [equivalentRecords, setEquivalentRecords] = useState<ExerciseRecord[]>([]);
   const inspectRequestRef = useRef(0);
@@ -149,18 +150,16 @@ export default function ExercisesShell() {
     navOpen,
     setNavOpen,
     equipmentName,
-    onEquivalentMissing: async (exerciseId?: number | string) => {
-      if (exerciseId == null) {
-        setNotice('Exercício não encontrado na lista atual');
-        return;
-      }
-      const fromLookup = exerciseLookup.find((item) => String(item.id) === String(exerciseId));
-      if (fromLookup) {
-        const target = (panel.current || document.body) as HTMLElement;
-        inspect(fromLookup, { currentTarget: target } as never);
-        return;
-      }
-      setNotice('Exercício não encontrado na lista atual');
+    onEquivalentMissing: (exerciseId?: number | string) => {
+      void resolveEquivalentSelection({
+        exerciseId,
+        exerciseLookup,
+        getExerciseById,
+        mapExerciseEquivalents,
+        inspect,
+        setNotice,
+        inspectEventTarget: (panel.current || document.body) as HTMLElement,
+      });
     },
   };
 

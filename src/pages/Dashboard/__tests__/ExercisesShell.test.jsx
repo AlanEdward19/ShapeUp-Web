@@ -6,9 +6,16 @@ vi.mock('../../../contexts/AuthContext', () => ({useAuth:()=>({currentUser:{uid:
 vi.mock('../../../contexts/UserProfileContext', () => ({useUserProfile:()=>({name:'Test',initials:'T',photo:''})}));
 vi.mock('../../../hooks/useExercises', () => ({useExercises: vi.fn()}));
 vi.mock('../../../hooks/api/useTrainingApi', () => ({ useTrainingApi: vi.fn() }));
+vi.mock('../../../utils/exerciseEquivalents', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    mapExerciseEquivalents: vi.fn((...args) => actual.mapExerciseEquivalents(...args)),
+  };
+});
 import { useExercises } from '../../../hooks/useExercises';
 import { useTrainingApi } from '../../../hooks/api/useTrainingApi';
-import * as exerciseEquivalents from '../../../utils/exerciseEquivalents';
+import { mapExerciseEquivalents } from '../../../utils/exerciseEquivalents';
 import Exercises from '../ExercisesShell';
 
 const baseExercise = {
@@ -48,10 +55,12 @@ function renderShell() {
 }
 
 let getExerciseEquivalents;
+let getExerciseById;
 
 beforeEach(() => {
   getExerciseEquivalents = vi.fn().mockResolvedValue([]);
-  useTrainingApi.mockReturnValue({ getExerciseEquivalents, getExerciseById: vi.fn() });
+  getExerciseById = vi.fn().mockResolvedValue(null);
+  useTrainingApi.mockReturnValue({ getExerciseEquivalents, getExerciseById });
   mockCatalog([baseExercise]);
 });
 
@@ -135,24 +144,13 @@ describe('ExercisesShell', () => {
     expect(within(drawer).queryByText('Variação em máquina')).toBeNull();
   });
 
-  it('navigates the drawer to an equivalent from GET records on click', async () => {
-    getExerciseEquivalents.mockResolvedValue([variant]);
-    mockCatalog([baseExercise]);
-    const { root, drawer } = renderShell();
-    fireEvent.click(root.querySelector('.exercise-item'));
-    await within(drawer).findByText('Variação em máquina');
-    fireEvent.click(within(drawer).getByText('Variação em máquina'));
-    expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Variação em máquina');
-    expect(getExerciseEquivalents).toHaveBeenLastCalledWith(8);
-  });
-
-  it('shows the missing-equivalent toast and keeps the current exercise', async () => {
-    const mapSpy = vi.spyOn(exerciseEquivalents, 'mapExerciseEquivalents').mockReturnValue({
+  it('shows not-found notice and keeps drawer title when getExerciseById misses', async () => {
+    vi.mocked(mapExerciseEquivalents).mockImplementationOnce(() => ({
       equivalents: [{ exerciseId: 99 }],
       records: [],
-    });
+    }));
     getExerciseEquivalents.mockResolvedValue([{ id: 99 }]);
-    mockCatalog([baseExercise]);
+    getExerciseById.mockRejectedValue(new Error('404'));
     const { root, drawer } = renderShell();
     fireEvent.click(root.querySelector('.exercise-item'));
     await within(drawer).findByText('EX-99');
@@ -163,6 +161,16 @@ describe('ExercisesShell', () => {
       );
     });
     expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Exercício real');
-    mapSpy.mockRestore();
+  });
+
+  it('navigates the drawer to an equivalent from GET records on click', async () => {
+    getExerciseEquivalents.mockResolvedValue([variant]);
+    mockCatalog([baseExercise]);
+    const { root, drawer } = renderShell();
+    fireEvent.click(root.querySelector('.exercise-item'));
+    await within(drawer).findByText('Variação em máquina');
+    fireEvent.click(within(drawer).getByText('Variação em máquina'));
+    expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Variação em máquina');
+    expect(getExerciseEquivalents).toHaveBeenLastCalledWith(8);
   });
 });
