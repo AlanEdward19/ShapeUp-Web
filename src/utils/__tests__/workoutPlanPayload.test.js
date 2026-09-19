@@ -99,6 +99,45 @@ describe('findTimeBasedDurationError (TBE-02)', () => {
     });
 });
 
+describe('mixed TimeBased and WeightBased blocks (TBE-02 AC5)', () => {
+    const mixedPlan = {
+        name: 'Mixed',
+        weeks: 4,
+        phase: 'Hypertrophy',
+        difficulty: 'Intermediate',
+        blocks: [{
+            type: 'superset',
+            exercises: [
+                {
+                    exerciseId: 10,
+                    exerciseType: 'timeBased',
+                    sets: [{ type: 'working', technique: 'Straight', duration: '05:00', distance: '', intensityType: 'rpe', intensityValue: '8', rest: '90' }],
+                },
+                {
+                    exerciseId: 1,
+                    exerciseType: 'weightBased',
+                    sets: [{ type: 'working', technique: 'Straight', reps: '8', load: '100', intensityType: 'rpe', intensityValue: '8', rest: '90' }],
+                },
+            ],
+        }],
+    };
+
+    it('builds both set shapes without homogeneity errors', () => {
+        expect(findTimeBasedDurationError(mixedPlan)).toBeNull();
+        const body = buildWorkoutPlanBody(mixedPlan, 'user-1');
+        expect(body.blocks[0].exercises[0].sets[0]).toMatchObject({
+            durationSeconds: 300,
+            load: null,
+            repetitions: null,
+        });
+        expect(body.blocks[0].exercises[1].sets[0]).toMatchObject({
+            repetitions: 8,
+            load: 100,
+            durationSeconds: null,
+        });
+    });
+});
+
 describe('createDefaultPlannedSet (TBE-02)', () => {
     it('creates Straight preset with duration for timeBased', () => {
         const set = createDefaultPlannedSet('timeBased');
