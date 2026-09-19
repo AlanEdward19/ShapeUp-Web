@@ -88,11 +88,14 @@ tertiary), pra que o app pareça um produto único, não dois estilos colados.
 **Acceptance Criteria**:
 
 1. WHEN `design-system.css` é atualizado THEN `[data-theme='dark']` SHALL expor, como custom
-   properties, o equivalente a TODA a família de cor do YAML de referência (surface, surface-dim,
-   surface-bright, surface-container-lowest/low/high/highest, on-surface, on-surface-variant,
-   outline/outline-variant, primary/on-primary/primary-container/on-primary-container, secondary/
-   tertiary equivalentes, error/on-error/error-container) — não apenas `--primary`/`--accent`/
-   `--warning` como hoje
+   properties, **todos os tokens mapeados na tabela de modo escuro do Design**
+   (`.specs/features/design-system-retheme/design.md`, seção “Tokens — modo escuro”): nomes
+   legados preservados (`--primary`, `--bg-main`, …), tokens aditivos (`--bg-surface-*`,
+   `--outline`, `--secondary-container`, `--tertiary-container`, raio/espaço), e valores alinhados
+   a `shell-assets` / YAML **somente onde o Design aponta uma linha** — não apenas
+   `--primary`/`--accent`/`--warning`. Nomes M3/YAML sem mapeamento no Design (ex.
+   `primary-container`, `surface-dim`, `outline-variant`, `error-container`) ficam fora de escopo
+   desta feature até existir consumidor documentado no Design
 2. WHEN qualquer tela hoje usa um token existente (`--bg-main`, `--bg-card`, `--text-main`, etc.)
    THEN o valor por trás do token SHALL mudar pra família Warm Oxide Athletic, mas o NOME do token
    SHALL ser preservado sempre que possível (evita quebrar consumidores existentes só por causa do
