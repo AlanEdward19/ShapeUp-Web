@@ -23,7 +23,7 @@ const equipmentName = (ex: ExerciseRecord) =>
 
 export default function ExercisesShell() {
   const { exercises: exerciseList, loading, error, searchTerm, setSearchTerm } = useExercises();
-  const { getExerciseEquivalents, getExerciseById } = useTrainingApi();
+  const { getExerciseEquivalents } = useTrainingApi();
   const exercises = exerciseList as ExerciseRecord[];
   const [equivalentRecords, setEquivalentRecords] = useState<ExerciseRecord[]>([]);
   const inspectRequestRef = useRef(0);
@@ -155,20 +155,10 @@ export default function ExercisesShell() {
         return;
       }
       const fromLookup = exerciseLookup.find((item) => String(item.id) === String(exerciseId));
-      const target = (panel.current || document.body) as HTMLElement;
       if (fromLookup) {
+        const target = (panel.current || document.body) as HTMLElement;
         inspect(fromLookup, { currentTarget: target } as never);
         return;
-      }
-      try {
-        const remote = await getExerciseById(exerciseId);
-        const { records } = mapExerciseEquivalents(remote?.id != null ? [remote] : []);
-        if (records[0]) {
-          inspect(records[0], { currentTarget: target } as never);
-          return;
-        }
-      } catch {
-        /* toast below */
       }
       setNotice('Exercício não encontrado na lista atual');
     },

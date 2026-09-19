@@ -8,6 +8,7 @@ vi.mock('../../../hooks/useExercises', () => ({useExercises: vi.fn()}));
 vi.mock('../../../hooks/api/useTrainingApi', () => ({ useTrainingApi: vi.fn() }));
 import { useExercises } from '../../../hooks/useExercises';
 import { useTrainingApi } from '../../../hooks/api/useTrainingApi';
+import * as exerciseEquivalents from '../../../utils/exerciseEquivalents';
 import Exercises from '../ExercisesShell';
 
 const baseExercise = {
@@ -143,5 +144,25 @@ describe('ExercisesShell', () => {
     fireEvent.click(within(drawer).getByText('Variação em máquina'));
     expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Variação em máquina');
     expect(getExerciseEquivalents).toHaveBeenLastCalledWith(8);
+  });
+
+  it('shows the missing-equivalent toast and keeps the current exercise', async () => {
+    const mapSpy = vi.spyOn(exerciseEquivalents, 'mapExerciseEquivalents').mockReturnValue({
+      equivalents: [{ exerciseId: 99 }],
+      records: [],
+    });
+    getExerciseEquivalents.mockResolvedValue([{ id: 99 }]);
+    mockCatalog([baseExercise]);
+    const { root, drawer } = renderShell();
+    fireEvent.click(root.querySelector('.exercise-item'));
+    await within(drawer).findByText('EX-99');
+    fireEvent.click(within(drawer).getByText('EX-99'));
+    await vi.waitFor(() => {
+      expect(root.getElementById('toastMessage')).toHaveTextContent(
+        'Exercício não encontrado na lista atual',
+      );
+    });
+    expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Exercício real');
+    mapSpy.mockRestore();
   });
 });
