@@ -95,6 +95,17 @@ const DARK_DESIGN_VALUES = {
   '--space-xl': '2.5rem',
 }
 
+/** M3/YAML names intentionally not mapped in design.md — not part of the Execute contract. */
+const UNMAPPED_M3_TOKEN_NAMES = [
+  '--primary-container',
+  '--on-primary-container',
+  '--on-error',
+  '--error-container',
+  '--outline-variant',
+  '--bg-surface-dim',
+  '--bg-surface-bright',
+]
+
 const LIGHT_DESIGN_VALUES = {
   '--primary': '#e06c43',
   '--primary-hover': '#c85a35',
@@ -145,6 +156,22 @@ describe('design-system Warm Oxide token contract', () => {
     expect(tokenValue(dark, '--shadow-md')).toContain('oklch(')
   })
 
+  it('uses the Design dark table as the token contract (unmapped M3-only names are absent)', () => {
+    expect(Object.keys(DARK_DESIGN_VALUES).length).toBeGreaterThanOrEqual(20)
+    for (const name of UNMAPPED_M3_TOKEN_NAMES) {
+      expect(
+        dark,
+        `dark block should not expose unmapped ${name}`,
+      ).not.toMatch(new RegExp(`(?:^|\\n)\\s*${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}:`))
+    }
+  })
+
+  it('swaps token values when data-theme selects dark vs :root light defaults', () => {
+    expect(tokenValue(light, '--bg-main')).not.toBe(tokenValue(dark, '--bg-main'))
+    expect(tokenValue(light, '--text-main')).not.toBe(tokenValue(dark, '--text-main'))
+    expect(tokenValue(light, '--border-color')).not.toBe(tokenValue(dark, '--border-color'))
+  })
+
   it('matches the Design light token table in the same hue family', () => {
     for (const [name, value] of Object.entries(LIGHT_DESIGN_VALUES)) {
       expect(tokenValue(light, name)).toBe(value)
@@ -159,6 +186,14 @@ describe('design-system Warm Oxide token contract', () => {
     const lightLink = tokenValue(light, '--link-color')
     const lightBg = tokenValue(light, '--bg-main')
     expect(contrastRatio(lightLink, lightBg)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  it('meets WCAG AA for default light text pairs on --bg-main (DSRT-02 AC2)', () => {
+    const lightBg = tokenValue(light, '--bg-main')
+    const textMain = tokenValue(light, '--text-main')
+    const textMuted = tokenValue(light, '--text-muted')
+    expect(contrastRatio(textMain, lightBg)).toBeGreaterThanOrEqual(4.5)
+    expect(contrastRatio(textMuted, lightBg)).toBeGreaterThanOrEqual(4.5)
   })
 })
 
