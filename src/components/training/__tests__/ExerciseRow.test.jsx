@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { withLang } from '../../../test/withLang';
 import ExerciseRow from '../ExerciseRow';
@@ -23,6 +23,22 @@ describe('ExerciseRow time-based columns (TBE-02)', () => {
         ));
         expect(screen.getByText('Duration')).toBeInTheDocument();
         expect(screen.getByText('Distance (m)')).toBeInTheDocument();
+    });
+
+    it('locks nested set technique to Straight for timeBased (TBE-02 AC2)', () => {
+        localStorage.setItem('shapeup_language', 'en');
+        render(withLang(
+            <ExerciseRow
+                exercise={{ ...baseExercise, exerciseType: 'timeBased', sets: [{ ...baseExercise.sets[0], duration: '05:00', distance: '' }] }}
+                blockType="straight"
+                onChange={() => {}}
+                onRemove={() => {}}
+            />
+        ));
+        const techniqueSelect = screen.getAllByRole('combobox')[1];
+        expect(techniqueSelect).toBeDisabled();
+        expect(within(techniqueSelect).getAllByRole('option')).toHaveLength(1);
+        expect(screen.queryByRole('option', { name: /drop set/i })).not.toBeInTheDocument();
     });
 
     it('shows reps/load headers for weightBased exercises', () => {
