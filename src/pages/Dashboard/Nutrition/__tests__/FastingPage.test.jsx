@@ -121,8 +121,18 @@ describe('FastingPage (IFTW-01..05)', () => {
         mockGetClock.mockResolvedValue(idleSnapshot);
         const { getByTestId, getByLabelText } = renderPage();
         await waitFor(() => expect(getByTestId('fasting-page')).toBeInTheDocument());
+        expect(getByLabelText(/14:10/)).toBeInTheDocument();
         expect(getByLabelText(/16:8/)).toBeInTheDocument();
-        expect(getByLabelText(/eating window starts|janela de alimentação/i)).toBeInTheDocument();
+        expect(getByLabelText(/18:6/)).toBeInTheDocument();
+        expect(getByLabelText(/20:4/)).toBeInTheDocument();
+        const eatingStart = getByLabelText(/eating window starts|janela de alimentação/i);
+        expect(eatingStart).toBeInTheDocument();
+        expect(
+            Array.from(eatingStart.querySelectorAll('option')).some((o) => o.value === '12:00'),
+        ).toBe(true);
+        expect(
+            Array.from(eatingStart.querySelectorAll('option')).some((o) => o.value === '12:30'),
+        ).toBe(true);
         expect(getByTestId('fasting-save')).toBeInTheDocument();
     });
 
