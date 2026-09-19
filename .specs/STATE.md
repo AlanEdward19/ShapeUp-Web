@@ -50,15 +50,18 @@
 
 ## Handoff
 
-- **Feature**: stitch-migration
-- **Phase / Task**: **Closed — Verified (PASS)** — T1–T19; Verifier 2026-09-15 @ `fdeb92b`; docs aligned 2026-09-16
-- **Completed**: AD-WEB-007 end-state — zero `src/stitch/`; native `.tsx` shells; `PlanEditorShell`; static assets in `pages/shell-assets/`; runtime motor (`sourceRuntime`/`StitchTemplate`) removed; gates green (check-frontend-gates, build, lint, tsc, **112** tests); `spec.md` STMIG table + goals/success synced to `validation.md`
+- **Feature**: exercise-library-detail-polish
+- **Phase / Task**: Closed — Verified (PASS, second verifier pass)
+- **Completed**: T1–T8 + test-strengthening; API seed synergists in ShapeUpV2
 - **In-progress**: none
-- **Next step**: none for this feature — pick next roadmap item when ready
+- **Next step**: none for this feature
 - **Blockers**: none
-- **Cross-repo**: workout-editor PASS; Builder coordination closed by T19
-- **Validation report**: `.specs/features/stitch-migration/validation.md`
-- **Optional backlog (non-blocking)**: none — `shell-assets` rename + PNG cleanup done 2026-09-16
+- **Uncommitted files**: none for ELP (validation.md to be committed)
+- **Branch**: develop
+- **Validation report**: `.specs/features/exercise-library-detail-polish/validation.md`
+- **Cross-repo**: ShapeUpV2 `ebff5a9`, `02c5684`, `a62e1c5`
+
+- **Feature (queued)**: intermittent-fasting-timer (Web slice) — specs drafted, not this push
 
 ---
 
