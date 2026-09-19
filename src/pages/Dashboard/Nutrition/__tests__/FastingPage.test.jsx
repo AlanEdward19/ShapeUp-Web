@@ -93,6 +93,54 @@ describe('maybeNotifyEatingWindow (IFTW-10)', () => {
         expect(calls).toHaveLength(0);
         vi.unstubAllGlobals();
     });
+
+    it('does nothing when permission is default', () => {
+        const calls = [];
+        class MockNotification {
+            constructor(title, options) {
+                calls.push([title, options]);
+            }
+        }
+        MockNotification.permission = 'default';
+        vi.stubGlobal('Notification', MockNotification);
+        maybeNotifyEatingWindow('Fasting', 'Eating', (key) => key);
+        expect(calls).toHaveLength(0);
+        vi.unstubAllGlobals();
+    });
+});
+
+describe('FastingPage notification permission default (IFTW-10)', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockGetHistory.mockResolvedValue({ items: [] });
+        class MockNotification {
+            constructor() {
+                throw new Error('Notification should not be constructed');
+            }
+        }
+        MockNotification.permission = 'default';
+        vi.stubGlobal('Notification', MockNotification);
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('shows Eating clock without notification error toast when permission is default', async () => {
+        mockGetClock.mockResolvedValue({
+            ...agendaSnapshot,
+            clock: {
+                status: 'Eating',
+                boundaryAt: new Date(Date.now() + 3600 * 1000).toISOString(),
+                source: 'Agenda',
+            },
+        });
+        const { getByTestId, queryByTestId } = renderPage();
+        await waitFor(() => {
+            expect(getByTestId('fasting-countdown')).toHaveAttribute('data-clock-status', 'Eating');
+        });
+        expect(queryByTestId('fasting-error')).not.toBeInTheDocument();
+    });
 });
 
 describe('FastingPage (IFTW-01..05)', () => {
