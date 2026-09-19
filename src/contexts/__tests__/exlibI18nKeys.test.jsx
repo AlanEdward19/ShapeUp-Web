@@ -109,4 +109,18 @@ describe('exlib i18n keys', () => {
         expect(pt['exlib.drawer.add']).toBe('Adicionar à Ficha do Aluno');
         expect(pt['exlib.video.empty']).toBe('Vídeo de execução não cadastrado');
     });
+
+    it('falls back to the key string for an unknown key without crashing', () => {
+        localStorage.setItem('shapeup_language', 'pt-BR');
+        const ProbeUnknown = () => {
+            const { t } = useLanguage();
+            return <span data-testid="unknown">{t('exlib.__no_such_key__')}</span>;
+        };
+        const { getByTestId } = render(
+            <LanguageProvider>
+                <ProbeUnknown />
+            </LanguageProvider>,
+        );
+        expect(getByTestId('unknown').textContent).toBe('exlib.__no_such_key__');
+    });
 });

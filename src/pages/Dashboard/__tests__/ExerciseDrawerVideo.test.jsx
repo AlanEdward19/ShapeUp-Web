@@ -33,6 +33,7 @@ describe('ExerciseDrawerVideo', () => {
     const { container, getByTitle, queryByTitle } = renderVideo(
       <ExerciseDrawerVideo videoUrl="https://www.youtube.com/watch?v=dQw4w9wgGcQ" title="Supino" />,
     );
+    expect(container.querySelector('[data-video-player]')).toHaveClass('aspect-square');
     expect(container.querySelector('iframe')).toBeNull();
     const poster = container.querySelector('img');
     expect(poster).toHaveAttribute('src', 'https://img.youtube.com/vi/dQw4w9wgGcQ/hqdefault.jpg');
@@ -48,6 +49,7 @@ describe('ExerciseDrawerVideo', () => {
     const { container, getByTitle } = renderVideo(
       <ExerciseDrawerVideo videoUrl="https://vimeo.com/123456789" title="Supino" />,
     );
+    expect(container.querySelector('[data-video-player]')).toHaveClass('aspect-square');
     expect(container.querySelector('iframe')).toBeNull();
     fireEvent.click(getByTitle('Reproduzir'));
     expect(container.querySelector('iframe')).toHaveAttribute(
@@ -59,6 +61,7 @@ describe('ExerciseDrawerVideo', () => {
   it('shows empty copy for missing, invalid, and unknown-host URLs instead of a player', () => {
     const empty = renderVideo(<ExerciseDrawerVideo title="Supino" />);
     expect(empty.container).toHaveTextContent('Vídeo de execução não cadastrado');
+    expect(empty.container.querySelector('.aspect-square')).toBeTruthy();
     expect(empty.container.querySelector('video')).toBeNull();
     expect(empty.container.querySelector('iframe')).toBeNull();
     empty.unmount();
