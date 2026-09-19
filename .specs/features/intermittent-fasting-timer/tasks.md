@@ -84,8 +84,8 @@ T6 → T7 → T8
 **Requirement**: IFTW-01, IFTW-03, IFTW-04
 **Tools**: Skill tlc-spec-driven Execute
 **Done when**:
-- [ ] 404 JSON `nutrition.fasting.disabled` → thrown error.code matches
-- [ ] putAgenda sends `eatingStartMinutes` 720 and IANA `timeZone` for 16:8 / 12:00
+- [x] 404 JSON `nutrition.fasting.disabled` → thrown error.code matches
+- [x] putAgenda sends `eatingStartMinutes` 720 and IANA `timeZone` for 16:8 / 12:00
 **Tests**: unit
 **Gate**: quick
 **Commit**: `feat(nutrition): add fasting API client hook`

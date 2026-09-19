@@ -72,8 +72,18 @@ export const apiClient = async (endpoint, options = {}) => {
     }
 
     if (!response.ok) {
-        const error = new Error(`API Request to ${url} failed with status: ${response.status}`);
+        let body = null;
+        try {
+            body = await response.json();
+        } catch {
+            body = null;
+        }
+        const error = new Error(
+            body?.message || `API Request to ${url} failed with status: ${response.status}`,
+        );
         error.status = response.status;
+        if (body?.code) error.code = body.code;
+        if (body?.message) error.message = body.message;
         throw error;
     }
 
