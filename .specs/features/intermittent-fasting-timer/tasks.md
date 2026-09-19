@@ -253,7 +253,7 @@ Batches: **Batch 1 = T1–T3**. **Batch 2 = T4–T5**. **Batch 3 = T6–T8** (fo
 ## Fix Tasks (Verifier gaps)
 
 - [x] **F1** — IFTW-01 AC1: assert all presets and 30-minute grid options
-- [ ] **F2** — IFTW-01 AC3 + IFTW-08 AC2: invalid agenda save tests
+- [x] **F2** — IFTW-01 AC3 + IFTW-08 AC2: invalid agenda save tests
 - [ ] **F3** — IFTW-02 AC2–AC3, IFTW-03 AC1/AC3: Eating tick, override snapshots + clock data attrs
 - [ ] **F4** — IFTW-05/06/07/09: disclaimer, recommendation PUT, diary, history cap
 - [ ] **F5** — IFTW-10 AC2: default Notification permission path

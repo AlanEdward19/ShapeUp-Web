@@ -136,6 +136,60 @@ describe('FastingPage (IFTW-01..05)', () => {
         expect(getByTestId('fasting-save')).toBeInTheDocument();
     });
 
+    it('refuses Save with off-grid eating start and names the field', async () => {
+        mockGetClock.mockResolvedValue(idleSnapshot);
+        const { getByTestId, getByLabelText, getByText } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-save')).toBeInTheDocument());
+        fireEvent.click(getByLabelText(/16:8/));
+        fireEvent.change(getByLabelText(/eating window starts|janela de alimentação/i), {
+            target: { value: '12:15' },
+        });
+        fireEvent.click(getByTestId('fasting-save'));
+        await waitFor(() => {
+            expect(mockPutAgenda).not.toHaveBeenCalled();
+            expect(getByText(/30-minute grid|intervalos de 30 minutos/i)).toBeInTheDocument();
+        });
+    });
+
+    it('refuses Save with empty protocol from agenda and names the field', async () => {
+        mockGetClock.mockResolvedValue({
+            ...idleSnapshot,
+            agenda: {
+                protocol: '',
+                fastHours: 16,
+                eatHours: 8,
+                eatingStartMinutes: 720,
+                timeZone: 'America/Sao_Paulo',
+            },
+        });
+        const { getByTestId, getByText } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-save')).toBeInTheDocument());
+        fireEvent.click(getByTestId('fasting-save'));
+        await waitFor(() => {
+            expect(mockPutAgenda).not.toHaveBeenCalled();
+            expect(getByText(/Choose a protocol|Escolha um protocolo/i)).toBeInTheDocument();
+        });
+    });
+
+    it('refuses Save with custom fast hours outside 12–23', async () => {
+        mockGetClock.mockResolvedValue(idleSnapshot);
+        const { getByTestId, getByLabelText, getByText } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-save')).toBeInTheDocument());
+        fireEvent.click(getByLabelText(/custom|personalizado/i));
+        const customHoursInput = getByTestId('fasting-custom-hours');
+        customHoursInput.removeAttribute('min');
+        customHoursInput.removeAttribute('max');
+        fireEvent.change(customHoursInput, { target: { value: '8' } });
+        fireEvent.click(getByTestId('fasting-save'));
+        await waitFor(() => {
+            expect(mockPutAgenda).not.toHaveBeenCalled();
+            expect(getByText(/between 12 and 23|entre 12 e 23/i)).toBeInTheDocument();
+        });
+        fireEvent.change(customHoursInput, { target: { value: '24' } });
+        fireEvent.click(getByTestId('fasting-save'));
+        await waitFor(() => expect(mockPutAgenda).not.toHaveBeenCalled());
+    });
+
     it('PUTs agenda with eatingStartMinutes 720 for 16:8 at 12:00', async () => {
         mockGetClock.mockResolvedValue(idleSnapshot);
         const { getByTestId, getByLabelText } = renderPage();
