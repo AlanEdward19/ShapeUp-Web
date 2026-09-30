@@ -7,11 +7,11 @@ const operationKey = (sessionId, setId) => `shapeup_set_op_${sessionId}_${setId}
 const operationIdFor = (sessionId, setId) => {
     const key = operationKey(sessionId, setId);
     try {
-        const stored = sessionStorage.getItem(key);
+        const stored = localStorage.getItem(key);
         if (stored) return stored;
     } catch { /* storage indisponível: o id vale só para este envio */ }
     const id = crypto.randomUUID ? crypto.randomUUID() : `op-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    try { sessionStorage.setItem(key, id); } catch { /* ignore */ }
+    try { localStorage.setItem(key, id); } catch { /* ignore */ }
     return id;
 };
 

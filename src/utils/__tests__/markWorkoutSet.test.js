@@ -5,7 +5,7 @@ const exercise = { id: 7, exerciseType: 'weightBased', sets: [] };
 const set = { id: 's_0_0', type: 'working', log: { reps: '8', weight: '50', rpe: '8' }, prescribedRest: 90 };
 
 describe('markWorkoutSet', () => {
-    beforeEach(() => sessionStorage.clear());
+    beforeEach(() => localStorage.clear());
 
     it('builds the POST /sets body with a client operationId', () => {
         const body = buildMarkSetBody({ sessionId: 'abc', exercise, set, unitSystem: 'metric' });
