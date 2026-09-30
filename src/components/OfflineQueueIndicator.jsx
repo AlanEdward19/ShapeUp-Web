@@ -10,7 +10,7 @@ import './OfflineQueueIndicator.css';
 // enqueueMutation with something worth describing.
 const DESCRIPTORS = [
     [/\/api\/training\/workouts\/start$/, 'offline.item.workout_start', 'Workout start'],
-    [/\/api\/training\/workouts\/[^/]+\/state$/, 'offline.item.workout_state', 'Workout progress'],
+    [/\/api\/training\/workouts\/[^/]+\/(state|sets)$/, 'offline.item.workout_state', 'Workout progress'],
     [/\/api\/training\/workouts\/[^/]+\/finish$/, 'offline.item.workout_finish', 'Workout completion'],
     [/\/api\/training\/workouts\/[^/]+\/cancel$/, 'offline.item.workout_cancel', 'Workout cancellation'],
     [/\/api\/training\/workout-plans/, 'offline.item.workout_plan', 'Training plan'],

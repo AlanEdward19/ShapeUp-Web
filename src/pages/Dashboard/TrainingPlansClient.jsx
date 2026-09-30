@@ -12,6 +12,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
+import { enqueueMarkedSet } from '../../utils/markWorkoutSet';
 import { generateObjectId } from '../../utils/objectId';
 import { normalizePlan, flattenBlockExercises } from '../../utils/trainingNormalization';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
@@ -261,7 +262,6 @@ const ClientView = () => {
     });
 
     const hasFirstDoneRef = useRef(false);
-    const lastSyncedHashRef = useRef('');
     const committedSetsRef = useRef(new Set()); // Tracks sets that have been "sent" at least once as done
     const doneClickGuardRef = useRef({});
     const exercisesRef = useRef(exercises);
@@ -292,47 +292,6 @@ const ClientView = () => {
         });
     }, [workoutSessionId, unitSystem]);
     
-    /**
-     * Sincroniza o estado atual do treino com o servidor.
-     * Só envia se houver mudança no payload filtrado desde a última sincronização.
-     * Enfileira via mutationQueue (offline foundation) em vez de chamar a API direto: a
-     * escrita fica durável (sobrevive offline/reload) e ganha retry/backoff automáticos.
-     * dedupeKey garante que só a versão mais recente do payload desta sessão fica pendente.
-     */
-    const syncWorkoutStateIfNeeded = useCallback(({ sourceExercises, elapsedSeconds }) => {
-        if (!workoutSessionId) return;
-
-        // 1. Build payload containing ONLY current completed sets
-        const payload = buildWorkoutStatePayload(sourceExercises ?? exercisesRef.current, elapsedSeconds ?? workoutTimeRef.current);
-
-        // 2. Compara o hash do payload de séries FINALIZADAS
-        const currentPayloadHash = JSON.stringify(payload.exercises); // Compare only exercises/sets content
-
-        // 3. Se for igual ao que já está enfileirado/sincronizado, não faz nada
-        if (currentPayloadHash === lastSyncedHashRef.current) {
-            return;
-        }
-
-        // 4. Se o usuário apenas DESMARCOU uma série, não sincronizamos
-        const currentDoneCount = payload.exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
-        const lastDoneCount = parseInt(sessionStorage.getItem(`lastDoneCount_client_${workoutSessionId}`) || '0');
-
-        if (currentDoneCount < lastDoneCount) {
-             return;
-        }
-
-        // 5. Enfileira a sincronização
-        lastSyncedHashRef.current = currentPayloadHash;
-        sessionStorage.setItem(`lastDoneCount_client_${workoutSessionId}`, currentDoneCount.toString());
-
-        enqueueMutation({
-            endpoint: `/api/training/workouts/${workoutSessionId}/state`,
-            method: 'PUT',
-            body: payload,
-            dedupeKey: `workout-state-${workoutSessionId}`,
-        });
-    }, [workoutSessionId, buildWorkoutStatePayload]);
-
     // -- Fetch Plans from API & LocalStorage --
     useEffect(() => {
         const fetchPlans = async () => {
@@ -422,7 +381,6 @@ const ClientView = () => {
                 setExercises(runtimeExercises);
                 hasFirstDoneRef.current = false;
                 committedSetsRef.current = new Set();
-                lastSyncedHashRef.current = '';
                 doneClickGuardRef.current = {};
                 setIsFinishingSession(false);
                 setActivePlan(plan);
@@ -513,20 +471,6 @@ const ClientView = () => {
             }
         }
     }, [sessionActive, setIsOpen, setSteps, setCurrentStep, t]);
-
-    // Debounced synchronization: Only sync state when changes occur and have settled (2s)
-    useEffect(() => {
-        if (!sessionActive || !workoutSessionId || !hasFirstDoneRef.current) return;
-        
-        const timerId = setTimeout(() => {
-            syncWorkoutStateIfNeeded({
-                sourceExercises: exercises,
-                elapsedSeconds: workoutTimeRef.current
-            });
-        }, 2000);
-
-        return () => clearTimeout(timerId);
-    }, [exercises, sessionActive, workoutSessionId, syncWorkoutStateIfNeeded]);
 
     useEffect(() => {
         if (!sessionActive) {
@@ -634,7 +578,6 @@ const ClientView = () => {
         setExercises(runtimeExercises);
         hasFirstDoneRef.current = false;
         committedSetsRef.current = new Set();
-        lastSyncedHashRef.current = JSON.stringify(buildWorkoutStatePayload(runtimeExercises, 0).exercises);
         doneClickGuardRef.current = {};
         setIsFinishingSession(false);
         setActivePlan(plan);
@@ -718,6 +661,13 @@ const ClientView = () => {
             const targetSet = result.exercises[exerciseIndex].sets[setIndex];
             committedSetsRef.current.add(targetSet.id);
             hasFirstDoneRef.current = true;
+            enqueueMarkedSet({
+                enqueueMutation,
+                sessionId: workoutSessionId,
+                exercise: result.exercises[exerciseIndex],
+                set: targetSet,
+                unitSystem,
+            });
         }
 
         if (result.startRest && defaultRest > 0) {
@@ -773,11 +723,6 @@ const ClientView = () => {
     const finishSession = async () => {
         setIsFinishingSession(true);
 
-        // Force a final sync before proceeding to feedback/overview to ensure no pending changes are lost
-        await syncWorkoutStateIfNeeded({
-            sourceExercises: exercises,
-            elapsedSeconds: workoutTime
-        });
 
         // Instead of directly ending, trigger feedback flow
         setShowFeedbackModal(true);
@@ -907,7 +852,6 @@ const ClientView = () => {
         setRestTimer(0);
         setExercises([]);
         hasFirstDoneRef.current = false;
-        lastSyncedHashRef.current = '';
         doneClickGuardRef.current = {};
         setViewingExerciseDef(null);
     };
@@ -932,7 +876,6 @@ const ClientView = () => {
         setRestTimer(0);
         setExercises([]);
         hasFirstDoneRef.current = false;
-        lastSyncedHashRef.current = '';
         doneClickGuardRef.current = {};
         setViewingExerciseDef(null);
     };
