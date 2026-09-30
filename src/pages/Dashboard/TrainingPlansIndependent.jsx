@@ -18,6 +18,7 @@ import {
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
+import { enqueueMarkedSet } from '../../utils/markWorkoutSet';
 import { generateObjectId } from '../../utils/objectId';
 import { flattenBlockExercises, normalizePlan } from '../../utils/trainingNormalization';
 import { unmapSetType } from '../../utils/trainingEnums';
@@ -185,7 +186,6 @@ const TrainingPlansIndependent = () => {
     const [invalidLogs, setInvalidLogs] = useState({});
 
     const hasFirstDoneRef = useRef(false);
-    const lastSyncedHashRef = useRef('');
     const committedSetsRef = useRef(new Set()); // Tracks sets that have been "sent" at least once as done
     const doneClickGuardRef = useRef({});
     const sessionExercisesRef = useRef(sessionExercises);
@@ -221,50 +221,6 @@ const TrainingPlansIndependent = () => {
         });
     }, [workoutSessionId, unitSystem]);
     
-    /**
-     * Sincroniza o estado atual do treino com o servidor.
-     * Só envia se houver mudança no payload filtrado desde a última sincronização.
-     * Enfileira via mutationQueue (offline foundation) em vez de chamar a API direto: a
-     * escrita fica durável (sobrevive offline/reload) e ganha retry/backoff automáticos.
-     * dedupeKey garante que só a versão mais recente do payload desta sessão fica pendente.
-     */
-    const syncWorkoutStateIfNeeded = useCallback(({ sourceExercises, elapsedSeconds }) => {
-        if (!workoutSessionId) return;
-
-        // 1. Build payload containing ONLY current completed sets
-        const payload = buildWorkoutStatePayloadLocal(sourceExercises ?? sessionExercisesRef.current, elapsedSeconds ?? workoutTimeRef.current);
-
-        // 2. Compara o hash do payload de séries FINALIZADAS
-        const currentPayloadHash = JSON.stringify(payload.exercises); // Compare only exercises/sets content
-
-        // 3. Se for igual ao que já está enfileirado/sincronizado, não faz nada
-        if (currentPayloadHash === lastSyncedHashRef.current) {
-            return;
-        }
-
-        // 4. Se o usuário apenas DESMARCOU uma série, não sincronizamos (deixamos o servidor com a última versão válida)
-        // Só sincronizamos se houver conteúdo novo ou mudança em algo já marcado.
-        // Contamos o total de sets no payload. Se diminuiu, é um "undone" puro, pulamos sem atualizar o hash.
-        const currentDoneCount = payload.exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
-        const lastDoneCount = parseInt(sessionStorage.getItem(`lastDoneCount_${workoutSessionId}`) || '0');
-
-        if (currentDoneCount < lastDoneCount) {
-             // Just bail, don't update hash. If they re-check, currentPayloadHash will match lastSyncedHashRef and still bail.
-             return;
-        }
-
-        // 5. Enfileira a sincronização
-        lastSyncedHashRef.current = currentPayloadHash;
-        sessionStorage.setItem(`lastDoneCount_${workoutSessionId}`, currentDoneCount.toString());
-
-        enqueueMutation({
-            endpoint: `/api/training/workouts/${workoutSessionId}/state`,
-            method: 'PUT',
-            body: payload,
-            dedupeKey: `workout-state-${workoutSessionId}`,
-        });
-    }, [workoutSessionId, buildWorkoutStatePayloadLocal]);
-
     const mutateSessionExercises = useCallback((mutator) => {
         const next = [...sessionExercisesRef.current];
         mutator(next);
@@ -343,7 +299,6 @@ const TrainingPlansIndependent = () => {
                 setSessionExercises(runtimeExercises);
                 hasFirstDoneRef.current = false;
                 committedSetsRef.current = new Set();
-                lastSyncedHashRef.current = '';
                 doneClickGuardRef.current = {};
                 setIsFinishingSession(false);
                 setActivePlan(plan);
@@ -433,20 +388,6 @@ const TrainingPlansIndependent = () => {
             clearInterval(restInterval);
         };
     }, [sessionActive, isResting, restTimer, showFeedbackModal, showOverviewModal, showCancelModal]);
-
-    // Debounced synchronization: Only sync state when changes occur and have settled (2s)
-    useEffect(() => {
-        if (!sessionActive || !workoutSessionId || !hasFirstDoneRef.current) return;
-
-        const timerId = setTimeout(() => {
-            syncWorkoutStateIfNeeded({
-                sourceExercises: sessionExercises,
-                elapsedSeconds: workoutTimeRef.current
-            });
-        }, 2000);
-
-        return () => clearTimeout(timerId);
-    }, [sessionExercises, sessionActive, workoutSessionId, syncWorkoutStateIfNeeded]);
 
     // ─── PLAN MANAGEMENT HANDLERS ─────────────────────────────────
 
@@ -608,7 +549,6 @@ const TrainingPlansIndependent = () => {
         setSessionExercises(runtimeExercises);
         hasFirstDoneRef.current = false;
         committedSetsRef.current = new Set();
-        lastSyncedHashRef.current = ''; // Reset hash for new session
         doneClickGuardRef.current = {};
         setIsFinishingSession(false);
         setActivePlan(plan);
@@ -621,7 +561,6 @@ const TrainingPlansIndependent = () => {
         if (isFinishingSession) return;
 
         setIsFinishingSession(true);
-        await syncWorkoutStateIfNeeded({ force: true });
 
         setShowFeedbackModal(true);
         setSessionTitle?.(null);
@@ -718,7 +657,6 @@ const TrainingPlansIndependent = () => {
         setShowFeedbackModal(false);
         setShowCancelModal(false);
         hasFirstDoneRef.current = false;
-        lastSyncedHashRef.current = '';
         doneClickGuardRef.current = {};
         setSessionTitle?.(null);
     };
@@ -852,6 +790,13 @@ const TrainingPlansIndependent = () => {
                                                 if (completedState) {
                                                     committedSetsRef.current.add(s.id);
                                                     hasFirstDoneRef.current = true;
+                                                    enqueueMarkedSet({
+                                                        enqueueMutation,
+                                                        sessionId: workoutSessionId,
+                                                        exercise: result.exercises[exIdx],
+                                                        set: result.exercises[exIdx].sets[sIdx],
+                                                        unitSystem,
+                                                    });
                                                 }
 
                                                 if (result.startRest && s.prescribedRest > 0) { setRestTimer(s.prescribedRest); setIsResting(true); }

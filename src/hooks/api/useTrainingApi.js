@@ -102,13 +102,6 @@ export const useTrainingApi = () => {
         });
     }, []);
 
-    const updateWorkoutState = useCallback(async (sessionId, command) => {
-        return await apiClient(`/api/training/workouts/${sessionId}/state`, {
-            method: 'PUT',
-            body: JSON.stringify(command)
-        });
-    }, []);
-
     const cancelWorkout = useCallback(async (sessionId) => {
         return await apiClient(`/api/training/workouts/${sessionId}/cancel`, {
             method: 'POST'
@@ -218,7 +211,7 @@ export const useTrainingApi = () => {
         // Workout Plans
         createWorkoutPlan, updateWorkoutPlan, deleteWorkoutPlan, getWorkoutPlanById, copyWorkoutPlan, getWorkoutPlansByUser,
         // Workouts
-        startWorkout, finishWorkout, updateWorkoutState, cancelWorkout, getWorkoutById, getWorkoutsByUser, getActiveWorkout,
+        startWorkout, finishWorkout, cancelWorkout, getWorkoutById, getWorkoutsByUser, getActiveWorkout,
         // Exercises
         getExercises, getExerciseById, getExerciseEquivalents, createExercise, updateExercise, deleteExercise, suggestExercises,
         // Equipments
