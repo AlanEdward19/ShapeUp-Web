@@ -19,6 +19,8 @@ import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import { useXpCelebration } from '../../hooks/useXpCelebration';
 import { runWorkoutSubmitFeedback } from './workoutSubmitFeedback';
 import WorkoutFinishXpPopup from './WorkoutFinishXpPopup';
+import SessionEndCard from '../../components/session/SessionEndCard';
+import { buildSessionEndSummary } from '../../utils/sessionEndSummary';
 import { buildWorkoutStatePayload as buildWorkoutStateApiPayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { mapExerciseEquivalents } from '../../utils/exerciseEquivalents';
 import EquivalentPickerModal from '../../components/training/EquivalentPickerModal';
@@ -1170,9 +1172,11 @@ const ClientView = () => {
                 const clientId = localStorage.getItem('shapeup_client_id') || 1;
                 const storedPlansRaw = localStorage.getItem(`shapeup_client_plans_${clientId}`);
                 let previousBestMap = {};
+                let previousHistory = [];
 
                 if (storedPlansRaw) {
                     const dbPlans = JSON.parse(storedPlansRaw);
+                    previousHistory = dbPlans.flatMap(plan => plan.history || []);
                     dbPlans.forEach(plan => {
                         (plan.history || []).forEach(h => {
                             h.exercises.forEach(ex => {
@@ -1241,6 +1245,13 @@ const ClientView = () => {
                                     <span className="su-stat-label">{t('client.session.modal.gamified.prs')}</span>
                                 </div>
                             </div>
+
+                            <SessionEndCard
+                                title={activePlan?.name || t('client.session.modal.gamified.fallback')}
+                                summary={buildSessionEndSummary(exercises, previousHistory)}
+                                volumeText={totalVol.toLocaleString()}
+                                durationText={`${Math.ceil(workoutTime / 60)}m`}
+                            />
 
                             <div className="su-gamified-actions">
                                 <Button size="lg" fullWidth onClick={skipOverviewAndFinish}>
