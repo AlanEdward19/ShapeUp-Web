@@ -2,8 +2,7 @@ import { buildWorkoutStatePayload } from './workoutStatePayload';
 
 const operationKey = (sessionId, setId) => `shapeup_set_op_${sessionId}_${setId}`;
 
-// Um operation_id por série na sessão: marcar, desmarcar e marcar de novo reenvia o mesmo id,
-// e o servidor trata o repetido como sucesso sem criar segunda série.
+// Mesmo operation_id por série na sessão, para o reenvio não criar segunda série.
 const operationIdFor = (sessionId, setId) => {
     const key = operationKey(sessionId, setId);
     try {
@@ -15,11 +14,7 @@ const operationIdFor = (sessionId, setId) => {
     return id;
 };
 
-/**
- * Corpo de POST /workouts/{sessionId}/sets para uma série marcada, com o mesmo preenchimento
- * (reps/carga/RPE prescritos) e validações que o restante do treino usa.
- * Devolve null quando não há o que enviar.
- */
+// Corpo de POST /workouts/{sessionId}/sets; null quando não há o que enviar.
 export const buildMarkSetBody = ({ sessionId, exercise, set, unitSystem }) => {
     const { exercises } = buildWorkoutStatePayload({
         sessionId,
@@ -35,10 +30,7 @@ export const buildMarkSetBody = ({ sessionId, exercise, set, unitSystem }) => {
     };
 };
 
-/**
- * Marca a série pela fila offline (mutationQueue): a tela já mostra a série feita e o envio
- * é durável, com retry. Cada série tem a sua própria chave, então uma não substitui outra.
- */
+// Envia pela fila offline, com uma chave por série para uma não substituir a outra.
 export const enqueueMarkedSet = ({ enqueueMutation, sessionId, exercise, set, unitSystem }) => {
     if (!sessionId) return;
     const body = buildMarkSetBody({ sessionId, exercise, set, unitSystem });
