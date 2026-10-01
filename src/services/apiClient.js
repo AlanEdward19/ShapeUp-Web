@@ -32,6 +32,9 @@ const setCachedResponse = (url, data) => {
  * no cabeçalho Authorization de toda requisição.
  */
 export const apiClient = async (endpoint, options = {}) => {
+    // `noReadCache` keeps user/plan-scoped reads out of the shared offline cache.
+    const { noReadCache = false, ...fetchOptions } = options;
+    options = fetchOptions;
     let token = '';
 
     // Sempre pega um token fresco caso o currentUser exista
@@ -50,7 +53,7 @@ export const apiClient = async (endpoint, options = {}) => {
 
     // A rota relativa se beneficia do proxy do Vite em ambiente de desenvolvimento
     const url = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-    const isRead = (options.method || 'GET').toUpperCase() === 'GET';
+    const isRead = (options.method || 'GET').toUpperCase() === 'GET' && !noReadCache;
 
     let response;
     try {

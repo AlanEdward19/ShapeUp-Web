@@ -175,4 +175,27 @@ describe('AthleteView schedule wiring (WSD-03..WSD-06)', () => {
     expect(getDashboardMe).not.toHaveBeenCalled();
     expect(getDashboardMe).not.toHaveBeenCalledWith(5);
   });
+
+  it('maps the weekly reading: ready with days, 403 to locked, other errors to error', async () => {
+    plansResponse = [];
+    const renderView = () => render(
+      <MemoryRouter>
+        <AthleteView {...scoreboardProps} />
+      </MemoryRouter>,
+    );
+
+    getWeeklyReading.mockResolvedValueOnce({ daysWithWork: 3, loadTrends: [] });
+    const first = renderView();
+    await waitFor(() => expect(lastAthleteState?.weeklyReading).toEqual({ status: 'ready', data: { daysWithWork: 3, loadTrends: [] } }));
+    first.unmount();
+
+    getWeeklyReading.mockRejectedValueOnce(Object.assign(new Error('forbidden'), { status: 403 }));
+    const second = renderView();
+    await waitFor(() => expect(lastAthleteState?.weeklyReading).toEqual({ status: 'locked' }));
+    second.unmount();
+
+    getWeeklyReading.mockRejectedValueOnce(new Error('boom'));
+    renderView();
+    await waitFor(() => expect(lastAthleteState?.weeklyReading).toEqual({ status: 'error' }));
+  });
 });

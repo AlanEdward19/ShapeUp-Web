@@ -206,7 +206,7 @@ export const useTrainingApi = () => {
     }, []);
 
     const getWeeklyReading = useCallback(async () => {
-        return await apiClient('/api/training/dashboard/me/weekly-reading');
+        return await apiClient('/api/training/dashboard/me/weekly-reading', { noReadCache: true });
     }, []);
 
     return {
