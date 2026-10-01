@@ -22,7 +22,7 @@ const resolveLoad = (set) => {
 };
 
 /**
- * Builds the PUT /workouts/{id}/state (and finish) body the Training API expects.
+ * Builds the workout body the Training API expects (finish and set marking).
  * Falls back to prescribed reps/load/RPE when the athlete marks Done without typing logs.
  */
 export const buildWorkoutStatePayload = ({ sessionId, exercises, unitSystem }) => {
