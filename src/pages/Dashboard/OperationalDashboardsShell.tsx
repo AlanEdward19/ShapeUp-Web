@@ -28,6 +28,7 @@ import {
 } from './operational-dashboard/ProfessionalDashboardMarkup';
 import type { ChartPoint, DashboardClientRow, NormalizedPlan, StoredMessage } from './operational-dashboard/types';
 import { useDashboardCopy } from './operational-dashboard/useDashboardCopy';
+import type { WeeklyReadingState } from '../../components/gamification/WeeklyReadingCard';
 
 function read<T>(key: string, fallback: T): T {
   try {
@@ -163,7 +164,7 @@ export function AthleteView(scoreboardState: AthleteDashboardState) {
   const date = new Date().toLocaleDateString('en-CA');
   const { water, addWater } = useHydration(date);
   const { getDiaryDay, getNutritionProfile } = useNutritionApi();
-  const { getDashboardMe, getWorkoutsByUser, getWorkoutPlansByUser } = useTrainingApi();
+  const { getDashboardMe, getWeeklyReading, getWorkoutsByUser, getWorkoutPlansByUser } = useTrainingApi();
   const { getMe } = useAuthorizationApi();
   const [chartData, setChartData] = useState<ChartPoint[]>([]);
   const [plans, setPlans] = useState<NormalizedPlan[]>([]);
@@ -230,6 +231,21 @@ export function AthleteView(scoreboardState: AthleteDashboardState) {
     };
   }, [plans, plansLoadSettled, trainingError, getDashboardMe]);
 
+  const [weeklyReading, setWeeklyReading] = useState<WeeklyReadingState>({ status: 'loading' });
+  useEffect(() => {
+    let active = true;
+    getWeeklyReading()
+      .then(data => {
+        if (active) setWeeklyReading({ status: 'ready', data });
+      })
+      .catch(error => {
+        if (active) setWeeklyReading({ status: error?.status === 403 ? 'locked' : 'error' });
+      });
+    return () => {
+      active = false;
+    };
+  }, [getWeeklyReading]);
+
   const [nutrition, setNutrition] = useState<AthleteDashboardState['nutrition']>({});
   useEffect(() => {
     let active = true;
@@ -262,6 +278,7 @@ export function AthleteView(scoreboardState: AthleteDashboardState) {
     exercises,
     chartData,
     trainingError,
+    weeklyReading,
     dashboard,
     nutrition,
     water,

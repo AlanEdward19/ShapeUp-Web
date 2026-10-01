@@ -2,6 +2,8 @@ import FadeUp from '../../../components/motion/FadeUp';
 import NumberFlow from '../../../components/motion/NumberFlow';
 import AthleteScoreboard from '../../../components/gamification/AthleteScoreboard';
 import type { AthleteScoreboardState } from '../../../components/gamification/AthleteScoreboard';
+import WeeklyReadingCard from '../../../components/gamification/WeeklyReadingCard';
+import type { WeeklyReadingState } from '../../../components/gamification/WeeklyReadingCard';
 import HistoryChart from '../../../components/charts/HistoryChart';
 import type { ReactElement } from 'react';
 import type { ChartPoint, NormalizedExercise, NormalizedPlan, StoredMessage } from './types';
@@ -13,6 +15,7 @@ export type AthleteDashboardState = AthleteScoreboardState & {
   exercises: NormalizedExercise[];
   chartData: ChartPoint[];
   trainingError: string;
+  weeklyReading?: WeeklyReadingState;
   dashboard: {
     sessionsCompletionRate?: number;
     weeklyVolumeProgressPercent?: number;
@@ -134,6 +137,8 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
           </div>
           <AthleteScoreboard state={state} />
         </section>
+
+        {state.weeklyReading ? <WeeklyReadingCard reading={state.weeklyReading} /> : null}
 
         <FadeUp>
         <section className="grid grid-cols-2 divide-y divide-[#2a201b] border-y border-[#2a201b] py-4 md:grid-cols-4 md:divide-x md:divide-y-0" data-tour="client-metrics">

@@ -2,6 +2,7 @@ import { render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+const getWeeklyReading = vi.fn().mockResolvedValue({ daysWithWork: 0, loadTrends: [] });
 const getDashboardMe = vi.fn().mockResolvedValue({ sessionsTargetPerWeek: 2, sessionsCompletedThisWeek: 1 });
 const getWorkoutPlanById = vi.fn();
 const getWorkoutPlansByUser = vi.fn();
@@ -25,6 +26,7 @@ vi.mock('../../../utils/workoutSchedule', async importOriginal => {
 vi.mock('../../../hooks/api/useTrainingApi', () => ({
   useTrainingApi: () => ({
     getDashboardMe,
+    getWeeklyReading,
     getWorkoutsByUser,
     getWorkoutPlansByUser,
     getWorkoutPlanById,

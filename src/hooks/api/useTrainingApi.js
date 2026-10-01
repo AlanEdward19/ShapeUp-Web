@@ -205,6 +205,10 @@ export const useTrainingApi = () => {
         return await apiClient(`/api/training/dashboard/me?${query.toString()}`);
     }, []);
 
+    const getWeeklyReading = useCallback(async () => {
+        return await apiClient('/api/training/dashboard/me/weekly-reading');
+    }, []);
+
     return {
         // Workout Templates
         getWorkoutTemplates, getWorkoutTemplateById, createWorkoutTemplate, updateWorkoutTemplate, deleteWorkoutTemplate, copyWorkoutTemplate, assignWorkoutTemplate,
@@ -217,6 +221,6 @@ export const useTrainingApi = () => {
         // Equipments
         getEquipments, getEquipmentById, createEquipment, updateEquipment, deleteEquipment,
         // Dashboard
-        getDashboardMe
+        getDashboardMe, getWeeklyReading
     };
 };
