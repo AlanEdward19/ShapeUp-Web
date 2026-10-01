@@ -2,6 +2,7 @@ import { render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+const getWeeklyReading = vi.fn().mockResolvedValue({ daysWithWork: 0, loadTrends: [] });
 const getDashboardMe = vi.fn().mockResolvedValue({ sessionsTargetPerWeek: 2, sessionsCompletedThisWeek: 1 });
 const getWorkoutPlanById = vi.fn();
 const getWorkoutPlansByUser = vi.fn();
@@ -25,6 +26,7 @@ vi.mock('../../../utils/workoutSchedule', async importOriginal => {
 vi.mock('../../../hooks/api/useTrainingApi', () => ({
   useTrainingApi: () => ({
     getDashboardMe,
+    getWeeklyReading,
     getWorkoutsByUser,
     getWorkoutPlansByUser,
     getWorkoutPlanById,
@@ -172,5 +174,28 @@ describe('AthleteView schedule wiring (WSD-03..WSD-06)', () => {
     await waitFor(() => expect(lastAthleteState?.trainingError).toBeTruthy());
     expect(getDashboardMe).not.toHaveBeenCalled();
     expect(getDashboardMe).not.toHaveBeenCalledWith(5);
+  });
+
+  it('maps the weekly reading: ready with days, 403 to locked, other errors to error', async () => {
+    plansResponse = [];
+    const renderView = () => render(
+      <MemoryRouter>
+        <AthleteView {...scoreboardProps} />
+      </MemoryRouter>,
+    );
+
+    getWeeklyReading.mockResolvedValueOnce({ daysWithWork: 3, loadTrends: [] });
+    const first = renderView();
+    await waitFor(() => expect(lastAthleteState?.weeklyReading).toEqual({ status: 'ready', data: { daysWithWork: 3, loadTrends: [] } }));
+    first.unmount();
+
+    getWeeklyReading.mockRejectedValueOnce(Object.assign(new Error('forbidden'), { status: 403 }));
+    const second = renderView();
+    await waitFor(() => expect(lastAthleteState?.weeklyReading).toEqual({ status: 'locked' }));
+    second.unmount();
+
+    getWeeklyReading.mockRejectedValueOnce(new Error('boom'));
+    renderView();
+    await waitFor(() => expect(lastAthleteState?.weeklyReading).toEqual({ status: 'error' }));
   });
 });
