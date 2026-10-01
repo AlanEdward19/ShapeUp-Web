@@ -29,6 +29,8 @@ import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import { useXpCelebration } from '../../hooks/useXpCelebration';
 import { runWorkoutSubmitFeedback } from './workoutSubmitFeedback';
 import WorkoutFinishXpPopup from './WorkoutFinishXpPopup';
+import SessionEndCard from '../../components/session/SessionEndCard';
+import { buildSessionEndSummary } from '../../utils/sessionEndSummary';
 import {
     applyToggleLoggedSetComplete,
     applyUpdateSetLog,
@@ -882,6 +884,13 @@ const TrainingPlansIndependent = () => {
                                     <span className="su-stat-label">{t('client.session.modal.gamified.duration')}</span>
                                 </div>
                             </div>
+
+                            <SessionEndCard
+                                title={activePlan?.name || t('client.session.modal.gamified.fallback')}
+                                summary={buildSessionEndSummary(sessionExercises, activePlan?.history)}
+                                volumeText={formatWeight(sessionExercises.reduce((a, ex) => a + ex.sets.filter(s => s.completed).reduce((sa, s) => sa + (parseFloat(s.log.weight) * parseFloat(s.log.reps) || 0), 0), 0)).replace('0 ', '')}
+                                durationText={formatTime(workoutTime)}
+                            />
 
                             <div className="su-gamified-actions">
                                 <Button fullWidth size="lg" onClick={handleSessionCompleted}>
