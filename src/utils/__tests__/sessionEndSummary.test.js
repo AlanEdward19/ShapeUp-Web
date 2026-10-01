@@ -31,4 +31,15 @@ describe('buildSessionEndSummary', () => {
         expect(buildSessionEndSummary([{ name: 'Supino', sets: [set('85', false)] }], [past('Supino', 80)]).loadIncreases).toBe(0);
         expect(buildSessionEndSummary(undefined, undefined)).toEqual({ totalSets: 0, completedSets: 0, loadIncreases: 0 });
     });
+
+    it('finds the last time by date even when the history is not newest first', () => {
+        const summary = buildSessionEndSummary(
+            [{ name: 'Supino', sets: [set('85')] }],
+            [
+                { startedAtUtc: '2026-08-01T10:00:00Z', exercises: [{ name: 'Supino', sets: [{ load: 60 }] }] },
+                { startedAtUtc: '2026-09-20T10:00:00Z', exercises: [{ name: 'Supino', sets: [{ load: 90 }] }] },
+            ],
+        );
+        expect(summary.loadIncreases).toBe(0);
+    });
 });

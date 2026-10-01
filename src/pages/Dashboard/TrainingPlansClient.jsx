@@ -1176,9 +1176,7 @@ const ClientView = () => {
 
                 if (storedPlansRaw) {
                     const dbPlans = JSON.parse(storedPlansRaw);
-                    previousHistory = dbPlans
-                        .flatMap(plan => plan.history || [])
-                        .sort((a, b) => (parseInt(String(b.id).replace(/\D/g, ''), 10) || 0) - (parseInt(String(a.id).replace(/\D/g, ''), 10) || 0));
+                    previousHistory = dbPlans.flatMap(plan => plan.history || []);
                     dbPlans.forEach(plan => {
                         (plan.history || []).forEach(h => {
                             h.exercises.forEach(ex => {
