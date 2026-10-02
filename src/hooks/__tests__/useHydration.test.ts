@@ -182,6 +182,45 @@ describe('useHydration', () => {
   });
 });
 
+describe('useHydration unsent values', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    localStorage.clear();
+    resetHydrationCache();
+    mockGet.mockReset().mockResolvedValue({ totalMl: 500 });
+    mockPut.mockReset().mockResolvedValue({});
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('caps at 10000 ml', async () => {
+    mockGet.mockResolvedValue({ totalMl: 9900 });
+    const { result } = renderHook(() => useHydration(DATE));
+    await flushPromises();
+    act(() => result.current.addWater());
+    expect(result.current.water).toBe(10000);
+    act(() => result.current.addWater());
+    expect(result.current.water).toBe(10000);
+  });
+
+  it('keeps a value whose send failed on leaving the screen, and retries it on the next open', async () => {
+    const first = renderHook(() => useHydration(DATE));
+    await flushPromises();
+    act(() => first.result.current.addWater());
+    mockPut.mockRejectedValueOnce(new Error('offline'));
+    first.unmount();
+    await flushPromises();
+
+    mockGet.mockResolvedValue({ totalMl: 500 });
+    const second = renderHook(() => useHydration(DATE));
+    await flushPromises();
+    expect(second.result.current.water).toBe(750);
+    expect(mockPut).toHaveBeenLastCalledWith(DATE, expect.objectContaining({ totalMl: 750 }));
+  });
+});
+
 describe('waterPercent', () => {
   it('returns null without goal and caps at 100', () => {
     expect(waterPercent(500, 0)).toBeNull();
