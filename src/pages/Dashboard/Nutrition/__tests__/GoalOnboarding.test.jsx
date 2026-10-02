@@ -92,4 +92,27 @@ describe('GoalOnboarding', () => {
             expect(getByTestId('goal-result')).toHaveTextContent('1800 kcal');
         });
     });
+
+    it('sends the water goal with the manual goal and shows it in the result', async () => {
+        mockSetManualGoal.mockResolvedValue({
+            activeGoal: { kcal: 1800, proteinG: 140, carbG: 180, fatG: 60, waterMl: 2500 },
+            onboardingSkipped: true,
+        });
+        const { getByTestId } = renderOnboarding();
+
+        fireEvent.click(getByTestId('mode-manual-btn'));
+        fireEvent.change(getByTestId('manual-kcal-input'), { target: { value: '1800' } });
+        fireEvent.change(getByTestId('manual-protein-input'), { target: { value: '140' } });
+        fireEvent.change(getByTestId('manual-carb-input'), { target: { value: '180' } });
+        fireEvent.change(getByTestId('manual-fat-input'), { target: { value: '60' } });
+        fireEvent.change(getByTestId('manual-water-input'), { target: { value: '2500' } });
+        fireEvent.click(getByTestId('manual-submit-btn'));
+
+        await waitFor(() => {
+            expect(mockSetManualGoal).toHaveBeenCalledWith({
+                goal: { kcal: 1800, proteinG: 140, carbG: 180, fatG: 60, waterMl: 2500 },
+            });
+            expect(getByTestId('goal-result')).toHaveTextContent('Água 2500 ml');
+        });
+    });
 });

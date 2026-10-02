@@ -22,6 +22,7 @@ const baseState: AthleteDashboardState = {
   nutrition: {},
   water: 0,
   onAddWater: vi.fn(),
+  onRemoveWater: vi.fn(),
   messages: [],
   language: 'pt-BR',
   tr: (text: string) => text,

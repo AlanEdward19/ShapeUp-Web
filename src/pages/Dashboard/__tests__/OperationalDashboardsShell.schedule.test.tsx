@@ -45,7 +45,7 @@ vi.mock('../../../hooks/api/useNutritionApi', () => ({
 }));
 
 vi.mock('../../../hooks/useHydration', () => ({
-  default: () => ({ water: 0, addWater: vi.fn() }),
+  default: () => ({ water: 0, addWater: vi.fn(), removeWater: vi.fn() }),
 }));
 
 vi.mock('../../../contexts/UserProfileContext', () => ({

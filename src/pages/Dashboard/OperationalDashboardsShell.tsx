@@ -162,7 +162,7 @@ export function AthleteView(scoreboardState: AthleteDashboardState) {
   useWorkspaceDashboardTour('shapeup_client_dashboard_tour_seen', athleteTourSteps);
   const navigate = useNavigate();
   const date = new Date().toLocaleDateString('en-CA');
-  const { water, addWater } = useHydration(date);
+  const { water, addWater, removeWater } = useHydration(date);
   const { getDiaryDay, getNutritionProfile } = useNutritionApi();
   const { getDashboardMe, getWeeklyReading, getWorkoutsByUser, getWorkoutPlansByUser } = useTrainingApi();
   const { getMe } = useAuthorizationApi();
@@ -283,6 +283,7 @@ export function AthleteView(scoreboardState: AthleteDashboardState) {
     nutrition,
     water,
     onAddWater: addWater,
+    onRemoveWater: removeWater,
     messages,
     language,
     tr,

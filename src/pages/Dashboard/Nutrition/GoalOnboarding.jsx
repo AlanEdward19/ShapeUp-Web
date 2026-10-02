@@ -22,7 +22,7 @@ const GoalOnboarding = () => {
     const [age, setAge] = useState('');
     const [biologicalSex, setBiologicalSex] = useState('Male');
     const [activityLevel, setActivityLevel] = useState('ModeratelyActive');
-    const [manualGoal, setManualGoalState] = useState({ kcal: '', proteinG: '', carbG: '', fatG: '' });
+    const [manualGoal, setManualGoalState] = useState({ kcal: '', proteinG: '', carbG: '', fatG: '', waterMl: '' });
     const [result, setResult] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -51,14 +51,15 @@ const GoalOnboarding = () => {
         setError('');
         setLoading(true);
         try {
-            const profile = await setManualGoal({
-                goal: {
-                    kcal: parseInt(manualGoal.kcal, 10),
-                    proteinG: parseInt(manualGoal.proteinG, 10),
-                    carbG: parseInt(manualGoal.carbG, 10),
-                    fatG: parseInt(manualGoal.fatG, 10),
-                },
-            });
+            const goal = {
+                kcal: parseInt(manualGoal.kcal, 10),
+                proteinG: parseInt(manualGoal.proteinG, 10),
+                carbG: parseInt(manualGoal.carbG, 10),
+                fatG: parseInt(manualGoal.fatG, 10),
+            };
+            // Empty keeps the stored water goal; 0 clears it.
+            if (manualGoal.waterMl !== '') goal.waterMl = parseInt(manualGoal.waterMl, 10);
+            const profile = await setManualGoal({ goal });
             setResult(profile);
         } catch (err) {
             setError(err.message || t('nutrition.goal.error.save'));
@@ -158,6 +159,7 @@ const GoalOnboarding = () => {
                             <Input label={t('nutrition.form.protein')} type="number" value={manualGoal.proteinG} onChange={(e) => setManualGoalState((p) => ({ ...p, proteinG: e.target.value }))} data-testid="manual-protein-input" />
                             <Input label={t('nutrition.form.carb')} type="number" value={manualGoal.carbG} onChange={(e) => setManualGoalState((p) => ({ ...p, carbG: e.target.value }))} data-testid="manual-carb-input" />
                             <Input label={t('nutrition.form.fat')} type="number" value={manualGoal.fatG} onChange={(e) => setManualGoalState((p) => ({ ...p, fatG: e.target.value }))} data-testid="manual-fat-input" />
+                            <Input label="Meta de água (ml)" type="number" min="0" max="10000" step="50" placeholder="Ex.: 2500" value={manualGoal.waterMl} onChange={(e) => setManualGoalState((p) => ({ ...p, waterMl: e.target.value }))} data-testid="manual-water-input" />
                         </div>
                         {error && <p className="su-input-error-text" role="alert">{error}</p>}
                         <Button type="submit" disabled={loading} data-testid="manual-submit-btn">
@@ -174,6 +176,7 @@ const GoalOnboarding = () => {
                     <p>
                         {result.activeGoal.kcal} kcal · P {result.activeGoal.proteinG}g ·
                         C {result.activeGoal.carbG}g · G {result.activeGoal.fatG}g
+                        {result.activeGoal.waterMl ? ` · Água ${result.activeGoal.waterMl} ml` : ''}
                     </p>
                 </section>
             )}

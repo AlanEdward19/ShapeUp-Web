@@ -182,7 +182,7 @@ const DiaryDay = ({ renderView } = {}) => {
                             infoLabel={t('nutrition.diary.info')}
                         />
                     ))}
-                    <HydrationMetric key={date} date={date} />
+                    <HydrationMetric key={date} date={date} goalMl={goal?.waterMl} />
                 </div>
                 {!goal && (
                     <p className="su-text-muted" data-testid="no-goal-hint">
