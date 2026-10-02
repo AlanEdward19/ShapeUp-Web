@@ -1,7 +1,21 @@
-import { useState } from 'react';
-import { Droplets } from 'lucide-react';
-export default function HydrationMetric({ date }) {
-  const key = `shapeup_water_${localStorage.getItem('shapeup_user_id') || 'current'}_${date}`;
-  const [water, setWater] = useState(() => Number(localStorage.getItem(key)) || 0);
-  return <div className="su-hydration-metric"><span>Hidratação</span><div className="su-water-value"><strong>{(water / 1000).toLocaleString('pt-BR')} <small>litros</small></strong><button type="button" aria-label="Registrar 250 ml de água" onClick={() => { const next = water + 250; setWater(next); localStorage.setItem(key, String(next)); }}><Droplets size={12} />+250ml</button></div><p>Registro diário neste dispositivo</p></div>;
+import { Droplets, Minus } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import useHydration, { waterPercent } from '../hooks/useHydration';
+
+export default function HydrationMetric({ date, goalMl }) {
+  const { water, addWater, removeWater } = useHydration(date);
+  const percent = waterPercent(water, goalMl);
+  const liters = (ml) => (ml / 1000).toLocaleString('pt-BR');
+  return (
+    <div className="su-hydration-metric">
+      <span>Hidratação{percent !== null && <> · {percent}%</>}</span>
+      <div className="su-water-value">
+        <strong>{liters(water)} <small>{goalMl ? `/ ${liters(goalMl)} litros` : 'litros'}</small></strong>
+        <button type="button" aria-label="Remover 250 ml de água" disabled={water <= 0} onClick={removeWater}><Minus size={12} />−250ml</button>
+        <button type="button" aria-label="Registrar 250 ml de água" onClick={addWater}><Droplets size={12} />+250ml</button>
+      </div>
+      {percent !== null && <progress max={100} value={percent} aria-label="Progresso da meta de água" />}
+      <p>{goalMl ? 'Sincronizado com a sua conta' : <>Sem meta definida · <Link to="/dashboard/nutrition/goal">definir meta</Link></>}</p>
+    </div>
+  );
 }

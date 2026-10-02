@@ -6,7 +6,11 @@ import { withLang } from '../../../../test/withLang';
 import { NutritionDiaryView } from '../NutritionDiaryShell';
 
 vi.mock('../../../../hooks/api/useNutritionApi', () => ({
-  useNutritionApi: () => ({ getDiaryDay: vi.fn().mockResolvedValue({ meals: [], totals: {} }) }),
+  useNutritionApi: () => ({
+    getDiaryDay: vi.fn().mockResolvedValue({ meals: [], totals: {} }),
+    getHydrationDay: vi.fn().mockResolvedValue({ totalMl: 0 }),
+    putHydrationDay: vi.fn().mockResolvedValue({}),
+  }),
 }));
 
 const baseState = {
@@ -49,5 +53,16 @@ describe('NutritionDiaryShell', () => {
     expect(getByTestId('diary-shell-load-error')).toBeInTheDocument();
     fireEvent.click(getByTestId('diary-shell-retry-btn'));
     expect(loadData).toHaveBeenCalled();
+  });
+
+  it('shows the water goal percentage and the decrease button', async () => {
+    const { findByText, getByLabelText } = renderView({ goal: { kcal: 2000, waterMl: 2500 } });
+    expect(await findByText(/0% da meta/)).toBeInTheDocument();
+    expect(getByLabelText('Remover 250 ml de água')).toBeDisabled();
+  });
+
+  it('prompts to set a water goal when there is none', async () => {
+    const { findByText } = renderView({ goal: { kcal: 2000 } });
+    expect(await findByText(/Sem meta definida/)).toBeInTheDocument();
   });
 });

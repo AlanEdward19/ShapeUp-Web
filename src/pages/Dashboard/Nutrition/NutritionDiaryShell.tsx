@@ -3,7 +3,7 @@ import Skeleton from '../../../components/Skeleton';
 import HistoryChart from '../../../components/charts/HistoryChart';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { copy } from '../../shell-assets/copy';
-import useHydration from '../../../hooks/useHydration';
+import useHydration, { waterPercent } from '../../../hooks/useHydration';
 import { useEffect, useState, type ChangeEvent, type ReactElement } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DiaryDay from './DiaryDay';
@@ -66,6 +66,7 @@ export type NutritionDiaryViewState = {
     proteinG?: number;
     carbG?: number;
     fatG?: number;
+    waterMl?: number | null;
   } | null;
   loading: boolean;
   loadError: string | null;
@@ -162,7 +163,9 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
     language === 'pt-BR'
       ? text
       : copy[text]?.[language === 'es' ? 1 : 0] || translateCopy(text);
-  const { water, addWater } = useHydration(state.date);
+  const { water, addWater, removeWater } = useHydration(state.date);
+  const waterGoal = state.goal?.waterMl || 0;
+  const waterPct = waterPercent(water, waterGoal);
   const { getDiaryDay } = useNutritionApi();
   const [week, setWeek] = useState<Array<{ session: number; date: string; volume: number }>>([]);
 
@@ -336,23 +339,52 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-primary">
                   Hidratação
                 </span>
+                <span className="text-[11px] text-text-muted tabular-nums">
+                  {waterPct !== null ? `${waterPct}%` : '—'}
+                </span>
               </div>
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl font-bold tracking-tight text-on-surface tabular-nums">
                   {(water / 1000).toLocaleString(language)}
                 </span>
-                <span className="text-[13px] text-text-muted tabular-nums">litros registrados</span>
+                <span className="text-[13px] text-text-muted tabular-nums">
+                  {waterGoal ? `/ ${(waterGoal / 1000).toLocaleString(language)} litros` : 'litros registrados'}
+                </span>
               </div>
               <div className="w-full h-1.5 bg-[#29211D] rounded-full overflow-hidden">
-                <div className="h-full bg-primary rounded-full" style={{ width: '0%' }} />
+                <div className="h-full bg-primary rounded-full" style={{ width: `${waterPct ?? 0}%` }} />
               </div>
-              <button
-                type="button"
-                className="text-[12px] text-left text-text-muted hover:text-on-surface"
-                onClick={addWater}
-              >
-                +250 ml • Registrar água
-              </button>
+              <div className="text-[12px] text-text-muted">
+                {waterGoal ? (
+                  <span>{waterPct}% da meta</span>
+                ) : (
+                  <button
+                    type="button"
+                    className="text-left hover:text-on-surface"
+                    onClick={() => navigate('/dashboard/nutrition/goal')}
+                  >
+                    Sem meta definida • Definir
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-3 text-[12px]">
+                <button
+                  type="button"
+                  className="text-left text-text-muted hover:text-on-surface disabled:opacity-40"
+                  aria-label="Remover 250 ml de água"
+                  disabled={water <= 0}
+                  onClick={removeWater}
+                >
+                  −250 ml
+                </button>
+                <button
+                  type="button"
+                  className="text-left text-text-muted hover:text-on-surface"
+                  onClick={addWater}
+                >
+                  +250 ml • Registrar água
+                </button>
+              </div>
             </div>
           </section>
 

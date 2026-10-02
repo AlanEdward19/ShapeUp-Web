@@ -22,6 +22,8 @@ vi.mock('../../../../hooks/api/useNutritionApi', () => ({
         suggestSubstitutes: mockSuggestSubstitutes,
         substituteDiaryItem: vi.fn(),
         searchFoods: vi.fn(),
+        getHydrationDay: vi.fn().mockResolvedValue({ totalMl: 0 }),
+        putHydrationDay: vi.fn().mockResolvedValue({}),
         addDiaryEntry: mockAddDiaryEntry,
     }),
 }));

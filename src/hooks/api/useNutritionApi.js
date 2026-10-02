@@ -116,6 +116,20 @@ export const useNutritionApi = () => {
         });
     }, []);
 
+    // --- HYDRATION ---
+    // User-scoped and mutable by other devices, so it stays out of the shared offline read cache.
+    const getHydrationDay = useCallback(async (date) => {
+        const query = new URLSearchParams({ date });
+        return await apiClient(`/api/nutrition/hydration?${query.toString()}`, { noReadCache: true });
+    }, []);
+
+    const putHydrationDay = useCallback(async (date, command) => {
+        return await apiClient(`/api/nutrition/hydration/${encodeURIComponent(date)}`, {
+            method: 'PUT',
+            body: JSON.stringify(command)
+        });
+    }, []);
+
     // --- FOOD MODERATION (ADMIN) ---
     const getPendingModerations = useCallback(async (cursor, pageSize) => {
         const query = new URLSearchParams();
@@ -162,6 +176,8 @@ export const useNutritionApi = () => {
         createMealPlan, activateMealPlan,
         // Profile
         getNutritionProfile, completeOnboarding, setManualGoal,
+        // Hydration
+        getHydrationDay, putHydrationDay,
         // Moderation
         getPendingModerations, decideModeration,
         // Weight

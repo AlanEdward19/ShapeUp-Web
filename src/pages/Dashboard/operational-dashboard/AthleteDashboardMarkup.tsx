@@ -25,11 +25,12 @@ export type AthleteDashboardState = AthleteScoreboardState & {
   } | null;
   nutrition: {
     totals?: { kcal?: number; proteinG?: number };
-    goal?: { kcal?: number; proteinG?: number };
+    goal?: { kcal?: number; proteinG?: number; waterMl?: number | null };
     meals?: unknown[];
   };
   water: number;
   onAddWater: () => void;
+  onRemoveWater: () => void;
   messages: StoredMessage[];
   language: string;
   tr: (text: string) => string;
@@ -58,12 +59,15 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
     nutrition,
     water,
     onAddWater,
+    onRemoveWater,
     messages,
     language,
     tr,
     onNavigate,
   } = state;
 
+  const waterGoal = nutrition.goal?.waterMl || 0;
+  const waterPct = waterGoal ? Math.min(100, Math.round((water / waterGoal) * 100)) : null;
   const nutritionPercent = nutrition.goal?.kcal
     ? Math.round(((nutrition.totals?.kcal || 0) / nutrition.goal.kcal) * 100)
     : 0;
@@ -198,15 +202,29 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
           <div className="py-2 last:pr-0 md:px-5 md:py-0">
             <div className="mb-1 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-[#82736b]">
               <span>Hidratação</span>
-              <span id="waterPct" className="text-[11px] text-[#82736b]">Registro diário</span>
+              <span id="waterPct" className="text-[11px] text-[#82736b]">
+                {waterPct !== null ? `${waterPct}% da meta` : 'Sem meta definida'}
+              </span>
             </div>
             <div className="mb-1 flex items-baseline justify-between">
               <div className="flex items-baseline gap-1">
                 <span id="waterDisplay" className="font-headline text-2xl font-bold text-[#eee0da]">
                   {(water / 1000).toLocaleString(language)}
                 </span>
-                <span className="text-xs text-[#82736b]">litros registrados</span>
+                <span className="text-xs text-[#82736b]">
+                  {waterGoal ? `/ ${(waterGoal / 1000).toLocaleString(language)} litros` : 'litros registrados'}
+                </span>
               </div>
+              <button
+                id="removeWaterQuickBtn"
+                type="button"
+                aria-label="Remover 250 ml de água"
+                disabled={water <= 0}
+                className="rounded border border-[#382b24] bg-[#1c1512] px-2 py-0.5 text-[11px] font-semibold text-[#82736b] transition-colors hover:border-[#7d986b] disabled:opacity-40"
+                onClick={onRemoveWater}
+              >
+                −250ml
+              </button>
               <button
                 id="addWaterQuickBtn"
                 type="button"
@@ -216,7 +234,13 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
                 +250ml
               </button>
             </div>
-            <div className="text-[11px] text-[#82736b]">Registro diário neste dispositivo</div>
+            <div className="text-[11px] text-[#82736b]">
+              {waterGoal ? 'Sincronizado com a sua conta' : (
+                <button type="button" className="underline" onClick={() => onNavigate('/dashboard/nutrition/goal')}>
+                  Definir meta de água
+                </button>
+              )}
+            </div>
           </div>
         </section>
         </FadeUp>
