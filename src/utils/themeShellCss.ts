@@ -32,7 +32,10 @@ export function tokenFor(property: string, channels: Channels): string | null {
   const chromatic = s > 0.3 && l > 18 && l < 85;
 
   if (chromatic) {
-    if (h >= 5 && h < 28) return isText ? '--link-color' : '--primary';
+    if (h >= 5 && h < 28) {
+      if (isText && l >= 75) return '--text-muted'; // peach ink from the old dark theme reads as secondary text
+      return isText ? '--link-color' : '--primary';
+    }
     if (h >= 28 && h < 60) return '--warning';
     if (h >= 70 && h < 170) return isText ? '--success' : '--accent';
     if (h >= 345 || h < 5) return '--error';

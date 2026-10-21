@@ -28,10 +28,6 @@
 }
 .shell-body .text-xs { font-size: 13px; line-height: 1.4; }
 .shell-body :is(.text-\[10px\], .text-\[11px\]) { font-size: 12px; line-height: 1.35; }
-.shell-body label.uppercase,
-.shell-body :is(h1, h2, h3).uppercase {
-  font-size: inherit;
-}
 .shell-body label.uppercase { font-size: 13px; font-weight: 600; color: var(--text-muted); }
 
 /* Shape: one radius scale instead of sharp 2-4px corners. */

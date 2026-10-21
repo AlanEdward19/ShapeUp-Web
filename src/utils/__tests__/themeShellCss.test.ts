@@ -13,6 +13,10 @@ describe('themeShellCss', () => {
     expect(tokenFor('color', [224, 108, 67])).toBe('--link-color');
   });
 
+  it('turns peach text into secondary ink instead of brand orange', () => {
+    expect(tokenFor('color', [255, 181, 157])).toBe('--text-muted');
+  });
+
   it('keeps alpha, including Tailwind opacity variables', () => {
     const css = '.a{background-color: rgb(33 26 23 / 0.5)}.b{color: rgb(245 237 230 / var(--tw-text-opacity, 1))}';
     const out = themeShellCss(css);
