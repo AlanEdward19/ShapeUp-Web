@@ -2,6 +2,7 @@
 /* Auto-generated from templates/landing.html — do not edit by hand */
 import type { ReactElement } from 'react';
 import Logo from '../../../components/Logo/Logo';
+import { HeroShowcase } from './HeroShowcase';
 
 export function LandingStaticMarkup(): ReactElement {
   return (
@@ -106,14 +107,14 @@ export function LandingStaticMarkup(): ReactElement {
           >
 
             <span
-      className="font-mono text-xs uppercase tracking-widest text-terracotta font-medium mb-4 block"
+      className="text-sm tracking-wide text-terracotta font-semibold mb-4 block"
             >
 
             Plataforma de Prescrição e Acompanhamento
                       </span>
 
             <h1
-      className="font-headline font-bold text-4xl sm:text-5xl lg:text-[4.25rem] tracking-tight leading-[1.05] uppercase text-text-main"
+      className="font-headline font-bold text-4xl sm:text-5xl lg:text-[4.25rem] tracking-tight leading-[1.02] text-text-main"
             >
 
             O software de treino e prescrição feito para quem vive da prática.
@@ -132,7 +133,7 @@ export function LandingStaticMarkup(): ReactElement {
             >
 
               <a
-      className="inline-flex items-center justify-center font-headline font-semibold text-lg uppercase tracking-wide px-6 py-3 bg-terracotta hover:bg-terracotta-hover text-surface-base rounded transition-colors"
+      className="inline-flex items-center justify-center lp-cta"
       href="#planos"
               >
 
@@ -140,7 +141,7 @@ export function LandingStaticMarkup(): ReactElement {
                           </a>
 
               <a
-      className="inline-flex items-center justify-center gap-2 font-body text-sm font-medium text-text-sub hover:text-text-main px-5 py-3 border border-border-clean hover:border-text-sub/40 rounded transition-colors"
+      className="inline-flex items-center justify-center gap-2 lp-cta lp-cta-soft"
       href="#demo-modal"
               >
 
@@ -156,365 +157,7 @@ export function LandingStaticMarkup(): ReactElement {
           </div>
 
 
-          <div
-      className="mt-14 border border-border-clean bg-surface-warm rounded overflow-hidden shadow-xl"
-          >
-
-
-            <div
-      className="border-b border-border-subtle px-6 py-4 flex flex-wrap items-center justify-between gap-4 bg-surface-soft/40"
-            >
-
-              <div
-      className="flex items-center gap-4"
-              >
-
-                <div
-      className="w-10 h-10 rounded bg-surface-warm border border-border-clean flex items-center justify-center font-headline font-bold text-lg text-terracotta"
-                >
-
-                RP
-                              </div>
-
-                <div>
-
-                  <div
-      className="flex items-center gap-2"
-                  >
-
-                    <span
-      className="font-semibold text-text-main text-base"
-                    >Rodrigo Prado</span>
-
-                    <span
-      className="font-mono text-xs text-text-muted px-2 py-0.5 bg-surface-warm rounded border border-border-subtle"
-                    >Semana 3 • Bloco Hipertrofia</span>
-
-                  </div>
-
-                  <span
-      className="text-xs text-text-sub block mt-0.5"
-                  >Objetivo: Força &amp; Hipertrofia Inferiores • 4 treinos semanais</span>
-
-                </div>
-
-              </div>
-
-              <div
-      className="flex items-center gap-6 font-mono text-xs text-text-sub"
-              >
-
-                <div>
-
-                  <span
-      className="text-text-muted block text-[10px] uppercase"
-                  >Aderência Recente</span>
-
-                  <span
-      className="text-text-main font-semibold"
-                  >12 de 12 sessões</span>
-
-                </div>
-
-                <div
-      className="hidden sm:block w-px h-6 bg-border-subtle"
-                ></div>
-
-                <div
-      className="hidden sm:block"
-                >
-
-                  <span
-      className="text-text-muted block text-[10px] uppercase"
-                  >Última Atualização</span>
-
-                  <span
-      className="text-text-main"
-                  >Hoje, 09:40</span>
-
-                </div>
-
-              </div>
-
-            </div>
-
-
-            <div
-      className="p-6 lg:p-8"
-            >
-
-              <div
-      className="flex flex-wrap items-baseline justify-between gap-2 mb-6"
-              >
-
-                <div>
-
-                  <h3
-      className="font-headline font-bold text-2xl uppercase tracking-tight text-text-main"
-                  >
-
-                  Sessão A — Cadeira Posterior &amp; Extensão de Quadril
-                                  </h3>
-
-                  <p
-      className="text-xs text-text-sub mt-1"
-                  >Tempo total previsto: 55 min • Ênfase em controle excêntrico</p>
-
-                </div>
-
-                <span
-      className="font-mono text-xs text-olive bg-olive/10 border border-olive/20 px-2.5 py-1 rounded"
-                >
-
-                Volume equalizado: 14 séries
-                              </span>
-
-              </div>
-
-
-              <div
-      className="space-y-4"
-              >
-
-
-                <div
-      className="border border-border-subtle bg-surface-base/60 rounded p-4"
-                >
-
-                  <div
-      className="flex flex-wrap items-center justify-between gap-2 mb-3"
-                  >
-
-                    <div
-      className="flex items-center gap-3"
-                    >
-
-                      <span
-      className="font-mono text-xs text-terracotta font-semibold"
-                      >01</span>
-
-                      <h4
-      className="font-headline font-bold text-lg uppercase text-text-main"
-                      >Levantamento Terra Romeno (RDL)</h4>
-
-                      <span
-      className="text-xs text-text-muted hidden sm:inline"
-                      >• Barra Olímpica</span>
-
-                    </div>
-
-                    <div
-      className="flex items-center gap-3 font-mono text-xs text-text-sub"
-                    >
-
-                      <span>
-Cadência:                         <strong
-      className="text-text-main"
-                        >3-0-1-0</strong>
-                      </span>
-
-                      <span
-      className="text-border-clean"
-                      >|</span>
-
-                      <span>
-Descanso:                         <strong
-      className="text-text-main"
-                        >2 min</strong>
-                      </span>
-
-                    </div>
-
-                  </div>
-
-
-                  <div
-      className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-mono text-xs"
-                  >
-
-                    <div
-      className="p-2.5 bg-surface-warm rounded border border-border-subtle flex justify-between items-center"
-                    >
-
-                      <span
-      className="text-text-muted"
-                      >1ª série</span>
-
-                      <span
-      className="text-text-main font-semibold"
-                      >12 reps × 60 kg</span>
-
-                    </div>
-
-                    <div
-      className="p-2.5 bg-surface-warm rounded border border-border-subtle flex justify-between items-center"
-                    >
-
-                      <span
-      className="text-text-muted"
-                      >2ª série</span>
-
-                      <span
-      className="text-text-main font-semibold"
-                      >10 reps × 80 kg</span>
-
-                    </div>
-
-                    <div
-      className="p-2.5 bg-surface-warm rounded border border-border-subtle flex justify-between items-center"
-                    >
-
-                      <span
-      className="text-text-muted"
-                      >3ª série</span>
-
-                      <span
-      className="text-text-main font-semibold"
-                      >8 reps × 95 kg</span>
-
-                    </div>
-
-                    <div
-      className="p-2.5 bg-terracotta-dim rounded border border-terracotta/30 flex justify-between items-center"
-                    >
-
-                      <span
-      className="text-terracotta"
-                      >Top Set</span>
-
-                      <span
-      className="text-text-main font-bold"
-                      >6 reps × 105 kg</span>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-
-                <div
-      className="border border-border-subtle bg-surface-base/60 rounded p-4"
-                >
-
-                  <div
-      className="flex flex-wrap items-center justify-between gap-2 mb-3"
-                  >
-
-                    <div
-      className="flex items-center gap-3"
-                    >
-
-                      <span
-      className="font-mono text-xs text-terracotta font-semibold"
-                      >02</span>
-
-                      <h4
-      className="font-headline font-bold text-lg uppercase text-text-main"
-                      >Mesa Flexora Unilateral</h4>
-
-                      <span
-      className="text-xs text-text-muted hidden sm:inline"
-                      >• Foco em pico de contração</span>
-
-                    </div>
-
-                    <div
-      className="flex items-center gap-3 font-mono text-xs text-text-sub"
-                    >
-
-                      <span>
-Cadência:                         <strong
-      className="text-text-main"
-                        >2-1-1-1</strong>
-                      </span>
-
-                      <span
-      className="text-border-clean"
-                      >|</span>
-
-                      <span>
-Descanso:                         <strong
-      className="text-text-main"
-                        >90 seg</strong>
-                      </span>
-
-                    </div>
-
-                  </div>
-
-
-                  <div
-      className="grid grid-cols-2 sm:grid-cols-3 gap-2 font-mono text-xs"
-                  >
-
-                    <div
-      className="p-2.5 bg-surface-warm rounded border border-border-subtle flex justify-between items-center"
-                    >
-
-                      <span
-      className="text-text-muted"
-                      >Série 1</span>
-
-                      <span
-      className="text-text-main font-semibold"
-                      >12 reps × 30 kg</span>
-
-                    </div>
-
-                    <div
-      className="p-2.5 bg-surface-warm rounded border border-border-subtle flex justify-between items-center"
-                    >
-
-                      <span
-      className="text-text-muted"
-                      >Série 2</span>
-
-                      <span
-      className="text-text-main font-semibold"
-                      >10 reps × 35 kg</span>
-
-                    </div>
-
-                    <div
-      className="p-2.5 bg-surface-warm rounded border border-border-subtle flex justify-between items-center"
-                    >
-
-                      <span
-      className="text-text-muted"
-                      >Série 3</span>
-
-                      <span
-      className="text-text-main font-semibold"
-                      >8+4 reps (Rest-pause)</span>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-
-                <div
-      className="p-3 bg-surface-soft/30 rounded border-l-2 border-terracotta text-xs text-text-sub flex items-start gap-2"
-                >
-
-                  <span
-      className="material-symbols-outlined text-[16px] text-terracotta shrink-0 mt-0.5"
-                  >edit_note</span>
-
-                  <span>
-                    <strong>Orientação ao atleta:</strong>
- Manter escápulas ativadas e joelho destravado na fase excêntrica do RDL. Registrar carga e percepção de esforço imediatamente ao fim da sessão.                  </span>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
+          <HeroShowcase />
         </div>
 
       </section>
