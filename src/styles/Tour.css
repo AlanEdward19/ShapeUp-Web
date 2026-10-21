@@ -6,18 +6,32 @@
     background: var(--bg-card) !important;
     color: var(--text-main) !important;
     border: 1px solid var(--border-color) !important;
-    border-radius: var(--radius-md) !important;
+    border-radius: 22px !important;
     box-shadow: var(--shadow-md) !important;
+    padding: 1.25rem 1.25rem 1rem !important;
+    max-width: min(24rem, calc(100vw - 2rem)) !important;
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.45;
 }
 
 .reactour__popover button,
 .reactour__popover [data-tour-elem='controls'] button {
-    color: var(--primary) !important;
+    color: var(--link-color) !important;
+}
+
+/* 44px targets for prev/next/close */
+.reactour__popover [data-tour-elem='left-arrow'],
+.reactour__popover [data-tour-elem='right-arrow'] {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-grid;
+    place-items: center;
 }
 
 .reactour__popover [data-tour-elem='badge'] {
-    background: var(--primary) !important;
-    color: var(--text-on-primary) !important;
+    background: var(--primary-solid) !important;
+    color: #fff8f5 !important;
 }
 
 .reactour__dot {
@@ -27,4 +41,20 @@
 .reactour__dot--active,
 .reactour__dot[aria-pressed='true'] {
     background: var(--primary) !important;
+}
+
+/* Phones: pin the card to the bottom edge instead of floating next to a target that may be off-screen. */
+@media (max-width: 767px) {
+    .reactour__popover {
+        position: fixed !important;
+        top: auto !important;
+        left: 1rem !important;
+        right: 1rem !important;
+        bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+        transform: none !important;
+        width: auto !important;
+        max-width: none !important;
+        max-height: 45dvh;
+        overflow-y: auto;
+    }
 }

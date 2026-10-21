@@ -82,7 +82,8 @@ function App() {
       styles={{
         popover: (base) => ({
           ...base,
-          borderRadius: 12,
+          borderRadius: 22,
+          maxWidth: 'min(24rem, calc(100vw - 2rem))',
           backgroundColor: 'var(--bg-card)',
           color: 'var(--text-main)',
           border: '1px solid var(--border-color)',
