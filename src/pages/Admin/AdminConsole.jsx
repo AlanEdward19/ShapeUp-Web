@@ -27,6 +27,15 @@ const SECTIONS = ['overview', 'users', 'credentials', 'plans', 'catalog', 'safet
 
 const itemsOf = (page) => page?.items ?? page?.Items ?? [];
 
+async function runAction(setError, fallback, action) {
+    setError('');
+    try {
+        await action();
+    } catch (err) {
+        setError(err?.message || fallback);
+    }
+}
+
 export default function AdminConsole() {
     const { t } = useLanguage();
     const [params, setParams] = useSearchParams();
@@ -134,10 +143,10 @@ function UsersSection() {
                     <li key={user.userId} data-testid={`user-${user.userId}`}>
                         <strong>{user.displayName || user.email}</strong>
                         <span> {user.email} · {user.isActive ? t('admin.users.active') : t('admin.users.inactive')}</span>
-                        <button type="button" className="su-btn su-btn-secondary" onClick={async () => {
+                        <button type="button" className="su-btn su-btn-secondary" onClick={() => runAction(setError, t('admin.hub.error'), async () => {
                             await setUserActive(user.userId, !user.isActive);
                             await load(search);
-                        }}>
+                        })}>
                             {user.isActive ? t('admin.users.deactivate') : t('admin.users.activate')}
                         </button>
                     </li>
@@ -238,11 +247,13 @@ function PlansSection() {
             <Status loading={loading} error={error} empty={false} />
             <h2>{t('admin.plans.tiers')}</h2>
             <ul>{tiers.map((tier) => <li key={tier.id}>{tier.name} · {tier.price} · {tier.targetRole}</li>)}</ul>
-            <form onSubmit={async (event) => {
+            <form onSubmit={(event) => {
                 event.preventDefault();
-                await createPlatformTier({ name, description: null, targetRole: 'independentClient', price: Number(price), maxClients: null, maxTrainers: null });
-                setName('');
-                await load();
+                runAction(setError, t('admin.hub.error'), async () => {
+                    await createPlatformTier({ name, description: null, targetRole: 'independentClient', price: Number(price), maxClients: null, maxTrainers: null });
+                    setName('');
+                    await load();
+                });
             }}>
                 <input aria-label={t('admin.plans.name')} value={name} onChange={(event) => setName(event.target.value)} required />
                 <input aria-label={t('admin.plans.price')} value={price} onChange={(event) => setPrice(event.target.value)} />
@@ -251,11 +262,13 @@ function PlansSection() {
             <h2>{t('admin.plans.assignments')}</h2>
             <ul>{assignments.map((row) => <li key={row.id}>#{row.userId} · {row.role} · {row.tierName || t('admin.plans.noTier')} · {row.isActive ? t('admin.users.active') : t('admin.users.inactive')}</li>)}</ul>
             {!loading && tiers.length === 0 && assignments.length === 0 && <p className="su-text-muted" data-testid="admin-empty">{t('admin.hub.empty')}</p>}
-            <form onSubmit={async (event) => {
+            <form onSubmit={(event) => {
                 event.preventDefault();
-                await assignUserRole({ userId: Number(roleUserId), role, platformTierId: null });
-                setRoleUserId('');
-                await load();
+                runAction(setError, t('admin.hub.error'), async () => {
+                    await assignUserRole({ userId: Number(roleUserId), role, platformTierId: null });
+                    setRoleUserId('');
+                    await load();
+                });
             }}>
                 <input aria-label={t('admin.plans.userId')} value={roleUserId} onChange={(event) => setRoleUserId(event.target.value)} required />
                 <select aria-label={t('admin.plans.role')} value={role} onChange={(event) => setRole(event.target.value)}>
@@ -299,14 +312,16 @@ function CatalogSection() {
             <h2>{t('admin.catalog.exercises')}</h2>
             <ul>{exercises.map((item) => (
                 <li key={item.id}>{item.namePt || item.name}
-                    <button type="button" className="su-btn su-btn-secondary" onClick={async () => { await deleteExercise(item.id); await load(); }}>{t('admin.catalog.delete')}</button>
+                    <button type="button" className="su-btn su-btn-secondary" onClick={() => runAction(setError, t('admin.hub.error'), async () => { await deleteExercise(item.id); await load(); })}>{t('admin.catalog.delete')}</button>
                 </li>
             ))}</ul>
-            <form onSubmit={async (event) => {
+            <form onSubmit={(event) => {
                 event.preventDefault();
-                await createExercise({ name: exerciseName, namePt: exerciseName, description: null, videoUrl: null, muscles: [], equipmentIds: [], steps: [], exerciseType: 'weightBased' });
-                setExerciseName('');
-                await load();
+                runAction(setError, t('admin.hub.error'), async () => {
+                    await createExercise({ name: exerciseName, namePt: exerciseName, description: null, videoUrl: null, muscles: [], equipmentIds: [], steps: [], exerciseType: 'weightBased' });
+                    setExerciseName('');
+                    await load();
+                });
             }}>
                 <input aria-label={t('admin.catalog.exerciseName')} value={exerciseName} onChange={(event) => setExerciseName(event.target.value)} required />
                 <button className="su-btn" type="submit">{t('admin.catalog.addExercise')}</button>
@@ -314,14 +329,16 @@ function CatalogSection() {
             <h2>{t('admin.catalog.equipments')}</h2>
             <ul>{equipments.map((item) => (
                 <li key={item.id}>{item.namePt || item.name}
-                    <button type="button" className="su-btn su-btn-secondary" onClick={async () => { await deleteEquipment(item.id); await load(); }}>{t('admin.catalog.delete')}</button>
+                    <button type="button" className="su-btn su-btn-secondary" onClick={() => runAction(setError, t('admin.hub.error'), async () => { await deleteEquipment(item.id); await load(); })}>{t('admin.catalog.delete')}</button>
                 </li>
             ))}</ul>
-            <form onSubmit={async (event) => {
+            <form onSubmit={(event) => {
                 event.preventDefault();
-                await createEquipment({ name: equipmentName, namePt: equipmentName, description: null });
-                setEquipmentName('');
-                await load();
+                runAction(setError, t('admin.hub.error'), async () => {
+                    await createEquipment({ name: equipmentName, namePt: equipmentName, description: null });
+                    setEquipmentName('');
+                    await load();
+                });
             }}>
                 <input aria-label={t('admin.catalog.equipmentName')} value={equipmentName} onChange={(event) => setEquipmentName(event.target.value)} required />
                 <button className="su-btn" type="submit">{t('admin.catalog.addEquipment')}</button>
@@ -350,8 +367,8 @@ function SafetySection() {
                 {rows.map((report) => (
                     <li key={report.id} data-testid={`report-${report.id}`}>
                         <strong>{report.reason}</strong> · {report.targetType} · {report.details || ''}
-                        <button type="button" className="su-btn" onClick={async () => { await resolveSafetyReport(report.id, 'Resolved', t('admin.safety.resolvedNote')); await load(); }}>{t('admin.safety.resolve')}</button>
-                        <button type="button" className="su-btn su-btn-secondary" onClick={async () => { await resolveSafetyReport(report.id, 'Dismissed', t('admin.safety.dismissedNote')); await load(); }}>{t('admin.safety.dismiss')}</button>
+                        <button type="button" className="su-btn" onClick={() => runAction(setError, t('admin.hub.error'), async () => { await resolveSafetyReport(report.id, 'Resolved', t('admin.safety.resolvedNote')); await load(); })}>{t('admin.safety.resolve')}</button>
+                        <button type="button" className="su-btn su-btn-secondary" onClick={() => runAction(setError, t('admin.hub.error'), async () => { await resolveSafetyReport(report.id, 'Dismissed', t('admin.safety.dismissedNote')); await load(); })}>{t('admin.safety.dismiss')}</button>
                     </li>
                 ))}
             </ul>

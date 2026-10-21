@@ -43,7 +43,7 @@ vi.mock('../../../hooks/api/useAuditLogsApi', () => ({
     useAuditLogsApi: () => ({ getAuditLogs: vi.fn().mockResolvedValue({ items: [] }) }),
 }));
 
-import { getAdminOverview, listCredentialsUnderReview } from '../../../services/platformClient';
+import { getAdminOverview, listCredentialsUnderReview, listUsers, setUserActive } from '../../../services/platformClient';
 
 describe('AdminConsole', () => {
     beforeEach(() => {
@@ -83,5 +83,26 @@ describe('AdminConsole', () => {
         fireEvent.click([...buttons].find((button) => button.textContent === 'Professionals'));
 
         await waitFor(() => expect(getByTestId('council-link-9')).toHaveAttribute('href', 'https://www.crefsp.gov.br/'));
+    });
+
+    it('shows the request error when a user status change fails', async () => {
+        listUsers.mockResolvedValue({
+            items: [{ userId: 7, email: 'ana@example.com', displayName: 'Ana', isActive: true }],
+        });
+        setUserActive.mockRejectedValue(new Error('denied'));
+
+        const { getByTestId, getByRole } = render(withLang(
+            <MemoryRouter>
+                <AdminConsole />
+            </MemoryRouter>,
+        ));
+
+        const buttons = getByTestId('admin-console').querySelectorAll('button');
+        fireEvent.click([...buttons].find((button) => button.textContent === 'Users'));
+
+        await waitFor(() => expect(getByTestId('user-7')).toBeInTheDocument());
+        fireEvent.click(getByRole('button', { name: 'Deactivate' }));
+
+        await waitFor(() => expect(getByRole('alert')).toHaveTextContent('denied'));
     });
 });

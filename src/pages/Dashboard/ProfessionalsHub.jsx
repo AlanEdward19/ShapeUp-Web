@@ -14,8 +14,12 @@ export default function ProfessionalsDirectory() {
     useEffect(() => {
         let active = true;
         listProfessionalDirectory({ professionType: profession || undefined, pageSize: 20 })
-            .then((page) => { if (active) setRows(itemsOf(page)); })
-            .catch((err) => { if (active) setError(err.message || t('admin.hub.error')); })
+            .then((page) => {
+                if (!active) return;
+                setError('');
+                setRows(itemsOf(page));
+            })
+            .catch((err) => { if (active) { setRows([]); setError(err.message || t('admin.hub.error')); } })
             .finally(() => { if (active) setLoading(false); });
         return () => { active = false; };
     }, [profession, t]);

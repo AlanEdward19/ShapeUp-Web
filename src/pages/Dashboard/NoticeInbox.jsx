@@ -30,8 +30,13 @@ export default function NoticeInbox() {
                         <div>{notice.body}</div>
                         {!notice.readAtUtc && (
                             <button type="button" className="su-btn su-btn-secondary" onClick={async () => {
-                                await markNoticeRead(notice.id);
-                                setRows((current) => current.map((item) => item.id === notice.id ? { ...item, readAtUtc: new Date().toISOString() } : item));
+                                setError('');
+                                try {
+                                    await markNoticeRead(notice.id);
+                                    setRows((current) => current.map((item) => item.id === notice.id ? { ...item, readAtUtc: new Date().toISOString() } : item));
+                                } catch (err) {
+                                    setError(err.message || t('admin.hub.error'));
+                                }
                             }}>{t('notices.read')}</button>
                         )}
                     </li>

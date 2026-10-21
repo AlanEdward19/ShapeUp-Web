@@ -42,8 +42,13 @@ export default function ServicePlans() {
                 {plans.map((plan) => (
                     <li key={plan.id}>{plan.name} · {plan.price} · {plan.durationDays}d
                         <button type="button" className="su-btn su-btn-secondary" onClick={async () => {
-                            await deleteTrainerPlan(trainerId, plan.id);
-                            await load(trainerId);
+                            setError('');
+                            try {
+                                await deleteTrainerPlan(trainerId, plan.id);
+                                await load(trainerId);
+                            } catch (err) {
+                                setError(err.message || t('admin.hub.error'));
+                            }
                         }}>{t('admin.catalog.delete')}</button>
                     </li>
                 ))}
