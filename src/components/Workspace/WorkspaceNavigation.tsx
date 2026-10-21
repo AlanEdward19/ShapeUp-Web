@@ -45,7 +45,6 @@ export function UnifiedSidebarNavigation({ flow, open, close }: UnifiedSidebarNa
             <Logo width="32" height="32" />
             <span className="sn-wordmark">ShapeUp</span>
           </Link>
-          <small>{roleLabel(role, language)}</small>
         </div>
         <nav aria-label="Navegação principal">
           {groups.map(group => (

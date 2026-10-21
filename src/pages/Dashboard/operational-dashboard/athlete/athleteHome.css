@@ -210,3 +210,6 @@
   .ah-row-plan{display:none}
   .ah-meter{width:84px}
 }
+.ah-pro-adherence .ah-summary-body{flex-direction:column!important;align-items:center}
+.ah-pro-adherence .ah-rings{width:150px!important;height:150px!important}
+.ah-actions>button{white-space:nowrap}
