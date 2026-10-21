@@ -37,14 +37,14 @@
     min-height: var(--button-min-height);
     padding: 0.875rem 1.25rem;
     border-radius: var(--radius-button);
-    background: var(--primary);
-    color: var(--text-on-primary);
+    background: var(--primary-solid);
+    color: #fff8f5;
     box-shadow: none;
 }
 
 .su-btn-primary:hover,
 .su-btn-primary:active {
-    background: #e87a53;
+    background: var(--primary-solid-hover);
 }
 
 .su-btn-primary:active {
