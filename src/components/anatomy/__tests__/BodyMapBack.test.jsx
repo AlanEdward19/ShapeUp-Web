@@ -29,7 +29,7 @@ describe('BodyMapBack', () => {
         const svg = container.querySelector('svg.su-body-map-svg');
         expect(svg).toBeTruthy();
         expect(svg.classList.contains('is-photo')).toBe(false);
-        expect(svg.getAttribute('viewBox')).toBe('205 40 380 960');
+        expect(svg.getAttribute('viewBox')).toBe('197 136 396 792');
         expect(svg.querySelector('image')).toBeNull();
 
         for (const region of BACK_REGIONS) {
