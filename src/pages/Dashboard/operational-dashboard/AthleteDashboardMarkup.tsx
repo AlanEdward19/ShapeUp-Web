@@ -245,7 +245,8 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
               </section>
             )}
 
-            <section className="ah-card ah-nutrition" aria-label={c.nutrition}>
+            <section className="ah-card ah-side" aria-label={`${c.nutrition} · ${c.hydration}`}>
+              <div className="ah-block ah-nutrition">
               <div className="ah-card-head">
                 <h3 className="ah-card-title">{c.nutrition}</h3>
                 <button type="button" className="ah-link" onClick={() => onNavigate('/dashboard/nutrition/diary')}>{c.openDiary}</button>
@@ -265,9 +266,9 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
                 <i style={{ width: `${proteinPct ?? 0}%`, background: 'var(--primary)' }} />
               </div>
               <p className="ah-card-sub">{c.meals(nutrition.meals?.length || 0)}</p>
-            </section>
+              </div>
 
-            <section className="ah-card ah-water" aria-label={c.hydration}>
+              <div className="ah-block ah-water">
               <div className="ah-card-head">
                 <h3 className="ah-card-title">{c.hydration}</h3>
                 {!waterGoal && (
@@ -289,9 +290,9 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
                   +{WATER_STEP} ml
                 </button>
               </div>
-            </section>
+              </div>
 
-            <section className="ah-card ah-coach" aria-label={c.coach}>
+              <div className="ah-block ah-coach">
               <div className="ah-card-head">
                 <h3 className="ah-card-title">{c.coach}</h3>
               </div>
@@ -302,6 +303,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
                 <Icon name="chat_bubble" />
                 {c.reply}
               </button>
+              </div>
             </section>
 
             <section className="ah-card ah-progress" aria-label={c.progress}>

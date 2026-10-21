@@ -4,6 +4,7 @@ import ProfileSelectionDialog from '../components/ProfileSelectionDialog';
 import WorkspaceShellPage from '../components/Workspace/WorkspaceShellPage';
 import { workspaceNavStyle } from '../pages/shell-assets/workspaceNavStyle';
 import { AthleteDashboardMarkup } from '../pages/Dashboard/operational-dashboard/AthleteDashboardMarkup';
+import { ProfessionalDashboardMarkup } from '../pages/Dashboard/operational-dashboard/ProfessionalDashboardMarkup';
 import athleteHomeCss from '../pages/Dashboard/operational-dashboard/athlete/athleteHome.css?inline';
 
 const roles = [{ role: 'Trainer' }, { role: 'IndependentClient' }, { role: 'GymOwner' }];
@@ -37,6 +38,20 @@ const athlete = {
     weeklyReading: { status: 'locked' },
 };
 
+const clients = [
+    { id: 1, name: 'Rodrigo Prado', goal: 'Força e hipertrofia', activePlan: 'Upper A/B', compliance: 92, nextSessionAt: new Date().toISOString() },
+    { id: 2, name: 'Marina Costa', goal: 'Emagrecimento', activePlan: 'Full body', compliance: 64 },
+    { id: 3, name: 'Felipe Andrade', goal: 'Corrida 10k', activePlan: '', compliance: 31 },
+    { id: 4, name: 'Júlia Nogueira', goal: 'Mobilidade', activePlan: 'Mobilidade', compliance: 78 },
+];
+const pro = {
+    userName: 'Alan Oliveira', query: '', onQueryChange: () => {}, filter: 'Todos', onFilterChange: () => {},
+    clients, filtered: clients, loadError: '', todayCount: 3, pending: 2, adherence: 66,
+    feedback: [{ id: 1, clientName: 'Marina Costa', text: 'Senti o joelho no agachamento, posso trocar?' }],
+    appointments: [clients[0]], language: 'pt-BR', tr: text => text,
+    onOpenClient: () => {}, onOpenMessages: () => {}, onEnrollClient: () => {}, onNewWorkout: () => {}, onOpenClients: () => {},
+};
+
 /** Dev-only gallery (`/__design/:name`) so screens can be reviewed without a backend session. */
 export default function DesignPreview() {
     const { name } = useParams();
@@ -61,6 +76,14 @@ export default function DesignPreview() {
         return (
             <WorkspaceShellPage name="athlete" css={workspaceNavStyle + athleteHomeCss}>
                 <AthleteDashboardMarkup state={state} />
+            </WorkspaceShellPage>
+        );
+    }
+    if (name === 'pro') {
+        localStorage.setItem('shapeup_role', 'professional');
+        return (
+            <WorkspaceShellPage name="professional" css={workspaceNavStyle + athleteHomeCss}>
+                <ProfessionalDashboardMarkup state={pro} />
             </WorkspaceShellPage>
         );
     }

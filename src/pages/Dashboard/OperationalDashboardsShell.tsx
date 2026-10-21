@@ -142,7 +142,7 @@ export function ProfessionalDashboard() {
   };
 
   return (
-    <WorkspaceShellPage name="professional" css={workspaceNavStyle}>
+    <WorkspaceShellPage name="professional" css={workspaceNavStyle + athleteHomeCss}>
       <ProfessionalDashboardMarkup state={shellState} />
     </WorkspaceShellPage>
   );
