@@ -26,14 +26,14 @@ describe('localizeExercise', () => {
     it('uses English catalog names outside pt-BR', () => {
         const en = localizeExercise(bench, 'en');
         expect(en.name).toBe('Incline DB Press');
-        expect(en.muscles).toEqual(['Chest']);
+        expect(en.muscles).toEqual(['Mid chest']);
         expect(en.equipment).toBe('Dumbbell');
     });
 
     it('uses Portuguese catalog names for pt-BR', () => {
         const pt = localizeExercise(bench, 'pt-BR');
         expect(pt.name).toBe('Supino inclinado halteres');
-        expect(pt.muscles).toEqual(['Peitoral']);
+        expect(pt.muscles).toEqual(['Peito médio']);
         expect(pt.equipment).toBe('Halteres');
     });
 
@@ -56,13 +56,19 @@ describe('localizeExercise', () => {
         expect(localized.muscles).toEqual(['Lats']);
     });
 
+    it('names muscles like the mobile app (flag first, API name as fallback)', () => {
+        const pt = localizeExercise({ id: 9, name: 'X', muscles: [{ muscleNamePt: 'Peitoral', muscleGroup: 2 }, { muscleNamePt: 'Algo livre' }] }, 'pt-BR');
+        expect(pt.muscles).toEqual(['Peito superior', 'Algo livre']);
+        expect(localizeExercise({ id: 10, name: 'Y', muscles: [{ muscleGroup: 8192 }, { muscleGroup: 16384 }] }, 'pt-BR').muscles).toEqual(['Dorsais', 'Abdômen superior']);
+    });
+
     it('builds filter chips only from muscles present on API exercises', () => {
         const labels = [
             localizeExercise({ id: 1, name: 'A', muscles: [{ muscleName: 'Chest', muscleNamePt: 'Peitoral', muscleGroup: 7 }] }, 'en'),
             localizeExercise({ id: 2, name: 'B', muscles: [{ muscleName: 'Lats', muscleNamePt: 'Latíssimo', muscleGroup: 8192 }] }, 'en'),
             localizeExercise({ id: 3, name: 'C', muscles: [] }, 'en'),
         ].flatMap((ex) => ex.muscles);
-        expect([...new Set(labels)].sort()).toEqual(['Chest', 'Lats']);
+        expect([...new Set(labels)].sort()).toEqual(['Lats', 'Lower chest', 'Mid chest', 'Upper chest']);
     });
 });
 

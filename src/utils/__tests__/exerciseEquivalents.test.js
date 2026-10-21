@@ -33,7 +33,7 @@ describe('mapExerciseEquivalents', () => {
         expect(records[0]).toMatchObject({
             id: 2,
             name: 'Incline DB Press',
-            muscles: ['Chest'],
+            muscles: ['Mid chest'],
             equipments: [{ equipmentNamePt: 'Halteres', equipmentName: 'Dumbbell' }],
         });
         expect(mapExerciseEquivalents([sampleResponse], 'pt-BR').records[0].name).toBe('Supino inclinado halteres');

@@ -45,15 +45,16 @@ export function muscleDisplayName(muscle, language) {
         const fromGroup = leavesFromMuscleGroup(text).map((id) => leafDisplayName(id, language));
         return fromGroup[0] || text;
     }
-    const named = pickLocalized(
+    // Same precedence as the mobile app: the muscle flag wins, API-provided names are the fallback.
+    const fromFlag = leavesFromMuscleGroup(muscle.muscleGroup ?? muscle.MuscleGroup)
+        .map((id) => leafDisplayName(id, language))
+        .join(' / ');
+    if (fromFlag) return fromFlag;
+    return pickLocalized(
         language,
         muscle.muscleName || muscle.MuscleName || muscle.name || muscle.Name,
         muscle.muscleNamePt || muscle.MuscleNamePt || muscle.namePt || muscle.NamePt,
     );
-    if (named) return named;
-    return leavesFromMuscleGroup(muscle.muscleGroup ?? muscle.MuscleGroup)
-        .map((id) => leafDisplayName(id, language))
-        .join(' / ');
 }
 
 export function equipmentDisplayName(item, language) {

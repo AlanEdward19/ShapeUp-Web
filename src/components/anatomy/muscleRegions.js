@@ -219,6 +219,7 @@ const ALIAS_TO_LEAVES = {
     cuerpocompleto: [...CHEST, ...ARMS, ...SHOULDERS, ...BACK, ...ABS, ...LEGS],
 };
 
+/** Labels follow the mobile app (lib/data/muscle_taxonomy.dart) so both clients say the same thing. */
 const LEAF_PT = {
     UpperChest: 'Peito superior',
     MiddleChest: 'Peito médio',
@@ -226,27 +227,72 @@ const LEAF_PT = {
     Biceps: 'Bíceps',
     Triceps: 'Tríceps',
     Forearms: 'Antebraços',
-    DeltoidAnterior: 'Deltóide anterior',
-    DeltoidLateral: 'Deltóide lateral',
-    DeltoidPosterior: 'Deltóide posterior',
+    DeltoidAnterior: 'Ombro anterior',
+    DeltoidLateral: 'Ombro lateral',
+    DeltoidPosterior: 'Ombro posterior',
     Traps: 'Trapézio',
-    UpperBack: 'Costas superior',
-    MiddleBack: 'Costas média',
-    LowerBack: 'Costas inferior',
-    Lats: 'Latíssimo',
+    UpperBack: 'Costas superiores',
+    MiddleBack: 'Costas centrais',
+    LowerBack: 'Lombar',
+    Lats: 'Dorsais',
     AbsUpper: 'Abdômen superior',
     AbsLower: 'Abdômen inferior',
     AbsObliques: 'Oblíquos',
     Quadriceps: 'Quadríceps',
-    Hamstrings: 'Isquiotibiais',
+    Hamstrings: 'Posterior de coxa',
     Glutes: 'Glúteos',
     Calves: 'Panturrilhas',
-    HipFlexors: 'Flexores de quadril',
+    HipFlexors: 'Flexores do quadril',
 };
 
+const LEAF_EN = {
+    UpperChest: 'Upper chest', MiddleChest: 'Mid chest', LowerChest: 'Lower chest',
+    Biceps: 'Biceps', Triceps: 'Triceps', Forearms: 'Forearms',
+    DeltoidAnterior: 'Front delt', DeltoidLateral: 'Side delt', DeltoidPosterior: 'Rear delt',
+    Traps: 'Traps', UpperBack: 'Upper back', MiddleBack: 'Mid back', LowerBack: 'Lower back', Lats: 'Lats',
+    AbsUpper: 'Upper abs', AbsLower: 'Lower abs', AbsObliques: 'Obliques',
+    Quadriceps: 'Quads', Hamstrings: 'Hamstrings', Glutes: 'Glutes', Calves: 'Calves', HipFlexors: 'Hip flexors',
+};
+
+const LEAF_ES = {
+    UpperChest: 'Pecho superior', MiddleChest: 'Pecho medio', LowerChest: 'Pecho inferior',
+    Biceps: 'Bíceps', Triceps: 'Tríceps', Forearms: 'Antebrazos',
+    DeltoidAnterior: 'Hombro anterior', DeltoidLateral: 'Hombro lateral', DeltoidPosterior: 'Hombro posterior',
+    Traps: 'Trapecio', UpperBack: 'Espalda superior', MiddleBack: 'Espalda media', LowerBack: 'Zona lumbar', Lats: 'Dorsales',
+    AbsUpper: 'Abdomen superior', AbsLower: 'Abdomen inferior', AbsObliques: 'Oblicuos',
+    Quadriceps: 'Cuádriceps', Hamstrings: 'Isquiotibiales', Glutes: 'Glúteos', Calves: 'Gemelos', HipFlexors: 'Flexores de cadera',
+};
+
+export const LEAF_LABELS = { 'pt-BR': LEAF_PT, en: LEAF_EN, es: LEAF_ES };
+
 export function leafDisplayName(id, language = 'en') {
-    if (language === 'pt-BR') return LEAF_PT[id] || id;
-    return String(id || '').replace(/([a-z])([A-Z])/g, '$1 $2');
+    return (LEAF_LABELS[language] || LEAF_EN)[id] || String(id || '').replace(/([a-z])([A-Z])/g, '$1 $2');
+}
+
+/** Selectable groups in the library filter, same buckets as mobile `muscleGroups`. */
+export const MUSCLE_GROUPS = {
+    Chest: ['UpperChest', 'MiddleChest', 'LowerChest'],
+    Back: ['Lats', 'Traps', 'UpperBack', 'MiddleBack', 'LowerBack'],
+    Shoulders: ['DeltoidAnterior', 'DeltoidLateral', 'DeltoidPosterior'],
+    Biceps: ['Biceps'],
+    Triceps: ['Triceps'],
+    Forearms: ['Forearms'],
+    Abs: ['AbsUpper', 'AbsLower', 'AbsObliques'],
+    Quadriceps: ['Quadriceps'],
+    Hamstrings: ['Hamstrings'],
+    Glutes: ['Glutes'],
+    Calves: ['Calves'],
+    HipFlexors: ['HipFlexors'],
+};
+
+const GROUP_LABELS = {
+    'pt-BR': { Chest: 'Peito', Back: 'Costas', Shoulders: 'Ombros', Abs: 'Abdômen' },
+    en: { Chest: 'Chest', Back: 'Back', Shoulders: 'Shoulders', Abs: 'Abs' },
+    es: { Chest: 'Pecho', Back: 'Espalda', Shoulders: 'Hombros', Abs: 'Abdomen' },
+};
+
+export function groupDisplayName(group, language = 'en') {
+    return (GROUP_LABELS[language] || GROUP_LABELS.en)[group] || leafDisplayName(MUSCLE_GROUPS[group]?.[0] ?? group, language);
 }
 
 /** API MuscleGroup is a [Flags] int aligned with LEAF_MUSCLES bit order. */
