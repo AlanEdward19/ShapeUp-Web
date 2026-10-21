@@ -315,7 +315,10 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                         <span><b>{totalSets}</b> {t('pro.builder.stat.sets')}</span>
                         <span><b>{estMins}</b> {t('pro.builder.stat.duration')}</span>
                     </div>
-                    <Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button>
+                    <div className="su-heading-actions">
+                        <Button variant="ghost" onClick={onCancel}>{t('pro.builder.btn.cancel')}</Button>
+                        <Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button>
+                    </div>
                 </div>
             </header>
             {/* LEFT: Plan builder */}
@@ -482,19 +485,12 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                         </div>
                     )}
 
-                    <Button fullWidth icon={<Save size={16} />} onClick={commitPlan}>
-                        {t('pro.builder.btn.save')}
-                    </Button>
                     {onAssign && (
                         <Button fullWidth variant="outline" className="su-mt-2" style={{ color: 'var(--text-main)' }}
                             onClick={() => onAssign(planPayload())}>
                             {t('pro.builder.btn.assign')}
                         </Button>
                     )}
-                    <Button fullWidth variant="outline" icon={<X size={16} />}
-                        onClick={onCancel} style={{ marginTop: '0.5rem' }}>
-                        {t('pro.builder.btn.cancel')}
-                    </Button>
                 </Card>
             </details>
             {showExerciseLibrary && (

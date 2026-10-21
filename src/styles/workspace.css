@@ -966,7 +966,6 @@
 .su-prescription-editor .su-heading-title{flex:1 1 16rem;min-width:0}
 .su-prescription-editor .su-heading-title>p{margin:0}
 .su-prescription-editor .su-heading-main .su-prescription-stats{margin:0}
-.su-prescription-editor .su-heading-main>.su-btn{margin-left:auto}
 .su-prescription-editor .su-settings-split{grid-template-columns:minmax(0,1fr);padding:0 20px 20px}
 
 /* narrow screens: the summary (map + metrics) rises above the form as one compact card */
@@ -985,8 +984,6 @@
   .su-prescription-editor .su-sticky-card .su-metric-val{font-size:15px}
   .su-prescription-editor .su-sticky-card .su-chart-section,
   .su-prescription-editor .su-sticky-card>.su-btn{grid-column:1/-1}
-  /* save and back already live in the heading and the back link */
-  .su-prescription-editor .su-sticky-card>.su-btn{display:none}
   .su-prescription-editor .su-sticky-card .su-metric-item{align-items:flex-start;text-align:left}
 }
 @media(max-width:420px){
@@ -995,3 +992,18 @@
   .su-prescription-editor .su-sticky-card .su-intelligence-metrics{grid-template-columns:1fr}
 }
 .su-prescription-editor .su-sticky-card .su-body-map-head{display:none}
+
+/* heading grid: title and stats stack on the left, save stays on the right at any width */
+.su-prescription-editor .su-heading-main{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"title actions" "stats actions";align-items:center;gap:10px 24px}
+.su-prescription-editor .su-heading-title{grid-area:title;flex:none}
+.su-prescription-editor .su-heading-main .su-prescription-stats{grid-area:stats}
+.su-prescription-editor .su-heading-actions{grid-area:actions;display:flex;align-items:center;gap:8px;align-self:center}
+.su-prescription-editor .su-heading-actions .su-btn{white-space:nowrap}
+@media(max-width:520px){
+  .su-prescription-editor .su-heading-main{grid-template-columns:1fr;grid-template-areas:"title" "stats" "actions"}
+  .su-prescription-editor .su-heading-actions>.su-btn-primary{flex:1;justify-content:center}
+}
+/* wide: the summary column scrolls on its own */
+@media(min-width:1101px){
+  .su-prescription-editor .su-prescription-analytics{max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+}
