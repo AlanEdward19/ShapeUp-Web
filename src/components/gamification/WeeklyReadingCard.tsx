@@ -72,11 +72,11 @@ export default function WeeklyReadingCard({ reading }: { reading: WeeklyReadingS
             <span>{l.days(reading.data.daysWithWork)}</span>
           </p>
           <h3 style={{ fontSize: 12, fontWeight: 600, margin: '16px 0 8px' }}>{l.trends}</h3>
-          {reading.data.loadTrends.length === 0 ? (
+          {(reading.data.loadTrends ?? []).length === 0 ? (
             <p>{l.noTrends}</p>
           ) : (
             <ul>
-              {reading.data.loadTrends.map(item => (
+              {(reading.data.loadTrends ?? []).map(item => (
                 <li key={item.exerciseId} data-trend={item.trend}>
                   {item.exerciseName}: {formatWeight(item.currentMaxLoad)} ({l[item.trend]})
                 </li>

@@ -1,3 +1,4 @@
+import WeekdayChips from '../../components/training/WeekdayChips';
 import { readAllPages } from '../../utils/readAllPages';
 import { workoutHistory } from '../../utils/workoutHistory';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -68,9 +69,7 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, owned, c
         <div className="su-independent-plan-card">
             <div className="su-plan-card-body">
                 <div className="su-plan-card-main">
-                    <span className="su-phase-badge">
-                        {plan.phase?.toUpperCase() || 'GENERAL'}
-                    </span>
+                    {plan.phase ? <span className="su-phase-badge">{plan.phase}</span> : null}
                     <h2 className="su-plan-display-name">{plan.name}</h2>
                     <p className="su-plan-display-meta">
                         {t('pro.builder.diff')}: <strong>{t(`pro.builder.diff.${plan.difficulty?.toLowerCase()}`) || plan.difficulty}</strong> · {plan.weeks} {t('pro.client.plan.weeks')}
@@ -78,6 +77,9 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, owned, c
                     <div className="su-ex-count-badge">
                         <span>{mapExercises.length} {t('pro.client.plan.exercises')}</span>
                     </div>
+                    <WeekdayChips days={plan.assignedWeekdays} />
+                </div>
+                <div className="su-plan-card-map">
                     <WorkoutBodyMap exercises={mapExercises} compact />
                 </div>
                 <div className="su-plan-card-side">

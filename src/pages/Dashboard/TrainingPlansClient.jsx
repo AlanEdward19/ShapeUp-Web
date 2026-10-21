@@ -1,3 +1,4 @@
+import WeekdayChips from '../../components/training/WeekdayChips';
 import { readAllPages } from '../../utils/readAllPages';
 import { executedExercisesForMap, workoutHistory } from '../../utils/workoutHistory';
 import { unmapSetType } from '../../utils/trainingEnums';
@@ -964,6 +965,7 @@ const ClientView = () => {
                                                 {flattenBlockExercises(plan.blocks).length} {t('client.training.card.exercises')}
                                             </div>
                                         </div>
+                                        <WeekdayChips days={plan.assignedWeekdays} />
                                     </div>
 
                                     <div className="su-plan-hero-action" data-tour="tp-start-btn">
