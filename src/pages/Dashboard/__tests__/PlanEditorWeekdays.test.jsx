@@ -34,7 +34,7 @@ describe('PlanEditor weekday selector (WSD-02)', () => {
         expect(screen.getByTestId('weekday-selector')).toBeInTheDocument();
         fireEvent.click(screen.getByTestId('weekday-1'));
         fireEvent.click(screen.getByTestId('weekday-4'));
-        fireEvent.click(screen.getAllByRole('button', { name: 'Save Plan' })[0]);
+        fireEvent.click(screen.getAllByRole('button', { name: 'Save workout' })[0]);
 
         expect(onSave).toHaveBeenCalledTimes(1);
         expect(onSave.mock.calls[0][0].assignedWeekdays).toEqual([1, 4]);
@@ -48,7 +48,7 @@ describe('PlanEditor weekday selector (WSD-02)', () => {
 
         fireEvent.click(screen.getByTestId('weekday-1'));
         fireEvent.click(screen.getByTestId('weekday-4'));
-        fireEvent.click(screen.getAllByRole('button', { name: 'Save Plan' })[0]);
+        fireEvent.click(screen.getAllByRole('button', { name: 'Save workout' })[0]);
 
         expect(onSave.mock.calls[0][0].assignedWeekdays).toEqual([]);
     });

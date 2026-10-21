@@ -409,21 +409,25 @@
 .su-register-stage .su-register-roles small{font-size:13px}
 .su-auth-centered .su-register-progress+.su-auth-title{font-size:30px!important}
 .su-register-stage p{font-size:13px}
-.su-builder-layout.su-prescription-editor{display:flex;flex-direction:column;gap:24px}
-.su-prescription-heading{display:flex;align-items:center;flex-wrap:wrap;gap:24px;padding:24px;border:1px solid var(--border-color);border-radius:6px;background:var(--bg-card)}
+.su-builder-layout.su-prescription-editor{display:grid;grid-template-columns:minmax(0,1fr) 22rem;gap:24px;align-items:start}
+.su-prescription-heading{display:flex;align-items:center;flex-wrap:wrap;gap:24px;padding:24px;grid-column:1/-1;border:1px solid var(--border-color);border-radius:24px;background:var(--bg-card)}
 .su-prescription-heading h2{font:700 30px 'Barlow Condensed',sans-serif;text-transform:none;margin:5px 0}
 .su-prescription-heading p{color:var(--text-muted);font-size:13px;margin:0}
 .su-prescription-stats{display:flex;gap:24px;margin-left:auto}
 .su-prescription-stats span{display:flex;flex-direction:column;font-size:11px;color:var(--text-muted)}
 .su-prescription-stats b{font:600 22px 'Barlow Condensed',sans-serif;color:var(--text-main)}
 .su-prescription-editor .su-plan-builder{width:100%;min-width:0}
-.su-prescription-editor .su-plan-meta-grid{grid-template-columns:2fr 1fr 1fr 1fr!important}
-.su-prescription-editor .su-plan-header-card{padding:0!important;border:1px solid var(--border-color);background:var(--bg-card);border-radius:6px;margin-bottom:24px}
+.su-prescription-editor .su-plan-meta-grid{grid-template-columns:1fr 1fr!important}
+.su-prescription-editor .su-plan-meta-grid>:first-child{grid-column:1/-1}
+.su-prescription-editor .su-plan-header-card{padding:0!important;border:1px solid var(--border-color);background:var(--bg-card);border-radius:24px;margin-bottom:24px}
 .su-prescription-settings summary,.su-prescription-analytics>summary{padding:16px 20px;cursor:pointer;font-weight:600;font-size:14px}
 .su-prescription-settings summary span{font-weight:400;font-size:12px;color:var(--text-muted);margin-left:20px}
 .su-prescription-settings .su-plan-meta-grid,.su-prescription-settings>.su-mt-4{padding:0 20px 20px}
 .su-prescription-analytics .su-sticky-card{position:static}
-.su-prescription-analytics{width:100%;border:1px solid var(--border-color);border-radius:6px}
+.su-prescription-analytics{width:100%;border:1px solid var(--border-color);border-radius:24px;background:var(--bg-card);position:sticky;top:16px;grid-column:2;grid-row:2}
+.su-prescription-analytics .su-sticky-card{border:0;box-shadow:none;background:transparent}
+.su-prescription-editor .su-plan-builder{grid-column:1;grid-row:2}
+@media(max-width:1100px){.su-builder-layout.su-prescription-editor{grid-template-columns:1fr}.su-prescription-analytics{position:static;grid-column:1;grid-row:auto}.su-prescription-editor .su-plan-builder{grid-row:auto}}
 .su-prescription-editor .su-sortable-list{display:grid;gap:24px}
 .su-prescription-editor .su-exercise-stack{width:100%}
 .su-prescription-editor .su-intelligence-metrics{display:grid;grid-template-columns:repeat(3,1fr)}

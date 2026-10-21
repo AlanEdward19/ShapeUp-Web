@@ -280,7 +280,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">{t('pro.builder.kicker')}</span><h1>{name || t('pro.builder.name')}</h1><p>{t(`pro.builder.phase.${phase.toLowerCase().split(' ')[0]}`) || phase} · {weeks} {t('client.training.card.weeks')} · {t(`pro.builder.diff.${difficulty.toLowerCase()}`) || difficulty}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> {t('pro.builder.stat.exercises')}</span><span><b>{totalSets}</b> {t('pro.builder.stat.sets')}</span><span><b>{estMins}</b> {t('pro.builder.stat.duration')}</span></div><Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button></header>
             {/* LEFT: Plan builder */}
             <div className="su-plan-builder">
-                <details className="su-plan-header-card su-prescription-settings" data-tour="pe-settings" open={!plan.name}><summary>{t('pro.builder.params')} <span>{t('pro.builder.params.hint')}</span></summary>
+                <details className="su-plan-header-card su-prescription-settings" data-tour="pe-settings" open><summary>{t('pro.builder.params')} <span>{t('pro.builder.params.hint')}</span></summary>
                     <div className="su-plan-meta-grid">
                         <Input label={t('pro.builder.name')} value={name} onChange={e => setName(e.target.value)} />
                         <Input label={t('pro.builder.weeks')} type="number" min="1" max="52" value={weeks} onChange={e => setWeeks(e.target.value)} />
@@ -364,7 +364,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             </div>
 
             {/* RIGHT: Sticky summary sidebar */}
-            <details className="su-structural-analytics su-prescription-analytics" data-tour="pe-summary"><summary>{t('pro.builder.analytics')}</summary>
+            <details className="su-structural-analytics su-prescription-analytics" data-tour="pe-summary" open><summary>{t('pro.builder.analytics')}</summary>
                 <Card className="su-sticky-card">
                     <div className="su-card-header-flex">
                         <h3 className="su-card-title">

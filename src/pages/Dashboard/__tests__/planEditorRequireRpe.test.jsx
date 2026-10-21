@@ -75,7 +75,7 @@ describe('PlanEditor bulk require RPE (WEV-06)', () => {
         expect(toggles[0]).toHaveAttribute('aria-pressed', 'true');
         expect(toggles[2]).toHaveAttribute('aria-pressed', 'true');
 
-        fireEvent.click(screen.getAllByRole('button', { name: 'Save Plan' })[0]);
+        fireEvent.click(screen.getAllByRole('button', { name: 'Save workout' })[0]);
         expect(onSave).toHaveBeenCalledTimes(1);
         const saved = onSave.mock.calls[0][0];
         expect(saved.blocks[0].exercises[0].requireRpe).toBe(true);
@@ -86,12 +86,12 @@ describe('PlanEditor bulk require RPE (WEV-06)', () => {
 
     it('localizes plan builder chrome instead of keeping Portuguese copy', () => {
         render(withLang(<PlanEditor plan={twoBlockPlan} onSave={vi.fn()} onCancel={vi.fn()} />));
-        expect(screen.getByText('Plan parameters')).toBeInTheDocument();
-        expect(screen.getByText('Name, goal, duration and notes')).toBeInTheDocument();
-        expect(screen.getByRole('heading', { name: /Prescribed exercises/i })).toBeInTheDocument();
-        expect(screen.getByText('Prescription analysis and muscle distribution')).toBeInTheDocument();
-        expect(screen.queryByText('Parâmetros do plano')).not.toBeInTheDocument();
-        expect(screen.queryByText('Exercícios prescritos')).not.toBeInTheDocument();
+        expect(screen.getByText('Name and details')).toBeInTheDocument();
+        expect(screen.getByText('Goal, duration and weekdays')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: /Workout exercises/i })).toBeInTheDocument();
+        expect(screen.getByText('Muscles in this workout')).toBeInTheDocument();
+        expect(screen.queryByText('Nome e informações')).not.toBeInTheDocument();
+        expect(screen.queryByText('Exercícios do treino')).not.toBeInTheDocument();
         expect(screen.queryByText('Análise da prescrição e distribuição muscular')).not.toBeInTheDocument();
     });
 });
