@@ -59,7 +59,7 @@ export function buildNavigation({ role, platformAdmin, language }: NavigationInp
       items: [
         item('home', 'Início', '/dashboard'),
         ...(pro ? [item('group', 'Alunos', '/dashboard/clients')] : []),
-        item('fitness_center', pro ? 'Treinos e periodização' : 'Meus treinos', '/dashboard/training'),
+        item('exercise', pro ? 'Treinos e periodização' : 'Meus treinos', '/dashboard/training'),
         item('nutrition', 'Nutrição', '/dashboard/nutrition/diary'),
         item('chat_bubble', 'Mensagens', '/dashboard/messages'),
       ],
@@ -89,7 +89,7 @@ export function buildNavigation({ role, platformAdmin, language }: NavigationInp
     id: 'explore',
     label: 'Explorar',
     items: [
-      item('exercise', 'Biblioteca de exercícios', '/dashboard/exercises'),
+      item('menu_book', 'Biblioteca de exercícios', '/dashboard/exercises'),
       ...(!pro
         ? [item('flag', 'Meus objetivos', '/dashboard/objectives'), item('location_on', 'Academias', '/dashboard/gyms')]
         : []),

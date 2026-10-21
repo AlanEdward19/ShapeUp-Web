@@ -145,3 +145,18 @@ export function exerciseMatchesAnyMuscle(ex, selectedMuscles) {
     if (!selectedMuscles?.length) return true;
     return selectedMuscles.some((muscle) => exerciseMatchesMuscleFilter(ex, muscle));
 }
+
+/** Library kinds, same buckets as the mobile ExerciseKind. */
+export const EXERCISE_KINDS = ['all', 'weight', 'cardio', 'isometric', 'stretch', 'mobility'];
+
+export function exerciseKind(ex) {
+    const raw = String(ex?.exerciseType ?? ex?.ExerciseType ?? '').toLowerCase();
+    const timed = raw === '2' || raw === 'timebased';
+    if (!timed) return 'weight';
+    const name = fold([ex?.name, ex?.nameEn, ex?.namePt].filter(Boolean).join(' '));
+    const cardio = (ex?.muscles ?? []).some((muscle) => fold(muscle) === 'cardio');
+    if (cardio) return 'cardio';
+    if (/along|stretch|estiramiento/.test(name)) return 'stretch';
+    if (/mobilidade|mobility|movilidad/.test(name)) return 'mobility';
+    return 'isometric';
+}
