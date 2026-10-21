@@ -37,7 +37,7 @@
     margin: 0.15rem 0 0;
     font-family: var(--font-display);
     font-size: clamp(1.35rem, 2.4vw, 2rem);
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     line-height: 1;
@@ -132,7 +132,7 @@
 .su-badge {
     font-family: var(--font-display);
     font-size: 0.75rem;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--primary);
     margin-left: 0.35rem;
     letter-spacing: 0;
@@ -165,7 +165,7 @@
 .su-avatar-initials {
     font-family: var(--font-display);
     font-size: 0.8rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     color: var(--primary);
 }

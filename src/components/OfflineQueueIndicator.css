@@ -20,7 +20,7 @@
     color: var(--text-main);
     font-family: var(--font-display);
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     box-shadow: none;
@@ -55,7 +55,7 @@
 .su-offline-panel-header {
     font-family: var(--font-display);
     font-size: 0.78rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     color: var(--text-main);

@@ -13,7 +13,7 @@
 .su-suggest-label {
     font-family: var(--font-display);
     font-size: 0.8rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     color: var(--text-main);
@@ -48,7 +48,7 @@
     color: var(--text-muted);
     font-family: var(--font-display);
     font-size: 0.85rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     cursor: pointer;

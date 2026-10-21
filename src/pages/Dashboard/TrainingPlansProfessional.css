@@ -13,7 +13,7 @@
 .su-page-title {
     font-family: var(--font-display);
     font-size: clamp(2rem, 5vw, 3.1rem);
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     line-height: 0.92;
@@ -164,7 +164,7 @@
 .su-pe-ex-name-input {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     color: var(--text-main);
@@ -192,7 +192,7 @@
 .su-ex-title {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     color: var(--text-main);
@@ -286,7 +286,7 @@
 
 .su-set-index {
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 700;
     color: var(--primary);
     text-align: center;
 }
@@ -409,7 +409,7 @@
     justify-content: center;
     font-family: var(--font-display);
     font-size: 0.7rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     color: var(--text-muted);
@@ -563,7 +563,7 @@
 .su-template-title-clean {
     font-family: var(--font-display);
     font-size: 1.45rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     color: var(--text-main);
@@ -599,7 +599,7 @@
 .su-metric-clean-val {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-main);
 }
 
@@ -656,7 +656,7 @@
 .su-empty-title {
     font-family: var(--font-display);
     font-size: 1.75rem;
-    font-weight: 800;
+    font-weight: 700;
     text-transform: none;
     letter-spacing: 0;
     color: var(--text-main);

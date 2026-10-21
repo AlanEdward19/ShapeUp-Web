@@ -14,7 +14,7 @@
 .su-page-title {
     font-family: var(--font-display);
     font-size: clamp(1.85rem, 3.4vw, 2.6rem);
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     line-height: 0.95;
@@ -49,7 +49,7 @@
 .su-generator-header h2 {
     font-family: var(--font-display);
     font-size: 1.45rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     margin: 0;
@@ -214,7 +214,7 @@
 .su-history-header h3 {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     margin: 0;

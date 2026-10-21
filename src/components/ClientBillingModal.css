@@ -28,7 +28,7 @@
 .su-billing-modal .su-modal-header h2 {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
 }
@@ -49,7 +49,7 @@
 .su-billing-for-name {
     font-family: var(--font-display);
     font-size: 1.2rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
 }

@@ -33,7 +33,7 @@
 .su-elm-title {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     color: var(--text-main);
@@ -93,7 +93,7 @@
     color: var(--text-muted);
     cursor: pointer;
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     text-transform: none;
     font-size: 0.75rem;
