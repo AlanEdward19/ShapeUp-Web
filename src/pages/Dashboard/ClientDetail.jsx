@@ -305,7 +305,20 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
 
     return (
         <div className="su-builder-layout su-prescription-editor">
-            <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">{t('pro.builder.kicker')}</span><h1>{name || t('pro.builder.name')}</h1><p>{phaseText} · {weeks} {t('client.training.card.weeks')} · {diffText}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> {t('pro.builder.stat.exercises')}</span><span><b>{totalSets}</b> {t('pro.builder.stat.sets')}</span><span><b>{estMins}</b> {t('pro.builder.stat.duration')}</span></div><Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button></header>
+            <header className="su-prescription-heading">
+                <div className="su-heading-main">
+                    <span className="su-nutrition-kicker">{t('pro.builder.kicker')}</span>
+                    <h1>{name || t('pro.builder.name')}</h1>
+                    <p>{phaseText} · {weeks} {t('client.training.card.weeks')} · {diffText}</p>
+                    <div className="su-prescription-stats">
+                        <span><b>{allExercises.length}</b> {t('pro.builder.stat.exercises')}</span>
+                        <span><b>{totalSets}</b> {t('pro.builder.stat.sets')}</span>
+                        <span><b>{estMins}</b> {t('pro.builder.stat.duration')}</span>
+                    </div>
+                    <Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button>
+                </div>
+                <aside className="su-heading-map"><WorkoutBodyMap exercises={allExercises} catalog={exerciseCatalog} compact /></aside>
+            </header>
             {/* LEFT: Plan builder */}
             <div className="su-plan-builder">
                 <details className="su-plan-header-card su-prescription-settings" data-tour="pe-settings" open><summary>{t('pro.builder.params')} <span>{t('pro.builder.params.hint')}</span></summary>
@@ -356,7 +369,6 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                         </div>
                     )}
                     </div>
-                    <aside className="su-settings-map"><WorkoutBodyMap exercises={allExercises} catalog={exerciseCatalog} compact /></aside>
                     </div>
                 </details>
 

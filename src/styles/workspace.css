@@ -959,3 +959,23 @@
   .su-prescription-editor .su-set-base-grid>.su-set-index{grid-row:1;align-self:end}
   .su-prescription-editor .su-intensity-group input{min-width:0;flex:1}
 }
+
+/* heading: details on the left, muscle map on the right */
+.su-prescription-editor .su-prescription-heading{display:grid;grid-template-columns:minmax(0,1fr) clamp(150px,30%,260px);gap:16px 28px;align-items:center;padding:20px 24px}
+.su-prescription-editor .su-prescription-heading>.su-btn{margin-left:0}
+.su-prescription-editor .su-heading-main{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
+.su-prescription-editor .su-heading-main>p{margin:0}
+.su-prescription-editor .su-heading-main .su-prescription-stats{margin:8px 0 6px}
+.su-prescription-editor .su-heading-map{min-width:0}
+.su-prescription-editor .su-heading-map .su-body-map{gap:.35rem}
+.su-prescription-editor .su-heading-map .su-body-map-head{display:none}
+.su-prescription-editor .su-heading-map .su-body-map-figure{padding:6px 4px;max-width:none}
+.su-prescription-editor .su-heading-map .su-body-map-svg{max-height:170px}
+.su-prescription-editor .su-heading-map .su-body-map-pane-label{font-size:11px}
+.su-prescription-editor .su-heading-map .su-body-map-hint{margin:0;font-size:12px;text-align:center}
+.su-prescription-editor .su-settings-split{grid-template-columns:minmax(0,1fr);padding:0 20px 20px}
+@media(max-width:420px){
+  .su-prescription-editor .su-prescription-heading{grid-template-columns:minmax(0,1fr) 108px;padding:16px;gap:12px}
+  .su-prescription-editor .su-heading-map .su-body-map-svg{max-height:130px}
+  .su-prescription-editor .su-settings-split{padding:0 14px 16px}
+}
