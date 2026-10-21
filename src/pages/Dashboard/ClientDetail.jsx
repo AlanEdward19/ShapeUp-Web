@@ -537,7 +537,7 @@ export const SessionDetailModal = ({ session, planName, onClose, planExercises =
 };
 
 // ─── PLAN CARD (with expandable history) ────────────────────
-export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighlightedSessionId, catalog = [] }) => {
+export const PlanCard = ({ plan, onEdit, onCopy, onDelete, initialHighlightedSessionId, catalog = [] }) => {
     const { t } = useLanguage();
     const [historyOpen, setHistoryOpen] = useState(false);
     const [selectedSession, setSelectedSession] = useState(null);
@@ -565,11 +565,6 @@ export const PlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, initialHighl
                         </p>
                     </div>
                     <div className="su-cp-plan-actions">
-                        {onStart && (
-                            <button className="su-cp-action-btn execute" onClick={() => onStart(plan)} title="Start Session">
-                                <Play size={16} fill="currentColor" /> {t('client.training.card.btn')}
-                            </button>
-                        )}
                         <button className="su-cp-action-btn edit" onClick={() => onEdit(plan)} title="Edit Plan">
                             <Settings2 size={16} /> {t('pro.client.plan.btn.edit')}
                         </button>

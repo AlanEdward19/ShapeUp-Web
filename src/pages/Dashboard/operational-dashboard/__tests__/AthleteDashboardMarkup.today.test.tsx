@@ -82,6 +82,6 @@ describe('AthleteDashboardMarkup Frequência empty state (WSD-06)', () => {
   it('offers the rest-day state instead of the start CTA when nothing is scheduled', () => {
     render(withLang(<AthleteDashboardMarkup state={baseState} />));
     expect(screen.getByText('Hoje é dia de descanso')).toBeInTheDocument();
-    expect(screen.queryByText('Começar treino')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ver treino de hoje')).not.toBeInTheDocument();
   });
 });

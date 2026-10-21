@@ -272,7 +272,7 @@ export function ExerciseDrawer({ state }: { state: DrawerState }): ReactElement 
             onClick={() => state.add(active)}
           >
             <span className="material-symbols-outlined text-[16px]">playlist_add</span>
-            <span>{t('exlib.drawer.add')}</span>
+            <span>{t(['professional', 'gym'].includes(localStorage.getItem('shapeup_role') ?? '') ? 'exlib.drawer.add' : 'exlib.drawer.add_own')}</span>
           </button>
           <button
             type="button"
