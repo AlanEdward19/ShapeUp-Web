@@ -202,3 +202,31 @@
         display: none;
     }
 }
+
+/* Apple-style top bar: translucent, pill search, round avatar. */
+.su-header {
+    background-color: color-mix(in srgb, var(--bg-main) 82%, transparent);
+    -webkit-backdrop-filter: saturate(1.4) blur(18px);
+    backdrop-filter: saturate(1.4) blur(18px);
+}
+
+.su-header-search {
+    border: 0;
+    border-radius: 12px;
+    padding: 0 0.9rem;
+    min-height: 2.75rem;
+    background: var(--bg-surface-high);
+}
+
+.su-header-search:focus-within {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 28%, transparent);
+}
+
+.su-avatar {
+    border-radius: 50%;
+    border: 0;
+    background: color-mix(in oklch, var(--primary) 16%, var(--bg-surface-high));
+}
+
+.su-avatar-initials { color: var(--link-color); }
+.su-badge { color: var(--link-color); }
