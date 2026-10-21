@@ -65,6 +65,7 @@ const Sidebar = ({ isProfessional, isIndependent, isGym, isOpen, onClose, profil
     ];
 
     const adminNavItems = [
+        { name: language === 'pt-BR' ? 'Administração' : 'Administration', path: '/dashboard/admin' },
         { name: language === 'pt-BR' ? 'Moderação de alimentos' : 'Food moderation', path: '/dashboard/admin/food-moderation' },
         { name: language === 'pt-BR' ? 'Recursos da plataforma' : 'Platform features', path: '/dashboard/admin/feature-flags' },
     ];

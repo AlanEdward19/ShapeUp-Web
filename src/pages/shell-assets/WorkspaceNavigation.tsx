@@ -49,9 +49,13 @@ export default function WorkspaceNavigation({ flow, open, close }: WorkspaceNavi
     ...(role === 'gym'
       ? [['groups', 'Equipe', '/dashboard/staff'], ['sensor_door', 'Controle de Acesso', '/dashboard/turnstile']]
       : []),
+    ['groups', 'Profissionais', '/dashboard/professionals'],
+    ['notifications', 'Avisos', '/dashboard/notifications'],
+    ...(pro ? [['sell', 'Planos de atendimento', '/dashboard/service-plans']] : []),
     ['settings', 'Configurações', '/dashboard/settings'],
     ...(localStorage.getItem('shapeup_platform_admin') === 'true'
       ? [
+          ['admin_panel_settings', 'Administração', '/dashboard/admin'],
           ['verified_user', 'Moderação de Alimentos', '/dashboard/admin/food-moderation'],
           ['tune', 'Recursos da Plataforma', '/dashboard/admin/feature-flags'],
         ]

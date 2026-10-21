@@ -39,6 +39,10 @@ const GoalOnboarding = lazy(() => import('./pages/Dashboard/Nutrition/GoalOnboar
 const FastingPage = lazy(() => import('./pages/Dashboard/Nutrition/FastingPage'));
 import FoodModerationQueue from './pages/Admin/ModerationShell';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
+import AdminConsole from './pages/Admin/AdminConsole';
+import NoticeInbox from './pages/Dashboard/NoticeInbox';
+import ProfessionalsDirectory from './pages/Dashboard/ProfessionalsHub';
+import ServicePlans from './pages/Dashboard/ServicePlans';
 import ExploreGyms from './pages/Dashboard/GymsExploreShell';
 import Onboarding from './pages/Dashboard/OnboardingShell';
 import useShellLanguage from './hooks/useShellLanguage';
@@ -126,8 +130,12 @@ function App() {
               <Route path="goal" element={<GoalOnboarding />} />
               <Route path="fasting" element={<FastingPage />} />
             </Route>
+            <Route path="admin" element={<AdminConsole />} />
             <Route path="admin/food-moderation" element={<FoodModerationQueue />} />
             <Route path="admin/feature-flags" element={<FeatureFlagsPanel />} />
+            <Route path="notifications" element={<NoticeInbox />} />
+            <Route path="professionals" element={<ProfessionalsDirectory />} />
+            <Route path="service-plans" element={<ServicePlans />} />
             <Route path="staff" element={<StaffGym />} />
             <Route path="turnstile" element={<TurnstileGym />} />
             <Route path="financial" element={<FinancialGym />} />

@@ -64,8 +64,11 @@ export function UnifiedSidebarNavigation({ flow, open, close }: UnifiedSidebarNa
     ...(!pro ? [['location_on', 'Buscar Academias', '/dashboard/gyms'] as NavItem] : []),
     ...(role === 'gym' ? [['payments', 'Gestão Financeira', '/dashboard/financial'] as NavItem] : []),
     ...(role === 'gym' ? [['groups', 'Equipe', '/dashboard/staff'] as NavItem, ['sensor_door', 'Controle de Acesso', '/dashboard/turnstile'] as NavItem] : []),
+    ['groups', 'Profissionais', '/dashboard/professionals'],
+    ['notifications', 'Avisos', '/dashboard/notifications'],
+    ...(pro ? [['sell', 'Planos de atendimento', '/dashboard/service-plans'] as NavItem] : []),
     ['settings', 'Configurações', '/dashboard/settings'],
-    ...(localStorage.getItem('shapeup_platform_admin') === 'true' ? [['verified_user', 'Moderação de Alimentos', '/dashboard/admin/food-moderation'] as NavItem, ['tune', 'Recursos da Plataforma', '/dashboard/admin/feature-flags'] as NavItem] : []),
+    ...(localStorage.getItem('shapeup_platform_admin') === 'true' ? [['admin_panel_settings', 'Administração', '/dashboard/admin'] as NavItem, ['verified_user', 'Moderação de Alimentos', '/dashboard/admin/food-moderation'] as NavItem, ['tune', 'Recursos da Plataforma', '/dashboard/admin/feature-flags'] as NavItem] : []),
   ];
   return (
     <>
