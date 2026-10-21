@@ -1,6 +1,6 @@
 .su-skeleton {
-  background: var(--bg-card, #211a17);
-  border-radius: var(--radius-sm, 0.375rem);
+  background: var(--bg-surface-high, #302825);
+  border-radius: var(--radius-control, 0.75rem);
 }
 
 .su-skeleton-pulse {

@@ -57,9 +57,17 @@ export default function UnifiedNavigation({ flow, open, close }: UnifiedNavigati
           ['sensor_door', 'Controle de Acesso', '/dashboard/turnstile'],
         ] as NavItem[])
       : []),
+    ['link', 'Vínculos', '/dashboard/links'],
+    ['nutrition', 'Prática nutricional', '/dashboard/nutrition/practice'],
+    ['mail', 'Convites', '/dashboard/training-invites'],
+    ['badge', 'Credencial', '/dashboard/credential'],
+    ['groups', 'Profissionais', '/dashboard/professionals'],
+    ['notifications', 'Avisos', '/dashboard/notifications'],
+    ...(pro ? ([['sell', 'Planos de atendimento', '/dashboard/service-plans']] as NavItem[]) : []),
     ['settings', 'Configurações', '/dashboard/settings'],
     ...(localStorage.getItem('shapeup_platform_admin') === 'true'
       ? ([
+          ['admin_panel_settings', 'Administração', '/dashboard/admin'],
           ['verified_user', 'Moderação de Alimentos', '/dashboard/admin/food-moderation'],
           ['tune', 'Recursos da Plataforma', '/dashboard/admin/feature-flags'],
         ] as NavItem[])

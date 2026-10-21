@@ -85,6 +85,7 @@ export const buildWorkoutPlanBody = (plan, targetUserId) => ({
     phase: plan.phase || 'Hypertrophy',
     difficulty: mapDifficulty(plan.difficulty),
     assignedWeekdays: mapAssignedWeekdaysToApi(plan.assignedWeekdays ?? []),
+    ...(plan.scheduledTime ? { scheduledTime: plan.scheduledTime } : {}),
     blocks: (plan.blocks || []).map((block) => ({
         type: mapBlockType(block.type),
         timeCapSeconds: block.timeCapSeconds === '' || block.timeCapSeconds == null ? null : parseInt(block.timeCapSeconds, 10),

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent, type MouseEv
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import manifest from './manifest.json';
+import higShellPolish from '../../styles/higShellPolish.css?inline';
 import useShellLanguage from '../../hooks/useShellLanguage';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -120,7 +121,7 @@ export default function DashboardShellHost({
                 <link key={href} rel="stylesheet" href={href} />
               ))}
               <style>{inlineCss}</style>
-              <style>{`${hostBaseCss}${css}`}</style>
+              <style>{`${hostBaseCss}${css}${higShellPolish}`}</style>
               <div
                 className={`shell-body dark ${bodyClass ?? entry.bodyClass ?? ''}`}
                 onClick={click}

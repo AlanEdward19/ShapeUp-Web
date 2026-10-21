@@ -19,11 +19,11 @@
     margin: 0;
     color: var(--text-main);
     font-family: var(--font-display);
-    font-size: clamp(1.6rem, 3vw, 2.25rem);
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    line-height: 1;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    line-height: 1.15;
 }
 
 .su-error-boundary p {
@@ -34,15 +34,17 @@
 
 .su-error-boundary button {
     margin-top: 0.85rem;
-    padding: 0.65rem 1.25rem;
-    border-radius: var(--radius-sm);
+    min-height: var(--button-min-height);
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--radius-button);
     border: none;
     background: var(--primary);
     color: var(--text-on-primary);
-    font-family: var(--font-display);
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-family: var(--font-sans);
+    font-size: var(--font-size-body);
+    font-weight: 600;
+    letter-spacing: -0.006em;
+    text-transform: none;
     cursor: pointer;
 }
 

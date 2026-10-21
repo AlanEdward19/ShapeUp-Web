@@ -12,7 +12,7 @@
 .lp-topbar{position:sticky;top:0;z-index:30;height:64px;background:color-mix(in srgb, var(--bg-main) 96%, transparent);border-bottom:1px solid var(--lp-border)}
 .lp-topbar>.lp-container{display:flex;align-items:center;justify-content:space-between;gap:24px;height:100%}
 .lp-brand{display:inline-flex;align-items:center;gap:12px;font:700 24px 'Barlow Condensed',sans-serif;text-transform:uppercase}
-.lp-brand svg{width:28px;height:28px}
+.lp-brand :is(svg, img){width:28px;height:28px}
 .lp-brand b{color:var(--lp-accent)}
 .lp-topbar nav{display:flex;gap:32px;font:500 17px 'Barlow Condensed',sans-serif;text-transform:uppercase;color:var(--lp-muted)}
 .lp-actions{display:flex;align-items:center;flex-wrap:wrap;gap:16px}
@@ -110,7 +110,7 @@
 .lp-hero-copy h1{font-size:42px}
 .lp-topbar .lp-button{font-size:13px;padding:8px 10px}
 .lp-brand{font-size:22px;gap:6px}
-.lp-brand svg{width:24px}
+.lp-brand :is(svg, img){width:24px;height:24px}
 .lp-library{padding:16px}
 .lp-library-row{flex-wrap:wrap}
 .lp-hero-copy .lp-actions{align-items:stretch;flex-direction:column}}

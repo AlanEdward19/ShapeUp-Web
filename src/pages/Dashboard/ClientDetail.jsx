@@ -86,6 +86,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     const [weeks, setWeeks] = useState(plan.weeks);
     const [planNotes, setPlanNotes] = useState(plan.notes || '');
     const [assignedWeekdays, setAssignedWeekdays] = useState(plan.assignedWeekdays ?? []);
+    const [scheduledTime, setScheduledTime] = useState(plan.scheduledTime || '');
     const [currentBlocks, setCurrentBlocks] = useState(
         (plan.blocks || []).map(block => ({
             ...block,
@@ -109,6 +110,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
         notes: planNotes,
         blocks: currentBlocks,
         assignedWeekdays,
+        scheduledTime: plan._templateId ? undefined : (scheduledTime || null),
     });
 
     const commitPlan = () => {
@@ -304,6 +306,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                     </div>
                     {!plan._templateId && (
                         <div className="su-mt-4">
+                            <Input label={t('pro.builder.time')} type="time" value={scheduledTime} onChange={(event) => setScheduledTime(event.target.value)} data-testid="plan-scheduled-time" />
                             <span className="su-input-label">{t('pro.builder.weekdays')}</span>
                             <div className="su-weekday-toggle-row" role="group" data-testid="weekday-selector" aria-label={t('pro.builder.weekdays')}>
                                 {WEEKDAY_API_NAMES.map((name, day) => (

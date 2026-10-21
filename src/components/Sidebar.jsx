@@ -40,6 +40,9 @@ const Sidebar = ({ isProfessional, isIndependent, isGym, isOpen, onClose, profil
         { name: language === 'pt-BR' ? 'Criador & Periodização' : t('nav.training_plans'), path: '/dashboard/training' },
         { name: t('nav.exercises_library'), path: '/dashboard/exercises' },
         { name: t('nav.nutrition'), path: '/dashboard/nutrition/diary' },
+        { name: t('parity.nav.practice'), path: '/dashboard/nutrition/practice' },
+        { name: t('parity.nav.invites'), path: '/dashboard/training-invites' },
+        { name: t('parity.nav.credential'), path: '/dashboard/credential' },
         { name: t('nav.reports'), path: '/dashboard/reports' },
         { name: language === 'pt-BR' ? 'Mensagens & Consultoria' : t('nav.feedback'), path: '/dashboard/feedback' },
         { name: t('nav.analytics'), path: '/dashboard/analytics' },
@@ -50,6 +53,7 @@ const Sidebar = ({ isProfessional, isIndependent, isGym, isOpen, onClose, profil
         { name: t('nav.dashboard'), path: '/dashboard' },
         { name: t('nav.my_training'), path: '/dashboard/training' },
         { name: t('nav.nutrition'), path: '/dashboard/nutrition/diary' },
+        { name: t('parity.nav.links'), path: '/dashboard/links' },
         { name: t('nav.objectives'), path: '/dashboard/objectives' },
         { name: t('sidebar.chat'), path: '/dashboard/messages' },
         { name: t('nav.settings'), path: '/dashboard/settings' },
@@ -60,11 +64,13 @@ const Sidebar = ({ isProfessional, isIndependent, isGym, isOpen, onClose, profil
         { name: t('nav.training_plans'), path: '/dashboard/training' },
         { name: t('nav.exercises_library'), path: '/dashboard/exercises' },
         { name: t('nav.nutrition'), path: '/dashboard/nutrition/diary' },
+        { name: t('parity.nav.links'), path: '/dashboard/links' },
         { name: t('nav.objectives'), path: '/dashboard/objectives' },
         { name: t('nav.settings'), path: '/dashboard/settings' },
     ];
 
     const adminNavItems = [
+        { name: language === 'pt-BR' ? 'Administração' : 'Administration', path: '/dashboard/admin' },
         { name: language === 'pt-BR' ? 'Moderação de alimentos' : 'Food moderation', path: '/dashboard/admin/food-moderation' },
         { name: language === 'pt-BR' ? 'Recursos da plataforma' : 'Platform features', path: '/dashboard/admin/feature-flags' },
     ];

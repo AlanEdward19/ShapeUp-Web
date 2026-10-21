@@ -1,7 +1,7 @@
 .su-card {
     background-color: var(--bg-card);
-    border-radius: var(--radius-md);
-    padding: 1.35rem 1.25rem 1.5rem;
+    border-radius: var(--radius-button);
+    padding: 1rem;
     box-shadow: var(--shadow-soft);
     border: 1px solid var(--border-color);
     width: 100%;
