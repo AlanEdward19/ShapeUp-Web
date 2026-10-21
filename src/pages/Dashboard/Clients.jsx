@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import { Search, Filter, Trash2, CheckCircle, DollarSign, Power, AlertCircle, PauseCircle } from 'lucide-react';
 import Card from '../../components/Card';
 import Button from '../../components/Button';

@@ -895,3 +895,17 @@
     .col-target { grid-column: 1 / -1; }
     .col-done { justify-self: end; }
 }
+
+.su-app-note {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin: 1rem 0 0;
+    padding: 0.9rem 1.1rem;
+    border-radius: 18px;
+    background: color-mix(in oklab, var(--primary) 10%, var(--bg-card));
+    border: 1px solid var(--border-color);
+}
+
+.su-app-note .material-symbols-outlined { flex: none; color: var(--link-color); font-size: 26px; }
+.su-app-note p { margin: 0; color: var(--text-main); font-size: 0.9375rem; line-height: 1.4; }

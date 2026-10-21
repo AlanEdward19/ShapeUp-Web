@@ -5,7 +5,7 @@ import GamificationProgressCard from '../../components/gamification/Gamification
 import { useGamificationApi } from '../../hooks/api/useGamificationApi';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
 import { useExercises } from '../../hooks/useExercises';
 import './DashboardClient.css';

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Send } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../components/tour/useShadowAwareTour';
 import { useGymManagementApi } from '../hooks/api/useGymManagementApi';
 import './InviteClientModal.css';
 

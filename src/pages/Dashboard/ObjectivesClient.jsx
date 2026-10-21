@@ -6,7 +6,7 @@ import Input from '../../components/Input';
 import { Trash2, Check } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import { useNutritionApi } from '../../hooks/api/useNutritionApi';
 import { enqueueMutation } from '../../services/mutationQueue';
 import { collapseSameDayWeight, localDateKey, localDayUtcNoonIso, upsertSameDayWeight } from '../../utils/weightHistory';

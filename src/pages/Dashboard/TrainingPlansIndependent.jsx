@@ -3,7 +3,7 @@ import { readAllPages } from '../../utils/readAllPages';
 import { workoutHistory } from '../../utils/workoutHistory';
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import Button from '../../components/Button';
 import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';

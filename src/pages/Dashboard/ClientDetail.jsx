@@ -5,7 +5,7 @@ import { readAllPages } from '../../utils/readAllPages';
 import { workoutHistory } from '../../utils/workoutHistory';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import {
     ArrowLeft, Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp, AlertTriangle,
     X, Save, Settings2, History, Play
@@ -204,7 +204,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             const tourSteps = [
                 {
                     selector: '[data-tour="pe-settings"]',
-                    content: t('tour.clientdetail.7'),
+                    content: t('tour.plan_editor.settings'),
                 },
                 {
                     selector: '[data-tour="pe-stack"]',

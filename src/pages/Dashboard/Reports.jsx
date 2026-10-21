@@ -10,7 +10,7 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import { calculateMuscleSetsTotal } from '../../utils/muscleAnalytics';
 import { useExercises } from '../../hooks/useExercises';
 import './Reports.css';
