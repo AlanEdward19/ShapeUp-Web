@@ -25,8 +25,8 @@
 .su-cookie-title {
   font-family: var(--font-display);
   font-size: 1.15rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   margin-bottom: 0.35rem;
 }
 
@@ -55,7 +55,7 @@
   font-weight: 600;
   cursor: pointer;
   padding: 0.55rem 0.9rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
 }
 
 .su-cookie-primary {

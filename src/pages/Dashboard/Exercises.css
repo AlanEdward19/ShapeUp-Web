@@ -52,7 +52,7 @@
     width: 320px;
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     box-shadow: var(--shadow-md);
     z-index: 50;
     padding: 1rem;
@@ -62,8 +62,8 @@
     font-family: var(--font-display);
     font-size: 0.8rem;
     font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
     margin-bottom: 0.75rem;
     padding-bottom: 0.4rem;
@@ -106,8 +106,8 @@
     font-family: var(--font-display);
     font-size: 0.8rem;
     font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     cursor: pointer;
 }
 
@@ -156,8 +156,8 @@
     font-family: var(--font-display);
     font-size: 1.2rem;
     font-weight: 800;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
     margin-bottom: 0.3rem;
     white-space: nowrap;
@@ -176,8 +176,8 @@
     font-family: var(--font-display);
     font-size: 0.7rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     background: transparent;
     color: var(--text-muted);
     padding: 0;

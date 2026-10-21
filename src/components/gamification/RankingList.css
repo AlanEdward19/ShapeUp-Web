@@ -10,8 +10,8 @@
     font-family: var(--font-display);
     font-size: 1.55rem;
     font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
     margin: 0;
 }
@@ -47,7 +47,7 @@
     font-family: var(--font-display);
     font-size: 1.1rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0;
     color: var(--text-muted);
 }
 
@@ -75,8 +75,8 @@
 
 .su-ranking-stat {
     font-size: 0.75rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
 }
 
@@ -96,8 +96,8 @@
     display: block;
     font-size: 0.65rem;
     color: var(--text-muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     margin-top: 0.2rem;
 }
 

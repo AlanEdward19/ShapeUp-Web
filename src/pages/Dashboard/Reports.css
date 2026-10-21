@@ -15,8 +15,8 @@
     font-family: var(--font-display);
     font-size: clamp(1.85rem, 3.4vw, 2.6rem);
     font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     line-height: 0.95;
     margin-bottom: 0.35rem;
 }
@@ -50,8 +50,8 @@
     font-family: var(--font-display);
     font-size: 1.45rem;
     font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     margin: 0;
 }
 
@@ -81,8 +81,8 @@
     font-family: var(--font-display);
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
 }
 
@@ -140,8 +140,8 @@
     font-family: var(--font-display);
     font-size: 0.9rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     cursor: pointer;
 }
 
@@ -215,8 +215,8 @@
     font-family: var(--font-display);
     font-size: 1.35rem;
     font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     margin: 0;
 }
 
@@ -231,9 +231,9 @@
     font-family: var(--font-display);
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
+    letter-spacing: 0;
     color: var(--text-muted);
-    text-transform: uppercase;
+    text-transform: none;
     background: transparent;
     border-bottom: 1px solid var(--text-main);
 }
@@ -253,8 +253,8 @@
 .su-report-type-badge,
 .su-report-type-tag {
     font-family: var(--font-display);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     font-size: 0.72rem;
     font-weight: 700;
     color: var(--text-muted);
@@ -275,8 +275,8 @@
     font-family: var(--font-display);
     font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     cursor: pointer;
 }
 
@@ -304,8 +304,8 @@
     display: block;
     color: var(--warning);
     font-family: var(--font-display);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .su-empty-history {

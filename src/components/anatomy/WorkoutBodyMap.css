@@ -18,8 +18,8 @@
     font-family: var(--font-display);
     font-size: 0.85rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
     margin: 0;
 }
@@ -46,8 +46,8 @@
     font-family: var(--font-display);
     font-size: 0.65rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
 }
 

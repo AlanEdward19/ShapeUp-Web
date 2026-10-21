@@ -1,6 +1,6 @@
 .st-auth-brand{display:inline-flex;align-items:center;gap:12px;color:var(--text-main);text-decoration:none;margin-bottom:40px;width:fit-content}
-.st-auth-brand strong{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;letter-spacing:.16em;line-height:1}
-.st-auth-mark{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--border-color);border-radius:4px;background:var(--bg-card);color:var(--primary)}
+.st-auth-brand strong{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;text-transform: none;letter-spacing: 0;line-height:1}
+.st-auth-mark{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--border-color);border-radius: var(--radius-md);background:var(--bg-card);color:var(--primary)}
 input::-ms-reveal,input::-ms-clear{display:none}
 .st-registration-password{background-color:#1a1412;color:var(--text-main);border-color:var(--border-color);caret-color:var(--text-main);color-scheme:dark}
 .st-registration-password::placeholder{color:var(--text-muted);opacity:1}
