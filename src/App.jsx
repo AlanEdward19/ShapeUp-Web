@@ -51,6 +51,8 @@ import ExploreGyms from './pages/Dashboard/GymsExploreShell';
 import Onboarding from './pages/Dashboard/OnboardingShell';
 import useShellLanguage from './hooks/useShellLanguage';
 
+const DesignPreview = import.meta.env.DEV ? lazy(() => import('./dev/DesignPreview')) : null;
+
 // Wrapper for the Login page
 const LoginWrapper = () => {
   return <Login />;
@@ -111,6 +113,7 @@ function App() {
           <Route path="/privacy" element={<LegalDocument kind="privacy" />} />
           <Route path="/terms" element={<LegalDocument kind="terms" />} />
           <Route path="/login" element={<LoginWrapper />} />
+          {DesignPreview && <Route path="/__design/:name" element={<React.Suspense fallback={null}><DesignPreview /></React.Suspense>} />}
           <Route path="/register" element={<RegistrationShell />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
