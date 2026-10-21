@@ -110,8 +110,8 @@
 .ah-water-actions button:hover:not(:disabled){background:var(--bg-surface-highest)}
 .ah-water-actions button:active:not(:disabled){transform:scale(.97)}
 .ah-water-actions button:disabled{opacity:.4;cursor:default}
-.ah-water-actions .is-primary{background:var(--primary);color:#fff8f5}
-.ah-water-actions .is-primary:hover:not(:disabled){background:var(--primary-hover)}
+.ah-water-actions .is-primary{background:var(--primary-solid);color:#fff8f5}
+.ah-water-actions .is-primary:hover:not(:disabled){background:var(--primary-solid-hover)}
 
 /* coach */
 .ah-quote{margin:0 0 14px;padding:14px 16px;border-radius:18px;background:var(--bg-surface-high);font-size:16px;line-height:1.5}

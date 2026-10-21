@@ -11,7 +11,10 @@ import './styles/workspace.css';
 import { redirectToHttpsIfNeeded } from './utils/forceHttps';
 import { startAnalyticsIfAllowed } from './utils/analytics';
 
+import { installPreviewApi } from './dev/previewMode';
+
 redirectToHttpsIfNeeded();
+installPreviewApi();
 startAnalyticsIfAllowed();
 
 ReactDOM.createRoot(document.getElementById('root')).render(

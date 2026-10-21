@@ -3,8 +3,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
 :root {
+  --su-color-scheme: light;
   --primary: #e06c43;
   --primary-hover: #c85a35;
+  --primary-solid: #b94a25;
+  --primary-solid-hover: #a43f1d;
   --accent: #5a7a48;
   --text-on-primary: #181311;
   --reactour-accent: var(--primary);
@@ -72,8 +75,11 @@
 
 [data-theme='dark'] {
   color-scheme: dark;
+  --su-color-scheme: dark;
   --primary: #e06c43;
   --primary-hover: #e87a53;
+  --primary-solid: #b94a25;
+  --primary-solid-hover: #cc552d;
   --accent: #7d9b68;
   --text-on-primary: #181311;
   --reactour-accent: var(--primary);

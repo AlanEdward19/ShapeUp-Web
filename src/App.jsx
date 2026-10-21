@@ -49,6 +49,7 @@ import TrainerInvites from './pages/Dashboard/TrainerInvites';
 import CredentialRegistration from './pages/Dashboard/CredentialRegistration';
 import ExploreGyms from './pages/Dashboard/GymsExploreShell';
 import Onboarding from './pages/Dashboard/OnboardingShell';
+import { previewRole } from './dev/previewMode';
 import useShellLanguage from './hooks/useShellLanguage';
 
 const DesignPreview = import.meta.env.DEV ? lazy(() => import('./dev/DesignPreview')) : null;
@@ -61,7 +62,7 @@ const LoginWrapper = () => {
 // Protects routes that require authentication
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
-  if (!currentUser) return <Navigate to="/login" replace />;
+  if (!currentUser && !previewRole()) return <Navigate to="/login" replace />;
   return children;
 };
 

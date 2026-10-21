@@ -1,151 +1,150 @@
-/* Visual pass for shadow-DOM shells. Does not change behavior. */
+/* Shared Apple-HIG pass for every shadow-DOM shell. Colors are tokens, so light and dark both work. */
 .shell-body {
+  background: var(--bg-main);
+  color: var(--text-main);
   font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
   font-size: 15px;
   line-height: 1.47;
   -webkit-font-smoothing: antialiased;
 }
 
+/* Type: sentence case, sans for labels, condensed only for titles and big numerals. */
 .shell-body :is(h1, h2, h3, .font-headline) {
   font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   letter-spacing: 0;
   text-transform: none;
-  line-height: 1.15;
+  line-height: 1.12;
 }
-
-.shell-body .text-xs {
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.shell-body .text-\[10px\],
-.shell-body .text-\[11px\] {
-  font-size: 12px;
-  line-height: 1.35;
-  letter-spacing: 0.01em;
-}
-
-.shell-body .text-\[\#82736b\],
-.shell-body .text-\[\#85766f\],
-.shell-body .text-\[\#bdaea6\] {
-  color: #d0c4bb;
-}
-
-.shell-body .text-\[\#eee0da\] {
-  color: #f5ede6;
-}
-
-.shell-body .tracking-wide,
-.shell-body .tracking-wider,
-.shell-body .tracking-tight,
-.shell-body .uppercase {
-  letter-spacing: 0.01em;
-}
-
-.shell-body :is(h1, h2, h3, label).uppercase,
-.shell-body :is(h1, h2, h3).font-headline {
+.shell-body .uppercase,
+.shell-body .normal-case {
   text-transform: none;
 }
-
-.shell-body button {
-  font-family: 'Source Sans 3', sans-serif;
-  min-height: 44px;
+.shell-body :is(.tracking-wide, .tracking-wider, .tracking-widest, .tracking-tight, .uppercase) {
+  letter-spacing: 0;
 }
-
-.shell-body button:active:not(:disabled) {
-  transform: scale(0.97);
+.shell-body .font-mono {
+  font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+  font-variant-numeric: tabular-nums;
 }
+.shell-body .text-xs { font-size: 13px; line-height: 1.4; }
+.shell-body :is(.text-\[10px\], .text-\[11px\]) { font-size: 12px; line-height: 1.35; }
+.shell-body label.uppercase,
+.shell-body :is(h1, h2, h3).uppercase {
+  font-size: inherit;
+}
+.shell-body label.uppercase { font-size: 13px; font-weight: 600; color: var(--text-muted); }
 
-.shell-body button.bg-brand-primary,
-.shell-body a.bg-brand-primary,
-.shell-body button.bg-\[\#e06c43\],
-.shell-body a.bg-\[\#e06c43\] {
-  min-height: 52px;
+/* Shape: one radius scale instead of sharp 2-4px corners. */
+.shell-body :is(.rounded, .rounded-sm, .rounded-md) { border-radius: 12px; }
+.shell-body .rounded-lg { border-radius: 16px; }
+.shell-body .rounded-xl { border-radius: 20px; }
+.shell-body .rounded-2xl { border-radius: 24px; }
+
+/* Controls */
+.shell-body button { font-family: 'Source Sans 3', sans-serif; min-height: 44px; }
+.shell-body button:active:not(:disabled) { transform: scale(0.97); }
+.shell-body :is(button, a, [role='button']) { transition: background-color 0.14s, color 0.14s, transform 0.14s cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Filled: the solid oxide keeps 5:1 with paper ink. */
+.shell-body :is(button, a).bg-brand-primary,
+.shell-body :is(button, a).bg-terracotta,
+.shell-body :is(button, a).bg-brand-terracotta,
+.shell-body :is(button, a).bg-\[\#e06c43\],
+.shell-body :is(button, a).bg-\[\#E06C43\],
+.shell-body .su-btn-primary {
+  min-height: 48px;
   border-radius: 14px;
   padding-inline: 20px;
-  font-size: 17px;
+  background: var(--primary-solid);
+  color: #fff8f5;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: -0.006em;
-  color: #181311;
+  border-color: transparent;
+}
+.shell-body :is(button, a).bg-brand-primary:hover:not(:disabled),
+.shell-body :is(button, a).bg-terracotta:hover:not(:disabled),
+.shell-body :is(button, a).bg-brand-terracotta:hover:not(:disabled),
+.shell-body :is(button, a).bg-\[\#e06c43\]:hover:not(:disabled),
+.shell-body .su-btn-primary:hover:not(:disabled) {
+  background: var(--primary-solid-hover);
+  color: #fff8f5;
 }
 
-.shell-body button.bg-brand-primary:hover,
-.shell-body a.bg-brand-primary:hover,
-.shell-body button.bg-\[\#e06c43\]:hover,
-.shell-body a.bg-\[\#e06c43\]:hover,
-.shell-body .su-btn-primary:hover {
-  background: #e87a53;
-  color: #181311;
-}
-
+/* Tinted: secondary actions are quiet gray fills, never outlined boxes. */
 .shell-body button.bg-brand-surface,
 .shell-body .su-btn-secondary,
 .shell-body .su-btn-outline {
   min-height: 44px;
-  border-radius: 8px;
+  border-radius: 12px;
   border-color: transparent;
-  background: #302825;
-  color: #f5ede6;
+  background: var(--bg-surface-high);
+  color: var(--text-main);
   font-size: 15px;
 }
 
-.shell-body .su-btn-primary {
-  min-height: 52px;
-  border-radius: 14px;
-  padding: 14px 20px;
-  background: #e06c43;
-  color: #181311;
-  font-size: 17px;
-  font-weight: 600;
-}
-
-.shell-body input:not([type='checkbox']):not([type='radio']):not([type='hidden']),
+.shell-body input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='range']),
 .shell-body select,
 .shell-body textarea {
   min-height: 48px;
   border-radius: 12px;
+  border-color: var(--border-input);
+  background-color: var(--bg-input);
+  color: var(--text-main);
   font-size: 16px;
 }
-
-.shell-body label.uppercase {
-  text-transform: none;
-  font-size: 13px;
-  font-weight: 600;
-  color: #d0c4bb;
+.shell-body textarea { min-height: 96px; }
+.shell-body input::placeholder,
+.shell-body textarea::placeholder { color: var(--text-muted); opacity: 0.7; }
+.shell-body :is(input, select, textarea):focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 22%, transparent);
+  outline: none;
 }
+.shell-body :is(input[type='checkbox'], input[type='radio']) { accent-color: var(--primary); color: var(--primary); }
 
-.shell-body :is(button, a, input, select, textarea, [role='button']):focus-visible {
-  outline: 2px solid #e06c43;
+.shell-body :is(button, a, input, select, textarea, [role='button'], summary):focus-visible {
+  outline: 2px solid var(--link-color);
   outline-offset: 2px;
 }
+
+/* Tables read as lists: quiet headers, airy rows. */
+.shell-body th {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-muted);
+}
+.shell-body :is(td, th) { padding-block: 14px; }
+.shell-body tbody tr { transition: background-color 0.14s; }
+.shell-body tbody tr:hover { background: color-mix(in oklab, var(--bg-surface-high) 60%, transparent); }
+
+/* Modals */
+.shell-body dialog {
+  border: 0;
+  border-radius: 24px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 0.4);
+}
+.shell-body dialog::backdrop { background: rgb(12 8 6 / 0.55); backdrop-filter: blur(10px); }
 
 .shell-body p[role='alert'] {
   margin: 12px 0;
   padding: 12px 16px;
-  border-radius: 12px;
-  background: #3b221f;
-  color: #f5ede6;
-  border: 1px solid #e5534a;
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--error) 16%, transparent);
+  color: var(--text-main);
 }
 
-.shell-body .rounded,
-.shell-body .rounded-md {
-  border-radius: 12px;
-}
-
-.shell-body header button {
-  min-height: 44px;
-}
+.shell-body * { scrollbar-width: thin; scrollbar-color: var(--bg-surface-highest) transparent; }
 
 @media (max-width: 767px) {
-  .shell-body .px-8 {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
+  .shell-body .px-8 { padding-left: 16px; padding-right: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .shell-body button:active {
-    transform: none;
-  }
+  .shell-body * { transition: none !important; }
+  .shell-body button:active { transform: none; }
 }

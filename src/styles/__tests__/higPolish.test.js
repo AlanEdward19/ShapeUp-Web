@@ -44,7 +44,8 @@ describe('HIG polish contract', () => {
   it('keeps shell focus, alerts, and readable muted ink', () => {
     expect(shellCss).toMatch(/:focus-visible/)
     expect(shellCss).toMatch(/p\[role='alert'\]/)
-    expect(shellCss).toContain('#d0c4bb')
+    expect(shellCss).toContain('var(--text-muted)')
+    expect(contrastRatio('#fff8f5', '#b94a25')).toBeGreaterThanOrEqual(4.5)
     expect(contrastRatio('#181311', '#e06c43')).toBeGreaterThanOrEqual(4.5)
     expect(contrastRatio('#d0c4bb', '#18120f')).toBeGreaterThanOrEqual(4.5)
     expect(contrastRatio('#f5ede6', '#3b221f')).toBeGreaterThanOrEqual(4.5)
