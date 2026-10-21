@@ -4,6 +4,8 @@ import { useUserManagementApi } from '../../hooks/api/useUserManagementApi';
 import WorkspaceShellPage from '../../components/Workspace/WorkspaceShellPage';
 import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { useEffect, useState } from 'react';
+import athleteHomeCss from './operational-dashboard/athlete/athleteHome.css?inline';
+import settingsCss from './markup/settingsPage.css?inline';
 import {
   SettingsPublicMarkup,
   type SettingsValues,
@@ -79,7 +81,7 @@ export default function SettingsShell() {
   };
 
   return (
-    <WorkspaceShellPage name="settings" css={workspaceNavStyle}>
+    <WorkspaceShellPage name="settings" css={workspaceNavStyle + athleteHomeCss + settingsCss}>
       <SettingsPublicMarkup state={shellState} />
     </WorkspaceShellPage>
   );

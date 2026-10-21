@@ -49,7 +49,7 @@ const AUTH_BLOCKED_CONSUMERS = [
   },
   {
     screen: 'settings',
-    path: 'src/pages/Dashboard/markup/SettingsPublicMarkup.tsx',
+    path: 'src/pages/Dashboard/markup/settingsPage.css',
     tokenSignals: ['var(--text-main)', 'var(--border-color)'],
   },
 ]

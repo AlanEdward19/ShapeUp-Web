@@ -9,7 +9,6 @@ const baseTabs = [
     { to: '/dashboard/nutrition/foods', key: 'nutrition.nav.foods' },
     { to: '/dashboard/nutrition/meal-plans', key: 'nutrition.nav.plans' },
     { to: '/dashboard/nutrition/goal', key: 'nutrition.nav.goal' },
-    { to: '/dashboard/nutrition/practice', key: 'parity.nav.practice' },
 ];
 
 const NutritionNav = () => {
@@ -36,9 +35,12 @@ const NutritionNav = () => {
         };
     }, [getClock]);
 
+    const role = localStorage.getItem('shapeup_role');
+    const professional = role === 'professional' || role === 'gym';
+    const practice = professional ? [{ to: '/dashboard/nutrition/practice', key: 'parity.nav.practice' }] : [];
     const tabs = fastingTabVisible
-        ? [...baseTabs, { to: '/dashboard/nutrition/fasting', key: 'nutrition.nav.fasting' }]
-        : baseTabs;
+        ? [...baseTabs, ...practice, { to: '/dashboard/nutrition/fasting', key: 'nutrition.nav.fasting' }]
+        : [...baseTabs, ...practice];
 
     return (
         <nav className="su-nutrition-nav" data-testid="nutrition-nav">

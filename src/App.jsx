@@ -49,6 +49,7 @@ import TrainerInvites from './pages/Dashboard/TrainerInvites';
 import CredentialRegistration from './pages/Dashboard/CredentialRegistration';
 import ExploreGyms from './pages/Dashboard/GymsExploreShell';
 import Onboarding from './pages/Dashboard/OnboardingShell';
+import { canOpen } from './components/Workspace/navigationModel';
 import { previewRole } from './dev/previewMode';
 import useShellLanguage from './hooks/useShellLanguage';
 
@@ -63,6 +64,12 @@ const LoginWrapper = () => {
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
   if (!currentUser && !previewRole()) return <Navigate to="/login" replace />;
+  return children;
+};
+
+// Keeps direct links to another profile's tools from rendering (e.g. athlete profile of a multi-profile account).
+const RoleRoute = ({ path, children }) => {
+  if (!canOpen(localStorage.getItem('shapeup_role'), path)) return <Navigate to="/dashboard" replace />;
   return children;
 };
 
@@ -123,12 +130,12 @@ function App() {
           <Route path="/dashboard" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route index element={<Dashboard />} />
             <Route path="training" element={<WorkspaceRoutedPage><TrainingPlans /></WorkspaceRoutedPage>} />
-            <Route path="clients" element={<Clients />} />
-            <Route path="clients/:id" element={<ClientDetail />} />
+            <Route path="clients" element={<RoleRoute path="/dashboard/clients"><Clients /></RoleRoute>} />
+            <Route path="clients/:id" element={<RoleRoute path="/dashboard/clients"><ClientDetail /></RoleRoute>} />
             <Route path="exercises" element={<Exercises />} />
             <Route path="feedback" element={<Feedback />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="reports" element={<Reports />} />
+            <Route path="analytics" element={<RoleRoute path="/dashboard/analytics"><Analytics /></RoleRoute>} />
+            <Route path="reports" element={<RoleRoute path="/dashboard/reports"><Reports /></RoleRoute>} />
             <Route path="settings" element={<Settings />} />
             <Route path="objectives" element={<WorkspaceRoutedPage><ObjectivesClient /></WorkspaceRoutedPage>} />
             <Route path="nutrition" element={<NutritionWorkspaceShell />}>
@@ -137,20 +144,20 @@ function App() {
               <Route path="meal-plans" element={<MealPlanManager />} />
               <Route path="goal" element={<GoalOnboarding />} />
               <Route path="fasting" element={<FastingPage />} />
-              <Route path="practice" element={<NutritionPractice />} />
+              <Route path="practice" element={<RoleRoute path="/dashboard/nutrition/practice"><NutritionPractice /></RoleRoute>} />
             </Route>
             <Route path="admin" element={<AdminConsole />} />
             <Route path="admin/food-moderation" element={<FoodModerationQueue />} />
             <Route path="admin/feature-flags" element={<FeatureFlagsPanel />} />
             <Route path="notifications" element={<NoticeInbox />} />
             <Route path="professionals" element={<ProfessionalsDirectory />} />
-            <Route path="service-plans" element={<ServicePlans />} />
+            <Route path="service-plans" element={<RoleRoute path="/dashboard/service-plans"><ServicePlans /></RoleRoute>} />
             <Route path="links" element={<LinksHub />} />
-            <Route path="training-invites" element={<TrainerInvites />} />
-            <Route path="credential" element={<CredentialRegistration />} />
-            <Route path="staff" element={<StaffGym />} />
-            <Route path="turnstile" element={<TurnstileGym />} />
-            <Route path="financial" element={<FinancialGym />} />
+            <Route path="training-invites" element={<RoleRoute path="/dashboard/training-invites"><TrainerInvites /></RoleRoute>} />
+            <Route path="credential" element={<RoleRoute path="/dashboard/credential"><CredentialRegistration /></RoleRoute>} />
+            <Route path="staff" element={<RoleRoute path="/dashboard/staff"><StaffGym /></RoleRoute>} />
+            <Route path="turnstile" element={<RoleRoute path="/dashboard/turnstile"><TurnstileGym /></RoleRoute>} />
+            <Route path="financial" element={<RoleRoute path="/dashboard/financial"><FinancialGym /></RoleRoute>} />
             {/* Mock nested routes below */}
             <Route path="messages" element={<MessagesShell />} />
             <Route path="gyms" element={<ExploreGyms />} />

@@ -94,7 +94,7 @@ export function buildNavigation({ role, platformAdmin, language }: NavigationInp
         ? [item('flag', 'Meus objetivos', '/dashboard/objectives'), item('location_on', 'Academias', '/dashboard/gyms')]
         : []),
       item('badge', 'Profissionais', '/dashboard/professionals'),
-      item('restaurant', 'Prática nutricional', '/dashboard/nutrition/practice'),
+      ...(pro ? [item('restaurant', 'Prática nutricional', '/dashboard/nutrition/practice')] : []),
     ],
   });
 
@@ -103,8 +103,7 @@ export function buildNavigation({ role, platformAdmin, language }: NavigationInp
     label: 'Conta',
     items: [
       item('link', 'Vínculos', '/dashboard/links'),
-      item('mail', 'Convites', '/dashboard/training-invites'),
-      item('id_card', 'Credencial', '/dashboard/credential'),
+      ...(pro ? [item('mail', 'Convites', '/dashboard/training-invites'), item('id_card', 'Credencial', '/dashboard/credential')] : []),
       item('notifications', 'Avisos', '/dashboard/notifications'),
       item('settings', 'Configurações', '/dashboard/settings'),
     ],
@@ -133,4 +132,17 @@ export function roleLabel(role: string | null, language?: string): string {
   if (role === 'gym') return translate('Academia', language);
   if (role === 'professional') return translate('Personal trainer', language);
   return translate('Atleta', language);
+}
+
+/** Routes only a given kind of profile may open; everything else redirects home. */
+export const PROFESSIONAL_ONLY_PATHS = ['clients', 'analytics', 'reports', 'service-plans', 'training-invites', 'credential', 'nutrition/practice'];
+export const GYM_ONLY_PATHS = ['staff', 'turnstile', 'financial'];
+
+export function canOpen(role: string | null, path: string): boolean {
+  const gym = role === 'gym';
+  const pro = role === 'professional' || gym;
+  const normalized = path.replace(/^\/dashboard\//, '');
+  if (GYM_ONLY_PATHS.some(entry => normalized === entry)) return gym;
+  if (PROFESSIONAL_ONLY_PATHS.some(entry => normalized === entry || normalized.startsWith(`${entry}/`))) return pro;
+  return true;
 }
