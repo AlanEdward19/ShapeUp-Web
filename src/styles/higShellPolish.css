@@ -1,0 +1,151 @@
+/* Visual pass for shadow-DOM shells. Does not change behavior. */
+.shell-body {
+  font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.47;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shell-body :is(h1, h2, h3, .font-headline) {
+  font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.15;
+}
+
+.shell-body .text-xs {
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.shell-body .text-\[10px\],
+.shell-body .text-\[11px\] {
+  font-size: 12px;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+
+.shell-body .text-\[\#82736b\],
+.shell-body .text-\[\#85766f\],
+.shell-body .text-\[\#bdaea6\] {
+  color: #d0c4bb;
+}
+
+.shell-body .text-\[\#eee0da\] {
+  color: #f5ede6;
+}
+
+.shell-body .tracking-wide,
+.shell-body .tracking-wider,
+.shell-body .tracking-tight,
+.shell-body .uppercase {
+  letter-spacing: 0.01em;
+}
+
+.shell-body :is(h1, h2, h3, label).uppercase,
+.shell-body :is(h1, h2, h3).font-headline {
+  text-transform: none;
+}
+
+.shell-body button {
+  font-family: 'Source Sans 3', sans-serif;
+  min-height: 44px;
+}
+
+.shell-body button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.shell-body button.bg-brand-primary,
+.shell-body a.bg-brand-primary,
+.shell-body button.bg-\[\#e06c43\],
+.shell-body a.bg-\[\#e06c43\] {
+  min-height: 52px;
+  border-radius: 14px;
+  padding-inline: 20px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.006em;
+  color: #181311;
+}
+
+.shell-body button.bg-brand-primary:hover,
+.shell-body a.bg-brand-primary:hover,
+.shell-body button.bg-\[\#e06c43\]:hover,
+.shell-body a.bg-\[\#e06c43\]:hover,
+.shell-body .su-btn-primary:hover {
+  background: #e87a53;
+  color: #181311;
+}
+
+.shell-body button.bg-brand-surface,
+.shell-body .su-btn-secondary,
+.shell-body .su-btn-outline {
+  min-height: 44px;
+  border-radius: 8px;
+  border-color: transparent;
+  background: #302825;
+  color: #f5ede6;
+  font-size: 15px;
+}
+
+.shell-body .su-btn-primary {
+  min-height: 52px;
+  border-radius: 14px;
+  padding: 14px 20px;
+  background: #e06c43;
+  color: #181311;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.shell-body input:not([type='checkbox']):not([type='radio']):not([type='hidden']),
+.shell-body select,
+.shell-body textarea {
+  min-height: 48px;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+.shell-body label.uppercase {
+  text-transform: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #d0c4bb;
+}
+
+.shell-body :is(button, a, input, select, textarea, [role='button']):focus-visible {
+  outline: 2px solid #e06c43;
+  outline-offset: 2px;
+}
+
+.shell-body p[role='alert'] {
+  margin: 12px 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #3b221f;
+  color: #f5ede6;
+  border: 1px solid #e5534a;
+}
+
+.shell-body .rounded,
+.shell-body .rounded-md {
+  border-radius: 12px;
+}
+
+.shell-body header button {
+  min-height: 44px;
+}
+
+@media (max-width: 767px) {
+  .shell-body .px-8 {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell-body button:active {
+    transform: none;
+  }
+}

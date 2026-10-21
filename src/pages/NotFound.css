@@ -12,15 +12,16 @@
   font-family: var(--font-display);
   font-size: clamp(4rem, 12vw, 8rem);
   line-height: 0.85;
-  color: var(--primary);
+  color: var(--link-color);
   margin-bottom: 1rem;
 }
 
 .su-404 h1 {
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 4vw, 2.8rem);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
   max-width: 16ch;
   margin-bottom: 0.75rem;
 }
@@ -35,8 +36,12 @@
   align-self: flex-start;
   background: var(--primary);
   color: var(--text-on-primary);
-  padding: 0.85rem 1.25rem;
-  font-weight: 700;
+  min-height: 3.25rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 0.875rem;
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 600;
 }
 
 .su-404-cta:hover {

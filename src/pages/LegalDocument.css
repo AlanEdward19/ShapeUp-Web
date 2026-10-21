@@ -18,8 +18,8 @@
   gap: 0.5rem;
   color: var(--text-main);
   font-family: var(--font-display);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0;
+  text-transform: none;
   font-weight: 700;
 }
 
@@ -41,9 +41,10 @@
 }
 
 .su-legal-kicker {
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
   color: var(--text-muted);
   margin-bottom: 0.75rem;
 }
