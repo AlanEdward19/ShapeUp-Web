@@ -9,6 +9,7 @@ const baseTabs = [
     { to: '/dashboard/nutrition/foods', key: 'nutrition.nav.foods' },
     { to: '/dashboard/nutrition/meal-plans', key: 'nutrition.nav.plans' },
     { to: '/dashboard/nutrition/goal', key: 'nutrition.nav.goal' },
+    { to: '/dashboard/nutrition/practice', key: 'parity.nav.practice' },
 ];
 
 const NutritionNav = () => {

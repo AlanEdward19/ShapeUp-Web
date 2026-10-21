@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
+import { asList, listNutritionists } from '../../../services/parityClient';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import Skeleton from '../../../components/Skeleton';
 import './Nutrition.css';
@@ -26,6 +27,15 @@ const GoalOnboarding = () => {
     const [result, setResult] = useState(null);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [goalLocked, setGoalLocked] = useState(false);
+
+    useEffect(() => {
+        let active = true;
+        listNutritionists()
+            .then((rows) => { if (active) setGoalLocked(asList(rows).length > 0); })
+            .catch(() => { if (active) setGoalLocked(false); });
+        return () => { active = false; };
+    }, []);
 
     const handleOnboarding = async (e) => {
         e.preventDefault();
@@ -77,6 +87,10 @@ const GoalOnboarding = () => {
                 </div>
             </header>
 
+            {goalLocked ? (
+                <p role="status" data-testid="goal-locked">{t('nutrition.goal.locked')}</p>
+            ) : (
+            <>
             <div className="su-mode-switch">
                 <Button
                     variant={mode === 'onboarding' ? 'primary' : 'secondary'}
@@ -168,6 +182,8 @@ const GoalOnboarding = () => {
                     </form>
                     )}
                 </section>
+            )}
+            </>
             )}
 
             {result?.activeGoal && (

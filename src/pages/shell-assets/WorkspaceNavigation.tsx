@@ -49,6 +49,10 @@ export default function WorkspaceNavigation({ flow, open, close }: WorkspaceNavi
     ...(role === 'gym'
       ? [['groups', 'Equipe', '/dashboard/staff'], ['sensor_door', 'Controle de Acesso', '/dashboard/turnstile']]
       : []),
+    ['link', 'Vínculos', '/dashboard/links'],
+    ['nutrition', 'Prática nutricional', '/dashboard/nutrition/practice'],
+    ['mail', 'Convites', '/dashboard/training-invites'],
+    ['badge', 'Credencial', '/dashboard/credential'],
     ['groups', 'Profissionais', '/dashboard/professionals'],
     ['notifications', 'Avisos', '/dashboard/notifications'],
     ...(pro ? [['sell', 'Planos de atendimento', '/dashboard/service-plans']] : []),

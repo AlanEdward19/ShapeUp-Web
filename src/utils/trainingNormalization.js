@@ -140,5 +140,6 @@ export const normalizePlan = (plan) => ({
     blocks: (plan.blocks ?? []).map((b, idx) => normalizeBlock(b, idx)),
     history: plan.history ?? [],
     assignedWeekdays: unmapAssignedWeekdays(plan.assignedWeekdays),
+    scheduledTime: plan.scheduledTime ?? '',
     _planId: plan.planId,
 });

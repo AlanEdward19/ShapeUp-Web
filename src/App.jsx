@@ -37,12 +37,16 @@ const FoodSearch = lazy(() => import('./pages/Dashboard/Nutrition/FoodSearch'));
 const MealPlanManager = lazy(() => import('./pages/Dashboard/Nutrition/MealPlanManager'));
 const GoalOnboarding = lazy(() => import('./pages/Dashboard/Nutrition/GoalOnboarding'));
 const FastingPage = lazy(() => import('./pages/Dashboard/Nutrition/FastingPage'));
+const NutritionPractice = lazy(() => import('./pages/Dashboard/Nutrition/NutritionPractice'));
 import FoodModerationQueue from './pages/Admin/ModerationShell';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
 import AdminConsole from './pages/Admin/AdminConsole';
 import NoticeInbox from './pages/Dashboard/NoticeInbox';
 import ProfessionalsDirectory from './pages/Dashboard/ProfessionalsHub';
 import ServicePlans from './pages/Dashboard/ServicePlans';
+import LinksHub from './pages/Dashboard/LinksHub';
+import TrainerInvites from './pages/Dashboard/TrainerInvites';
+import CredentialRegistration from './pages/Dashboard/CredentialRegistration';
 import ExploreGyms from './pages/Dashboard/GymsExploreShell';
 import Onboarding from './pages/Dashboard/OnboardingShell';
 import useShellLanguage from './hooks/useShellLanguage';
@@ -129,6 +133,7 @@ function App() {
               <Route path="meal-plans" element={<MealPlanManager />} />
               <Route path="goal" element={<GoalOnboarding />} />
               <Route path="fasting" element={<FastingPage />} />
+              <Route path="practice" element={<NutritionPractice />} />
             </Route>
             <Route path="admin" element={<AdminConsole />} />
             <Route path="admin/food-moderation" element={<FoodModerationQueue />} />
@@ -136,6 +141,9 @@ function App() {
             <Route path="notifications" element={<NoticeInbox />} />
             <Route path="professionals" element={<ProfessionalsDirectory />} />
             <Route path="service-plans" element={<ServicePlans />} />
+            <Route path="links" element={<LinksHub />} />
+            <Route path="training-invites" element={<TrainerInvites />} />
+            <Route path="credential" element={<CredentialRegistration />} />
             <Route path="staff" element={<StaffGym />} />
             <Route path="turnstile" element={<TurnstileGym />} />
             <Route path="financial" element={<FinancialGym />} />

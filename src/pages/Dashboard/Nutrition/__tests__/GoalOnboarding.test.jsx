@@ -7,6 +7,11 @@ import GoalOnboarding from '../GoalOnboarding';
 const mockCompleteOnboarding = vi.fn();
 const mockSetManualGoal = vi.fn();
 
+vi.mock('../../../../services/parityClient', () => ({
+    asList: (value) => (Array.isArray(value) ? value : []),
+    listNutritionists: vi.fn().mockResolvedValue([]),
+}));
+
 vi.mock('../../../../hooks/api/useNutritionApi', () => ({
     useNutritionApi: () => ({
         completeOnboarding: mockCompleteOnboarding,

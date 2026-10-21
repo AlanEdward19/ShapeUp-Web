@@ -1,6 +1,9 @@
 import iconUrl from '../../assets/app-icon.png';
 
-export default function Logo({ className = '', style, width, height, variant: _variant, monochrome: _monochrome, ...props }) {
+/**
+ * @param {{ className?: string, style?: import('react').CSSProperties, width?: number | string, height?: number | string, variant?: string, monochrome?: boolean }} props
+ */
+export default function Logo({ className = '', style, width, height, variant: _variant = 'mark', monochrome: _monochrome = false, ...props }) {
   const size = height ?? width;
   return (
     <img

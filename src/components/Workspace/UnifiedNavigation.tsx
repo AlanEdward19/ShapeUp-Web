@@ -57,6 +57,10 @@ export default function UnifiedNavigation({ flow, open, close }: UnifiedNavigati
           ['sensor_door', 'Controle de Acesso', '/dashboard/turnstile'],
         ] as NavItem[])
       : []),
+    ['link', 'Vínculos', '/dashboard/links'],
+    ['nutrition', 'Prática nutricional', '/dashboard/nutrition/practice'],
+    ['mail', 'Convites', '/dashboard/training-invites'],
+    ['badge', 'Credencial', '/dashboard/credential'],
     ['groups', 'Profissionais', '/dashboard/professionals'],
     ['notifications', 'Avisos', '/dashboard/notifications'],
     ...(pro ? ([['sell', 'Planos de atendimento', '/dashboard/service-plans']] as NavItem[]) : []),
