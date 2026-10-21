@@ -744,3 +744,5 @@
 .su-cancel-btn:hover {
     background-color: var(--bg-main) !important;
 }
+
+.su-builder-back { margin: 0 0 0.5rem -0.75rem; }

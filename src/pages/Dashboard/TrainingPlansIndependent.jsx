@@ -319,12 +319,8 @@ const TrainingPlansIndependent = () => {
     if (editingPlan) {
         return (
             <div className="su-pro-dashboard su-independent-builder">
-                <div className="su-dashboard-header-flex su-mb-6">
-                    <div>
-                        <h1 className="su-page-title">{t('independent.builder.title')}</h1>
-                        <p className="su-page-subtitle">{t('independent.training.subtitle.builder')}</p>
-                    </div>
-                    <Button variant="outline" onClick={() => setEditingPlan(null)}>{t('independent.builder.btn.back')}</Button>
+                <div className="su-builder-back">
+                    <Button variant="ghost" onClick={() => setEditingPlan(null)}>← {t('independent.builder.btn.back')}</Button>
                 </div>
                 <PlanEditor plan={editingPlan} isIndependent={true} onSave={handleSavePlan} onCancel={() => setEditingPlan(null)} />
             </div>

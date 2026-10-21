@@ -5,6 +5,7 @@ import { readAllPages } from '../../utils/readAllPages';
 import { workoutHistory } from '../../utils/workoutHistory';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { useTour } from '../../components/tour/useShadowAwareTour';
 import {
     ArrowLeft, Plus, Copy, Trash2, ChevronRight, ChevronDown, ChevronUp, AlertTriangle,
@@ -93,6 +94,27 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             exercises: (block.exercises || []).map(ex => ({ ...ex, sets: (ex.sets || []).map(s => ({ ...s })) }))
         }))
     );
+    // Plans from the API carry only the exercise id; names, muscles and tags come from the catalog (as on mobile).
+    React.useEffect(() => {
+        if (!exerciseCatalog.length) return;
+        setCurrentBlocks(prev => {
+            let changed = false;
+            const next = prev.map(block => ({
+                ...block,
+                exercises: block.exercises.map(ex => {
+                    const hasName = Boolean(ex.name && String(ex.name).trim());
+                    if (hasName && ex.tags) return ex;
+                    const [enriched] = enrichExercisesFromCatalog([ex], exerciseCatalog);
+                    if (!enriched || enriched === ex) return ex;
+                    const muscles = [...new Set(enriched.muscles || [])];
+                    changed = true;
+                    return { ...enriched, muscles, tags: ex.tags || muscles.join(' • ') };
+                }),
+            }));
+            return changed ? next : prev;
+        });
+    }, [exerciseCatalog]);
+
     const [showExerciseLibrary, setShowExerciseLibrary] = useState(false);
     // null = the library selection creates a new Straight block; a number = it's added to that
     // existing block instead (needed to ever build a Superset/Emom with 2+ exercises).
@@ -100,6 +122,12 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     const [alertModal, setAlertModal] = useState({ visible: false, title: '', message: '' });
 
     const allExercises = currentBlocks.flatMap(b => b.exercises);
+    // Missing translations come back as the key itself; show the stored value instead.
+    const labelOr = (key, fallback) => { const value = t(key); return value === key ? fallback : value; };
+    const phaseText = labelOr(`pro.builder.phase.${String(phase || '').toLowerCase().split(' ')[0]}`, phase);
+    const diffText = labelOr(`pro.builder.diff.${String(difficulty || '').toLowerCase()}`, difficulty);
+    // Wide screens show the muscle map beside the form; narrow ones keep it folded so it does not push the form around.
+    const [analyticsOpen] = useState(() => typeof window === 'undefined' || !window.matchMedia || window.matchMedia('(min-width: 1101px)').matches);
 
     const planPayload = () => ({
         ...plan,
@@ -277,7 +305,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
 
     return (
         <div className="su-builder-layout su-prescription-editor">
-            <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">{t('pro.builder.kicker')}</span><h1>{name || t('pro.builder.name')}</h1><p>{t(`pro.builder.phase.${phase.toLowerCase().split(' ')[0]}`) || phase} · {weeks} {t('client.training.card.weeks')} · {t(`pro.builder.diff.${difficulty.toLowerCase()}`) || difficulty}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> {t('pro.builder.stat.exercises')}</span><span><b>{totalSets}</b> {t('pro.builder.stat.sets')}</span><span><b>{estMins}</b> {t('pro.builder.stat.duration')}</span></div><Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button></header>
+            <header className="su-prescription-heading"><div><span className="su-nutrition-kicker">{t('pro.builder.kicker')}</span><h1>{name || t('pro.builder.name')}</h1><p>{phaseText} · {weeks} {t('client.training.card.weeks')} · {diffText}</p></div><div className="su-prescription-stats"><span><b>{allExercises.length}</b> {t('pro.builder.stat.exercises')}</span><span><b>{totalSets}</b> {t('pro.builder.stat.sets')}</span><span><b>{estMins}</b> {t('pro.builder.stat.duration')}</span></div><Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button></header>
             {/* LEFT: Plan builder */}
             <div className="su-plan-builder">
                 <details className="su-plan-header-card su-prescription-settings" data-tour="pe-settings" open><summary>{t('pro.builder.params')} <span>{t('pro.builder.params.hint')}</span></summary>
@@ -327,7 +355,6 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                     )}
                 </details>
 
-                <div className="su-plan-session-strip"><span aria-current="true"><b>{t('pro.builder.session')}</b><strong>{name}</strong><small>{totalSets} {t('pro.builder.stat.sets')} · {t(`pro.builder.phase.${phase.toLowerCase().split(' ')[0]}`) || phase}</small></span></div>
                 <div className="su-exercise-stack" data-tour="pe-stack">
                     <div className="su-stack-header">
                         <h2>{t('pro.builder.prescribed')} <small>{allExercises.length} {t('pro.builder.stat.exercises')} · {estMins}</small></h2>
@@ -364,7 +391,7 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             </div>
 
             {/* RIGHT: Sticky summary sidebar */}
-            <details className="su-structural-analytics su-prescription-analytics" data-tour="pe-summary" open><summary>{t('pro.builder.analytics')}</summary>
+            <details className="su-structural-analytics su-prescription-analytics" data-tour="pe-summary" open={analyticsOpen}><summary>{t('pro.builder.analytics')}</summary>
                 <Card className="su-sticky-card">
                     <div className="su-card-header-flex">
                         <h3 className="su-card-title">
@@ -393,11 +420,11 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                         </div>
                         <div className="su-metric-item">
                             <span className="su-metric-label">{t('pro.builder.summary.phase')}</span>
-                            <span className="su-metric-val">{t(`pro.builder.phase.${phase.toLowerCase().split(' ')[0]}`) || phase}</span>
+                            <span className="su-metric-val">{phaseText}</span>
                         </div>
                         <div className="su-metric-item">
                             <span className="su-metric-label">{t('pro.builder.summary.diff')}</span>
-                            <span className="su-metric-val">{t(`pro.builder.diff.${difficulty.toLowerCase()}`) || difficulty}</span>
+                            <span className="su-metric-val">{diffText}</span>
                         </div>
                     </div>
 

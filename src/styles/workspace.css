@@ -427,7 +427,7 @@
 .su-prescription-analytics{width:100%;border:1px solid var(--border-color);border-radius:24px;background:var(--bg-card);position:sticky;top:16px;grid-column:2;grid-row:2}
 .su-prescription-analytics .su-sticky-card{border:0;box-shadow:none;background:transparent}
 .su-prescription-editor .su-plan-builder{grid-column:1;grid-row:2}
-@media(max-width:1100px){.su-builder-layout.su-prescription-editor{grid-template-columns:1fr}.su-prescription-analytics{position:static;grid-column:1;grid-row:auto}.su-prescription-editor .su-plan-builder{grid-row:auto}}
+@media(max-width:1100px){.su-builder-layout.su-prescription-editor{grid-template-columns:1fr}.su-prescription-analytics{position:static;grid-column:1;grid-row:2}.su-prescription-editor .su-plan-builder{grid-column:1;grid-row:3}}
 .su-prescription-editor .su-sortable-list{display:grid;gap:24px}
 .su-prescription-editor .su-exercise-stack{width:100%}
 .su-prescription-editor .su-intelligence-metrics{display:grid;grid-template-columns:repeat(3,1fr)}
@@ -827,3 +827,99 @@
 .su-header-session-title{font-size:1.375rem;font-weight:600;line-height:1.15}
 .su-layout-content :is(table, .su-table){width:100%}
 @media(max-width:720px){.su-layout-content{padding:1rem 1rem 2.5rem}.su-header{padding-inline:1rem}.su-header-session-title{font-size:1.15rem}}
+
+/* ===== Plan editor, consolidated pass (overrides the older layered rules above) ===== */
+.su-prescription-editor .su-prescription-heading{display:flex;align-items:center;flex-wrap:wrap;gap:12px 28px;padding:18px 22px;margin:0}
+.su-prescription-editor .su-prescription-heading>div:first-child{flex:1 1 16rem;min-width:0}
+.su-prescription-editor .su-prescription-heading h1{margin:2px 0;font:700 clamp(24px,3vw,32px)/1.1 'Barlow Condensed',sans-serif;text-transform:none;overflow-wrap:anywhere}
+.su-prescription-editor .su-nutrition-kicker{font-size:13px;font-weight:600;color:var(--link-color);text-transform:none;letter-spacing:0}
+.su-prescription-editor .su-prescription-stats{display:flex;flex-wrap:wrap;gap:6px 22px;margin:0}
+.su-prescription-editor .su-prescription-stats span{display:flex;flex-direction:row;align-items:baseline;gap:6px;font-size:13px;color:var(--text-muted)}
+.su-prescription-editor .su-prescription-stats b{font:700 24px/1 'Barlow Condensed',sans-serif;color:var(--text-main)}
+.su-prescription-editor .su-prescription-heading>.su-btn{flex:none}
+
+/* summary metrics: label above value, never overlapping */
+.su-prescription-editor .su-intelligence-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;margin:16px 0}
+.su-prescription-editor .su-metric-item{display:flex;flex-direction:column;gap:2px;min-width:0}
+.su-prescription-editor .su-metric-label{font-size:12px;color:var(--text-muted);white-space:normal}
+.su-prescription-editor .su-metric-val{font:600 17px/1.2 'Source Sans 3',sans-serif;overflow-wrap:anywhere}
+
+/* exercise card */
+.su-prescription-editor .su-exercise-builder-card{display:block;position:relative;padding:18px 18px 16px;border:1px solid var(--border-color);border-radius:20px;background:var(--bg-card);margin:0}
+.su-prescription-editor .su-drag-handle-vertical{position:absolute;top:14px;left:6px;width:18px;height:28px;padding:0;background:transparent;border:0;cursor:grab;opacity:.5}
+.su-prescription-editor .su-exercise-content{padding:0 0 0 14px;min-width:0}
+.su-prescription-editor .su-ex-header{display:flex;align-items:flex-start;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--border-color);flex-wrap:nowrap}
+.su-prescription-editor .su-prescription-exercise-number{flex:none;display:grid;place-items:center;width:34px;height:34px;padding:0;border:0;border-radius:50%;background:var(--bg-surface-high);color:var(--text-muted);font:700 13px 'Source Sans 3',sans-serif}
+.su-prescription-editor .su-ex-title-row{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.su-prescription-editor .su-pe-ex-name-input{width:100%;min-height:40px;padding:6px 8px;border:1px solid transparent;border-radius:10px;background:transparent;font:700 19px/1.25 'Source Sans 3',sans-serif;color:var(--text-main);text-overflow:ellipsis}
+.su-prescription-editor .su-pe-ex-name-input:hover{background:var(--bg-surface-high)}
+.su-prescription-editor .su-pe-ex-name-input:focus{background:var(--bg-input);border-color:var(--primary);outline:none}
+.su-prescription-editor .su-pe-ex-name-input::placeholder{color:var(--text-muted);font-weight:500}
+.su-prescription-editor .su-pe-ex-tags-input{width:100%;min-height:30px;padding:2px 8px;border:1px solid transparent;border-radius:8px;background:transparent;font-size:13px;color:var(--text-muted)}
+.su-prescription-editor .su-pe-ex-tags-input:focus{background:var(--bg-input);border-color:var(--border-input);outline:none}
+.su-prescription-editor .su-ex-toggles{display:flex;align-items:center;gap:6px;flex:none}
+.su-prescription-editor .su-ex-toggles .su-toggle-btn{min-height:36px;padding:0 12px;border:0;border-radius:999px;background:var(--bg-surface-high);color:var(--text-muted);font-size:13px;font-weight:600;white-space:nowrap}
+.su-prescription-editor .su-ex-toggles .su-toggle-btn.active{background:color-mix(in oklab,var(--primary) 18%,transparent);color:var(--link-color)}
+.su-prescription-editor .su-icon-btn{display:grid;place-items:center;width:36px;height:36px;min-height:36px;padding:0;border:0;border-radius:50%;background:transparent;font-size:20px;line-height:1;cursor:pointer}
+.su-prescription-editor .su-icon-btn:hover{background:var(--bg-surface-high)}
+
+/* sets: one grid shared by the labels row and every set */
+.su-prescription-editor .su-sets-builder{container-type:inline-size;max-width:100%;overflow:visible;padding-top:10px}
+.su-prescription-editor .su-sets-header-labels,
+.su-prescription-editor .su-set-base-grid{display:grid;grid-template-columns:28px minmax(88px,1.3fr) minmax(88px,1.3fr) minmax(56px,.8fr) minmax(56px,.8fr) minmax(104px,1.1fr) minmax(56px,.8fr) 36px;gap:8px;align-items:center;min-width:0!important}
+.su-prescription-editor .su-sets-header-labels{padding:0 0 6px;border:0;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:none;letter-spacing:0}
+.su-prescription-editor .su-sets-header-labels span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.su-prescription-editor .su-set-row{min-height:0;padding:4px 0;border:0;background:transparent}
+.su-prescription-editor .su-set-index{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--bg-surface-high);color:var(--text-muted);font-size:12px;font-weight:700}
+.su-prescription-editor .su-set-cell{min-width:0}
+.su-prescription-editor .su-set-cell::before{display:none;content:attr(data-label);margin-bottom:4px;font-size:12px;font-weight:600;color:var(--text-muted)}
+.su-prescription-editor .su-set-row .su-input-group{margin:0}
+.su-prescription-editor .su-set-row input,.su-prescription-editor .su-set-row select{width:100%;min-width:0;min-height:40px;padding:0 10px;font-size:14px;border-radius:10px;text-overflow:ellipsis}
+.su-prescription-editor .su-intensity-group{display:flex;align-items:center;gap:6px;min-width:0}
+.su-prescription-editor .su-intensity-toggle{flex:none;min-width:44px;min-height:40px;padding:0 8px;border:0;border-radius:10px;background:var(--bg-surface-high);color:var(--text-main);font-size:12px;font-weight:700}
+.su-prescription-editor .su-set-actions{display:grid;place-items:center}
+
+/* footer: notes + add set, never glued together */
+.su-prescription-editor .su-prescription-exercise-footer{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-top:10px;padding-top:12px;border-top:1px solid var(--border-color)}
+.su-prescription-editor .su-prescription-exercise-footer .su-ex-notes{flex:1 1 14rem;min-width:0;margin:0;padding:0}
+.su-prescription-editor .su-prescription-exercise-footer .su-input-group{margin:0}
+.su-prescription-editor .su-prescription-exercise-footer>.su-btn{flex:none;margin:0!important;min-height:40px;font-size:14px}
+
+/* blocks: no chrome for a plain single exercise */
+.su-prescription-editor .su-block-card{display:grid;gap:10px;padding:0;border:0;background:transparent}
+.su-prescription-editor .su-block-card[data-block-type=straight] .su-block-header-row{display:none}
+.su-prescription-editor .su-block-header-row{display:flex;align-items:center;gap:10px;padding:0 4px}
+.su-prescription-editor .su-block-exercises{display:grid;gap:12px;overflow:visible}
+.su-prescription-editor .su-sortable-list{display:grid;gap:16px}
+.su-prescription-editor .su-stack-header{display:flex;align-items:center;flex-wrap:wrap;gap:10px 12px;margin-bottom:14px}
+.su-prescription-editor .su-stack-header h2{flex:1 1 12rem;margin:0;font:700 24px/1.1 'Barlow Condensed',sans-serif}
+.su-prescription-editor .su-stack-header h2 small{display:block;margin-top:2px;font:400 13px 'Source Sans 3',sans-serif;color:var(--text-muted)}
+.su-prescription-editor .su-pe-add-ex-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border:1.5px dashed var(--border-input);border-radius:18px;background:transparent;color:var(--link-color);font-weight:600;cursor:pointer}
+.su-prescription-editor .su-pe-add-ex-btn:hover{background:var(--bg-surface-high)}
+
+/* narrow card: labels move into each cell and the grid wraps */
+@container (max-width: 700px){
+  .su-prescription-editor .su-sets-header-labels{display:none}
+  .su-prescription-editor .su-set-row{position:relative;padding:12px 48px 12px 12px;border-radius:14px;background:var(--bg-surface-high);margin-bottom:8px}
+  .su-prescription-editor .su-set-base-grid{grid-template-columns:28px repeat(4,minmax(0,1fr));row-gap:10px}
+  .su-prescription-editor .su-set-cell::before{display:block}
+  .su-prescription-editor .su-set-base-grid>:nth-child(2){grid-column:2/4}
+  .su-prescription-editor .su-set-base-grid>:nth-child(3){grid-column:4/6}
+  .su-prescription-editor .su-set-base-grid>:nth-child(4){grid-column:2;grid-row:2}
+  .su-prescription-editor .su-set-base-grid>:nth-child(5){grid-column:3;grid-row:2}
+  .su-prescription-editor .su-set-base-grid>:nth-child(6){grid-column:4;grid-row:2}
+  .su-prescription-editor .su-set-base-grid>:nth-child(7){grid-column:5;grid-row:2}
+  .su-prescription-editor .su-set-base-grid>:nth-child(8){position:absolute;top:8px;right:8px}
+  .su-prescription-editor .su-set-base-grid>.su-set-index{align-self:end;margin-bottom:6px}
+  .su-prescription-editor .su-set-row input,.su-prescription-editor .su-set-row select{background:var(--bg-input)}
+}
+@media(max-width:640px){
+  .su-prescription-editor .su-ex-header{flex-wrap:wrap}
+  .su-prescription-editor .su-ex-toggles{width:100%;justify-content:flex-end}
+}
+.su-prescription-editor .su-plan-meta-grid .su-input-group,.su-prescription-editor .su-prescription-settings .su-input-group{margin:0}
+.su-prescription-editor .su-plan-meta-grid{gap:14px 16px}
+.su-prescription-editor .su-prescription-stats{padding:0;border:0;background:transparent}
+.su-prescription-editor .su-prescription-heading{padding-block:14px}
+
+.su-prescription-editor .su-prescription-heading>.su-btn{margin-left:auto}
