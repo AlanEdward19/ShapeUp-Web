@@ -126,8 +126,6 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
     const labelOr = (key, fallback) => { const value = t(key); return value === key ? fallback : value; };
     const phaseText = labelOr(`pro.builder.phase.${String(phase || '').toLowerCase().split(' ')[0]}`, phase);
     const diffText = labelOr(`pro.builder.diff.${String(difficulty || '').toLowerCase()}`, difficulty);
-    // Wide screens show the muscle map beside the form; narrow ones keep it folded so it does not push the form around.
-    const [analyticsOpen] = useState(() => typeof window === 'undefined' || !window.matchMedia || window.matchMedia('(min-width: 1101px)').matches);
 
     const planPayload = () => ({
         ...plan,
@@ -307,9 +305,11 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
         <div className="su-builder-layout su-prescription-editor">
             <header className="su-prescription-heading">
                 <div className="su-heading-main">
-                    <span className="su-nutrition-kicker">{t('pro.builder.kicker')}</span>
-                    <h1>{name || t('pro.builder.name')}</h1>
-                    <p>{phaseText} · {weeks} {t('client.training.card.weeks')} · {diffText}</p>
+                    <div className="su-heading-title">
+                        <span className="su-nutrition-kicker">{t('pro.builder.kicker')}</span>
+                        <h1>{name || t('pro.builder.name')}</h1>
+                        <p>{phaseText} · {weeks} {t('client.training.card.weeks')} · {diffText}</p>
+                    </div>
                     <div className="su-prescription-stats">
                         <span><b>{allExercises.length}</b> {t('pro.builder.stat.exercises')}</span>
                         <span><b>{totalSets}</b> {t('pro.builder.stat.sets')}</span>
@@ -317,7 +317,6 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                     </div>
                     <Button icon={<Save size={16} />} onClick={commitPlan}>{t('pro.builder.btn.save')}</Button>
                 </div>
-                <aside className="su-heading-map"><WorkoutBodyMap exercises={allExercises} catalog={exerciseCatalog} compact /></aside>
             </header>
             {/* LEFT: Plan builder */}
             <div className="su-plan-builder">
@@ -408,13 +407,15 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             </div>
 
             {/* RIGHT: Sticky summary sidebar */}
-            <details className="su-structural-analytics su-prescription-analytics" data-tour="pe-summary" open={analyticsOpen}><summary>{t('pro.builder.analytics')}</summary>
+            <details className="su-structural-analytics su-prescription-analytics" data-tour="pe-summary" open><summary>{t('pro.builder.analytics')}</summary>
                 <Card className="su-sticky-card">
                     <div className="su-card-header-flex">
                         <h3 className="su-card-title">
                             {t('pro.builder.summary.title')}
                         </h3>
                     </div>
+
+                    <WorkoutBodyMap exercises={allExercises} catalog={exerciseCatalog} compact />
 
                     <div className="su-intelligence-metrics">
                         <div className="su-metric-item">

@@ -960,22 +960,38 @@
   .su-prescription-editor .su-intensity-group input{min-width:0;flex:1}
 }
 
-/* heading: details on the left, muscle map on the right */
-.su-prescription-editor .su-prescription-heading{display:grid;grid-template-columns:minmax(0,1fr) clamp(150px,30%,260px);gap:16px 28px;align-items:center;padding:20px 24px}
-.su-prescription-editor .su-prescription-heading>.su-btn{margin-left:0}
-.su-prescription-editor .su-heading-main{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0}
-.su-prescription-editor .su-heading-main>p{margin:0}
-.su-prescription-editor .su-heading-main .su-prescription-stats{margin:8px 0 6px}
-.su-prescription-editor .su-heading-map{min-width:0}
-.su-prescription-editor .su-heading-map .su-body-map{gap:.35rem}
-.su-prescription-editor .su-heading-map .su-body-map-head{display:none}
-.su-prescription-editor .su-heading-map .su-body-map-figure{padding:6px 4px;max-width:none}
-.su-prescription-editor .su-heading-map .su-body-map-svg{max-height:170px}
-.su-prescription-editor .su-heading-map .su-body-map-pane-label{font-size:11px}
-.su-prescription-editor .su-heading-map .su-body-map-hint{margin:0;font-size:12px;text-align:center}
+/* heading: title, stats and save in one row */
+.su-prescription-editor .su-prescription-heading{display:block;padding:18px 22px}
+.su-prescription-editor .su-heading-main{display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px}
+.su-prescription-editor .su-heading-title{flex:1 1 16rem;min-width:0}
+.su-prescription-editor .su-heading-title>p{margin:0}
+.su-prescription-editor .su-heading-main .su-prescription-stats{margin:0}
+.su-prescription-editor .su-heading-main>.su-btn{margin-left:auto}
 .su-prescription-editor .su-settings-split{grid-template-columns:minmax(0,1fr);padding:0 20px 20px}
-@media(max-width:420px){
-  .su-prescription-editor .su-prescription-heading{grid-template-columns:minmax(0,1fr) 108px;padding:16px;gap:12px}
-  .su-prescription-editor .su-heading-map .su-body-map-svg{max-height:130px}
-  .su-prescription-editor .su-settings-split{padding:0 14px 16px}
+
+/* narrow screens: the summary (map + metrics) rises above the form as one compact card */
+@media(max-width:1100px){
+  .su-prescription-editor .su-prescription-analytics{position:static;grid-column:1;grid-row:2;border-radius:22px}
+  .su-prescription-editor .su-prescription-analytics>summary{display:none}
+  .su-prescription-editor .su-prescription-analytics .su-sticky-card{display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr);gap:10px 18px;align-items:start;padding:16px}
+  .su-prescription-editor .su-sticky-card>*{min-width:0;margin:0}
+  .su-prescription-editor .su-sticky-card .su-card-header-flex{grid-column:1/-1}
+  .su-prescription-editor .su-sticky-card .su-body-map{grid-column:1;grid-row:2;gap:.3rem}
+  .su-prescription-editor .su-sticky-card .su-body-map-head{display:none}
+  .su-prescription-editor .su-sticky-card .su-body-map-figure{padding:4px}
+  .su-prescription-editor .su-sticky-card .su-body-map-svg{max-height:150px}
+  .su-prescription-editor .su-sticky-card .su-body-map-hint{font-size:12px;margin:0}
+  .su-prescription-editor .su-sticky-card .su-intelligence-metrics{grid-column:2;grid-row:2;grid-template-columns:1fr 1fr;gap:10px 14px;align-content:start}
+  .su-prescription-editor .su-sticky-card .su-metric-val{font-size:15px}
+  .su-prescription-editor .su-sticky-card .su-chart-section,
+  .su-prescription-editor .su-sticky-card>.su-btn{grid-column:1/-1}
+  /* save and back already live in the heading and the back link */
+  .su-prescription-editor .su-sticky-card>.su-btn{display:none}
+  .su-prescription-editor .su-sticky-card .su-metric-item{align-items:flex-start;text-align:left}
 }
+@media(max-width:420px){
+  .su-prescription-editor .su-prescription-analytics .su-sticky-card{grid-template-columns:104px minmax(0,1fr);gap:8px 12px;padding:12px}
+  .su-prescription-editor .su-sticky-card .su-body-map-svg{max-height:120px}
+  .su-prescription-editor .su-sticky-card .su-intelligence-metrics{grid-template-columns:1fr}
+}
+.su-prescription-editor .su-sticky-card .su-body-map-head{display:none}
