@@ -140,8 +140,16 @@
 
 .shell-body * { scrollbar-width: thin; scrollbar-color: var(--bg-surface-highest) transparent; }
 
+@media (max-width: 1180px) {
+  /* Messages: drop the right-hand context panel before the chat gets squeezed. */
+  .shell-body aside.w-80.border-l { display: none; }
+}
+
 @media (max-width: 767px) {
   .shell-body .px-8 { padding-left: 16px; padding-right: 16px; }
+  .shell-body .flex-1.flex.h-screen.overflow-hidden { flex-direction: column; height: auto; min-height: 100dvh; overflow: visible; }
+  .shell-body .sn-conversations { width: 100%; max-height: 38dvh; border-right: 0; }
+  .shell-body .flex-1.flex.h-screen.overflow-hidden > main { min-height: 62dvh; }
 }
 
 @media (prefers-reduced-motion: reduce) {

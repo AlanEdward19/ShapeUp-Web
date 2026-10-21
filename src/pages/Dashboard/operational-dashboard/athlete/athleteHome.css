@@ -135,7 +135,7 @@
   .ah-summary,.ah-week,.ah-nutrition,.ah-water,.ah-coach,.ah-progress,.ah-reading{grid-column:span 6}
 }
 @media(max-width:700px){
-  .ah-page{padding:64px 16px 48px}
+  .ah-page{padding:12px 16px 48px}
   .ah-grid{gap:14px}
   .ah-grid>*{grid-column:span 12!important}
   .ah-hero{min-height:230px;padding:24px;border-radius:26px}
