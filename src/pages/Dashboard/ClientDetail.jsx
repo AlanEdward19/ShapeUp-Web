@@ -309,6 +309,8 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             {/* LEFT: Plan builder */}
             <div className="su-plan-builder">
                 <details className="su-plan-header-card su-prescription-settings" data-tour="pe-settings" open><summary>{t('pro.builder.params')} <span>{t('pro.builder.params.hint')}</span></summary>
+                    <div className="su-settings-split">
+                    <div className="su-settings-fields">
                     <div className="su-plan-meta-grid">
                         <Input label={t('pro.builder.name')} value={name} onChange={e => setName(e.target.value)} />
                         <Input label={t('pro.builder.weeks')} type="number" min="1" max="52" value={weeks} onChange={e => setWeeks(e.target.value)} />
@@ -353,6 +355,9 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                             </div>
                         </div>
                     )}
+                    </div>
+                    <aside className="su-settings-map"><WorkoutBodyMap exercises={allExercises} catalog={exerciseCatalog} compact /></aside>
+                    </div>
                 </details>
 
                 <div className="su-exercise-stack" data-tour="pe-stack">
@@ -398,8 +403,6 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
                             {t('pro.builder.summary.title')}
                         </h3>
                     </div>
-
-                    <WorkoutBodyMap exercises={allExercises} catalog={exerciseCatalog} />
 
                     <div className="su-intelligence-metrics">
                         <div className="su-metric-item">

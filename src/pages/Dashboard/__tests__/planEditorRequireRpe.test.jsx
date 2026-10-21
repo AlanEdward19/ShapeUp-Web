@@ -89,7 +89,7 @@ describe('PlanEditor bulk require RPE (WEV-06)', () => {
         expect(screen.getByText('Name and details')).toBeInTheDocument();
         expect(screen.getByText('Goal, duration and weekdays')).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: /Workout exercises/i })).toBeInTheDocument();
-        expect(screen.getByText('Muscles in this workout')).toBeInTheDocument();
+        expect(screen.getByText('Workout summary and analysis')).toBeInTheDocument();
         expect(screen.queryByText('Nome e informações')).not.toBeInTheDocument();
         expect(screen.queryByText('Exercícios do treino')).not.toBeInTheDocument();
         expect(screen.queryByText('Análise da prescrição e distribuição muscular')).not.toBeInTheDocument();
