@@ -160,3 +160,13 @@ export function exerciseKind(ex) {
     if (/mobilidade|mobility|movilidad/.test(name)) return 'mobility';
     return 'isometric';
 }
+
+const KIND_LABELS = {
+    'pt-BR': { all: 'Todos', weight: 'Carga', cardio: 'Cardio', isometric: 'Isometria', stretch: 'Alongamento', mobility: 'Mobilidade' },
+    en: { all: 'All', weight: 'Weights', cardio: 'Cardio', isometric: 'Isometric', stretch: 'Stretching', mobility: 'Mobility' },
+    es: { all: 'Todos', weight: 'Carga', cardio: 'Cardio', isometric: 'Isometría', stretch: 'Estiramiento', mobility: 'Movilidad' },
+};
+
+export function exerciseKindLabel(kind, language = 'pt-BR') {
+    return (KIND_LABELS[language] || KIND_LABELS['pt-BR'])[kind] || kind;
+}
