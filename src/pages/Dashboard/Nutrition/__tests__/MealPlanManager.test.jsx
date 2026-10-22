@@ -7,6 +7,11 @@ import MealPlanManager from '../MealPlanManager';
 const mockCreateMealPlan = vi.fn();
 const mockActivateMealPlan = vi.fn();
 const mockSearchFoods = vi.fn();
+let mockLinked = false;
+
+vi.mock('../../../../hooks/useNutritionist', () => ({
+    default: () => ({ linked: mockLinked, loading: false }),
+}));
 
 vi.mock('../../../../hooks/api/useNutritionApi', () => ({
     useNutritionApi: () => ({
@@ -33,6 +38,7 @@ const pickFood = async (getByTestId, findByRole) => {
 describe('MealPlanManager', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockLinked = false;
         mockSearchFoods.mockResolvedValue({ items: [{ id: 'food-1', name: 'Arroz branco', macrosPer100: { kcal: 130 } }] });
         mockCreateMealPlan.mockResolvedValue({
             id: 'plan-1',
@@ -90,5 +96,12 @@ describe('MealPlanManager', () => {
             expect(mockActivateMealPlan).toHaveBeenCalledWith('plan-1', expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/));
             expect(getByTestId('activation-result')).toHaveTextContent('130 kcal');
         });
+    });
+
+    it('locks plan editing when a nutritionist is linked', () => {
+        mockLinked = true;
+        const { getByTestId, queryByTestId } = renderManager();
+        expect(getByTestId('meal-plan-locked')).toBeInTheDocument();
+        expect(queryByTestId('meal-plan-form')).not.toBeInTheDocument();
     });
 });

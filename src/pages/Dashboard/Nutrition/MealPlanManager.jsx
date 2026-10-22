@@ -5,11 +5,18 @@ import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import Skeleton from '../../../components/Skeleton';
 import FoodPicker from './FoodPicker';
+import useNutritionist from '../../../hooks/useNutritionist';
 import './Nutrition.css';
 
 const MEAL_SLOTS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
 const emptyItem = () => ({ mealSlot: 'Breakfast', foodId: '', foodName: '', quantityGramsOrMl: '100' });
+
+const lockedCopy = {
+    'pt-BR': ['Cardápio definido pelo seu nutricionista', 'Você pode registrar alimentos extras no diário a qualquer momento, mas as refeições do plano só mudam pelo seu nutricionista.'],
+    en: ['Meal plan set by your nutritionist', 'You can still log extra foods in your diary, but the plan meals can only be changed by your nutritionist.'],
+    es: ['Menú definido por tu nutricionista', 'Aún puedes registrar alimentos extra en el diario, pero las comidas del plan solo las cambia tu nutricionista.'],
+};
 
 const toDateKey = () => {
     const now = new Date();
@@ -20,6 +27,8 @@ const MealPlanManager = () => {
     const { t, language } = useLanguage();
     const slotLabel = { 'pt-BR': 'Refeição', en: 'Meal', es: 'Comida' }[language] || 'Refeição';
     const { createMealPlan, activateMealPlan } = useNutritionApi();
+    const { linked } = useNutritionist();
+    const [lockedTitle, lockedBody] = lockedCopy[language] || lockedCopy['pt-BR'];
     const [name, setName] = useState('');
     const [items, setItems] = useState([emptyItem()]);
     const [createdPlan, setCreatedPlan] = useState(null);
@@ -81,6 +90,15 @@ const MealPlanManager = () => {
                 </div>
             </header>
 
+            {linked ? (
+                <section className="su-plan-locked" role="status" data-testid="meal-plan-locked">
+                    <span className="material-symbols-outlined" aria-hidden="true">lock</span>
+                    <div>
+                        <p><strong>{lockedTitle}</strong></p>
+                        <p>{lockedBody}</p>
+                    </div>
+                </section>
+            ) : (
             <section className="su-journal-sheet" data-testid="meal-plan-form">
                 <h3 className="su-ledger-heading">{t('nutrition.plan.create')}</h3>
                 {loading ? (
@@ -149,6 +167,7 @@ const MealPlanManager = () => {
                 </form>
                 )}
             </section>
+            )}
 
             {createdPlan && (
                 <section className="su-journal-sheet" data-testid="created-plan-card">

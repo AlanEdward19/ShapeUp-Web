@@ -35,7 +35,6 @@ import WorkspaceRoutedPage from './components/Workspace/WorkspaceRoutedPage';
 const NutritionDiaryShell = lazy(() => import('./pages/Dashboard/Nutrition/NutritionDiaryShell'));
 const FoodSearch = lazy(() => import('./pages/Dashboard/Nutrition/FoodSearch'));
 const MealPlanManager = lazy(() => import('./pages/Dashboard/Nutrition/MealPlanManager'));
-const GoalOnboarding = lazy(() => import('./pages/Dashboard/Nutrition/GoalOnboarding'));
 const FastingPage = lazy(() => import('./pages/Dashboard/Nutrition/FastingPage'));
 const NutritionPractice = lazy(() => import('./pages/Dashboard/Nutrition/NutritionPractice'));
 import FoodModerationQueue from './pages/Admin/ModerationShell';
@@ -143,7 +142,7 @@ function App() {
               <Route path="diary" element={<NutritionDiaryShell />} />
               <Route path="foods" element={<FoodSearch />} />
               <Route path="meal-plans" element={<MealPlanManager />} />
-              <Route path="goal" element={<GoalOnboarding />} />
+              <Route path="goal" element={<Navigate to="/dashboard/nutrition/diary?goal=1" replace />} />
               <Route path="fasting" element={<FastingPage />} />
               <Route path="practice" element={<RoleRoute path="/dashboard/nutrition/practice"><NutritionPractice /></RoleRoute>} />
             </Route>

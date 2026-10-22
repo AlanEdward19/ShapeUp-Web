@@ -2,15 +2,10 @@ import { render, waitFor, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { withLang } from '../../../../test/withLang';
-import GoalOnboarding from '../GoalOnboarding';
+import GoalSheet from '../GoalSheet';
 
 const mockCompleteOnboarding = vi.fn();
 const mockSetManualGoal = vi.fn();
-
-vi.mock('../../../../services/parityClient', () => ({
-    asList: (value) => (Array.isArray(value) ? value : []),
-    listNutritionists: vi.fn().mockResolvedValue([]),
-}));
 
 vi.mock('../../../../hooks/api/useNutritionApi', () => ({
     useNutritionApi: () => ({
@@ -19,16 +14,16 @@ vi.mock('../../../../hooks/api/useNutritionApi', () => ({
     }),
 }));
 
-const renderOnboarding = () =>
+const renderOnboarding = (props = {}) =>
         render(
             withLang(
             <MemoryRouter>
-                <GoalOnboarding />
+                <GoalSheet {...props} />
             </MemoryRouter>
             )
         );
 
-describe('GoalOnboarding', () => {
+describe('GoalSheet', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockCompleteOnboarding.mockResolvedValue({
@@ -119,5 +114,19 @@ describe('GoalOnboarding', () => {
             });
             expect(getByTestId('goal-result')).toHaveTextContent('Água 2500 ml');
         });
+    });
+
+    it('prefills the manual form from the current goal', () => {
+        const { getByTestId } = renderOnboarding({ goal: { kcal: 2400, proteinG: 160, carbG: 260, fatG: 70, waterMl: 3000 } });
+        expect(getByTestId('manual-kcal-input')).toHaveValue(2400);
+        expect(getByTestId('manual-water-input')).toHaveValue(3000);
+    });
+
+    it('is read-only when a nutritionist owns the goal', () => {
+        const { getByTestId, queryByTestId } = renderOnboarding({ locked: true, goal: { kcal: 2400, proteinG: 160, carbG: 260, fatG: 70 } });
+        expect(getByTestId('goal-locked')).toBeInTheDocument();
+        expect(getByTestId('goal-summary')).toHaveTextContent('2400');
+        expect(queryByTestId('manual-submit-btn')).not.toBeInTheDocument();
+        expect(queryByTestId('onboarding-submit-btn')).not.toBeInTheDocument();
     });
 });

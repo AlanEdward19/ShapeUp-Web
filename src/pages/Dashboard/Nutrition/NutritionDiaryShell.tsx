@@ -6,9 +6,12 @@ import { useLanguage } from '../../../contexts/LanguageContext';
 import { copy } from '../../shell-assets/copy';
 import useHydration, { waterPercent } from '../../../hooks/useHydration';
 import { useEffect, useState, type ChangeEvent, type ReactElement } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import DiaryDay from './DiaryDay';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
+import { useFastingApi } from '../../../hooks/api/useFastingApi';
+import useNutritionist from '../../../hooks/useNutritionist';
+import GoalSheet from './GoalSheet';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
@@ -22,9 +25,9 @@ const slots: Record<string, string> = {
 };
 
 const diaryCopy = {
-  'pt-BR': { title: 'Diário nutricional', target: 'Meta diária', notSet: 'Não configurada', summary: 'Resumo do dia', calories: 'Calorias', protein: 'Proteínas', carbs: 'Carboidratos', fat: 'Gorduras', left: 'restantes', over: 'acima da meta', hydration: 'Hidratação', item: 'item', items: 'itens', emptyMeal: 'Nada registrado', history: 'Histórico calórico', note: 'Anotação do dia', notePlaceholder: 'Ex.: manter o carboidrato no jantar…' },
-  en: { title: 'Nutrition diary', target: 'Daily target', notSet: 'Not set', summary: 'Day summary', calories: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Fat', left: 'left', over: 'over target', hydration: 'Hydration', item: 'item', items: 'items', emptyMeal: 'Nothing logged', history: 'Calorie history', note: 'Note for the day', notePlaceholder: 'E.g. keep carbs at dinner…' },
-  es: { title: 'Diario nutricional', target: 'Meta diaria', notSet: 'No configurada', summary: 'Resumen del día', calories: 'Calorías', protein: 'Proteínas', carbs: 'Carbohidratos', fat: 'Grasas', left: 'restantes', over: 'sobre la meta', hydration: 'Hidratación', item: 'ítem', items: 'ítems', emptyMeal: 'Nada registrado', history: 'Historial calórico', note: 'Nota del día', notePlaceholder: 'Ej.: mantener los carbohidratos en la cena…' },
+  'pt-BR': { title: 'Diário nutricional', target: 'Meta diária', notSet: 'Não configurada', summary: 'Resumo do dia', calories: 'Calorias', protein: 'Proteínas', carbs: 'Carboidratos', fat: 'Gorduras', left: 'restantes', over: 'acima da meta', hydration: 'Hidratação', item: 'item', items: 'itens', emptyMeal: 'Nada registrado', history: 'Histórico calórico', note: 'Anotação do dia', notePlaceholder: 'Ex.: manter o carboidrato no jantar…', goal: 'Metas', plan: 'Cardápio', foods: 'Alimentos', fasting: 'Jejum', practice: 'Prática', locked: 'Definido pelo seu nutricionista', actions: 'Atalhos da nutrição', promptTitle: 'Quer definir uma meta?', promptBody: 'É opcional. Com uma meta, o diário mostra quanto falta para fechar o dia.', promptCta: 'Definir meta', promptSkip: 'Agora não' },
+  en: { title: 'Nutrition diary', target: 'Daily target', notSet: 'Not set', summary: 'Day summary', calories: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Fat', left: 'left', over: 'over target', hydration: 'Hydration', item: 'item', items: 'items', emptyMeal: 'Nothing logged', history: 'Calorie history', note: 'Note for the day', notePlaceholder: 'E.g. keep carbs at dinner…', goal: 'Goals', plan: 'Meal plan', foods: 'Foods', fasting: 'Fasting', practice: 'Practice', locked: 'Set by your nutritionist', actions: 'Nutrition shortcuts', promptTitle: 'Want to set a goal?', promptBody: 'It is optional. With a goal, the diary shows how much is left to close the day.', promptCta: 'Set a goal', promptSkip: 'Not now' },
+  es: { title: 'Diario nutricional', target: 'Meta diaria', notSet: 'No configurada', summary: 'Resumen del día', calories: 'Calorías', protein: 'Proteínas', carbs: 'Carbohidratos', fat: 'Grasas', left: 'restantes', over: 'sobre la meta', hydration: 'Hidratación', item: 'ítem', items: 'ítems', emptyMeal: 'Nada registrado', history: 'Historial calórico', note: 'Nota del día', notePlaceholder: 'Ej.: mantener los carbohidratos en la cena…', goal: 'Metas', plan: 'Menú', foods: 'Alimentos', fasting: 'Ayuno', practice: 'Práctica', locked: 'Definido por tu nutricionista', actions: 'Atajos de nutrición', promptTitle: '¿Quieres definir una meta?', promptBody: 'Es opcional. Con una meta, el diario muestra cuánto falta para cerrar el día.', promptCta: 'Definir meta', promptSkip: 'Ahora no' },
 } as const;
 
 const macroKeys = ['kcal', 'proteinG', 'carbG', 'fatG'] as const;
@@ -93,6 +96,19 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
   const waterGoal = state.goal?.waterMl || 0;
   const waterPct = waterPercent(water, waterGoal);
   const { getDiaryDay } = useNutritionApi();
+  const { getClock } = useFastingApi();
+  const { linked, loading: linkLoading } = useNutritionist();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [goalOpen, setGoalOpen] = useState(searchParams.get('goal') === '1');
+  const [fastingOn, setFastingOn] = useState(false);
+  // The sheet waits for the first load so it can prefill, and stays mounted while a save reloads the day.
+  const [loadedOnce, setLoadedOnce] = useState(false);
+  useEffect(() => {
+    if (!state.loading && !linkLoading) setLoadedOnce(true);
+  }, [state.loading, linkLoading]);
+  const promptKey = `shapeup_goal_prompt_dismissed_${localStorage.getItem('shapeup_user_id') || 'current'}`;
+  const [promptDismissed, setPromptDismissed] = useState(() => localStorage.getItem(promptKey) === '1');
+  const professional = ['professional', 'gym'].includes(localStorage.getItem('shapeup_role') || '');
   const [week, setWeek] = useState<Array<{ session: number; date: string; volume: number }>>([]);
 
   const noteKey = `shapeup_diary_note_${localStorage.getItem('shapeup_user_id') || 'current'}_${state.date}`;
@@ -100,6 +116,30 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
   const note = notes[noteKey] ?? localStorage.getItem(noteKey) ?? '';
   const [savedKey, setSavedKey] = useState<string | null>(null);
   const saved = savedKey === noteKey;
+
+  useEffect(() => {
+    let active = true;
+    getClock()
+      .then(() => { if (active) setFastingOn(true); })
+      .catch((err: { status?: number; code?: string }) => {
+        if (active) setFastingOn(!(err?.status === 404 && err?.code === 'nutrition.fasting.disabled'));
+      });
+    return () => { active = false; };
+  }, [getClock]);
+
+  const openGoal = () => setGoalOpen(true);
+  const closeGoal = () => {
+    setGoalOpen(false);
+    if (searchParams.get('goal')) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('goal');
+      setSearchParams(next, { replace: true });
+    }
+  };
+  const dismissPrompt = () => {
+    localStorage.setItem(promptKey, '1');
+    setPromptDismissed(true);
+  };
 
   const addFood = (mealSlot?: string) =>
     navigate(`/dashboard/nutrition/foods?date=${state.date}&mealSlot=${mealSlot || 'Breakfast'}`);
@@ -205,6 +245,50 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
         </div>
       </header>
 
+      <nav className="nd-actions" aria-label={c.actions}>
+        <button type="button" onClick={openGoal} data-testid="diary-goal-btn">
+          <span className="material-symbols-outlined" aria-hidden="true">{linked ? 'lock' : 'flag'}</span>
+          <span className="nd-actions-text">
+            <strong>{c.goal}</strong>
+            <small>{linked ? c.locked : kcalGoal ? `${number(kcalGoal)} kcal` : c.notSet}</small>
+          </span>
+        </button>
+        <button type="button" onClick={() => navigate('/dashboard/nutrition/meal-plans')}>
+          <span className="material-symbols-outlined" aria-hidden="true">menu_book</span>
+          <span className="nd-actions-text"><strong>{c.plan}</strong></span>
+        </button>
+        <button type="button" onClick={() => addFood()}>
+          <span className="material-symbols-outlined" aria-hidden="true">search</span>
+          <span className="nd-actions-text"><strong>{c.foods}</strong></span>
+        </button>
+        {fastingOn && (
+          <button type="button" onClick={() => navigate('/dashboard/nutrition/fasting')}>
+            <span className="material-symbols-outlined" aria-hidden="true">timer</span>
+            <span className="nd-actions-text"><strong>{c.fasting}</strong></span>
+          </button>
+        )}
+        {professional && (
+          <button type="button" onClick={() => navigate('/dashboard/nutrition/practice')}>
+            <span className="material-symbols-outlined" aria-hidden="true">stethoscope</span>
+            <span className="nd-actions-text"><strong>{c.practice}</strong></span>
+          </button>
+        )}
+      </nav>
+
+      {!state.goal && !state.loading && !linkLoading && !linked && !promptDismissed && (
+        <aside className="nd-card nd-prompt" data-testid="goal-prompt">
+          <span className="material-symbols-outlined" aria-hidden="true">flag</span>
+          <div>
+            <h2>{c.promptTitle}</h2>
+            <p>{c.promptBody}</p>
+          </div>
+          <div className="nd-prompt-actions">
+            <button type="button" className="nd-solid" onClick={openGoal}>{c.promptCta}</button>
+            <button type="button" className="nd-soft" onClick={dismissPrompt}>{c.promptSkip}</button>
+          </div>
+        </aside>
+      )}
+
       <section className="nd-summary" aria-label={c.summary}>
         <div className="nd-card nd-energy">
           <div className="nd-ring">
@@ -257,7 +341,7 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
             {waterGoal ? (
               <span>{waterPct}% da meta</span>
             ) : (
-              <button type="button" className="nd-link" onClick={() => navigate('/dashboard/nutrition/goal')}>
+              <button type="button" className="nd-link" onClick={openGoal}>
                 Sem meta definida • Definir
               </button>
             )}
@@ -384,11 +468,6 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
           </section>
 
           <section className="nd-card nd-links">
-            <button type="button" onClick={() => navigate('/dashboard/nutrition/goal')}>
-              <span className="material-symbols-outlined" aria-hidden="true">flag</span>
-              <span>Configurar meta nutricional</span>
-              <span className="material-symbols-outlined" aria-hidden="true">chevron_right</span>
-            </button>
             <button type="button" onClick={() => navigate('/dashboard/messages')}>
               <span className="material-symbols-outlined" aria-hidden="true">chat</span>
               <span>{tr('Falar com o Treinador')}</span>
@@ -397,6 +476,15 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
           </section>
         </aside>
       </div>
+
+      {goalOpen && loadedOnce && (
+        <GoalSheet
+          goal={state.goal}
+          locked={linked}
+          onClose={closeGoal}
+          onSaved={() => { dismissPrompt(); state.loadData(); }}
+        />
+      )}
     </div>
   );
 }

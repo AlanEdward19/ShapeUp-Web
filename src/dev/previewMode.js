@@ -44,7 +44,9 @@ const diary = {
 
 function mockBody(url) {
   if (url.includes('/nutrition/diary')) return diary;
-  if (url.includes('/nutrition/profile')) return { activeGoal: { kcal: 2400, proteinG: 160, carbG: 260, fatG: 70, waterMl: 3000 } };
+  // ?nogoal / ?nutritionist in localStorage flip the nutrition states for design review
+  if (url.includes('/nutrition/nutritionists')) return localStorage.getItem('shapeup_preview_nutritionist') ? [{ professionalUserId: 9, displayName: 'Dra. Marina' }] : [];
+  if (url.includes('/nutrition/profile')) return localStorage.getItem('shapeup_preview_nogoal') ? { activeGoal: null } : { activeGoal: { kcal: 2400, proteinG: 160, carbG: 260, fatG: 70, waterMl: 3000 } };
   if (/\/nutrition\/foods(\?|$)/.test(url)) return { items: [food(1, 'Peito de frango', 165, 31, 0, 3.6), food(2, 'Arroz branco cozido', 130, 2.7, 28, 0.3), food(3, 'Ovo cozido', 155, 13, 1.1, 11)] };
   if (url.includes('/nutrition/hydration')) return { totalMl: 1250 };
   if (/\/me(\?|$)/.test(url)) return { id: 1, userId: 1, displayName: 'Alan Oliveira', email: 'alan@shapeup.app' };
