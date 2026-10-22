@@ -115,7 +115,7 @@
   .nd-ring { align-self: center; }
   .nd-card { padding: 16px; border-radius: 22px; }
   .nd-meal > header { padding: 14px 16px 10px; }
-  .nd-entries li { padding-left: 16px; padding-right: 6px; flex-wrap: wrap; }
-  .nd-entry-name { flex: 1 1 60%; }
+  .nd-entries li { padding-left: 16px; padding-right: 4px; gap: 6px; }
+  .nd-entry-macros small { white-space: normal; text-align: right; }
 }
 @media (prefers-reduced-motion: reduce) { .nd * { transition: none !important; } }

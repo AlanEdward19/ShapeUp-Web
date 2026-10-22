@@ -114,7 +114,7 @@ const GoalOnboarding = () => {
                     {loading ? (
                         <Skeleton variant="card" />
                     ) : (
-                    <form onSubmit={handleOnboarding}>
+                    <form className="su-form-grid" onSubmit={handleOnboarding}>
                         <Input
                             label={t('nutrition.goal.height')}
                             type="number"
@@ -167,7 +167,7 @@ const GoalOnboarding = () => {
                     {loading ? (
                         <Skeleton variant="card" />
                     ) : (
-                    <form onSubmit={handleManualGoal}>
+                    <form className="su-form-grid" onSubmit={handleManualGoal}>
                         <div className="su-macro-fields">
                             <Input label={t('nutrition.macro.kcal')} type="number" value={manualGoal.kcal} onChange={(e) => setManualGoalState((p) => ({ ...p, kcal: e.target.value }))} data-testid="manual-kcal-input" />
                             <Input label={t('nutrition.form.protein')} type="number" value={manualGoal.proteinG} onChange={(e) => setManualGoalState((p) => ({ ...p, proteinG: e.target.value }))} data-testid="manual-protein-input" />
