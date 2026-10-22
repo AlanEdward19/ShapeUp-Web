@@ -1001,9 +1001,18 @@
 .su-prescription-editor .su-heading-actions .su-btn{white-space:nowrap}
 @media(max-width:520px){
   .su-prescription-editor .su-heading-main{grid-template-columns:1fr;grid-template-areas:"title" "stats" "actions"}
-  .su-prescription-editor .su-heading-actions>.su-btn-primary{flex:1;justify-content:center}
+  .su-prescription-editor .su-heading-actions{width:100%;display:grid;grid-template-columns:auto 1fr;gap:10px}
+  .su-prescription-editor .su-heading-actions>.su-btn{width:100%;justify-content:center}
+  .su-prescription-editor .su-heading-actions>.su-btn:first-child{width:auto;padding-inline:14px}
+  .su-prescription-editor .su-prescription-heading{padding:16px}
+  .su-prescription-editor .su-heading-main .su-prescription-stats{gap:4px 16px}
 }
 /* wide: the summary column scrolls on its own */
 @media(min-width:1101px){
   .su-prescription-editor .su-prescription-analytics{max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+}
+@media(max-width:700px){
+  .su-builder-layout.su-prescription-editor{row-gap:14px}
+  .su-prescription-editor .su-prescription-heading{padding:4px 2px 12px;border:0;background:transparent;border-bottom:1px solid var(--border-color);border-radius:0}
+  .su-builder-back{margin-bottom:0}
 }
