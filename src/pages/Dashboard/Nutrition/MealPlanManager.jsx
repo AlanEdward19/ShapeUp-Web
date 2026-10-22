@@ -4,11 +4,12 @@ import Button from '../../../components/Button';
 import { useNutritionApi } from '../../../hooks/api/useNutritionApi';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import Skeleton from '../../../components/Skeleton';
+import FoodPicker from './FoodPicker';
 import './Nutrition.css';
 
 const MEAL_SLOTS = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
-const emptyItem = () => ({ mealSlot: 'Breakfast', foodId: '', quantityGramsOrMl: '100' });
+const emptyItem = () => ({ mealSlot: 'Breakfast', foodId: '', foodName: '', quantityGramsOrMl: '100' });
 
 const toDateKey = () => {
     const now = new Date();
@@ -16,7 +17,8 @@ const toDateKey = () => {
 };
 
 const MealPlanManager = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+    const slotLabel = { 'pt-BR': 'Refeição', en: 'Meal', es: 'Comida' }[language] || 'Refeição';
     const { createMealPlan, activateMealPlan } = useNutritionApi();
     const [name, setName] = useState('');
     const [items, setItems] = useState([emptyItem()]);
@@ -30,6 +32,8 @@ const MealPlanManager = () => {
     };
 
     const addItem = () => setItems((prev) => [...prev, emptyItem()]);
+    const removeItem = (index) => setItems((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev));
+    const ready = name.trim() && items.every((item) => item.foodId && parseFloat(item.quantityGramsOrMl) > 0);
 
     const handleCreate = async (e) => {
         e.preventDefault();
@@ -84,39 +88,53 @@ const MealPlanManager = () => {
                 ) : (
                 <form onSubmit={handleCreate}>
                     <Input
+                        id="plan-name"
                         label={t('nutrition.plan.name')}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         data-testid="plan-name-input"
                     />
 
-                    {items.map((item, index) => (
-                        <div key={index} className="su-plan-item-row">
-                            <select
-                                className="su-input"
-                                value={item.mealSlot}
-                                onChange={(e) => updateItem(index, 'mealSlot', e.target.value)}
-                                data-testid={`plan-item-slot-${index}`}
-                            >
-                                {MEAL_SLOTS.map((slot) => (
-                                    <option key={slot} value={slot}>{t(`nutrition.meal.${slot}`)}</option>
-                                ))}
-                            </select>
-                            <Input
-                                label={t('nutrition.plan.food_id')}
-                                value={item.foodId}
-                                onChange={(e) => updateItem(index, 'foodId', e.target.value)}
-                                data-testid={`plan-item-food-${index}`}
-                            />
-                            <Input
-                                label={t('nutrition.plan.qty')}
-                                type="number"
-                                value={item.quantityGramsOrMl}
-                                onChange={(e) => updateItem(index, 'quantityGramsOrMl', e.target.value)}
-                                data-testid={`plan-item-qty-${index}`}
-                            />
-                        </div>
-                    ))}
+                    <div className="su-plan-items">
+                        {items.map((item, index) => (
+                            <div key={index} className="su-plan-item-row">
+                                <div className="su-input-group">
+                                    <label className="su-input-label" htmlFor={`plan-slot-${index}`}>{slotLabel}</label>
+                                    <select
+                                        id={`plan-slot-${index}`}
+                                        className="su-input"
+                                        value={item.mealSlot}
+                                        onChange={(e) => updateItem(index, 'mealSlot', e.target.value)}
+                                        data-testid={`plan-item-slot-${index}`}
+                                    >
+                                        {MEAL_SLOTS.map((slot) => (
+                                            <option key={slot} value={slot}>{t(`nutrition.meal.${slot}`)}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <FoodPicker
+                                    testId={`plan-item-food-${index}`}
+                                    value={item}
+                                    onSelect={(food) => setItems((prev) => prev.map((entry, i) => (i === index
+                                        ? { ...entry, foodId: food?.foodId ?? '', foodName: food?.foodName ?? '' }
+                                        : entry)))}
+                                />
+                                <Input
+                                    id={`plan-qty-${index}`}
+                                    label={t('nutrition.plan.qty')}
+                                    type="number"
+                                    min="1"
+                                    inputMode="decimal"
+                                    value={item.quantityGramsOrMl}
+                                    onChange={(e) => updateItem(index, 'quantityGramsOrMl', e.target.value)}
+                                    data-testid={`plan-item-qty-${index}`}
+                                />
+                                {items.length > 1 && (
+                                    <button type="button" className="su-plan-item-remove" onClick={() => removeItem(index)} aria-label="Remover item">×</button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
 
                     {error && <p className="su-input-error-text" role="alert">{error}</p>}
 
@@ -124,7 +142,7 @@ const MealPlanManager = () => {
                         <Button type="button" variant="secondary" onClick={addItem}>
                             {t('nutrition.plan.add')}
                         </Button>
-                        <Button type="submit" disabled={loading || !name.trim()} data-testid="create-plan-btn">
+                        <Button type="submit" disabled={loading || !ready} data-testid="create-plan-btn">
                             {loading ? t('nutrition.form.saving') : t('nutrition.plan.submit')}
                         </Button>
                     </div>

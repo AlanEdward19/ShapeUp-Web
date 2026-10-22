@@ -6,11 +6,13 @@ import MealPlanManager from '../MealPlanManager';
 
 const mockCreateMealPlan = vi.fn();
 const mockActivateMealPlan = vi.fn();
+const mockSearchFoods = vi.fn();
 
 vi.mock('../../../../hooks/api/useNutritionApi', () => ({
     useNutritionApi: () => ({
         createMealPlan: mockCreateMealPlan,
         activateMealPlan: mockActivateMealPlan,
+        searchFoods: mockSearchFoods,
     }),
 }));
 
@@ -23,9 +25,15 @@ const renderManager = () =>
             )
         );
 
+const pickFood = async (getByTestId, findByRole) => {
+    fireEvent.change(getByTestId('plan-item-food-0'), { target: { value: 'arroz' } });
+    fireEvent.click(await findByRole('option', { name: /Arroz branco/ }));
+};
+
 describe('MealPlanManager', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockSearchFoods.mockResolvedValue({ items: [{ id: 'food-1', name: 'Arroz branco', macrosPer100: { kcal: 130 } }] });
         mockCreateMealPlan.mockResolvedValue({
             id: 'plan-1',
             name: 'Semana leve',
@@ -44,9 +52,9 @@ describe('MealPlanManager', () => {
             () => new Promise((resolve) => { resolveCreate = resolve; }),
         );
 
-        const { getByTestId } = renderManager();
+        const { getByTestId, findByRole } = renderManager();
         fireEvent.change(getByTestId('plan-name-input'), { target: { value: 'Semana leve' } });
-        fireEvent.change(getByTestId('plan-item-food-0'), { target: { value: 'food-1' } });
+        await pickFood(getByTestId, findByRole);
         fireEvent.click(getByTestId('create-plan-btn'));
 
         expect(getByTestId('skeleton')).toHaveAttribute('data-variant', 'card');
@@ -66,10 +74,10 @@ describe('MealPlanManager', () => {
     });
 
     it('creates and activates a meal plan filling the diary', async () => {
-        const { getByTestId } = renderManager();
+        const { getByTestId, findByRole } = renderManager();
 
         fireEvent.change(getByTestId('plan-name-input'), { target: { value: 'Semana leve' } });
-        fireEvent.change(getByTestId('plan-item-food-0'), { target: { value: 'food-1' } });
+        await pickFood(getByTestId, findByRole);
         fireEvent.click(getByTestId('create-plan-btn'));
 
         await waitFor(() => {

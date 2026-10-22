@@ -33,7 +33,7 @@ function CachedOutlet(): ReactElement {
 
 export default function NutritionWorkspaceShell(): ReactElement {
   return (
-    <WorkspaceShellPage name="nutrition" css={shellCss}>
+    <WorkspaceShellPage name="nutrition" css={shellCss} adoptDocumentStyles>
       <div className="su-nutrition-workspace" data-testid="nutrition-workspace">
         <div className="su-nutrition-workspace-inner">
           <NutritionNav />
