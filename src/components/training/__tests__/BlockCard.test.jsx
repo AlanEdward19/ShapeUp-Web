@@ -91,7 +91,7 @@ describe('BlockCard exercise drag and drop', () => {
             effectAllowed: 'move',
             dropEffect: 'move',
         };
-        fireEvent.drop(screen.getByDisplayValue('Squat').closest('[data-ex-drop]'), { dataTransfer });
+        fireEvent.drop(screen.getByText('Squat').closest('[data-ex-drop]'), { dataTransfer });
         expect(onMoveExercise).toHaveBeenCalledWith(1, 0, 0);
     });
 });

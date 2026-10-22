@@ -27,8 +27,8 @@ describe('PlanEditor with API plans that only carry exercise ids', () => {
     it('fills the exercise name and muscles from the catalog', () => {
         localStorage.setItem('shapeup_language', 'pt-BR');
         render(withLang(<PlanEditor plan={plan} onSave={vi.fn()} onCancel={vi.fn()} />));
-        expect(screen.getByDisplayValue('Supino reto')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('Peito médio • Tríceps')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Supino reto' })).toBeInTheDocument();
+        expect(screen.getByText('Peito médio • Tríceps')).toBeInTheDocument();
     });
 
     it('never prints a raw translation key for an unknown phase', () => {

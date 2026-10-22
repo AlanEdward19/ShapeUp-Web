@@ -1016,3 +1016,6 @@
   .su-prescription-editor .su-prescription-heading{padding:4px 2px 12px;border:0;background:transparent;border-bottom:1px solid var(--border-color);border-radius:0}
   .su-builder-back{margin-bottom:0}
 }
+
+.su-prescription-editor .su-ex-name{margin:0;font:700 19px/1.25 'Source Sans 3',sans-serif;color:var(--text-main);overflow-wrap:anywhere;text-transform:none}
+.su-prescription-editor .su-ex-muscles{margin:2px 0 0;font-size:13px;color:var(--text-muted);overflow-wrap:anywhere}

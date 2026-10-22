@@ -18,6 +18,7 @@ const ExerciseRow = ({
     const { t } = useLanguage();
     const exerciseType = exercise.exerciseType || 'weightBased';
     const isTimeBased = exerciseType === 'timeBased';
+    const muscleLabel = (Array.isArray(exercise.muscles) && exercise.muscles.length ? [...new Set(exercise.muscles)].join(' • ') : exercise.tags) || '';
 
     const updateSet = (sIdx, field, value) => {
         const sets = [...exercise.sets];
@@ -56,18 +57,9 @@ const ExerciseRow = ({
             <div className="su-exercise-content">
                 <div className="su-ex-header">
                     <span className="su-prescription-exercise-number">{String(index + 1).padStart(2, '0')}</span><div className="su-ex-title-row">
-                        <input
-                            className="su-pe-ex-name-input"
-                            value={exercise.name}
-                            onChange={e => onChange('name', e.target.value)}
-                            placeholder={t('pro.builder.ex.name.ph')}
-                        />
-                        <input
-                            className="su-pe-ex-tags-input"
-                            value={exercise.tags}
-                            onChange={e => onChange('tags', e.target.value)}
-                            placeholder={t('pro.builder.ex.tags.ph')}
-                        />
+                        {/* The exercise comes from the catalog: its name and muscles are facts, not form fields. */}
+                        <h3 className="su-ex-name">{exercise.name || t('pro.builder.ex.unnamed')}</h3>
+                        {muscleLabel ? <p className="su-ex-muscles">{muscleLabel}</p> : null}
                     </div>
                     <div className="su-ex-toggles">
                         <button
