@@ -53,6 +53,7 @@ export default function AdminConsole() {
                     </button>
                 ))}
                 <Link className="su-btn su-btn-secondary" to="/dashboard/admin/food-moderation">{t('admin.hub.section.food')}</Link>
+                <Link className="su-btn su-btn-secondary" to="/dashboard/admin/exercise-requests">{t('admin.hub.section.exerciseRequests')}</Link>
                 <Link className="su-btn su-btn-secondary" to="/dashboard/admin/feature-flags">{t('admin.hub.section.flags')}</Link>
             </nav>
             {section === 'overview' && <OverviewSection />}

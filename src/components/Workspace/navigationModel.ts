@@ -33,6 +33,7 @@ const labels: Record<string, [en: string, es: string]> = {
   'Plataforma': ['Platform', 'Plataforma'],
   'Administração': ['Administration', 'Administración'],
   'Moderação de alimentos': ['Food moderation', 'Moderación de alimentos'],
+  'Solicitações de exercícios': ['Exercise requests', 'Solicitudes de ejercicios'],
   'Recursos da plataforma': ['Platform features', 'Funciones de la plataforma'],
   'Academia': ['Gym', 'Gimnasio'],
   'Personal trainer': ['Personal trainer', 'Entrenador personal'],
@@ -115,6 +116,7 @@ export function buildNavigation({ role, platformAdmin, language }: NavigationInp
       items: [
         item('admin_panel_settings', 'Administração', '/dashboard/admin'),
         item('verified_user', 'Moderação de alimentos', '/dashboard/admin/food-moderation'),
+        item('playlist_add_check', 'Solicitações de exercícios', '/dashboard/admin/exercise-requests'),
         item('tune', 'Recursos da plataforma', '/dashboard/admin/feature-flags'),
       ],
     });

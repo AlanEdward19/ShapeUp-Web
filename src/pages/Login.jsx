@@ -15,6 +15,7 @@ import './Login.css';
 
 const roleMapping = {
     'Trainer': 'professional',
+    'Nutritionist': 'professional',
     'GymOwner': 'gym',
     'IndependentClient': 'independent',
     'Client': 'client',

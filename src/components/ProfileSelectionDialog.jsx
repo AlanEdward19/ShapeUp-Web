@@ -13,6 +13,7 @@ const copy = {
         other: 'Usar outra conta',
         roles: {
             Trainer: ['Personal trainer', 'Alunos, treinos e planos de atendimento'],
+            Nutritionist: ['Nutricionista', 'Alunos, dietas e acompanhamento nutricional'],
             GymOwner: ['Academia', 'Equipe, alunos e financeiro'],
             IndependentClient: ['Treino próprio', 'Seus treinos e sua nutrição, sem profissional'],
             Client: ['Aluno', 'Treinos prescritos pelo seu profissional'],
@@ -25,6 +26,7 @@ const copy = {
         other: 'Use another account',
         roles: {
             Trainer: ['Personal trainer', 'Clients, workouts and service plans'],
+            Nutritionist: ['Nutritionist', 'Clients, diets and nutrition follow-up'],
             GymOwner: ['Gym', 'Staff, members and finances'],
             IndependentClient: ['Self-coached', 'Your own training and nutrition'],
             Client: ['Client', 'Workouts prescribed by your coach'],
@@ -37,6 +39,7 @@ const copy = {
         other: 'Usar otra cuenta',
         roles: {
             Trainer: ['Entrenador personal', 'Alumnos, entrenamientos y planes'],
+            Nutritionist: ['Nutricionista', 'Alumnos, dietas y seguimiento nutricional'],
             GymOwner: ['Gimnasio', 'Equipo, alumnos y finanzas'],
             IndependentClient: ['Entrenamiento propio', 'Tu entrenamiento y nutrición'],
             Client: ['Alumno', 'Entrenamientos de tu profesional'],
@@ -47,6 +50,7 @@ const copy = {
 
 const icons = {
     Trainer: Dumbbell,
+    Nutritionist: Dumbbell,
     GymOwner: Building2,
     IndependentClient: User,
     Client: Users,

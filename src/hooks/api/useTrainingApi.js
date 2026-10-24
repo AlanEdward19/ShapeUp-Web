@@ -166,6 +166,42 @@ export const useTrainingApi = () => {
         });
     }, []);
 
+    // --- EXERCISE REQUESTS (contract: ShapeUpV2 issue "Exercise requests") ---
+    const createExerciseRequest = useCallback(async (command) => {
+        return await apiClient('/api/training/exercise-requests', {
+            method: 'POST',
+            body: JSON.stringify(command)
+        });
+    }, []);
+
+    const listMyExerciseRequests = useCallback(async () => {
+        return await apiClient('/api/training/exercise-requests/mine');
+    }, []);
+
+    // Admin only: status filter is Pending | Approved | Rejected (omit for all).
+    const listExerciseRequests = useCallback(async ({ status, cursor, pageSize = 30 } = {}) => {
+        const query = new URLSearchParams();
+        if (status) query.append('status', status);
+        if (cursor) query.append('cursor', cursor);
+        query.append('pageSize', pageSize);
+        return await apiClient(`/api/training/exercise-requests?${query.toString()}`);
+    }, []);
+
+    // Admin only: creates the exercise and links it to the request in one transaction.
+    const approveExerciseRequest = useCallback(async (requestId, command) => {
+        return await apiClient(`/api/training/exercise-requests/${requestId}/approve`, {
+            method: 'POST',
+            body: JSON.stringify(command)
+        });
+    }, []);
+
+    const rejectExerciseRequest = useCallback(async (requestId, { reason }) => {
+        return await apiClient(`/api/training/exercise-requests/${requestId}/reject`, {
+            method: 'POST',
+            body: JSON.stringify({ reason })
+        });
+    }, []);
+
     // --- EQUIPMENTS ---
     const getEquipments = useCallback(async (cursor, pageSize) => {
         const query = new URLSearchParams();
@@ -218,6 +254,7 @@ export const useTrainingApi = () => {
         startWorkout, finishWorkout, cancelWorkout, getWorkoutById, getWorkoutsByUser, getActiveWorkout,
         // Exercises
         getExercises, getExerciseById, getExerciseEquivalents, createExercise, updateExercise, deleteExercise, suggestExercises,
+        createExerciseRequest, listMyExerciseRequests, listExerciseRequests, approveExerciseRequest, rejectExerciseRequest,
         // Equipments
         getEquipments, getEquipmentById, createEquipment, updateEquipment, deleteEquipment,
         // Dashboard

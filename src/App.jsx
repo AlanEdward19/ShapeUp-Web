@@ -38,6 +38,7 @@ const FastingPage = lazy(() => import('./pages/Dashboard/Nutrition/FastingPage')
 const NutritionPractice = lazy(() => import('./pages/Dashboard/Nutrition/NutritionPractice'));
 import FoodModerationQueue from './pages/Admin/ModerationShell';
 import FeatureFlagsPanel from './pages/Admin/FeatureFlagsPanel';
+import ExerciseRequests from './pages/Admin/ExerciseRequests';
 import AdminConsole from './pages/Admin/AdminConsole';
 import NoticeInbox from './pages/Dashboard/NoticeInbox';
 import ProfessionalsDirectory from './pages/Dashboard/ProfessionalsHub';
@@ -148,6 +149,7 @@ function App() {
             <Route path="admin" element={<AdminConsole />} />
             <Route path="admin/food-moderation" element={<FoodModerationQueue />} />
             <Route path="admin/feature-flags" element={<FeatureFlagsPanel />} />
+            <Route path="admin/exercise-requests" element={<ExerciseRequests />} />
             <Route path="notifications" element={<NoticeInbox />} />
             <Route path="professionals" element={<ProfessionalsDirectory />} />
             <Route path="service-plans" element={<RoleRoute path="/dashboard/service-plans"><ServicePlans /></RoleRoute>} />
