@@ -108,12 +108,10 @@ const copy = {
   },
 } as const;
 
-const KIND_ICON: Record<string, string> = {
-  weight: 'exercise',
-  cardio: 'directions_run',
-  isometric: 'timer',
-  stretch: 'self_improvement',
-  mobility: 'accessibility_new',
+const sectionKey = (ex: ExerciseRecord, sort: string): string => {
+  if (sort === 'muscles') return ex.muscles?.[0] || '—';
+  const first = String(ex.name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').charAt(0).toUpperCase();
+  return /[A-Z]/.test(first) ? first : '#';
 };
 
 function ExerciseRow({ ex, state, kindLabels }: { ex: ExerciseRecord; state: ExercisesShellState; kindLabels: Record<string, string> }) {
@@ -121,7 +119,8 @@ function ExerciseRow({ ex, state, kindLabels }: { ex: ExerciseRecord; state: Exe
   const active = state.active?.id === ex.id;
   const kind = exerciseKind(ex);
   const equipment = state.equipmentName(ex);
-  const subtitle = [(ex.muscles || []).slice(0, 2).join(', '), kindLabels[kind], equipment].filter(Boolean).join(' · ');
+  // Weights are the default; only call out the other kinds so the list stays quiet.
+  const subtitle = [(ex.muscles || []).slice(0, 2).join(', '), kind === 'weight' ? '' : kindLabels[kind], equipment].filter(Boolean).join(' · ');
   return (
     <li>
       <div
@@ -139,9 +138,6 @@ function ExerciseRow({ ex, state, kindLabels }: { ex: ExerciseRecord; state: Exe
           }
         }}
       >
-        <span className="ex-icon" aria-hidden="true">
-          <span className="material-symbols-outlined">{KIND_ICON[kind]}</span>
-        </span>
         <span className="ex-copy">
           <strong>{ex.name}</strong>
           <small>{subtitle}</small>
@@ -172,6 +168,13 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
   const equipmentOptions = [...new Set(state.exercises.map(state.equipmentName))];
   const isGroupActive = (group: string) => selected.includes(group) || MUSCLE_GROUPS[group as keyof typeof MUSCLE_GROUPS].some((leaf) => selected.includes(leaf));
   const expanded = Object.entries(MUSCLE_GROUPS).filter(([group, leaves]) => leaves.length > 1 && isGroupActive(group));
+  const sections = state.filtered.reduce<Array<[string, ExerciseRecord[]]>>((acc, ex) => {
+    const key = sectionKey(ex, state.sort);
+    const last = acc[acc.length - 1];
+    if (last && last[0] === key) last[1].push(ex);
+    else acc.push([key, [ex]]);
+    return acc;
+  }, []);
   const filtered = kind !== 'all' || selected.length > 0 || state.equipment !== 'all' || state.searchTerm !== '';
 
   return (
@@ -203,7 +206,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
               />
             </label>
 
-            <div className="ex-chips" role="group" aria-label={c.type}>
+            <div className="ex-segmented" role="group" aria-label={c.type}>
               {EXERCISE_KINDS.map((value) => (
                 <button key={value} type="button" aria-pressed={kind === value} onClick={() => state.setKind?.(value)}>
                   {c.kinds[value as keyof typeof c.kinds]}
@@ -259,9 +262,16 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
             ) : state.loading ? (
               <p className="ah-empty">{t('exlib.loading')}</p>
             ) : state.filtered.length ? (
-              <ul className="ex-list">
-                {state.filtered.map((ex) => <ExerciseRow key={ex.id} ex={ex} state={state} kindLabels={c.kinds} />)}
-              </ul>
+              <div className="ex-groups">
+                {sections.map(([label, items]) => (
+                  <section key={label} className="ex-group" aria-label={label}>
+                    <h2>{label}</h2>
+                    <ul className="ex-list">
+                      {items.map((ex) => <ExerciseRow key={ex.id} ex={ex} state={state} kindLabels={c.kinds} />)}
+                    </ul>
+                  </section>
+                ))}
+              </div>
             ) : (
               <div className="ex-empty">
                 <strong>{c.emptyTitle}</strong>

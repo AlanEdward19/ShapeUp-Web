@@ -25,9 +25,9 @@ const slots: Record<string, string> = {
 };
 
 const diaryCopy = {
-  'pt-BR': { title: 'Diário nutricional', target: 'Meta diária', notSet: 'Não configurada', summary: 'Resumo do dia', calories: 'Calorias', protein: 'Proteínas', carbs: 'Carboidratos', fat: 'Gorduras', left: 'restantes', over: 'acima da meta', hydration: 'Hidratação', item: 'item', items: 'itens', emptyMeal: 'Nada registrado', history: 'Histórico calórico', note: 'Anotação do dia', notePlaceholder: 'Ex.: manter o carboidrato no jantar…', goal: 'Metas', plan: 'Cardápio', foods: 'Alimentos', fasting: 'Jejum', practice: 'Prática', locked: 'Definido pelo seu nutricionista', actions: 'Atalhos da nutrição', promptTitle: 'Quer definir uma meta?', promptBody: 'É opcional. Com uma meta, o diário mostra quanto falta para fechar o dia.', promptCta: 'Definir meta', promptSkip: 'Agora não' },
-  en: { title: 'Nutrition diary', target: 'Daily target', notSet: 'Not set', summary: 'Day summary', calories: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Fat', left: 'left', over: 'over target', hydration: 'Hydration', item: 'item', items: 'items', emptyMeal: 'Nothing logged', history: 'Calorie history', note: 'Note for the day', notePlaceholder: 'E.g. keep carbs at dinner…', goal: 'Goals', plan: 'Meal plan', foods: 'Foods', fasting: 'Fasting', practice: 'Practice', locked: 'Set by your nutritionist', actions: 'Nutrition shortcuts', promptTitle: 'Want to set a goal?', promptBody: 'It is optional. With a goal, the diary shows how much is left to close the day.', promptCta: 'Set a goal', promptSkip: 'Not now' },
-  es: { title: 'Diario nutricional', target: 'Meta diaria', notSet: 'No configurada', summary: 'Resumen del día', calories: 'Calorías', protein: 'Proteínas', carbs: 'Carbohidratos', fat: 'Grasas', left: 'restantes', over: 'sobre la meta', hydration: 'Hidratación', item: 'ítem', items: 'ítems', emptyMeal: 'Nada registrado', history: 'Historial calórico', note: 'Nota del día', notePlaceholder: 'Ej.: mantener los carbohidratos en la cena…', goal: 'Metas', plan: 'Menú', foods: 'Alimentos', fasting: 'Ayuno', practice: 'Práctica', locked: 'Definido por tu nutricionista', actions: 'Atajos de nutrición', promptTitle: '¿Quieres definir una meta?', promptBody: 'Es opcional. Con una meta, el diario muestra cuánto falta para cerrar el día.', promptCta: 'Definir meta', promptSkip: 'Ahora no' },
+  'pt-BR': { title: 'Diário nutricional', target: 'Meta diária', notSet: 'Não configurada', summary: 'Resumo do dia', calories: 'Calorias', protein: 'Proteínas', carbs: 'Carboidratos', fat: 'Gorduras', left: 'restantes', over: 'acima da meta', hydration: 'Hidratação', item: 'item', items: 'itens', emptyMeal: 'Nada registrado', history: 'Histórico calórico', note: 'Anotação do dia', notePlaceholder: 'Ex.: manter o carboidrato no jantar…', today: 'Hoje', goal: 'Metas', plan: 'Cardápio', foods: 'Alimentos', fasting: 'Jejum', practice: 'Prática', locked: 'Definido pelo seu nutricionista', actions: 'Atalhos da nutrição', promptTitle: 'Quer definir uma meta?', promptBody: 'É opcional. Com uma meta, o diário mostra quanto falta para fechar o dia.', promptCta: 'Definir meta', promptSkip: 'Agora não' },
+  en: { title: 'Nutrition diary', target: 'Daily target', notSet: 'Not set', summary: 'Day summary', calories: 'Calories', protein: 'Protein', carbs: 'Carbs', fat: 'Fat', left: 'left', over: 'over target', hydration: 'Hydration', item: 'item', items: 'items', emptyMeal: 'Nothing logged', history: 'Calorie history', note: 'Note for the day', notePlaceholder: 'E.g. keep carbs at dinner…', today: 'Today', goal: 'Goals', plan: 'Meal plan', foods: 'Foods', fasting: 'Fasting', practice: 'Practice', locked: 'Set by your nutritionist', actions: 'Nutrition shortcuts', promptTitle: 'Want to set a goal?', promptBody: 'It is optional. With a goal, the diary shows how much is left to close the day.', promptCta: 'Set a goal', promptSkip: 'Not now' },
+  es: { title: 'Diario nutricional', target: 'Meta diaria', notSet: 'No configurada', summary: 'Resumen del día', calories: 'Calorías', protein: 'Proteínas', carbs: 'Carbohidratos', fat: 'Grasas', left: 'restantes', over: 'sobre la meta', hydration: 'Hidratación', item: 'ítem', items: 'ítems', emptyMeal: 'Nada registrado', history: 'Historial calórico', note: 'Nota del día', notePlaceholder: 'Ej.: mantener los carbohidratos en la cena…', today: 'Hoy', goal: 'Metas', plan: 'Menú', foods: 'Alimentos', fasting: 'Ayuno', practice: 'Práctica', locked: 'Definido por tu nutricionista', actions: 'Atajos de nutrición', promptTitle: '¿Quieres definir una meta?', promptBody: 'Es opcional. Con una meta, el diario muestra cuánto falta para cerrar el día.', promptCta: 'Definir meta', promptSkip: 'Ahora no' },
 } as const;
 
 const macroKeys = ['kcal', 'proteinG', 'carbG', 'fatG'] as const;
@@ -62,6 +62,8 @@ export type NutritionDiaryViewState = {
   }>;
   handleRemove: (entryId: string) => void | Promise<void>;
 };
+
+const todayKey = () => new Date().toLocaleDateString('en-CA');
 
 function shiftDate(date: string, delta: number): string {
   const day = new Date(`${date}T12:00:00`);
@@ -197,6 +199,7 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
   const kcalLeft = Math.round(kcalGoal - (state.totals.kcal || 0));
   const glasses = waterGoal ? Math.min(12, Math.max(1, Math.ceil(waterGoal / 250))) : 8;
   const filledGlasses = Math.min(glasses, Math.floor(water / 250));
+  const isToday = state.date === todayKey();
   const dateLabel = new Date(`${state.date}T12:00:00`).toLocaleDateString(language, { weekday: 'short', day: '2-digit', month: 'short' });
   const macroRows: Array<[MacroKey, string, string]> = [
     ['proteinG', c.protein, 'var(--accent)'],
@@ -218,11 +221,17 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
             <button type="button" aria-label={tr('Dia anterior')} onClick={() => state.setDate(shiftDate(state.date, -1))}>
               <span className="material-symbols-outlined" aria-hidden="true">chevron_left</span>
             </button>
-            <span aria-live="polite">{dateLabel}</span>
+            <span className="nd-stepper-date" aria-live="polite">
+              {isToday && <em className="nd-today">{c.today}</em>}
+              {dateLabel}
+            </span>
             <button type="button" aria-label={tr('Próximo dia')} onClick={() => state.setDate(shiftDate(state.date, 1))}>
               <span className="material-symbols-outlined" aria-hidden="true">chevron_right</span>
             </button>
-            <label className="nd-calendar" title={tr('Selecionar outra data')}>
+            {!isToday && (
+              <button type="button" className="nd-back-today" onClick={() => state.setDate(todayKey())}>{c.today}</button>
+            )}
+            <span className="nd-calendar" title={tr('Selecionar outra data')}>
               <span className="material-symbols-outlined" aria-hidden="true">calendar_month</span>
               <DatePicker
                 iconOnly
@@ -232,7 +241,7 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
                 required
                 aria-label={tr('Data do diário')}
               />
-            </label>
+            </span>
           </div>
           <button type="button" className="nd-soft" onClick={exportPdf}>
             <span className="material-symbols-outlined" aria-hidden="true">file_download</span>
