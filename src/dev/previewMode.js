@@ -56,7 +56,7 @@ function mockBody(url) {
   if (/\/nutrition\/foods(\?|$)/.test(url)) return { items: [food(1, 'Peito de frango', 165, 31, 0, 3.6), food(2, 'Arroz branco cozido', 130, 2.7, 28, 0.3), food(3, 'Ovo cozido', 155, 13, 1.1, 11)] };
   if (url.includes('/nutrition/hydration')) return { totalMl: 1250 };
   if (/\/me(\?|$)/.test(url)) return { id: 1, userId: 1, displayName: 'Alan Oliveira', email: 'alan@shapeup.app' };
-  if (url.includes('/training/workout-plans/user/')) return { items: [plan(1, 'Hipertrofia — Upper A', [1, 4], 1), plan(2, 'Lower B', [2, 5], 9)], nextCursor: null };
+  if (url.includes('/training/workout-plans/user/')) return { items: [plan(1, 'Hipertrofia — Upper A', [1, 4], 1), plan(2, 'Lower B', [], 9)], nextCursor: null };
   if (/\/training\/exercises(\?|$)/.test(url)) return { items: exercises, nextCursor: null };
   if (url.includes('/training/workouts/user/')) return { items: sessions, nextCursor: null };
   return { items: [], nextCursor: null };

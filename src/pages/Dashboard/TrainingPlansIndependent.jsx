@@ -30,8 +30,15 @@ const appNotes = {
     es: 'Los entrenamientos se realizan en la app ShapeUp. Aquí creas, organizas y revisas tu historial.',
 };
 
+const previewCopy = {
+    'pt-BR': { more: (n) => `+${n} exercícios`, anyDay: 'Sem dia fixo — treine quando quiser' },
+    en: { more: (n) => `+${n} more`, anyDay: 'No fixed day — train whenever you like' },
+    es: { more: (n) => `+${n} ejercicios`, anyDay: 'Sin día fijo — entrena cuando quieras' },
+};
+
 const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, owned, catalog = [] }) => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+    const preview = previewCopy[language] || previewCopy['pt-BR'];
     const mapExercises = enrichExercisesFromCatalog(flattenBlockExercises(plan.blocks), catalog);
     return (
         <div className="su-independent-plan-card">
@@ -45,7 +52,15 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, owned, catalog = 
                     <div className="su-ex-count-badge">
                         <span>{mapExercises.length} {t('pro.client.plan.exercises')}</span>
                     </div>
-                    <WeekdayChips days={plan.assignedWeekdays} />
+                    {plan.assignedWeekdays?.length
+                        ? <WeekdayChips days={plan.assignedWeekdays} />
+                        : <p className="su-plan-anyday">{preview.anyDay}</p>}
+                    {mapExercises.length > 0 && (
+                        <ul className="su-plan-ex-preview">
+                            {mapExercises.slice(0, 4).map((exercise, index) => <li key={`${exercise.id ?? exercise.name}-${index}`}>{exercise.name}</li>)}
+                            {mapExercises.length > 4 && <li className="is-more">{preview.more(mapExercises.length - 4)}</li>}
+                        </ul>
+                    )}
                 </div>
                 <div className="su-plan-card-map">
                     <WorkoutBodyMap exercises={mapExercises} compact />

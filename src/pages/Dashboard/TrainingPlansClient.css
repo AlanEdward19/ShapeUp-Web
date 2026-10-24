@@ -932,3 +932,10 @@
     .su-plan-tiny-actions { width: 100%; }
     .su-plan-tiny-actions button { flex: 1 1 auto; }
 }
+
+.su-plan-anyday { margin: 0.5rem 0 0; color: var(--text-muted); font-size: 0.875rem; }
+.su-plan-ex-preview { margin: 0.65rem 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.su-plan-ex-preview li { color: var(--text-main); font-size: 0.9375rem; line-height: 1.3; overflow-wrap: anywhere; }
+.su-plan-ex-preview li::before { content: ''; display: inline-block; width: 5px; height: 5px; margin-right: 10px; border-radius: 50%; background: var(--primary); vertical-align: middle; }
+.su-plan-ex-preview li.is-more { color: var(--text-muted); }
+.su-plan-ex-preview li.is-more::before { display: none; }
