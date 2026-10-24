@@ -31,6 +31,18 @@ const EATING_START_OPTIONS = eatingStartOptions();
 const pageCopy = {
     'pt-BR': {
         offTitle: 'Jejum desativado',
+        useSuggestion: 'Ativar com esta sugestão',
+        notNow: 'Agora não',
+        declinedLine: 'Você dispensou a sugestão do seu nutricionista.',
+        declineTitle: 'Dispensar a sugestão de jejum?',
+        declineBody: 'Seu nutricionista vai ver que você não vai ativar o jejum sugerido. Você pode ativar depois quando quiser.',
+        declineConfirm: 'Dispensar sugestão',
+        reasonLabel: 'Motivo (opcional)',
+        reasonHint: 'Seu nutricionista lê isso.',
+        disable: 'Desativar jejum',
+        disableTitle: 'Desativar o jejum?',
+        disableBody: 'A agenda e o contador são removidos. O histórico continua salvo.',
+        disableConfirm: 'Desativar',
         offBody: 'Você não tem uma agenda de jejum. Ative só se quiser acompanhar uma janela de alimentação, sozinho ou com seu nutricionista.',
         suggested: (protocol) => `Seu nutricionista sugeriu o protocolo ${protocol}.`,
         activate: 'Ativar jejum',
@@ -45,6 +57,18 @@ const pageCopy = {
     },
     en: {
         offTitle: 'Fasting is off',
+        useSuggestion: 'Use this suggestion',
+        notNow: 'Not now',
+        declinedLine: 'You turned down your nutritionist\'s suggestion.',
+        declineTitle: 'Turn down the fasting suggestion?',
+        declineBody: 'Your nutritionist will see that you will not use the suggested fasting. You can turn it on later.',
+        declineConfirm: 'Turn down',
+        reasonLabel: 'Reason (optional)',
+        reasonHint: 'Your nutritionist reads this.',
+        disable: 'Turn off fasting',
+        disableTitle: 'Turn off fasting?',
+        disableBody: 'The schedule and the countdown are removed. Your history stays saved.',
+        disableConfirm: 'Turn off',
         offBody: 'You have no fasting schedule. Turn it on only if you want to follow an eating window, on your own or with your nutritionist.',
         suggested: (protocol) => `Your nutritionist suggested the ${protocol} protocol.`,
         activate: 'Turn on fasting',
@@ -59,6 +83,18 @@ const pageCopy = {
     },
     es: {
         offTitle: 'Ayuno desactivado',
+        useSuggestion: 'Usar esta sugerencia',
+        notNow: 'Ahora no',
+        declinedLine: 'Descartaste la sugerencia de tu nutricionista.',
+        declineTitle: '¿Descartar la sugerencia de ayuno?',
+        declineBody: 'Tu nutricionista verá que no usarás el ayuno sugerido. Puedes activarlo después.',
+        declineConfirm: 'Descartar',
+        reasonLabel: 'Motivo (opcional)',
+        reasonHint: 'Tu nutricionista lo lee.',
+        disable: 'Desactivar ayuno',
+        disableTitle: '¿Desactivar el ayuno?',
+        disableBody: 'Se quitan la agenda y el contador. Tu historial queda guardado.',
+        disableConfirm: 'Desactivar',
         offBody: 'No tienes una agenda de ayuno. Actívala solo si quieres seguir una ventana de comida, por tu cuenta o con tu nutricionista.',
         suggested: (protocol) => `Tu nutricionista sugirió el protocolo ${protocol}.`,
         activate: 'Activar ayuno',
@@ -73,6 +109,21 @@ const pageCopy = {
     },
 };
 
+const ReasonField = ({ c, value, onChange, testId }) => (
+    <label className="su-fasting-field">
+        {c.reasonLabel}
+        <textarea
+            className="su-input"
+            rows={3}
+            maxLength={280}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            data-testid={testId}
+        />
+        <small className="su-text-muted">{c.reasonHint}</small>
+    </label>
+);
+
 const FastingPage = () => {
     const { t, language } = useLanguage();
     const c = pageCopy[language] || pageCopy['pt-BR'];
@@ -80,8 +131,10 @@ const FastingPage = () => {
         getClock,
         putAgenda,
         startOverride,
-        endOverrideEarly,
         cancelOverride,
+        disableAgenda,
+        endEarly,
+        declineRecommendation,
         getHistory,
     } = useFastingApi();
 
@@ -100,6 +153,9 @@ const FastingPage = () => {
     const [tick, setTick] = useState(0);
     const [formOpen, setFormOpen] = useState(false);
     const [confirmEnd, setConfirmEnd] = useState(false);
+    const [confirmOff, setConfirmOff] = useState(false);
+    const [confirmDecline, setConfirmDecline] = useState(false);
+    const [reason, setReason] = useState('');
     const loadVersion = useRef(0);
     const previousClockStatus = useRef(null);
 
@@ -255,7 +311,9 @@ const FastingPage = () => {
         : '';
     const startDisabled = actionPending || snapshot?.clock?.source === 'Override';
     const overrideActive = snapshot?.clock?.source === 'Override';
-    const canEndEarly = overrideActive && snapshot?.clock?.status === 'Fasting';
+    const canEndEarly = hasAgenda && snapshot?.clock?.status === 'Fasting';
+    const recommendation = snapshot?.recommendation?.protocol ? snapshot.recommendation : null;
+    const declined = recommendation?.status === 'Declined';
 
     return (
         <div className="su-nutrition-page" data-testid="fasting-page">
@@ -282,15 +340,25 @@ const FastingPage = () => {
                         <section className="su-journal-sheet su-fasting-off" data-testid="fasting-empty">
                             <h3 className="su-ledger-heading">{c.offTitle}</h3>
                             <p className="su-text-muted">{c.offBody}</p>
-                            {snapshot?.recommendation?.protocol && (
+                            {recommendation && !declined && (
                                 <p className="su-fasting-suggestion" data-testid="fasting-suggestion">
-                                    {c.suggested(snapshot.recommendation.protocol)}
+                                    {c.suggested(recommendation.protocol)}
                                 </p>
                             )}
+                            {declined && (
+                                <p className="su-text-muted" data-testid="fasting-declined">{c.declinedLine}</p>
+                            )}
                             {!formOpen && (
-                                <Button type="button" onClick={() => setFormOpen(true)} data-testid="fasting-activate">
-                                    {c.activate}
-                                </Button>
+                                <div className="su-fasting-actions">
+                                    <Button type="button" onClick={() => setFormOpen(true)} data-testid="fasting-activate">
+                                        {recommendation && !declined ? c.useSuggestion : c.activate}
+                                    </Button>
+                                    {recommendation && !declined && (
+                                        <Button type="button" variant="secondary" onClick={() => { setReason(''); setConfirmDecline(true); }} data-testid="fasting-decline">
+                                            {c.notNow}
+                                        </Button>
+                                    )}
+                                </div>
                             )}
                         </section>
                     )}
@@ -331,7 +399,7 @@ const FastingPage = () => {
                             <Button
                                 type="button"
                                 variant="secondary"
-                                onClick={() => setConfirmEnd(true)}
+                                onClick={() => { setReason(''); setConfirmEnd(true); }}
                                 disabled={actionPending}
                                 data-testid="fasting-end-early"
                             >
@@ -354,6 +422,9 @@ const FastingPage = () => {
                                 {c.edit}
                             </Button>
                         )}
+                        <Button type="button" variant="secondary" onClick={() => setConfirmOff(true)} disabled={actionPending} data-testid="fasting-disable">
+                            {c.disable}
+                        </Button>
                     </div>
                     </section>
                     )}
@@ -465,14 +536,54 @@ const FastingPage = () => {
                     <div className="su-substitute-sheet" role="dialog" aria-modal="true" aria-label={c.endTitle} onClick={(e) => e.stopPropagation()}>
                         <h3 className="su-ledger-heading">{c.endTitle}</h3>
                         <p className="su-text-muted">{c.endBody}</p>
+                        <ReasonField c={c} value={reason} onChange={setReason} testId="fasting-end-reason" />
                         <div className="su-form-actions">
                             <Button type="button" variant="secondary" onClick={() => setConfirmEnd(false)}>{c.back}</Button>
                             <Button
                                 type="button"
-                                onClick={() => { setConfirmEnd(false); runOverrideAction(endOverrideEarly); }}
+                                onClick={() => { setConfirmEnd(false); runOverrideAction(() => endEarly({ reason: reason.trim() })); }}
                                 data-testid="fasting-end-confirm-btn"
                             >
                                 {c.endConfirm}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {confirmDecline && (
+                <div className="su-substitute-overlay" data-testid="fasting-decline-confirm" onClick={() => setConfirmDecline(false)}>
+                    <div className="su-substitute-sheet" role="dialog" aria-modal="true" aria-label={c.declineTitle} onClick={(e) => e.stopPropagation()}>
+                        <h3 className="su-ledger-heading">{c.declineTitle}</h3>
+                        <p className="su-text-muted">{c.declineBody}</p>
+                        <ReasonField c={c} value={reason} onChange={setReason} testId="fasting-decline-reason" />
+                        <div className="su-form-actions">
+                            <Button type="button" variant="secondary" onClick={() => setConfirmDecline(false)}>{c.back}</Button>
+                            <Button
+                                type="button"
+                                onClick={() => { setConfirmDecline(false); runOverrideAction(() => declineRecommendation({ reason: reason.trim() })); }}
+                                data-testid="fasting-decline-confirm-btn"
+                            >
+                                {c.declineConfirm}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {confirmOff && (
+                <div className="su-substitute-overlay" data-testid="fasting-disable-confirm" onClick={() => setConfirmOff(false)}>
+                    <div className="su-substitute-sheet" role="dialog" aria-modal="true" aria-label={c.disableTitle} onClick={(e) => e.stopPropagation()}>
+                        <h3 className="su-ledger-heading">{c.disableTitle}</h3>
+                        <p className="su-text-muted">{c.disableBody}</p>
+                        <div className="su-form-actions">
+                            <Button type="button" variant="secondary" onClick={() => setConfirmOff(false)}>{c.back}</Button>
+                            <Button
+                                type="button"
+                                onClick={() => { setConfirmOff(false); setFormOpen(false); runOverrideAction(disableAgenda); }}
+                                data-testid="fasting-disable-confirm-btn"
+                            >
+                                {c.disableConfirm}
                             </Button>
                         </div>
                     </div>

@@ -867,6 +867,14 @@
 .su-practice-fasting h3 { margin: 1rem 0 .25rem; }
 .su-practice-fasting h4 { margin: .75rem 0 .35rem; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
 .su-practice-fasting ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
-.su-practice-fasting li { display: flex; justify-content: space-between; gap: 12px; padding: .6rem .85rem; border-radius: 14px; background: var(--bg-surface-high); }
+.su-practice-fasting li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; padding: .6rem .85rem; border-radius: 14px; background: var(--bg-surface-high); }
+.su-practice-reason { flex: 1 1 100%; font-style: normal; color: var(--text-muted); font-size: .875rem; }
+.su-practice-flag { display: grid; gap: 2px; margin: .5rem 0; padding: .65rem .9rem; border-radius: 14px; font-weight: 600; }
+.su-practice-flag p { margin: 0; }
+.su-practice-flag small { font-weight: 400; color: var(--text-muted); }
+.su-practice-flag.is-warning { background: color-mix(in oklab, var(--warning) 16%, transparent); }
+.su-practice-flag.is-ok { background: color-mix(in oklab, var(--success) 14%, transparent); }
 .su-practice-fasting li small { color: var(--text-muted); text-align: right; }
 .su-practice-fasting li[data-outcome='EndedEarly'] small { color: var(--warning); font-weight: 700; }
+.su-fasting-field { display: grid; gap: .35rem; margin: .75rem 0; }
+.su-fasting-field textarea { resize: vertical; }

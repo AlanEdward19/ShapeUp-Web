@@ -9,6 +9,9 @@ const mockGetClock = vi.fn();
 const mockPutAgenda = vi.fn();
 const mockStartOverride = vi.fn();
 const mockEndOverrideEarly = vi.fn();
+const mockEndEarly = vi.fn();
+const mockDisableAgenda = vi.fn();
+const mockDeclineRecommendation = vi.fn();
 const mockCancelOverride = vi.fn();
 const mockGetHistory = vi.fn();
 
@@ -21,6 +24,9 @@ vi.mock('../../../../hooks/api/useFastingApi', async (importOriginal) => {
             putAgenda: mockPutAgenda,
             startOverride: mockStartOverride,
             endOverrideEarly: mockEndOverrideEarly,
+            endEarly: mockEndEarly,
+            disableAgenda: mockDisableAgenda,
+            declineRecommendation: mockDeclineRecommendation,
             cancelOverride: mockCancelOverride,
             getHistory: mockGetHistory,
         }),
@@ -159,6 +165,9 @@ describe('FastingPage (IFTW-01..05)', () => {
         mockPutAgenda.mockResolvedValue({});
         mockStartOverride.mockResolvedValue({});
         mockEndOverrideEarly.mockResolvedValue({});
+        mockEndEarly.mockResolvedValue({});
+        mockDisableAgenda.mockResolvedValue({});
+        mockDeclineRecommendation.mockResolvedValue({});
         mockCancelOverride.mockResolvedValue({});
         mockGetHistory.mockResolvedValue({ items: [] });
         mockGetClock.mockResolvedValue(idleSnapshot);
@@ -398,19 +407,66 @@ describe('FastingPage (IFTW-01..05)', () => {
         expect(queryByLabelText(/16:8/)).not.toBeInTheDocument();
     });
 
-    it('asks for confirmation before ending a fast early', async () => {
-        mockGetClock.mockResolvedValue({
-            ...agendaSnapshot,
-            clock: { status: 'Fasting', boundaryAt: agendaSnapshot.clock.boundaryAt, source: 'Override' },
-        });
+    it('asks for confirmation and an optional reason before ending a fast early', async () => {
+        mockGetClock.mockResolvedValue(agendaSnapshot);
         const { getByTestId, queryByTestId } = renderPage();
         await waitFor(() => expect(getByTestId('fasting-end-early')).toBeInTheDocument());
         fireEvent.click(getByTestId('fasting-end-early'));
         expect(getByTestId('fasting-end-confirm')).toBeInTheDocument();
-        expect(mockEndOverrideEarly).not.toHaveBeenCalled();
+        expect(mockEndEarly).not.toHaveBeenCalled();
+        fireEvent.change(getByTestId('fasting-end-reason'), { target: { value: ' Jantar de família ' } });
         fireEvent.click(getByTestId('fasting-end-confirm-btn'));
-        await waitFor(() => expect(mockEndOverrideEarly).toHaveBeenCalledTimes(1));
+        await waitFor(() => expect(mockEndEarly).toHaveBeenCalledWith({ reason: 'Jantar de família' }));
         expect(queryByTestId('fasting-end-confirm')).not.toBeInTheDocument();
+    });
+
+    it('ends early without a reason when the field is left empty', async () => {
+        mockGetClock.mockResolvedValue(agendaSnapshot);
+        const { getByTestId } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-end-early')).toBeInTheDocument());
+        fireEvent.click(getByTestId('fasting-end-early'));
+        fireEvent.click(getByTestId('fasting-end-confirm-btn'));
+        await waitFor(() => expect(mockEndEarly).toHaveBeenCalledWith({ reason: '' }));
+    });
+
+    it('does not offer ending early while in the eating window', async () => {
+        mockGetClock.mockResolvedValue({ ...agendaSnapshot, clock: { ...agendaSnapshot.clock, status: 'Eating' } });
+        const { getByTestId, queryByTestId } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-countdown')).toBeInTheDocument());
+        expect(queryByTestId('fasting-end-early')).not.toBeInTheDocument();
+    });
+
+    it('turns fasting off only after confirmation', async () => {
+        mockGetClock.mockResolvedValue(agendaSnapshot);
+        const { getByTestId } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-disable')).toBeInTheDocument());
+        fireEvent.click(getByTestId('fasting-disable'));
+        expect(mockDisableAgenda).not.toHaveBeenCalled();
+        fireEvent.click(getByTestId('fasting-disable-confirm-btn'));
+        await waitFor(() => expect(mockDisableAgenda).toHaveBeenCalledTimes(1));
+    });
+
+    it('lets the client turn down the suggestion with an optional reason', async () => {
+        mockGetClock.mockResolvedValue({
+            ...idleSnapshot,
+            recommendation: { protocol: '18:6', fastHours: 18, status: 'Pending' },
+        });
+        const { getByTestId } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-decline')).toBeInTheDocument());
+        fireEvent.click(getByTestId('fasting-decline'));
+        fireEvent.change(getByTestId('fasting-decline-reason'), { target: { value: 'Treino de manhã cedo' } });
+        fireEvent.click(getByTestId('fasting-decline-confirm-btn'));
+        await waitFor(() => expect(mockDeclineRecommendation).toHaveBeenCalledWith({ reason: 'Treino de manhã cedo' }));
+    });
+
+    it('shows that the suggestion was turned down and hides the decline button', async () => {
+        mockGetClock.mockResolvedValue({
+            ...idleSnapshot,
+            recommendation: { protocol: '18:6', fastHours: 18, status: 'Declined' },
+        });
+        const { getByTestId, queryByTestId } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-declined')).toBeInTheDocument());
+        expect(queryByTestId('fasting-decline')).not.toBeInTheDocument();
     });
 
     it('shows load error and does not invent snapshot', async () => {
@@ -506,7 +562,7 @@ describe('FastingPage (IFTW-01..05)', () => {
         await waitFor(() => expect(getByTestId('fasting-end-early')).toBeInTheDocument());
         fireEvent.click(getByTestId('fasting-end-early'));
         fireEvent.click(getByTestId('fasting-end-confirm-btn'));
-        await waitFor(() => expect(mockEndOverrideEarly).toHaveBeenCalled());
+        await waitFor(() => expect(mockEndEarly).toHaveBeenCalled());
         fireEvent.click(getByTestId('fasting-cancel'));
         await waitFor(() => expect(mockCancelOverride).toHaveBeenCalled());
     });

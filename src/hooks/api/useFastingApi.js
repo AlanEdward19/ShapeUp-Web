@@ -64,6 +64,32 @@ export const useFastingApi = () => {
         [],
     );
 
+    // Turns fasting off: clears the saved agenda (API contract: DELETE /agenda).
+    const disableAgenda = useCallback(
+        async () => apiClient('/api/nutrition/fasting/agenda', { method: 'DELETE' }),
+        [],
+    );
+
+    // Ends the current fasting window early, agenda driven or manual. `reason` is optional (max 280).
+    const endEarly = useCallback(
+        async ({ reason } = {}) =>
+            apiClient('/api/nutrition/fasting/end-early', {
+                method: 'POST',
+                body: JSON.stringify(reason ? { reason } : {}),
+            }),
+        [],
+    );
+
+    // Client turns down the nutritionist's suggestion, with an optional reason.
+    const declineRecommendation = useCallback(
+        async ({ reason } = {}) =>
+            apiClient('/api/nutrition/fasting/recommendation/decline', {
+                method: 'POST',
+                body: JSON.stringify(reason ? { reason } : {}),
+            }),
+        [],
+    );
+
     const getHistory = useCallback(async () => apiClient('/api/nutrition/fasting/history'), []);
 
     return {
@@ -72,6 +98,9 @@ export const useFastingApi = () => {
         startOverride,
         endOverrideEarly,
         cancelOverride,
+        disableAgenda,
+        endEarly,
+        declineRecommendation,
         getHistory,
     };
 };
