@@ -31,9 +31,9 @@ const appNotes = {
 };
 
 const previewCopy = {
-    'pt-BR': { more: (n) => `+${n} exercícios`, anyDay: 'Sem dia fixo — treine quando quiser' },
-    en: { more: (n) => `+${n} more`, anyDay: 'No fixed day — train whenever you like' },
-    es: { more: (n) => `+${n} ejercicios`, anyDay: 'Sin día fijo — entrena cuando quieras' },
+    'pt-BR': { sets: (n) => `${n} ${n === 1 ? 'série' : 'séries'}`, anyDay: 'Sem dia fixo, treine quando quiser', list: 'Exercícios do treino' },
+    en: { sets: (n) => `${n} ${n === 1 ? 'set' : 'sets'}`, anyDay: 'No fixed day, train whenever you like', list: 'Workout exercises' },
+    es: { sets: (n) => `${n} ${n === 1 ? 'serie' : 'series'}`, anyDay: 'Sin día fijo, entrena cuando quieras', list: 'Ejercicios del entrenamiento' },
 };
 
 const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, owned, catalog = [] }) => {
@@ -56,9 +56,13 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, owned, catalog = 
                         ? <WeekdayChips days={plan.assignedWeekdays} />
                         : <p className="su-plan-anyday">{preview.anyDay}</p>}
                     {mapExercises.length > 0 && (
-                        <ul className="su-plan-ex-preview">
-                            {mapExercises.slice(0, 4).map((exercise, index) => <li key={`${exercise.id ?? exercise.name}-${index}`}>{exercise.name}</li>)}
-                            {mapExercises.length > 4 && <li className="is-more">{preview.more(mapExercises.length - 4)}</li>}
+                        <ul className="su-plan-ex-preview" aria-label={preview.list} tabIndex={mapExercises.length > 5 ? 0 : undefined}>
+                            {mapExercises.map((exercise, index) => (
+                                <li key={`${exercise.id ?? exercise.name}-${index}`}>
+                                    <span>{exercise.name}</span>
+                                    <small>{preview.sets(exercise.sets?.length || 0)}</small>
+                                </li>
+                            ))}
                         </ul>
                     )}
                 </div>
