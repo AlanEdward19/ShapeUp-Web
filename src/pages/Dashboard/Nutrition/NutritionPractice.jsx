@@ -28,6 +28,82 @@ const SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'];
 const today = () => new Date().toISOString().slice(0, 10);
 const pending = (status) => String(status).toLowerCase() === 'pending' || String(status).toLowerCase() === 'invited';
 
+const FASTING_COPY = {
+    'pt-BR': {
+        status: { Fasting: 'Em jejum', Eating: 'Janela de alimentação', Idle: 'Sem jejum em andamento' },
+        noAgenda: 'Sem agenda de jejum. O jejum só aparece aqui quando o cliente ou você definem uma agenda.',
+        protocol: 'Protocolo',
+        recent: 'Jejuns recentes',
+        empty: 'Nenhum jejum concluído ainda.',
+        outcomes: { Completed: 'Concluído', Cancelled: 'Cancelado', EndedEarly: 'Encerrado antes da hora' },
+        hours: 'h',
+    },
+    en: {
+        status: { Fasting: 'Fasting', Eating: 'Eating window', Idle: 'No fast in progress' },
+        noAgenda: 'No fasting schedule. Fasting only shows up here once the client or you set one.',
+        protocol: 'Protocol',
+        recent: 'Recent fasts',
+        empty: 'No completed fasts yet.',
+        outcomes: { Completed: 'Completed', Cancelled: 'Cancelled', EndedEarly: 'Ended early' },
+        hours: 'h',
+    },
+    es: {
+        status: { Fasting: 'En ayuno', Eating: 'Ventana de comida', Idle: 'Sin ayuno en curso' },
+        noAgenda: 'Sin agenda de ayuno. El ayuno solo aparece aquí cuando el cliente o tú definen una agenda.',
+        protocol: 'Protocolo',
+        recent: 'Ayunos recientes',
+        empty: 'Aún no hay ayunos completados.',
+        outcomes: { Completed: 'Completado', Cancelled: 'Cancelado', EndedEarly: 'Terminado antes de tiempo' },
+        hours: 'h',
+    },
+};
+
+const ClientFasting = ({ fasting, history, t }) => {
+    const { language } = useLanguage();
+    const c = FASTING_COPY[language] || FASTING_COPY['pt-BR'];
+    const items = (Array.isArray(history?.items) ? history.items : []).slice(0, 7);
+    if (fasting?.off) {
+        return <p data-testid="client-fasting">{t('parity.practice.fastingOff')}</p>;
+    }
+    if (fasting?.error) {
+        return <p data-testid="client-fasting">{t('parity.practice.fasting')} {fasting.error}</p>;
+    }
+    const agenda = fasting?.agenda;
+    return (
+        <div className="su-practice-fasting" data-testid="client-fasting">
+            <h3>{t('parity.practice.fasting')}</h3>
+            {agenda ? (
+                <p>
+                    <strong>{c.status[fasting?.clock?.status] || c.status.Idle}</strong>
+                    {', '}{c.protocol} {agenda.protocol}
+                </p>
+            ) : (
+                <p className="su-text-muted">{c.noAgenda}</p>
+            )}
+            {agenda && (
+                <>
+                    <h4>{c.recent}</h4>
+                    {items.length === 0 ? (
+                        <p className="su-text-muted">{c.empty}</p>
+                    ) : (
+                        <ul data-testid="client-fasting-history">
+                            {items.map((item) => (
+                                <li key={item.id} data-outcome={item.outcome}>
+                                    <span>{item.protocol}, {((item.fastingDurationSeconds || 0) / 3600).toLocaleString(language, { maximumFractionDigits: 1 })} {c.hours}</span>
+                                    <small>
+                                        {item.startedAtUtc ? `${new Date(item.startedAtUtc).toLocaleDateString(language, { day: '2-digit', month: 'short' })}, ` : ''}
+                                        {c.outcomes[item.outcome] || item.outcome}
+                                    </small>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </>
+            )}
+        </div>
+    );
+};
+
 export default function NutritionPractice() {
     const { t } = useLanguage();
     const [clients, setClients] = useState([]);
@@ -226,11 +302,7 @@ export default function NutritionPractice() {
                     <p data-testid="client-water">
                         {t('parity.practice.water')} {chart.hydration?.totalMl ?? '-'} ml
                     </p>
-                    <p data-testid="client-fasting">
-                        {chart.fasting?.off
-                            ? t('parity.practice.fastingOff')
-                            : `${t('parity.practice.fasting')} ${chart.fasting?.clock?.status || chart.fasting?.error || '-'}`}
-                    </p>
+                    <ClientFasting fasting={chart.fasting} history={chart.history} t={t} />
                     <form className="su-practice-goal" onSubmit={(event) => {
                         event.preventDefault();
                         run(async () => {

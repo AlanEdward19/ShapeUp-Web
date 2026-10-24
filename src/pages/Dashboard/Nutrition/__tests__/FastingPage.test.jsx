@@ -51,6 +51,16 @@ const agendaSnapshot = {
     },
 };
 
+// The form is closed until the user turns fasting on or edits the schedule.
+const openForm = async (getByTestId) => {
+    await waitFor(() => {
+        const trigger = document.querySelector('[data-testid="fasting-activate"], [data-testid="fasting-edit"]');
+        expect(trigger).toBeTruthy();
+    });
+    fireEvent.click(document.querySelector('[data-testid="fasting-activate"], [data-testid="fasting-edit"]'));
+    await waitFor(() => expect(getByTestId('fasting-save')).toBeInTheDocument());
+};
+
 const renderPage = () =>
     render(
         withLang(
@@ -165,6 +175,7 @@ describe('FastingPage (IFTW-01..05)', () => {
         const disclaimer = getByTestId('fasting-disclaimer');
         expect(disclaimer).toHaveTextContent(/not medical advice/i);
         expect(disclaimer).toHaveTextContent(/pregnant|under 18|eating disorder|clinician/i);
+        await openForm(getByTestId);
         expect(getByTestId('fasting-save')).toBeEnabled();
     });
 
@@ -172,6 +183,7 @@ describe('FastingPage (IFTW-01..05)', () => {
         mockGetClock.mockResolvedValue(idleSnapshot);
         const { getByTestId, getByLabelText } = renderPage();
         await waitFor(() => expect(getByTestId('fasting-page')).toBeInTheDocument());
+        await openForm(getByTestId);
         expect(getByLabelText(/14:10/)).toBeInTheDocument();
         expect(getByLabelText(/16:8/)).toBeInTheDocument();
         expect(getByLabelText(/18:6/)).toBeInTheDocument();
@@ -190,7 +202,7 @@ describe('FastingPage (IFTW-01..05)', () => {
     it('refuses Save with off-grid eating start and names the field', async () => {
         mockGetClock.mockResolvedValue(idleSnapshot);
         const { getByTestId, getByLabelText, getByText } = renderPage();
-        await waitFor(() => expect(getByTestId('fasting-save')).toBeInTheDocument());
+        await openForm(getByTestId);
         fireEvent.click(getByLabelText(/16:8/));
         fireEvent.change(getByLabelText(/eating window starts|janela de alimentação/i), {
             target: { value: '12:15' },
@@ -214,7 +226,7 @@ describe('FastingPage (IFTW-01..05)', () => {
             },
         });
         const { getByTestId, getByText } = renderPage();
-        await waitFor(() => expect(getByTestId('fasting-save')).toBeInTheDocument());
+        await openForm(getByTestId);
         fireEvent.click(getByTestId('fasting-save'));
         await waitFor(() => {
             expect(mockPutAgenda).not.toHaveBeenCalled();
@@ -225,7 +237,7 @@ describe('FastingPage (IFTW-01..05)', () => {
     it('refuses Save with custom fast hours outside 12–23', async () => {
         mockGetClock.mockResolvedValue(idleSnapshot);
         const { getByTestId, getByLabelText, getByText } = renderPage();
-        await waitFor(() => expect(getByTestId('fasting-save')).toBeInTheDocument());
+        await openForm(getByTestId);
         fireEvent.click(getByLabelText(/custom|personalizado/i));
         const customHoursInput = getByTestId('fasting-custom-hours');
         customHoursInput.removeAttribute('min');
@@ -244,7 +256,7 @@ describe('FastingPage (IFTW-01..05)', () => {
     it('PUTs agenda with eatingStartMinutes 720 for 16:8 at 12:00', async () => {
         mockGetClock.mockResolvedValue(idleSnapshot);
         const { getByTestId, getByLabelText } = renderPage();
-        await waitFor(() => expect(getByTestId('fasting-save')).toBeInTheDocument());
+        await openForm(getByTestId);
         fireEvent.click(getByLabelText(/16:8/));
         fireEvent.change(getByLabelText(/eating window starts|janela de alimentação/i), {
             target: { value: '12:00' },
@@ -376,14 +388,29 @@ describe('FastingPage (IFTW-01..05)', () => {
         await waitFor(() => expect(getByTestId('fasting-start')).toBeDisabled());
     });
 
-    it('refuses Start without agenda', async () => {
-        const { getByTestId, getByText } = renderPage();
-        await waitFor(() => expect(getByTestId('fasting-start')).toBeInTheDocument());
-        fireEvent.click(getByTestId('fasting-start'));
-        await waitFor(() => {
-            expect(mockStartOverride).not.toHaveBeenCalled();
-            expect(getByText(/Save an agenda|Salve uma agenda/i)).toBeInTheDocument();
+    it('is off by default: no countdown, no Start, only an activate button', async () => {
+        const { getByTestId, queryByTestId, queryByLabelText } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-empty')).toBeInTheDocument());
+        expect(getByTestId('fasting-activate')).toBeInTheDocument();
+        expect(queryByTestId('fasting-start')).not.toBeInTheDocument();
+        expect(queryByTestId('fasting-countdown')).not.toBeInTheDocument();
+        expect(queryByTestId('fasting-save')).not.toBeInTheDocument();
+        expect(queryByLabelText(/16:8/)).not.toBeInTheDocument();
+    });
+
+    it('asks for confirmation before ending a fast early', async () => {
+        mockGetClock.mockResolvedValue({
+            ...agendaSnapshot,
+            clock: { status: 'Fasting', boundaryAt: agendaSnapshot.clock.boundaryAt, source: 'Override' },
         });
+        const { getByTestId, queryByTestId } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-end-early')).toBeInTheDocument());
+        fireEvent.click(getByTestId('fasting-end-early'));
+        expect(getByTestId('fasting-end-confirm')).toBeInTheDocument();
+        expect(mockEndOverrideEarly).not.toHaveBeenCalled();
+        fireEvent.click(getByTestId('fasting-end-confirm-btn'));
+        await waitFor(() => expect(mockEndOverrideEarly).toHaveBeenCalledTimes(1));
+        expect(queryByTestId('fasting-end-confirm')).not.toBeInTheDocument();
     });
 
     it('shows load error and does not invent snapshot', async () => {
@@ -409,8 +436,10 @@ describe('FastingPage (IFTW-01..05)', () => {
             ...idleSnapshot,
             recommendation: { protocol: '18:6', fastHours: 18 },
         });
-        const { getByLabelText } = renderPage();
-        await waitFor(() => expect(getByLabelText(/18:6/)).toBeChecked());
+        const { getByLabelText, getByTestId } = renderPage();
+        await waitFor(() => expect(getByTestId('fasting-suggestion')).toHaveTextContent('18:6'));
+        await openForm(getByTestId);
+        expect(getByLabelText(/18:6/)).toBeChecked();
     });
 
     it('PUTs a protocol different from recommendation when athlete saves', async () => {
@@ -419,7 +448,8 @@ describe('FastingPage (IFTW-01..05)', () => {
             recommendation: { protocol: '18:6', fastHours: 18 },
         });
         const { getByTestId, getByLabelText } = renderPage();
-        await waitFor(() => expect(getByLabelText(/18:6/)).toBeChecked());
+        await openForm(getByTestId);
+        expect(getByLabelText(/18:6/)).toBeChecked();
         fireEvent.click(getByLabelText(/16:8/));
         fireEvent.click(getByTestId('fasting-save'));
         await waitFor(() => {
@@ -447,7 +477,7 @@ describe('FastingPage (IFTW-01..05)', () => {
     it('PUTs custom protocol with fastHours', async () => {
         mockGetClock.mockResolvedValue(idleSnapshot);
         const { getByTestId, getByLabelText } = renderPage();
-        await waitFor(() => expect(getByTestId('fasting-save')).toBeInTheDocument());
+        await openForm(getByTestId);
         fireEvent.click(getByLabelText(/custom|personalizado/i));
         fireEvent.change(getByTestId('fasting-custom-hours'), { target: { value: '15' } });
         fireEvent.click(getByTestId('fasting-save'));
@@ -475,6 +505,7 @@ describe('FastingPage (IFTW-01..05)', () => {
         const { getByTestId } = renderPage();
         await waitFor(() => expect(getByTestId('fasting-end-early')).toBeInTheDocument());
         fireEvent.click(getByTestId('fasting-end-early'));
+        fireEvent.click(getByTestId('fasting-end-confirm-btn'));
         await waitFor(() => expect(mockEndOverrideEarly).toHaveBeenCalled());
         fireEvent.click(getByTestId('fasting-cancel'));
         await waitFor(() => expect(mockCancelOverride).toHaveBeenCalled());

@@ -49,6 +49,13 @@ function mockBody(url) {
     return { targetWeight: 78, items: [[12, 83.2], [9, 82.8], [6, 82.1], [3, 81.9], [0, 81.4]].map(([ago, weight]) => ({ date: day(ago), weight })) };
   }
   if (url.includes('/api/notifications/inbox')) return { items: [{ id: 'n1', title: 'Nova ficha disponível', body: 'Seu treinador publicou o plano Hipertrofia, Upper A.', createdAtUtc: new Date().toISOString(), readAtUtc: null }, { id: 'n2', title: 'Bem-vindo ao ShapeUp', body: 'Complete seu perfil para receber recomendações.', createdAtUtc: '2026-10-20T12:00:00Z', readAtUtc: '2026-10-21T12:00:00Z' }], nextCursor: null };
+  if (/\/nutrition\/fasting\/history/.test(url)) return { items: [{ id: 'f1', startedAtUtc: new Date(Date.now() - 86400000).toISOString(), protocol: '16:8', outcome: 'Completed', fastingDurationSeconds: 57600 }, { id: 'f2', startedAtUtc: new Date(Date.now() - 2 * 86400000).toISOString(), protocol: '16:8', outcome: 'EndedEarly', fastingDurationSeconds: 43200 }], nextCursor: null };
+  if (/\/nutrition\/fasting(\?|$)/.test(url)) {
+    const agenda = localStorage.getItem('shapeup_preview_fasting') === 'agenda';
+    return agenda
+      ? { agenda: { protocol: '16:8', fastHours: 16, eatHours: 8, eatingStartMinutes: 720, timeZone: 'America/Sao_Paulo' }, override: null, recommendation: null, clock: { status: 'Fasting', boundaryAt: new Date(Date.now() + 5 * 3600000).toISOString(), source: 'Override' } }
+      : { agenda: null, override: null, recommendation: { protocol: '18:6', fastHours: 18 }, clock: { status: 'Idle', boundaryAt: null, source: null } };
+  }
   if (url.includes('/nutrition/diary')) return diary;
   // ?nogoal / ?nutritionist in localStorage flip the nutrition states for design review
   if (url.includes('/nutrition/nutritionists')) return localStorage.getItem('shapeup_preview_nutritionist') ? [{ professionalUserId: 9, displayName: 'Dra. Marina' }] : [];
