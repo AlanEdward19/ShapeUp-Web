@@ -8,6 +8,7 @@ import { navigationStyles } from './navigationStyles';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserProfile } from '../../contexts/UserProfileContext';
+import useUnreadNotices from '../../hooks/useUnreadNotices';
 
 export const navStyle = navigationStyles;
 
@@ -25,6 +26,8 @@ export function UnifiedSidebarNavigation({ flow, open, close }: UnifiedSidebarNa
   const { language } = (useLanguage() ?? {}) as { language?: string };
   const profile = useUserProfile();
   const name = profile.name || 'Minha conta';
+  const unread = useUnreadNotices();
+  const noticesLabel = language === 'en' ? 'Notices' : 'Avisos';
   useEffect(() => {
     const showMessages = () => navigate('/dashboard/messages');
     const escape = (event: KeyboardEvent) => { if (open && event.key === 'Escape') close?.(); };
@@ -65,6 +68,10 @@ export function UnifiedSidebarNavigation({ flow, open, close }: UnifiedSidebarNa
             <strong>{name}</strong>
             <small>{roleLabel(role, language)}</small>
           </div>
+          <Link to="/dashboard/notifications" className="sn-bell" title={noticesLabel} aria-label={unread ? `${noticesLabel} (${unread})` : noticesLabel} aria-current={pathname === '/dashboard/notifications' ? 'page' : undefined} onClick={close}>
+            <span className="material-symbols-outlined" aria-hidden="true">notifications</span>
+            {unread > 0 && <span className="sn-badge" aria-hidden="true">{unread > 9 ? '9+' : unread}</span>}
+          </Link>
           <button title="Encerrar sessão" aria-label="Encerrar sessão" type="button" data-testid="sidebar-logout" onClick={async () => { await signOut(); navigate('/login'); }}>
             <span className="material-symbols-outlined" aria-hidden="true">logout</span>
           </button>

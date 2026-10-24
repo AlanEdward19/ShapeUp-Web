@@ -48,7 +48,16 @@ describe('Layout workspace chrome bypass', () => {
     expect(queryByTestId('page')).toBeInTheDocument();
   });
 
-  it('keeps legacy chrome on non-nutrition dashboard routes', () => {
+  it('keeps the sidebar but no top bar for athletes on other dashboard routes', () => {
+    localStorage.setItem('shapeup_role', 'independent');
+    const { getByTestId, queryByTestId, getByRole } = renderAt('/dashboard/clients');
+    expect(getByTestId('legacy-sidebar')).toBeInTheDocument();
+    expect(queryByTestId('legacy-header')).not.toBeInTheDocument();
+    expect(getByRole('button', { name: /abrir menu/i })).toBeInTheDocument();
+  });
+
+  it('keeps the top bar for professionals, who use its search and quick actions', () => {
+    localStorage.setItem('shapeup_role', 'professional');
     const { getByTestId } = renderAt('/dashboard/clients');
     expect(getByTestId('legacy-sidebar')).toBeInTheDocument();
     expect(getByTestId('legacy-header')).toBeInTheDocument();

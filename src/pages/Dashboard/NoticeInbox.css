@@ -1,0 +1,21 @@
+.ni { max-width: 46rem; }
+.ni-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 16px; margin-bottom: 1.25rem; }
+.ni-head h1 { margin: 0; font: 700 2.4rem/1 var(--font-display); letter-spacing: 0; text-transform: none; }
+.ni-head p { margin: .35rem 0 0; color: var(--text-muted); }
+.ni-link { padding: 8px 0; border: 0; background: none; color: var(--link-color); font: inherit; font-weight: 600; cursor: pointer; }
+.ni-muted { color: var(--text-muted); }
+.ni-error { color: var(--danger, #e5484d); }
+.ni-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ni-item { display: flex; gap: 12px; padding: 1rem 1.1rem; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color); }
+.ni-item[data-unread] { background: color-mix(in oklab, var(--primary) 8%, var(--bg-card)); }
+.ni-dot { flex: none; width: 10px; height: 10px; margin-top: .45rem; border-radius: 50%; background: transparent; }
+.ni-item[data-unread] .ni-dot { background: var(--primary); }
+.ni-copy { min-width: 0; flex: 1; }
+.ni-title { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.ni-title strong { font-size: 1.05rem; font-weight: 600; overflow-wrap: anywhere; }
+.ni-title time { flex: none; color: var(--text-muted); font-size: .85rem; }
+.ni-copy p { margin: .25rem 0 0; color: var(--text-muted); overflow-wrap: anywhere; }
+.ni-copy .ni-link { margin-top: .25rem; }
+.ni-empty { display: grid; justify-items: center; gap: 6px; padding: 3rem 1rem; border-radius: 22px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); text-align: center; }
+.ni-empty .material-symbols-outlined { font-size: 32px; }
+.ni-empty p { margin: 0; }

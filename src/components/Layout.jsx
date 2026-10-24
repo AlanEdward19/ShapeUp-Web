@@ -35,7 +35,7 @@ const Layout = () => {
             {navigationOpen && <button className="su-navigation-backdrop" aria-label="Fechar menu" onClick={() => setNavigationOpen(false)} />}
             <Sidebar isProfessional={isProfessional} isIndependent={isIndependent} isGym={isGym} profile={currentProfile} isOpen={navigationOpen} onClose={closeNavigation} />
             <div className="su-layout-main">
-                <Header
+                {(isProfessional || isGym) ? <Header
                     navigationOpen={navigationOpen}
                     onToggleNavigation={() => setNavigationOpen(open => !open)}
                     isProfessional={isProfessional}
@@ -43,7 +43,11 @@ const Layout = () => {
                     isGym={isGym}
                     profile={currentProfile}
                     sessionTitle={sessionTitle}
-                />
+                /> : (
+                    <button type="button" className="su-navigation-toggle su-navigation-float" onClick={() => setNavigationOpen(open => !open)} aria-label="Abrir menu" aria-expanded={navigationOpen} aria-controls="workspace-navigation">
+                        <span className="material-symbols-outlined" aria-hidden="true">menu</span>
+                    </button>
+                )}
                 <main className="su-layout-content">
                     <div className="su-layout-folio">
                         <ErrorBoundary source="dashboard-page">

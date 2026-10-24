@@ -104,7 +104,6 @@ export function buildNavigation({ role, platformAdmin, language }: NavigationInp
     items: [
       item('link', 'Vínculos', '/dashboard/links'),
       ...(pro ? [item('mail', 'Convites', '/dashboard/training-invites'), item('id_card', 'Credencial', '/dashboard/credential')] : []),
-      item('notifications', 'Avisos', '/dashboard/notifications'),
       item('settings', 'Configurações', '/dashboard/settings'),
     ],
   });
