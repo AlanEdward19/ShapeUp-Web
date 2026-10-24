@@ -915,7 +915,11 @@
     gap: 1rem 1.5rem;
 }
 .su-plan-card-map { align-self: start; }
-.su-plan-card-side { align-self: end; }
+.su-plan-card-side { align-self: start; }
+/* Wide cards: details and actions stack at the top of the left column, the map spans beside them, so a plan without fixed weekdays leaves no hole. */
+@container plan-card (min-width: 40rem) {
+    .su-plan-card-body { grid-template-areas: 'main map' 'side map'; align-content: start; }
+}
 .su-plan-tiny-actions { flex-wrap: wrap; }
 .su-plan-tiny-actions button { white-space: nowrap; }
 @container plan-card (max-width: 30rem) {
