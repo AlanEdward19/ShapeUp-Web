@@ -73,3 +73,14 @@
   color: var(--text-main);
   border: 1px solid var(--border-color);
 }
+
+/* Small or short screens: keep the banner a strip, never half the page. */
+.su-cookie { border-radius: 20px; max-height: 60dvh; overflow-y: auto; overscroll-behavior: contain; }
+@media (max-width: 719px) {
+  .su-cookie { gap: .65rem; padding: .85rem 1rem; inset: auto .5rem .5rem .5rem; }
+  .su-cookie-title { font-size: 1rem; margin-bottom: .15rem; }
+  .su-cookie-text { font-size: .85rem; line-height: 1.35; }
+  .su-cookie-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .su-cookie-primary, .su-cookie-secondary { min-height: 44px; padding: 0 .6rem; }
+}
+@media (max-height: 520px) { .su-cookie { max-height: 45dvh; } }
