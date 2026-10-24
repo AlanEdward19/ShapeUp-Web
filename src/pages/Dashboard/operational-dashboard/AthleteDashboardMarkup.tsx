@@ -307,17 +307,19 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
               </div>
             </section>
 
-            <BodyWeightCard />
+            <div className="ah-trio">
+              <BodyWeightCard />
 
-            <section className="ah-card ah-progress" aria-label={c.progress}>
-              <AthleteScoreboard state={state} />
-            </section>
-
-            {state.weeklyReading ? (
-              <section className="ah-card ah-reading">
-                <WeeklyReadingCard reading={state.weeklyReading} />
+              <section className="ah-card ah-progress" aria-label={c.progress}>
+                <AthleteScoreboard state={state} />
               </section>
-            ) : null}
+
+              {state.weeklyReading ? (
+                <section className="ah-card ah-reading">
+                  <WeeklyReadingCard reading={state.weeklyReading} />
+                </section>
+              ) : null}
+            </div>
           </div>
         </FadeUp>
       </main>

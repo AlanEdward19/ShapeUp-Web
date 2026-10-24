@@ -22,7 +22,10 @@
 .ah-block{padding:20px 0;border-top:1px solid var(--border-color)}
 .ah-block:first-child{padding-top:0;border-top:0}
 .ah-block:last-child{padding-bottom:0}
-.ah-progress,.ah-reading{grid-column:span 6}
+/* No workout card beside it: nutrition, hydration and coach sit side by side across the full width instead of leaving a hole */
+.ah-grid:not(:has(.ah-today)) .ah-side{grid-column:1/-1;grid-row:auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:28px}
+.ah-grid:not(:has(.ah-today)) .ah-side .ah-block{padding:0;border-top:0}
+.ah-progress,.ah-reading{grid-column:auto}
 
 .ah-card{display:flex;flex-direction:column;background:var(--bg-card);border:1px solid var(--border-color);border-radius:26px;padding:22px 24px;box-shadow:var(--shadow-soft)}
 .ah-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
@@ -135,12 +138,12 @@
   .ah-page{padding:28px 24px 96px}
   .ah-hero,.ah-volume,.ah-today{grid-column:span 12}
   .ah-today{grid-row:auto}
-  .ah-summary,.ah-week,.ah-progress,.ah-reading{grid-column:span 6}
+  .ah-summary,.ah-week{grid-column:span 6}
   .ah-side{grid-column:span 12;grid-row:auto}
 }
 @media(max-width:700px){
   .ah-page{padding:12px 16px 48px}
-  .ah-grid{gap:14px}
+  .ah-grid,.ah-trio{gap:14px}
   .ah-grid>*{grid-column:span 12!important}
   .ah-hero{min-height:230px;padding:24px;border-radius:26px}
   .ah-card{padding:18px 18px;border-radius:22px}
@@ -215,7 +218,10 @@
 .ah-actions>button{white-space:nowrap}
 
 /* body weight card (moved here from the old "My goals" page) */
-.bw{grid-column:span 4;gap:6px}
+.bw{gap:6px}
+/* Bottom row: body weight, progress and weekly reading share the width evenly, whatever is present */
+.ah-trio{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr));gap:18px;align-items:stretch}
+.ah-trio>*{min-width:0;grid-column:auto!important}
 .bw-main{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
 .bw-none{font:600 1.2rem/1.2 'Source Sans 3',sans-serif;color:var(--text-muted)}
 .bw-delta{margin-bottom:6px;padding:3px 10px;border-radius:999px;background:var(--bg-surface-high);color:var(--text-muted);font-size:13px;font-weight:700}
@@ -231,4 +237,3 @@
 .bw-form input:focus{box-shadow:0 0 0 3px color-mix(in oklab,var(--primary) 30%,transparent)}
 .bw-form button{flex:1 1 auto;justify-content:center}
 .bw-form button:disabled{opacity:.45;cursor:default}
-@media(max-width:1100px){.bw{grid-column:span 6}}
