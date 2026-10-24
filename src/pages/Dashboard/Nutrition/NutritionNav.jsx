@@ -1,58 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import React from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { useFastingApi } from '../../../hooks/api/useFastingApi';
 import './Nutrition.css';
 
-const baseTabs = [
-    { to: '/dashboard/nutrition/diary', key: 'nutrition.nav.diary' },
-    { to: '/dashboard/nutrition/foods', key: 'nutrition.nav.foods' },
-    { to: '/dashboard/nutrition/meal-plans', key: 'nutrition.nav.plans' },
-    { to: '/dashboard/nutrition/goal', key: 'nutrition.nav.goal' },
-];
+const DIARY_PATH = '/dashboard/nutrition/diary';
 
+/** The diary is the only nutrition tab; every other screen is reached from it and returns here. */
 const NutritionNav = () => {
     const { t } = useLanguage();
-    const { getClock } = useFastingApi();
-    const [fastingTabVisible, setFastingTabVisible] = useState(false);
+    const { pathname } = useLocation();
 
-    useEffect(() => {
-        let active = true;
-        getClock()
-            .then(() => {
-                if (active) setFastingTabVisible(true);
-            })
-            .catch((err) => {
-                if (!active) return;
-                if (err?.status === 404 && err?.code === 'nutrition.fasting.disabled') {
-                    setFastingTabVisible(false);
-                } else {
-                    setFastingTabVisible(true);
-                }
-            });
-        return () => {
-            active = false;
-        };
-    }, [getClock]);
-
-    const role = localStorage.getItem('shapeup_role');
-    const professional = role === 'professional' || role === 'gym';
-    const practice = professional ? [{ to: '/dashboard/nutrition/practice', key: 'parity.nav.practice' }] : [];
-    const tabs = fastingTabVisible
-        ? [...baseTabs, ...practice, { to: '/dashboard/nutrition/fasting', key: 'nutrition.nav.fasting' }]
-        : [...baseTabs, ...practice];
+    if (pathname === DIARY_PATH) return null;
 
     return (
         <nav className="su-nutrition-nav" data-testid="nutrition-nav">
-            {tabs.map((tab) => (
-                <NavLink
-                    key={tab.to}
-                    to={tab.to}
-                    className={({ isActive }) => `su-btn su-btn-${isActive ? 'primary' : 'secondary'}`}
-                >
-                    {t(tab.key)}
-                </NavLink>
-            ))}
+            <NavLink to={DIARY_PATH} className="su-nutrition-back">
+                <span className="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+                {t('nutrition.nav.diary')}
+            </NavLink>
         </nav>
     );
 };

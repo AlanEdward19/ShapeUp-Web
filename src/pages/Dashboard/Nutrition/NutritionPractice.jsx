@@ -20,7 +20,9 @@ import {
     revokeNutritionInvite,
     setClientGoal,
 } from '../../../services/parityClient';
+import FoodPicker from './FoodPicker';
 import '../../Admin/AdminLedger.css';
+import './Nutrition.css';
 
 const SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'];
 const today = () => new Date().toISOString().slice(0, 10);
@@ -38,7 +40,7 @@ export default function NutritionPractice() {
     const [created, setCreated] = useState(null);
     const [templateName, setTemplateName] = useState('');
     const [slot, setSlot] = useState('breakfast');
-    const [foodId, setFoodId] = useState('');
+    const [food, setFood] = useState(null);
     const [grams, setGrams] = useState('100');
     const [goal, setGoal] = useState({ kcal: '', proteinG: '', carbG: '', fatG: '', waterMl: '' });
     const [error, setError] = useState('');
@@ -114,7 +116,7 @@ export default function NutritionPractice() {
     const lastWeight = chart?.weight?.items?.at?.(-1) ?? chart?.weight?.items?.[chart.weight.items.length - 1];
 
     return (
-        <section className="su-admin-ledger" data-testid="nutrition-practice">
+        <section className="su-admin-ledger su-nutrition-page su-practice" data-testid="nutrition-practice">
             <h1 className="su-page-title">{t('parity.practice.title')}</h1>
             {loading && <p className="su-text-muted">{t('admin.hub.loading')}</p>}
             {error && <p className="su-input-error-text" role="alert">{error}</p>}
@@ -135,7 +137,7 @@ export default function NutritionPractice() {
                 })}
             </ul>
             <h2>{t('parity.practice.invite')}</h2>
-            <form onSubmit={(event) => {
+            <form className="su-practice-invite" onSubmit={(event) => {
                 event.preventDefault();
                 run(async () => {
                     const result = await inviteNutritionClient(email.trim());
@@ -145,7 +147,7 @@ export default function NutritionPractice() {
                 });
             }}>
                 <input aria-label={t('parity.practice.inviteEmail')} value={email} onChange={(event) => setEmail(event.target.value)} data-testid="nutrition-invite-email" />
-                <button className="su-btn" type="submit">{t('parity.practice.sendInvite')}</button>
+                <button className="su-btn su-btn-primary" type="submit">{t('parity.practice.sendInvite')}</button>
             </form>
             {created?.token && <p data-testid="invite-token">{created.token}</p>}
             <ul>
@@ -185,10 +187,10 @@ export default function NutritionPractice() {
                     await createMealPlanTemplate({
                         name: templateName,
                         notes: null,
-                        items: [{ mealSlot: slot, foodId, quantityGramsOrMl: Number(grams) }],
+                        items: [{ mealSlot: slot, foodId: food?.foodId ?? '', quantityGramsOrMl: Number(grams) }],
                     });
                     setTemplateName('');
-                    setFoodId('');
+                    setFood(null);
                     await load();
                 });
             }}>
@@ -202,15 +204,12 @@ export default function NutritionPractice() {
                         {SLOTS.map((value) => <option key={value} value={value}>{value}</option>)}
                     </select>
                 </label>
-                <label>
-                    {t('parity.practice.foodId')}
-                    <input value={foodId} onChange={(event) => setFoodId(event.target.value)} required maxLength={24} data-testid="template-food" />
-                </label>
+                <FoodPicker testId="template-food" value={food} onSelect={setFood} />
                 <label>
                     {t('parity.practice.grams')}
                     <input value={grams} onChange={(event) => setGrams(event.target.value)} required data-testid="template-grams" />
                 </label>
-                <button className="su-btn" type="submit">{t('parity.practice.saveTemplate')}</button>
+                <button className="su-btn su-btn-primary" type="submit" disabled={!food}>{t('parity.practice.saveTemplate')}</button>
             </form>
             {selected && chart && (
                 <section data-testid="client-chart">
@@ -232,7 +231,7 @@ export default function NutritionPractice() {
                             ? t('parity.practice.fastingOff')
                             : `${t('parity.practice.fasting')} ${chart.fasting?.clock?.status || chart.fasting?.error || '—'}`}
                     </p>
-                    <form onSubmit={(event) => {
+                    <form className="su-practice-goal" onSubmit={(event) => {
                         event.preventDefault();
                         run(async () => {
                             await setClientGoal(selected, {
@@ -245,12 +244,13 @@ export default function NutritionPractice() {
                             await openClient(selected);
                         });
                     }}>
-                        <input aria-label="kcal" value={goal.kcal} onChange={(event) => setGoal({ ...goal, kcal: event.target.value })} required />
-                        <input aria-label="proteinG" value={goal.proteinG} onChange={(event) => setGoal({ ...goal, proteinG: event.target.value })} required />
-                        <input aria-label="carbG" value={goal.carbG} onChange={(event) => setGoal({ ...goal, carbG: event.target.value })} required />
-                        <input aria-label="fatG" value={goal.fatG} onChange={(event) => setGoal({ ...goal, fatG: event.target.value })} required />
-                        <input aria-label="waterMl" value={goal.waterMl} onChange={(event) => setGoal({ ...goal, waterMl: event.target.value })} />
-                        <button className="su-btn" type="submit">{t('parity.practice.saveGoal')}</button>
+                        {[['kcal', 'kcal', true], ['proteinG', 'Proteína (g)', true], ['carbG', 'Carboidratos (g)', true], ['fatG', 'Gorduras (g)', true], ['waterMl', 'Água (ml)', false]].map(([key, label, required]) => (
+                            <label key={key} className="su-practice-goal-field">
+                                <span>{label}</span>
+                                <input aria-label={key} inputMode="decimal" value={goal[key]} onChange={(event) => setGoal({ ...goal, [key]: event.target.value })} required={required} />
+                            </label>
+                        ))}
+                        <button className="su-btn su-btn-primary" type="submit">{t('parity.practice.saveGoal')}</button>
                     </form>
                     <button type="button" className="su-btn su-btn-secondary" onClick={() => run(async () => {
                         await endNutritionRelationship(selected);

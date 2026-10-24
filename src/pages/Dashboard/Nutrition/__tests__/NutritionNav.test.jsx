@@ -1,53 +1,26 @@
-import { render, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { withLang } from '../../../../test/withLang';
 import NutritionNav from '../NutritionNav';
 
-const mockGetClock = vi.fn();
+const renderAt = (path) =>
+    render(
+        withLang(
+            <MemoryRouter initialEntries={[path]}>
+                <NutritionNav />
+            </MemoryRouter>,
+        ),
+    );
 
-vi.mock('../../../../hooks/api/useFastingApi', () => ({
-    useFastingApi: () => ({ getClock: mockGetClock }),
-}));
-
-describe('NutritionNav fasting tab', () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
+describe('NutritionNav', () => {
+    it('renders nothing on the diary, which is the only tab', () => {
+        const { queryByTestId } = renderAt('/dashboard/nutrition/diary');
+        expect(queryByTestId('nutrition-nav')).not.toBeInTheDocument();
     });
 
-    it('shows Jejum link when GET fasting succeeds', async () => {
-        mockGetClock.mockResolvedValue({ clock: { status: 'Idle' } });
-        const { getByRole, queryByRole } = render(
-            withLang(
-                <MemoryRouter>
-                    <NutritionNav />
-                </MemoryRouter>,
-            ),
-        );
-        await waitFor(() => {
-            expect(getByRole('link', { name: /fasting|jejum/i })).toHaveAttribute(
-                'href',
-                '/dashboard/nutrition/fasting',
-            );
-        });
-        expect(queryByRole('link', { name: /fasting|jejum/i })).toBeInTheDocument();
-    });
-
-    it('omits Jejum link when fasting is disabled', async () => {
-        const err = new Error('disabled');
-        err.status = 404;
-        err.code = 'nutrition.fasting.disabled';
-        mockGetClock.mockRejectedValue(err);
-        const { queryByRole } = render(
-            withLang(
-                <MemoryRouter>
-                    <NutritionNav />
-                </MemoryRouter>,
-            ),
-        );
-        await waitFor(() => {
-            expect(mockGetClock).toHaveBeenCalled();
-        });
-        expect(queryByRole('link', { name: /fasting|jejum/i })).not.toBeInTheDocument();
+    it.each(['foods', 'meal-plans', 'fasting', 'practice'])('offers a way back to the diary from %s', (page) => {
+        const { getByRole } = renderAt(`/dashboard/nutrition/${page}`);
+        expect(getByRole('link', { name: /diário|diary|diario/i })).toHaveAttribute('href', '/dashboard/nutrition/diary');
     });
 });

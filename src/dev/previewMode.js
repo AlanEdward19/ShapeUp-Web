@@ -29,7 +29,26 @@ const exercises = [
   ex(9, 'Biceps curl', 'Rosca direta', 16, 'Dumbbell', 'Halteres'), ex(10, 'Triceps pushdown', 'Tríceps na polia', 8, 'Cable', 'Polia'),
 ];
 
+const food = (id, name, kcal, p, c, f) => ({ id, name, macrosPer100: { kcal, proteinG: p, carbG: c, fatG: f } });
+const entry = (id, name, grams, kcal, p, c, f) => ({ id, foodName: name, foodId: id, quantityGramsOrMl: grams, computedMacros: { kcal, proteinG: p, carbG: c, fatG: f } });
+const diary = {
+  date: new Date().toLocaleDateString('en-CA'),
+  meals: [
+    { mealSlot: 'Breakfast', items: [entry('e1', 'Ovos mexidos', 120, 190, 14, 2, 14), entry('e2', 'Pão integral', 50, 125, 5, 22, 2), entry('e3', 'Banana', 100, 89, 1, 23, 0)] },
+    { mealSlot: 'Lunch', items: [entry('e4', 'Frango grelhado', 180, 297, 56, 0, 6), entry('e5', 'Arroz branco', 200, 260, 5, 56, 1), entry('e6', 'Feijão', 120, 100, 6, 18, 0)] },
+    { mealSlot: 'Snack', items: [] },
+    { mealSlot: 'Dinner', items: [] },
+  ],
+  totals: { kcal: 1061, proteinG: 87, carbG: 121, fatG: 23 },
+};
+
 function mockBody(url) {
+  if (url.includes('/nutrition/diary')) return diary;
+  // ?nogoal / ?nutritionist in localStorage flip the nutrition states for design review
+  if (url.includes('/nutrition/nutritionists')) return localStorage.getItem('shapeup_preview_nutritionist') ? [{ professionalUserId: 9, displayName: 'Dra. Marina' }] : [];
+  if (url.includes('/nutrition/profile')) return localStorage.getItem('shapeup_preview_nogoal') ? { activeGoal: null } : { activeGoal: { kcal: 2400, proteinG: 160, carbG: 260, fatG: 70, waterMl: 3000 } };
+  if (/\/nutrition\/foods(\?|$)/.test(url)) return { items: [food(1, 'Peito de frango', 165, 31, 0, 3.6), food(2, 'Arroz branco cozido', 130, 2.7, 28, 0.3), food(3, 'Ovo cozido', 155, 13, 1.1, 11)] };
+  if (url.includes('/nutrition/hydration')) return { totalMl: 1250 };
   if (/\/me(\?|$)/.test(url)) return { id: 1, userId: 1, displayName: 'Alan Oliveira', email: 'alan@shapeup.app' };
   if (url.includes('/training/workout-plans/user/')) return { items: [plan(1, 'Hipertrofia — Upper A', [1, 4], 1), plan(2, 'Lower B', [2, 5], 9)], nextCursor: null };
   if (/\/training\/exercises(\?|$)/.test(url)) return { items: exercises, nextCursor: null };

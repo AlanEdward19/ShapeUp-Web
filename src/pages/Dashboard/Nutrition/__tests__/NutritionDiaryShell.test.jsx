@@ -13,6 +13,16 @@ vi.mock('../../../../hooks/api/useNutritionApi', () => ({
   }),
 }));
 
+let mockLinked = false;
+
+vi.mock('../../../../hooks/useNutritionist', () => ({
+  default: () => ({ linked: mockLinked, loading: false }),
+}));
+
+vi.mock('../../../../hooks/api/useFastingApi', () => ({
+  useFastingApi: () => ({ getClock: vi.fn().mockResolvedValue({ clock: {} }) }),
+}));
+
 const baseState = {
   date: '2026-09-10',
   setDate: vi.fn(),
@@ -64,5 +74,41 @@ describe('NutritionDiaryShell', () => {
   it('prompts to set a water goal when there is none', async () => {
     const { findByText } = renderView({ goal: { kcal: 2000 } });
     expect(await findByText(/Sem meta definida/)).toBeInTheDocument();
+  });
+
+  it('offers shortcuts to the meal plan, foods and fasting instead of tabs', async () => {
+    const { getByRole, findByRole } = renderView({ goal: { kcal: 2000 } });
+    expect(getByRole('button', { name: /cardápio|meal plan/i })).toBeInTheDocument();
+    expect(getByRole('button', { name: /alimentos|foods/i })).toBeInTheDocument();
+    expect(await findByRole('button', { name: /jejum|fasting/i })).toBeInTheDocument();
+  });
+
+  it('shows an optional, dismissible goal prompt when there is no goal', () => {
+    localStorage.removeItem('shapeup_goal_prompt_dismissed_current');
+    const { getByTestId, queryByTestId, getByText } = renderView({ goal: null });
+    expect(getByTestId('goal-prompt')).toBeInTheDocument();
+    fireEvent.click(getByText(/agora não|not now/i));
+    expect(queryByTestId('goal-prompt')).not.toBeInTheDocument();
+  });
+
+  it('opens the goal sheet from the goal button', () => {
+    const { getByTestId, queryByTestId } = renderView({ goal: { kcal: 2000 } });
+    expect(queryByTestId('goal-sheet')).not.toBeInTheDocument();
+    fireEvent.click(getByTestId('diary-goal-btn'));
+    expect(getByTestId('goal-sheet')).toBeInTheDocument();
+    expect(getByTestId('manual-kcal-input')).toHaveValue(2000);
+  });
+
+  it('keeps the goal read-only and hides the prompt when a nutritionist is linked', () => {
+    mockLinked = true;
+    try {
+      const { getByTestId, queryByTestId } = renderView({ goal: null });
+      expect(queryByTestId('goal-prompt')).not.toBeInTheDocument();
+      fireEvent.click(getByTestId('diary-goal-btn'));
+      expect(getByTestId('goal-locked')).toBeInTheDocument();
+      expect(queryByTestId('manual-submit-btn')).not.toBeInTheDocument();
+    } finally {
+      mockLinked = false;
+    }
   });
 });

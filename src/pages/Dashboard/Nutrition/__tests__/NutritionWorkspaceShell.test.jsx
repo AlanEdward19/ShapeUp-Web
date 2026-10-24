@@ -59,28 +59,25 @@ const shadowNav = (container) => {
 };
 
 describe('NutritionWorkspaceShell', () => {
-  it('renders nutrition nav in shadow root on diary route', () => {
+  it('shows the diary without a tab bar', () => {
     const { container } = renderShell('/dashboard/nutrition/diary');
-    const { nav, body } = shadowNav(container);
-    expect(nav).toBeInTheDocument();
-    expect(body.getByTestId('diary-child')).toBeInTheDocument();
+    const host = container.querySelector('[data-shell="nutrition"]');
+    expect(host.shadowRoot.querySelector('[data-testid="nutrition-nav"]')).toBeNull();
+    expect(within(host.shadowRoot.querySelector('.shell-body')).getByTestId('diary-child')).toBeInTheDocument();
   });
 
-  it('highlights active tab for direct URL to foods', () => {
+  it('offers a back link to the diary on sub-pages', () => {
     const { container } = renderShell('/dashboard/nutrition/foods');
-    const { nav } = shadowNav(container);
-    const foodsLink = within(nav).getByRole('link', { name: /alimentos|foods/i });
-    expect(foodsLink.className).toMatch(/su-btn-primary/);
+    const { nav, body } = shadowNav(container);
+    expect(within(nav).getByRole('link', { name: /diário|diary/i })).toHaveAttribute('href', '/dashboard/nutrition/diary');
+    expect(body.getByTestId('foods-child')).toBeInTheDocument();
   });
 
-  it('keeps the same nav node when switching tabs', () => {
-    const { container } = renderShell('/dashboard/nutrition/diary');
+  it('keeps the same nav node when going back to the diary', () => {
+    const { container } = renderShell('/dashboard/nutrition/foods');
     const { nav, body } = shadowNav(container);
-    const navBefore = nav;
-    fireEvent.click(within(nav).getByRole('link', { name: /alimentos|foods/i }));
-    const { nav: navAfter } = shadowNav(container);
-    expect(navAfter).toBe(navBefore);
-    expect(body.getByTestId('foods-child')).toBeInTheDocument();
+    fireEvent.click(within(nav).getByRole('link', { name: /diário|diary/i }));
+    expect(body.getByTestId('diary-child')).toBeVisible();
   });
 
   it('renders fasting child route in shell body', () => {
