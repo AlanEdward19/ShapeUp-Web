@@ -24,7 +24,6 @@ import MessagesShell, { FeedbackShell as Feedback } from './pages/Dashboard/Mess
 import Analytics from './pages/Dashboard/Analytics';
 import Reports from './pages/Dashboard/Reports';
 import Settings from './pages/Dashboard/SettingsShell';
-import ObjectivesClient from './pages/Dashboard/ObjectivesClient';
 import StaffGym from './pages/Dashboard/StaffGym';
 import TurnstileGym from './pages/Dashboard/TurnstileGym';
 import GymManagement from './pages/Dashboard/GymManagement';
@@ -137,7 +136,7 @@ function App() {
             <Route path="analytics" element={<RoleRoute path="/dashboard/analytics"><Analytics /></RoleRoute>} />
             <Route path="reports" element={<RoleRoute path="/dashboard/reports"><Reports /></RoleRoute>} />
             <Route path="settings" element={<Settings />} />
-            <Route path="objectives" element={<WorkspaceRoutedPage><ObjectivesClient /></WorkspaceRoutedPage>} />
+            <Route path="objectives" element={<Navigate to="/dashboard" replace />} />
             <Route path="nutrition" element={<NutritionWorkspaceShell />}>
               <Route path="diary" element={<NutritionDiaryShell />} />
               <Route path="foods" element={<FoodSearch />} />

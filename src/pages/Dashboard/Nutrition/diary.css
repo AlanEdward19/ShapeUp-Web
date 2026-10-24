@@ -135,6 +135,10 @@
 .gs-locked .material-symbols-outlined { color: var(--link-color); font-size: 20px; }
 .gs-muted { margin: 0; color: var(--text-muted); font-size: .85rem; }
 .gs-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.gs-confirm { display: grid; gap: .75rem; }
+.gs-confirm h3 { margin: 0; font: 700 1.2rem/1.2 var(--font-display); text-transform: none; letter-spacing: 0; }
+.gs-confirm .gs-sub { margin: .25rem 0 0; }
+.gs-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: .5rem; }
 .gs-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 16px; background: var(--bg-surface-high); }
 .gs-switch button { min-height: 40px; text-align: center; border: 0; border-radius: 12px; background: transparent; color: var(--text-main); font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer; }
 .gs-switch button[aria-pressed='true'] { background: var(--bg-card); box-shadow: 0 1px 3px rgb(0 0 0 / .18); }

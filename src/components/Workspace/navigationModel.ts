@@ -91,7 +91,7 @@ export function buildNavigation({ role, platformAdmin, language }: NavigationInp
     items: [
       item('menu_book', 'Biblioteca de exercícios', '/dashboard/exercises'),
       ...(!pro
-        ? [item('flag', 'Meus objetivos', '/dashboard/objectives'), item('location_on', 'Academias', '/dashboard/gyms')]
+        ? [item('location_on', 'Academias', '/dashboard/gyms')]
         : []),
       item('badge', 'Profissionais', '/dashboard/professionals'),
       ...(pro ? [item('restaurant', 'Prática nutricional', '/dashboard/nutrition/practice')] : []),

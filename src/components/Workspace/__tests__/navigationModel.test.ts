@@ -9,7 +9,8 @@ describe('workspace navigation by profile', () => {
     for (const href of ['/dashboard/clients', '/dashboard/credential', '/dashboard/training-invites', '/dashboard/reports', '/dashboard/service-plans', '/dashboard/nutrition/practice']) {
       expect(athlete).not.toContain(href);
     }
-    expect(athlete).toContain('/dashboard/objectives');
+    expect(athlete).toContain('/dashboard/gyms');
+    expect(athlete).not.toContain('/dashboard/objectives');
   });
 
   it('gives professionals their tools and gym owners the gym ones on top', () => {

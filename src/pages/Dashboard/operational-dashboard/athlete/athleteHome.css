@@ -213,3 +213,22 @@
 .ah-pro-adherence .ah-summary-body{flex-direction:column!important;align-items:center}
 .ah-pro-adherence .ah-rings{width:150px!important;height:150px!important}
 .ah-actions>button{white-space:nowrap}
+
+/* body weight card (moved here from the old "My goals" page) */
+.bw{grid-column:span 4;gap:6px}
+.bw-main{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.bw-none{font:600 1.2rem/1.2 'Source Sans 3',sans-serif;color:var(--text-muted)}
+.bw-delta{margin-bottom:6px;padding:3px 10px;border-radius:999px;background:var(--bg-surface-high);color:var(--text-muted);font-size:13px;font-weight:700}
+.bw-spark{display:block;width:100%;height:56px;margin:8px 0 2px}
+.bw-target{margin:4px 0 0;color:var(--text-muted);font-size:14px}
+.bw-target strong{color:var(--text-main)}
+.bw-recent{margin:10px 0 0;padding:4px 14px;list-style:none;border-radius:16px;background:var(--bg-surface-high)}
+.bw-recent li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px;color:var(--text-muted)}
+.bw-recent li+li{border-top:1px solid var(--border-color)}
+.bw-recent strong{color:var(--text-main);font-weight:600}
+.bw-form{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.bw-form input{flex:1 1 7rem;min-width:0;min-height:44px;padding:0 14px;border:0!important;border-radius:14px!important;background:var(--bg-surface-high)!important;color:var(--text-main);font:inherit;font-size:16px;outline:none}
+.bw-form input:focus{box-shadow:0 0 0 3px color-mix(in oklab,var(--primary) 30%,transparent)}
+.bw-form button{flex:1 1 auto;justify-content:center}
+.bw-form button:disabled{opacity:.45;cursor:default}
+@media(max-width:1100px){.bw{grid-column:span 6}}

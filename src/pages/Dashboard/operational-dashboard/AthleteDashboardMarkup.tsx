@@ -9,6 +9,7 @@ import type { ChartPoint, NormalizedExercise, NormalizedPlan, StoredMessage } fr
 import ActivityRings from './athlete/ActivityRings';
 import VolumeChart from './athlete/VolumeChart';
 import { athleteCopy } from './athlete/athleteCopy';
+import BodyWeightCard from './athlete/BodyWeightCard';
 
 export type AthleteDashboardState = AthleteScoreboardState & {
   userName: string;
@@ -305,6 +306,8 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
               </button>
               </div>
             </section>
+
+            <BodyWeightCard />
 
             <section className="ah-card ah-progress" aria-label={c.progress}>
               <AthleteScoreboard state={state} />

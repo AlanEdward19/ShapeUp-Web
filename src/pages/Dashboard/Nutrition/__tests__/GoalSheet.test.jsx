@@ -129,4 +129,32 @@ describe('GoalSheet', () => {
         expect(queryByTestId('manual-submit-btn')).not.toBeInTheDocument();
         expect(queryByTestId('onboarding-submit-btn')).not.toBeInTheDocument();
     });
+
+    it('asks before replacing an existing goal with a manual one', async () => {
+        const { getByTestId, queryByTestId } = renderOnboarding({ goal: { kcal: 2400, proteinG: 160, carbG: 260, fatG: 70 } });
+        fireEvent.change(getByTestId('manual-kcal-input'), { target: { value: '2000' } });
+        fireEvent.click(getByTestId('manual-submit-btn'));
+        expect(getByTestId('goal-confirm')).toHaveTextContent('2000');
+        expect(mockSetManualGoal).not.toHaveBeenCalled();
+
+        fireEvent.click(getByTestId('goal-confirm-back'));
+        expect(queryByTestId('goal-confirm')).not.toBeInTheDocument();
+        expect(mockSetManualGoal).not.toHaveBeenCalled();
+
+        fireEvent.click(getByTestId('manual-submit-btn'));
+        fireEvent.click(getByTestId('goal-confirm-btn'));
+        await waitFor(() => expect(mockSetManualGoal).toHaveBeenCalledTimes(1));
+    });
+
+    it('asks before recalculating the goal from TDEE when one already exists', async () => {
+        const { getByTestId } = renderOnboarding({ goal: { kcal: 2400, proteinG: 160, carbG: 260, fatG: 70 } });
+        fireEvent.click(getByTestId('mode-onboarding-btn'));
+        fireEvent.change(getByTestId('height-input'), { target: { value: '175' } });
+        fireEvent.change(getByTestId('age-input'), { target: { value: '30' } });
+        fireEvent.click(getByTestId('onboarding-submit-btn'));
+        expect(getByTestId('goal-confirm')).toBeInTheDocument();
+        expect(mockCompleteOnboarding).not.toHaveBeenCalled();
+        fireEvent.click(getByTestId('goal-confirm-btn'));
+        await waitFor(() => expect(mockCompleteOnboarding).toHaveBeenCalledTimes(1));
+    });
 });

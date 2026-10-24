@@ -179,8 +179,8 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
 
   return (
     <>
-      <WorkspaceNavigation flow open={state.navOpen} close={() => state.setNavOpen(false)} />
-      <div className="ah ex" data-shell-content style={{ marginLeft: 256 }}>
+      <WorkspaceNavigation open={state.navOpen} close={() => state.setNavOpen(false)} />
+      <div className="ah ex" data-shell-content style={{ marginLeft: 256, flex: 1, minWidth: 0 }}>
         <main className="ah-page ex-page">
           <header className="ah-header ah-header-split">
             <div>

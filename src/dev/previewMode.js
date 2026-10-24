@@ -43,6 +43,11 @@ const diary = {
 };
 
 function mockBody(url) {
+  if (/\/gym-management\/gyms(\?|$)/.test(url)) return { items: [{ id: 1, name: 'Iron Temple Pinheiros', address: 'Rua dos Pinheiros, 1200, São Paulo' }, { id: 2, name: 'Studio Move Vila Madalena', address: 'Rua Harmonia, 85, São Paulo' }, { id: 3, name: 'Arena Fit Moema', address: 'Av. Ibirapuera, 2400, São Paulo' }], nextCursor: null };
+  if (url.includes('/nutrition/weight/registers')) {
+    const day = (ago) => { const d = new Date(); d.setDate(d.getDate() - ago); return d.toLocaleDateString('en-CA'); };
+    return { targetWeight: 78, items: [[12, 83.2], [9, 82.8], [6, 82.1], [3, 81.9], [0, 81.4]].map(([ago, weight]) => ({ date: day(ago), weight })) };
+  }
   if (url.includes('/nutrition/diary')) return diary;
   // ?nogoal / ?nutritionist in localStorage flip the nutrition states for design review
   if (url.includes('/nutrition/nutritionists')) return localStorage.getItem('shapeup_preview_nutritionist') ? [{ professionalUserId: 9, displayName: 'Dra. Marina' }] : [];
