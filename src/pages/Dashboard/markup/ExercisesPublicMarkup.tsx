@@ -3,6 +3,7 @@ import type { KeyboardEvent, MouseEvent, ReactElement, RefObject } from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import WorkspaceNavigation from '../../shell-assets/WorkspaceNavigation';
 import { ExerciseDrawer } from './ExerciseDrawer';
+import ExerciseCartDialog from './ExerciseCartDialog';
 import { exerciseKind, EXERCISE_KINDS } from '../../../utils/exerciseCatalog';
 import { MUSCLE_GROUPS, groupDisplayName, leafDisplayName } from '../../../components/anatomy/muscleRegions';
 
@@ -63,6 +64,13 @@ export type ExercisesShellState = {
   inspect: (ex: ExerciseRecord, event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLElement>) => void;
   close: () => void;
   add: (ex: ExerciseRecord | null | undefined) => void;
+  picked?: ExerciseRecord[];
+  togglePick?: (ex: ExerciseRecord) => void;
+  clearPicked?: () => void;
+  cartOpen?: boolean;
+  setCartOpen?: (open: boolean) => void;
+  startNewWorkout?: () => void;
+  addToWorkout?: (planId: number | string) => void;
   notice: string;
   onCopyDetails: () => void;
   onSuggestOpen: () => void;
@@ -83,6 +91,10 @@ const copy = {
     emptyBody: 'Tente outro nome ou remova os filtros.',
     equipment: 'Equipamento',
     allEquipment: 'Todos',
+    pick: 'Selecionar',
+    selected: 'selecionados',
+    clearSelection: 'Limpar seleção',
+    useInWorkout: 'Usar em um treino',
   },
   en: {
     kinds: { all: 'All', weight: 'Weights', cardio: 'Cardio', isometric: 'Isometric', stretch: 'Stretching', mobility: 'Mobility' },
@@ -94,6 +106,10 @@ const copy = {
     emptyBody: 'Try another name or remove the filters.',
     equipment: 'Equipment',
     allEquipment: 'All',
+    pick: 'Select',
+    selected: 'selected',
+    clearSelection: 'Clear selection',
+    useInWorkout: 'Use in a workout',
   },
   es: {
     kinds: { all: 'Todos', weight: 'Carga', cardio: 'Cardio', isometric: 'Isometría', stretch: 'Estiramiento', mobility: 'Movilidad' },
@@ -105,6 +121,10 @@ const copy = {
     emptyBody: 'Prueba otro nombre o quita los filtros.',
     equipment: 'Equipamiento',
     allEquipment: 'Todos',
+    pick: 'Seleccionar',
+    selected: 'seleccionados',
+    clearSelection: 'Limpiar selección',
+    useInWorkout: 'Usar en un entrenamiento',
   },
 } as const;
 
@@ -114,9 +134,10 @@ const sectionKey = (ex: ExerciseRecord, sort: string): string => {
   return /[A-Z]/.test(first) ? first : '#';
 };
 
-function ExerciseRow({ ex, state, kindLabels }: { ex: ExerciseRecord; state: ExercisesShellState; kindLabels: Record<string, string> }) {
+function ExerciseRow({ ex, state, kindLabels, pickLabel }: { ex: ExerciseRecord; state: ExercisesShellState; kindLabels: Record<string, string>; pickLabel: string }) {
   const { t } = useLanguage();
   const active = state.active?.id === ex.id;
+  const checked = (state.picked ?? []).some((item) => String(item.id) === String(ex.id));
   const kind = exerciseKind(ex);
   const equipment = state.equipmentName(ex);
   // Weights are the default; only call out the other kinds so the list stays quiet.
@@ -144,15 +165,18 @@ function ExerciseRow({ ex, state, kindLabels }: { ex: ExerciseRecord; state: Exe
         </span>
         <button
           type="button"
-          className="ex-add"
-          title={t('exlib.row.insert')}
-          aria-label={`${t('exlib.row.insert')}: ${ex.name}`}
+          role="checkbox"
+          aria-checked={checked}
+          className="ex-check"
+          title={pickLabel}
+          aria-label={`${pickLabel}: ${ex.name}`}
           onClick={(event) => {
             event.stopPropagation();
-            state.add(ex);
+            state.togglePick?.(ex);
           }}
+          onKeyDown={(event) => event.stopPropagation()}
         >
-          <span className="material-symbols-outlined" aria-hidden="true">playlist_add</span>
+          <span className="material-symbols-outlined" aria-hidden="true">check</span>
         </button>
         <span className="material-symbols-outlined ex-chevron" aria-hidden="true">chevron_right</span>
       </div>
@@ -164,6 +188,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
   const { t, language } = useLanguage() as { t: (key: string, vars?: Record<string, unknown>) => string; language: string };
   const c = copy[(language as keyof typeof copy) in copy ? (language as keyof typeof copy) : 'pt-BR'];
   const kind = state.kind ?? 'all';
+  const picked = state.picked ?? [];
   const selected = state.muscles ?? [];
   const equipmentOptions = [...new Set(state.exercises.map(state.equipmentName))];
   const isGroupActive = (group: string) => selected.includes(group) || MUSCLE_GROUPS[group as keyof typeof MUSCLE_GROUPS].some((leaf) => selected.includes(leaf));
@@ -267,7 +292,7 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
                   <section key={label} className="ex-group" aria-label={label}>
                     <h2>{label}</h2>
                     <ul className="ex-list">
-                      {items.map((ex) => <ExerciseRow key={ex.id} ex={ex} state={state} kindLabels={c.kinds} />)}
+                      {items.map((ex) => <ExerciseRow key={ex.id} ex={ex} state={state} kindLabels={c.kinds} pickLabel={c.pick} />)}
                     </ul>
                   </section>
                 ))}
@@ -283,6 +308,24 @@ export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState })
         </main>
         <ExerciseDrawer state={state} />
       </div>
+      {picked.length > 0 && (
+        <div className="ex-cart" role="region" aria-label={c.useInWorkout} data-testid="exercise-cart-bar">
+          <span className="ex-cart-count"><strong>{picked.length}</strong> {c.selected}</span>
+          <button type="button" className="ex-cart-clear" onClick={() => state.clearPicked?.()}>{c.clearSelection}</button>
+          <button type="button" className="ex-cart-use" onClick={() => state.setCartOpen?.(true)} data-testid="exercise-cart-use">
+            <span className="material-symbols-outlined" aria-hidden="true">playlist_add</span>
+            {c.useInWorkout}
+          </button>
+        </div>
+      )}
+      {state.cartOpen && picked.length > 0 && (
+        <ExerciseCartDialog
+          count={picked.length}
+          onClose={() => state.setCartOpen?.(false)}
+          onCreate={() => state.startNewWorkout?.()}
+          onEdit={(planId: number | string) => state.addToWorkout?.(planId)}
+        />
+      )}
       <div className="ex-toast" id="toastNotification" hidden={!state.notice} role="status">
         <span className="material-symbols-outlined" aria-hidden="true">check_circle</span>
         <span id="toastMessage">{state.notice}</span>

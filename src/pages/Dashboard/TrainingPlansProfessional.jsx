@@ -11,6 +11,7 @@ import { enqueueMutation } from '../../services/mutationQueue';
 import { mapSetType, mapLoadUnit, mapTechnique, mapDifficulty, mapBlockType, mapIntensityType } from '../../utils/trainingEnums';
 import { normalizeTemplate, flattenBlockExercises, countBlockSets } from '../../utils/trainingNormalization';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
+import { appendExercisesToPlan, buildExerciseBlocks, exercisesFromState } from '../../utils/libraryExercises';
 import './TrainingPlansProfessional.css';
 
 // Shared by handleSaveTemplate and the offline-safe path of duplicateTemplate below --
@@ -57,7 +58,7 @@ const TrainingPlansProfessional = () => {
     const { getWorkoutTemplates } = useTrainingApi();
 
     const [templates, setTemplates] = useState([]);
-    const [, setLoadingTemplates] = useState(true);
+    const [loadingTemplates, setLoadingTemplates] = useState(true);
 
     // Fetch templates from API on mount
     useEffect(() => {
@@ -137,9 +138,18 @@ const TrainingPlansProfessional = () => {
             phase: 'Hypertrophy',
             difficulty: 'Intermediate',
             weeks: 4,
-            blocks: location.state?.exercise ? [{ id: 'b-' + Date.now(), type: 'straight', exercises: [{ ...location.state.exercise, exerciseId: location.state.exercise.id, id: 'e-' + Date.now(), notes: '', sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '', intensityType: 'rpe', intensityValue: '8', rest: '90' }] }] }] : []
+            blocks: buildExerciseBlocks(exercisesFromState(location.state), Date.now()),
         });
-    }, [location.state?.exercise]);
+    }, [location.state]);
+
+    // "Add to an existing template" from the library: open that template with the picked exercises appended.
+    useEffect(() => {
+        const target = location.state?.addTo;
+        if (target == null || loadingTemplates) return;
+        const template = templates.find((item) => String(item.id) === String(target));
+        if (template) setActiveTemplate(appendExercisesToPlan(template, exercisesFromState(location.state)));
+        navigate(location.pathname, { replace: true, state: null });
+    }, [location.state, location.pathname, loadingTemplates, templates, navigate]);
 
 
     // Offline-safe by construction: `tmpl` already has the full local copy of the template
@@ -245,7 +255,7 @@ const TrainingPlansProfessional = () => {
 
     useEffect(() => {
         if (location.state?.create) { openNewTemplate(); navigate(location.pathname, { replace: true, state: null }); }
-    }, [location.key, location.pathname, location.state?.create, navigate, openNewTemplate]);
+    }, [location.key, location.pathname, location.state?.create, navigate, openNewTemplate]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div className="su-pro-dashboard">

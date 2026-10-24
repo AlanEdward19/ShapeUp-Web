@@ -1,11 +1,12 @@
-import { render, fireEvent, within } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { render, fireEvent, within, waitFor } from '@testing-library/react';
+import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../shell-assets/styles/exercises.css?inline', () => ({ default: '' }));
 vi.mock('../../../contexts/AuthContext', () => ({useAuth:()=>({currentUser:{uid:'test'},signOut:vi.fn()})}));
 vi.mock('../../../contexts/UserProfileContext', () => ({useUserProfile:()=>({name:'Test',initials:'T',photo:''})}));
 vi.mock('../../../hooks/useExercises', () => ({useExercises: vi.fn()}));
 vi.mock('../../../hooks/api/useTrainingApi', () => ({ useTrainingApi: vi.fn() }));
+vi.mock('../../../hooks/api/useAuthorizationApi', () => ({ useAuthorizationApi: () => ({ getMe: vi.fn().mockResolvedValue({ id: 5 }) }) }));
 vi.mock('../../../utils/exerciseEquivalents', async (importOriginal) => {
   const actual = await importOriginal();
   return {
@@ -205,5 +206,73 @@ describe('ExercisesShell', () => {
     fireEvent.click(within(drawer).getByText('Variação em máquina'));
     expect(drawer.querySelector('#drawerTitle')).toHaveTextContent('Variação em máquina');
     expect(getExerciseEquivalents).toHaveBeenLastCalledWith(8);
+  });
+});
+
+describe('ExercisesShell library cart', () => {
+  const second = { ...variant, id: 9, name: 'Remada curvada' };
+  const Probe = () => <output data-testid="training-page">{JSON.stringify(useLocation().state)}</output>;
+  const seen = (getByTestId) => JSON.parse(getByTestId('training-page').textContent);
+
+  const renderCart = () => {
+    localStorage.setItem('shapeup_language', 'pt-BR');
+    localStorage.setItem('shapeup_role', 'independent');
+    mockCatalog([baseExercise, second]);
+    useTrainingApi.mockReturnValue({
+      getExerciseEquivalents,
+      getExerciseById,
+      getWorkoutPlansByUser: vi.fn().mockResolvedValue({ items: [{ planId: 31, id: 31, name: 'Upper A', createdByUserId: 5 }, { planId: 32, name: 'Do treinador', createdByUserId: 99 }], nextCursor: null }),
+      getWorkoutTemplates: vi.fn().mockResolvedValue([]),
+    });
+    const { container, getByTestId } = render(
+      <LanguageProvider>
+        <MemoryRouter initialEntries={['/dashboard/exercises']}>
+          <Routes>
+            <Route path="/dashboard/exercises" element={<Exercises />} />
+            <Route path="/dashboard/training" element={<Probe />} />
+          </Routes>
+        </MemoryRouter>
+      </LanguageProvider>,
+    );
+    return { root: container.querySelector('[data-shell]').shadowRoot, getByTestId };
+  };
+
+  it('ticks exercises into a selection bar without opening the details', () => {
+    const { root } = renderCart();
+    const [first, other] = root.querySelectorAll('.ex-check');
+    fireEvent.click(first);
+    fireEvent.click(other);
+    expect(first).toHaveAttribute('aria-checked', 'true');
+    expect(root.querySelector('[data-testid="exercise-cart-bar"]')).toHaveTextContent('2');
+    expect(root.getElementById('exerciseDrawer')).toHaveAttribute('aria-hidden', 'true');
+    fireEvent.click(first);
+    expect(root.querySelector('[data-testid="exercise-cart-bar"]')).toHaveTextContent('1');
+  });
+
+  it('creates a new workout carrying every ticked exercise', () => {
+    const { root, getByTestId } = renderCart();
+    root.querySelectorAll('.ex-check').forEach((box) => fireEvent.click(box));
+    fireEvent.click(root.querySelector('[data-testid="exercise-cart-use"]'));
+    fireEvent.click(root.querySelector('[data-testid="cart-create"]'));
+    const seenState = seen(getByTestId);
+    expect(seenState.create).toBe(true);
+    expect(seenState.exercises.map((exercise) => exercise.id).sort()).toEqual([7, 9]);
+  });
+
+  it('lets the user pick one of their own workouts to receive the exercises', async () => {
+    const { root, getByTestId } = renderCart();
+    fireEvent.click(root.querySelector('.ex-check'));
+    fireEvent.click(root.querySelector('[data-testid="exercise-cart-use"]'));
+    fireEvent.click(root.querySelector('[data-testid="cart-edit"]'));
+    const upperA = await waitFor(() => {
+      const node = root.querySelector('[data-testid="cart-plan-31"]');
+      expect(node).toBeTruthy();
+      return node;
+    });
+    expect(root.querySelector('[data-testid="cart-plan-32"]')).toBeNull();
+    fireEvent.click(upperA);
+    const seenState = seen(getByTestId);
+    expect(seenState.addTo).toBe(31);
+    expect(seenState.exercises).toHaveLength(1);
   });
 });

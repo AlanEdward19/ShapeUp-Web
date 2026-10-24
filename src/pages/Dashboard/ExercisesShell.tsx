@@ -142,9 +142,23 @@ export default function ExercisesShell() {
     setSearchTerm('');
   };
 
+  // Library "cart": tick exercises, then choose to start a new workout or add them to an existing one.
+  const [picked, setPicked] = useState<ExerciseRecord[]>([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const togglePick = (ex: ExerciseRecord) =>
+    setPicked((current) =>
+      current.some((item) => String(item.id) === String(ex.id))
+        ? current.filter((item) => String(item.id) !== String(ex.id))
+        : [...current, ex],
+    );
+  const clearPicked = () => setPicked([]);
   const add = (ex: ExerciseRecord | null | undefined) => {
-    if (ex) navigate('/dashboard/training', { state: { create: true, exercise: ex } });
+    if (!ex) return;
+    setPicked((current) => (current.some((item) => String(item.id) === String(ex.id)) ? current : [...current, ex]));
+    setCartOpen(true);
   };
+  const startNewWorkout = () => navigate('/dashboard/training', { state: { create: true, exercises: picked } });
+  const addToWorkout = (planId: number | string) => navigate('/dashboard/training', { state: { addTo: planId, exercises: picked } });
 
   const onCopyDetails = async () => {
     const active = selected;
@@ -186,6 +200,13 @@ export default function ExercisesShell() {
     inspect,
     close,
     add,
+    picked,
+    togglePick,
+    clearPicked,
+    cartOpen,
+    setCartOpen,
+    startNewWorkout,
+    addToWorkout,
     notice,
     onCopyDetails,
     onSuggestOpen: () => setSuggesting(true),

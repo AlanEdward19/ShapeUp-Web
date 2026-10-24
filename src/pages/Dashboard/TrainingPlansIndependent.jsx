@@ -15,6 +15,7 @@ import { generateObjectId } from '../../utils/objectId';
 import { flattenBlockExercises, normalizePlan } from '../../utils/trainingNormalization';
 import { buildWorkoutPlanBody, findTimeBasedDurationError } from '../../utils/workoutPlanPayload';
 import { enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
+import { appendExercisesToPlan, buildExerciseBlocks, exercisesFromState } from '../../utils/libraryExercises';
 import { useExercises } from '../../hooks/useExercises';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
 import './TrainingPlansClient.css';
@@ -112,10 +113,19 @@ const TrainingPlansIndependent = () => {
     const HISTORY_PER_PAGE = 5;
     useEffect(() => {
         if (!location.state?.create) return;
-        const exercise = location.state.exercise;
-        setEditingPlan({ id: `p${Date.now()}`, name: 'Novo plano de treino', phase: 'Hypertrophy', difficulty: 'Intermediate', weeks: 6, active: false, notes: '', history: [], blocks: exercise ? [{ id: `b${Date.now()}`, type: 'straight', exercises: [{ ...exercise, exerciseId: exercise.id, id: `e${Date.now()}`, notes: '', sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '', intensityType: 'rpe', intensityValue: '8', rest: '90' }] }] }] : [] });
+        const picked = exercisesFromState(location.state);
+        setEditingPlan({ id: `p${Date.now()}`, name: 'Novo plano de treino', phase: 'Hypertrophy', difficulty: 'Intermediate', weeks: 6, active: false, notes: '', history: [], blocks: buildExerciseBlocks(picked) });
         navigate(location.pathname, { replace: true, state: null });
     }, [location.state, location.pathname, navigate]);
+
+    // "Add to an existing workout" from the library: open that workout with the picked exercises appended.
+    useEffect(() => {
+        const target = location.state?.addTo;
+        if (target == null || loadingPlans) return;
+        const plan = plans.find((item) => String(item.id) === String(target) && ownPlan(item));
+        if (plan) setEditingPlan(appendExercisesToPlan(plan, exercisesFromState(location.state)));
+        navigate(location.pathname, { replace: true, state: null });
+    }, [location.state, location.pathname, loadingPlans, plans, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
     // Fetch plans from API on mount
