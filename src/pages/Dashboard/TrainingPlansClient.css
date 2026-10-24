@@ -909,3 +909,16 @@
 
 .su-app-note .material-symbols-outlined { flex: none; color: var(--link-color); font-size: 26px; }
 .su-app-note p { margin: 0; color: var(--text-main); font-size: 0.9375rem; line-height: 1.4; }
+
+/* Plan cards: lay out by the card's own width (the sidebar eats viewport width, so viewport queries lie). */
+.su-independent-plan-card { container-type: inline-size; container-name: plan-card; }
+.su-plan-tiny-actions { flex-wrap: wrap; }
+.su-plan-tiny-actions button { white-space: nowrap; }
+.su-plan-card-body { grid-template-columns: minmax(0, 1fr) minmax(150px, 230px); }
+@container plan-card (max-width: 34rem) {
+    .su-plan-card-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'main' 'map' 'side'; }
+    .su-plan-card-map { max-width: 16rem; width: 100%; justify-self: center; }
+    .su-plan-card-side { align-self: stretch; }
+    .su-plan-tiny-actions { width: 100%; }
+    .su-plan-tiny-actions button { flex: 1 1 auto; }
+}
