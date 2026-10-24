@@ -36,6 +36,12 @@ const previewCopy = {
     es: { sets: (n) => `${n} ${n === 1 ? 'serie' : 'series'}`, anyDay: 'Sin día fijo, entrena cuando quieras', list: 'Ejercicios del entrenamiento' },
 };
 
+const copyConfirmCopy = {
+    'pt-BR': { title: 'Copiar treino?', body: (name) => `Vamos criar uma cópia de ${name} na sua lista. O original não muda.`, confirm: 'Criar cópia' },
+    en: { title: 'Copy workout?', body: (name) => `We will add a copy of ${name} to your list. The original stays as is.`, confirm: 'Create copy' },
+    es: { title: '¿Copiar entrenamiento?', body: (name) => `Crearemos una copia de ${name} en tu lista. El original no cambia.`, confirm: 'Crear copia' },
+};
+
 const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, owned, catalog = [] }) => {
     const { t, language } = useLanguage();
     const preview = previewCopy[language] || previewCopy['pt-BR'];
@@ -101,6 +107,7 @@ const TrainingPlansIndependent = () => {
     const [showSessionDetail, setShowSessionDetail] = useState(null);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [planToDelete, setPlanToDelete] = useState(null);
+    const [planToCopy, setPlanToCopy] = useState(null);
     const [historyPage] = useState(1);
     const HISTORY_PER_PAGE = 5;
     useEffect(() => {
@@ -268,7 +275,9 @@ const TrainingPlansIndependent = () => {
     // the server to copy-by-reference and wait for a new id back. We build the duplicate
     // entirely client-side and enqueue it as a plain CREATE (same body-builder as
     // handleSavePlan), which is response-ignored/optimistic-local already.
-    const handleCopyPlan = (original) => {
+    const handleCopyPlan = (original) => setPlanToCopy(original);
+
+    const performCopyPlan = (original) => {
         const copy = {
             ...original,
             id: `p${Date.now()}`,
@@ -406,6 +415,26 @@ const TrainingPlansIndependent = () => {
                     onClose={() => setShowSessionDetail(null)}
                 />
             )}
+
+            {planToCopy && (() => {
+                const c = copyConfirmCopy[language] || copyConfirmCopy['pt-BR'];
+                return (
+                    <div className="su-modal-overlay su-delete-confirm-overlay" data-testid="copy-plan-confirm" onClick={() => setPlanToCopy(null)}>
+                        <div className="su-modal-box su-delete-confirm-content su-alert-modal-box" role="dialog" aria-modal="true" aria-label={c.title} onClick={e => e.stopPropagation()}>
+                            <h2>{c.title}</h2>
+                            <p className="su-text-muted">{c.body(planToCopy.name)}</p>
+                            <div className="su-modal-actions" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                                <Button variant="outline" className="su-cancel-btn" onClick={() => setPlanToCopy(null)} style={{ minWidth: '120px' }}>
+                                    {t('common.cancel') || 'Cancelar'}
+                                </Button>
+                                <Button onClick={() => { const original = planToCopy; setPlanToCopy(null); performCopyPlan(original); }} data-testid="copy-plan-confirm-btn" style={{ minWidth: '120px' }}>
+                                    {c.confirm}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
 
             {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (
