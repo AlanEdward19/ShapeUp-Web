@@ -148,7 +148,7 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
 
   const exportPdf = () => {
     const pdf = new jsPDF();
-    pdf.text(`ShapeUp — ${state.date}`, 14, 18);
+    pdf.text(`ShapeUp, ${state.date}`, 14, 18);
     autoTable(pdf, {
       startY: 26,
       head: [['Refeição', 'Alimento', 'Porção', 'kcal', 'P', 'C', 'G'].map(tr)],
@@ -337,7 +337,7 @@ export function NutritionDiaryView(state: NutritionDiaryViewState): ReactElement
         <div className="nd-card nd-water">
           <div className="nd-card-head">
             <h2>{c.hydration}</h2>
-            <span>{waterPct !== null ? `${waterPct}%` : '—'}</span>
+            <span>{waterPct !== null ? `${waterPct}%` : '-'}</span>
           </div>
           <p className="nd-big">
             {(water / 1000).toLocaleString(language)}

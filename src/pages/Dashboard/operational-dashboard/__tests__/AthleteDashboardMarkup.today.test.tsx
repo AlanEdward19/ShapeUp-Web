@@ -75,8 +75,8 @@ describe('AthleteDashboardMarkup Frequência empty state (WSD-06)', () => {
   it('shows em-dash for the workouts ring and the week summary when dashboard is null', () => {
     const { container } = render(withLang(<AthleteDashboardMarkup state={baseState} />));
     const workouts = screen.getByText('Treinos').closest('div') as HTMLElement;
-    expect(within(workouts).getByText('—')).toBeInTheDocument();
-    expect(container.querySelector('.ah-week .ah-card-sub')).toHaveTextContent('—');
+    expect(within(workouts).getByText('-')).toBeInTheDocument();
+    expect(container.querySelector('.ah-week .ah-card-sub')).toHaveTextContent('-');
   });
 
   it('offers the rest-day state instead of the start CTA when nothing is scheduled', () => {

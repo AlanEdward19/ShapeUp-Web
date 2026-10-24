@@ -148,8 +148,8 @@ setTimeout(() => {
                                         {ex.muscles.length > 2 && <span className="su-ex-tag-muscle">+{ex.muscles.length - 2}</span>}
                                     </div>
                                 </div>
-                                <span className="su-library-equipment">{ex.equipment || ex.equipments?.[0]?.equipmentNamePt || '—'}</span>
-                                <span className="su-library-pattern">{ex.type || '—'}</span>
+                                <span className="su-library-equipment">{ex.equipment || ex.equipments?.[0]?.equipmentNamePt || '-'}</span>
+                                <span className="su-library-pattern">{ex.type || '-'}</span>
                                 <span className="su-library-arrow" aria-hidden="true">›</span>
                             </button>
                         ))

@@ -1,4 +1,4 @@
-# Revisão de integração — Web / backend
+# Revisão de integração, Web / backend
 
 Revisão: 12/09/2026. Escopo: rotas de `src/App.jsx`, telas Stitch ativas, controllers e DTOs do backend local `ShapeUpApi`. Nenhum arquivo do backend foi alterado. Chamadas de escrita foram verificadas com mocks; não foram criados usuários, matrículas ou pagamentos reais durante a validação.
 

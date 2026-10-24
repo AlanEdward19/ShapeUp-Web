@@ -77,7 +77,7 @@ function QueueCard({
                 <div>
                   <span className="text-[#85766f] text-[10px] block font-sans">{MACRO_LABELS[key]}</span>
                   <strong className="text-[var(--text-main)] text-sm">
-                    {item.proposedMacros?.[key] ?? '—'}
+                    {item.proposedMacros?.[key] ?? '-'}
                   </strong>
                   {key === 'kcal' ? ' kcal' : 'g'}
                 </div>

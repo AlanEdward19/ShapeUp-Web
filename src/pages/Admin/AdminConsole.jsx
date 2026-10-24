@@ -100,7 +100,7 @@ function OverviewSection() {
         <section data-testid="admin-overview" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
             {cards.map(([key, value]) => (
                 <article key={key}>
-                    <strong data-testid={`metric-${key}`}>{value ?? '—'}</strong>
+                    <strong data-testid={`metric-${key}`}>{value ?? '-'}</strong>
                     <div>{t(`admin.metric.${key}`)}</div>
                 </article>
             ))}
@@ -393,7 +393,7 @@ function AuditSection() {
     return (
         <section>
             <Status loading={loading} error={error} empty={!loading && !error && rows.length === 0} />
-            <ul>{rows.map((row) => <li key={row.id}>{row.httpMethod} {row.endpoint} · {row.statusCode} · {row.userEmail || '—'}</li>)}</ul>
+            <ul>{rows.map((row) => <li key={row.id}>{row.httpMethod} {row.endpoint} · {row.statusCode} · {row.userEmail || '-'}</li>)}</ul>
         </section>
     );
 }

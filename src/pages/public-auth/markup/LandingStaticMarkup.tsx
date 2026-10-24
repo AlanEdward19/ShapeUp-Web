@@ -1,5 +1,5 @@
 /* eslint-disable */
-/* Auto-generated from templates/landing.html — do not edit by hand */
+/* Auto-generated from templates/landing.html, do not edit by hand */
 import type { ReactElement } from 'react';
 import Logo from '../../../components/Logo/Logo';
 import { HeroShowcase } from './HeroShowcase';
@@ -25,7 +25,7 @@ export function LandingStaticMarkup(): ReactElement {
           <a
       className="flex items-center gap-3"
       href="/"
-      aria-label="ShapeUp — Home"
+      aria-label="ShapeUp, Home"
           >
             <Logo variant="lockup" width="148" height="36" style={{}} />
           </a>

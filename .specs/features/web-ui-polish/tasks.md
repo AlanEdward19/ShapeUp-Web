@@ -26,7 +26,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | Legal page | unit | POL-03 AC1: no `transform`/`scale` on `.su-legal`; body text uses 1rem / line-height ≥ 1.5 | `src/pages/__tests__/LegalAndNotFound.test.jsx` | `npm test` |
 | Recovery / auth markup | unit | POL-03 AC2–AC4: `AuthBrand` / `.st-auth-brand`; shell body `bg-brand-bg`; primary submit tokens; secondary stays distinct | `src/pages/public-auth/Usability.test.jsx` | `npm test` |
 | Manifest / CSS tokens | unit | Asserted via Recovery host class (`bg-brand-bg`), not a raw JSON parser test | same Usability test | `npm test` |
-| Entity / config only | none | Build gate | — | build gate |
+| Entity / config only | none | Build gate | - | build gate |
 
 ## Gate Check Commands
 

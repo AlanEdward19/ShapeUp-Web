@@ -43,7 +43,7 @@
     flex-wrap: wrap;
 }
 
-/* Plan sheets — one paper surface, not nested cards */
+/* Plan sheets, one paper surface, not nested cards */
 .su-ledger-sheet,
 .su-active-plan-card,
 .su-independent-plan-card {
@@ -297,7 +297,7 @@
     }
 }
 
-/* Session engine — sticky rest strip */
+/* Session engine, sticky rest strip */
 .su-session-header-sticky {
     background: var(--bg-main);
     padding: 0.75rem 0 1rem;

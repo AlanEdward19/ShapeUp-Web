@@ -74,7 +74,7 @@ function ExerciseDrawerActivation({
 }): ReactElement {
   const { t } = useLanguage();
   const rows = activationRows(muscles, muscleDetails);
-  const agonist = rows[0] || { name: '—', percent: undefined, tone: 'terracotta' as const };
+  const agonist = rows[0] || { name: '-', percent: undefined, tone: 'terracotta' as const };
   const rest = rows.slice(1);
 
   const row = (
@@ -112,12 +112,12 @@ function ExerciseDrawerActivation({
           {t('exlib.drawer.library_badge')}
         </span>
       </div>
-      {row('drawerAgonist', agonist.name, agonist.percent, 'terracotta', agonist.name !== '—')}
+      {row('drawerAgonist', agonist.name, agonist.percent, 'terracotta', agonist.name !== '-')}
       {rest.length
         ? rest.map((item, index) =>
             row(index === 0 ? 'drawerSynergist' : `drawerSynergist-${index}`, item.name, item.percent, 'muted', true),
           )
-        : row('drawerSynergist', '—', undefined, 'muted', false)}
+        : row('drawerSynergist', '-', undefined, 'muted', false)}
     </div>
   );
 }
@@ -160,14 +160,14 @@ export function ExerciseDrawer({ state }: { state: DrawerState }): ReactElement 
   const active = state.active;
   const prescribe = t('exlib.drawer.prescribe');
   const drawer = {
-    drawerCode: active ? `EX-${active.id}` : '—',
+    drawerCode: active ? `EX-${active.id}` : '-',
     drawerTitle: active?.name || t('exlib.drawer.select'),
     drawerPattern: active?.type || t('exlib.drawer.exercise'),
-    drawerPrimaryMuscle: active?.muscles?.join(', ') || '—',
+    drawerPrimaryMuscle: active?.muscles?.join(', ') || '-',
     drawerSets: prescribe,
     drawerReps: prescribe,
     drawerRest: prescribe,
-    drawerError: active?.precautions || '—',
+    drawerError: active?.precautions || '-',
     drawerStep1: active?.descriptionPt || active?.description || t('exlib.drawer.no_steps'),
   };
 

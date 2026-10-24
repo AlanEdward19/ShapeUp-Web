@@ -1,4 +1,4 @@
-# Validação de Execução de Treino (Frontend) — Tasks
+# Validação de Execução de Treino (Frontend), Tasks
 
 ## Execution Protocol (MANDATORY -- do not skip)
 
@@ -25,7 +25,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | `ExerciseRow` toggle | unit (RTL) | Toggle flips `onChange('requireRpe', ...)`; default off | `src/components/training/__tests__/ExerciseRow.test.jsx` | `npm test -- src/components/training/__tests__/ExerciseRow.test.jsx` |
 | i18n dictionary | unit | New keys present in `en`, `pt-BR`, `es` with equal key sets | `src/contexts/__tests__/wevI18nKeys.test.jsx` | `npm test -- src/contexts/__tests__/wevI18nKeys.test.jsx` |
 | Page wiring (`TrainingPlansClient` / `Independent` / `ClientDetail` mappers) | unit | Helpers already 1:1; page tasks assert gate function is called via extracting logic OR a focused RTL click if mocks stay cheap. No weaker assertions than `workoutStatePayload.test.js` | colocated `__tests__` or utils tests | `npm test` |
-| CSS / PlanEditorShell reexport | none | build/lint only | — | `npm run lint` |
+| CSS / PlanEditorShell reexport | none | build/lint only | - | `npm run lint` |
 
 ## Gate Check Commands
 

@@ -18,7 +18,7 @@ const exercises = ['Agachamento Livre com Barra'].map((name, i) => ({
 const plan = {
   id: 1,
   templateId: 1,
-  name: 'Mesociclo de hipertrofia — Fase 2',
+  name: 'Mesociclo de hipertrofia, Fase 2',
   durationInWeeks: 6,
   blocks: [{ id: 'b1', type: 1, exercises }],
   history: [],
@@ -27,7 +27,7 @@ const clients = ['Juliana Mendes'].map((name, i) => ({
   id: i + 1,
   name,
   status: 'Active',
-  activePlan: 'Hipertrofia — Fase 2',
+  activePlan: 'Hipertrofia, Fase 2',
   compliance: 94,
   lastCheckin: 'Hoje',
 }));

@@ -114,6 +114,6 @@ const body = dom.window.document.body;
 const jsx = [...body.childNodes].map((n) => nodeToJsx(n)).join('');
 
 fs.mkdirSync(outDir, { recursive: true });
-const file = `/* eslint-disable */\n/* Auto-generated from stitch/templates/onboarding.html — wire interactivity in OnboardingDashboardMarkup.tsx */\nimport type { ReactElement } from 'react';\n\nexport function OnboardingStaticMarkup(): ReactElement {\n  return (\n    <>\n${jsx}    </>\n  );\n}\n`;
+const file = `/* eslint-disable */\n/* Auto-generated from stitch/templates/onboarding.html, wire interactivity in OnboardingDashboardMarkup.tsx */\nimport type { ReactElement } from 'react';\n\nexport function OnboardingStaticMarkup(): ReactElement {\n  return (\n    <>\n${jsx}    </>\n  );\n}\n`;
 fs.writeFileSync(path.join(outDir, 'OnboardingStaticMarkup.tsx'), file);
 console.log('wrote OnboardingStaticMarkup.tsx');

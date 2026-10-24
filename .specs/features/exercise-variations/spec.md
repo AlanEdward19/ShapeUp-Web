@@ -1,4 +1,4 @@
-# Variações de Exercício (frontend) — Specification
+# Variações de Exercício (frontend), Specification
 
 **Canonical (read-only, backend CLOSED `1b82672`)**: `ShapeUpV2/.specs/features/exercise-variations/`
 **Sibling (presentation)**: `.specs/features/exercise-detail-drawer/`

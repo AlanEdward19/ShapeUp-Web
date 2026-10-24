@@ -1,4 +1,4 @@
-# Validação de Execução de Treino (Frontend) — Specification
+# Validação de Execução de Treino (Frontend), Specification
 
 > **Canonical API spec (do not edit, do not re-specify):** `ShapeUpV2/.specs/features/workout-execution-validation/spec.md`  
 > Also: `design.md` and `validation.md` in that same folder. Backend ACs are **CLOSED** (`RequireRpe` live). This file covers **only** the Frontend ACs: **WEV-01, WEV-03, WEV-04**, and the UI halves of **WEV-05, WEV-06, WEV-07, WEV-08**.
@@ -47,7 +47,7 @@ Na execução (`TrainingPlansClient.jsx`, `toggleSetComplete`), o aluno marca um
 | Failure | `set.failure === true` define `log.rpe = '10'` (já existe). Gate de RPE obrigatório trata `'10'` como preenchido | Canônico edge case | y |
 | Dimensões restantes | Auth, rate limit, TTL, métricas, circuit breaker: N/A neste corte de UI. Concorrência = snapshot no start. Retry do save de execução = fila já existente, sem mudança | Escopo frontend de gates/i18n/toggle | n |
 
-**Open questions:** none — all resolved or logged above.
+**Open questions:** none, all resolved or logged above.
 
 ---
 

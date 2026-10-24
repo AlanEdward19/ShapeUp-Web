@@ -48,7 +48,7 @@ function mockBody(url) {
     const day = (ago) => { const d = new Date(); d.setDate(d.getDate() - ago); return d.toLocaleDateString('en-CA'); };
     return { targetWeight: 78, items: [[12, 83.2], [9, 82.8], [6, 82.1], [3, 81.9], [0, 81.4]].map(([ago, weight]) => ({ date: day(ago), weight })) };
   }
-  if (url.includes('/api/notifications/inbox')) return { items: [{ id: 'n1', title: 'Nova ficha disponível', body: 'Seu treinador publicou o plano Hipertrofia — Upper A.', createdAtUtc: new Date().toISOString(), readAtUtc: null }, { id: 'n2', title: 'Bem-vindo ao ShapeUp', body: 'Complete seu perfil para receber recomendações.', createdAtUtc: '2026-10-20T12:00:00Z', readAtUtc: '2026-10-21T12:00:00Z' }], nextCursor: null };
+  if (url.includes('/api/notifications/inbox')) return { items: [{ id: 'n1', title: 'Nova ficha disponível', body: 'Seu treinador publicou o plano Hipertrofia, Upper A.', createdAtUtc: new Date().toISOString(), readAtUtc: null }, { id: 'n2', title: 'Bem-vindo ao ShapeUp', body: 'Complete seu perfil para receber recomendações.', createdAtUtc: '2026-10-20T12:00:00Z', readAtUtc: '2026-10-21T12:00:00Z' }], nextCursor: null };
   if (url.includes('/nutrition/diary')) return diary;
   // ?nogoal / ?nutritionist in localStorage flip the nutrition states for design review
   if (url.includes('/nutrition/nutritionists')) return localStorage.getItem('shapeup_preview_nutritionist') ? [{ professionalUserId: 9, displayName: 'Dra. Marina' }] : [];
@@ -56,7 +56,7 @@ function mockBody(url) {
   if (/\/nutrition\/foods(\?|$)/.test(url)) return { items: [food(1, 'Peito de frango', 165, 31, 0, 3.6), food(2, 'Arroz branco cozido', 130, 2.7, 28, 0.3), food(3, 'Ovo cozido', 155, 13, 1.1, 11)] };
   if (url.includes('/nutrition/hydration')) return { totalMl: 1250 };
   if (/\/me(\?|$)/.test(url)) return { id: 1, userId: 1, displayName: 'Alan Oliveira', email: 'alan@shapeup.app' };
-  if (url.includes('/training/workout-plans/user/')) return { items: [plan(1, 'Hipertrofia — Upper A', [1, 4], 1), plan(2, 'Lower B', [], 9)], nextCursor: null };
+  if (url.includes('/training/workout-plans/user/')) return { items: [plan(1, 'Hipertrofia, Upper A', [1, 4], 1), plan(2, 'Lower B', [], 9)], nextCursor: null };
   if (/\/training\/exercises(\?|$)/.test(url)) return { items: exercises, nextCursor: null };
   if (url.includes('/training/workouts/user/')) return { items: sessions, nextCursor: null };
   return { items: [], nextCursor: null };

@@ -1,4 +1,4 @@
-# XP Feedback Loop (frontend) — Specification
+# XP Feedback Loop (frontend), Specification
 
 **Canonical parent**: `ShapeUpApi` / `ShapeUpV2/.specs/features/xp-feedback-loop/spec.md` (read-only). This file is the ShapeUp-Web slice: XPF-01, XPF-02, XPF-03, XPF-05, and the frontend half of XPF-06.
 

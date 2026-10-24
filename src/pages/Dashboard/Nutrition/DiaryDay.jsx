@@ -32,9 +32,9 @@ const MacroProgressBar = ({ label, consumed, goal, color, informational, infoLab
         <div className="su-macro-cell" data-testid={`macro-progress-${label}`}>
             <div className="su-macro-meta">
                 <span className="su-macro-label" title={informational ? infoLabel : undefined}>{label}</span>
-                <span className="su-macro-percentage">{goal ? `${percent}%` : '—'}</span>
+                <span className="su-macro-percentage">{goal ? `${percent}%` : '-'}</span>
             </div>
-<div className="su-macro-nums"><strong>{consumed}</strong><small> / {goal || '—'} {informational ? 'kcal' : 'g'}</small></div>
+<div className="su-macro-nums"><strong>{consumed}</strong><small> / {goal || '-'} {informational ? 'kcal' : 'g'}</small></div>
             <div
                 className="su-macro-track"
                 role="progressbar"
@@ -211,7 +211,7 @@ const DiaryDay = ({ renderView } = {}) => {
                 meals.map((meal, mealIndex) => (
                     <section key={meal.mealSlot} className="su-journal-sheet" data-testid={`meal-${meal.mealSlot}`}>
                         <h3 className="su-ledger-heading">
-                            Refeição {String(mealIndex + 1).padStart(2, '0')} — {t(`nutrition.meal.${meal.mealSlot}`) || meal.mealSlot}
+                            Refeição {String(mealIndex + 1).padStart(2, '0')}, {t(`nutrition.meal.${meal.mealSlot}`) || meal.mealSlot}
                         </h3>
                         {meal.items?.length === 0 ? (
                             <p className="su-text-muted">{t('nutrition.diary.empty_meal')}</p>

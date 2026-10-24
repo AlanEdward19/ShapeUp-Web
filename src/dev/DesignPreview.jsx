@@ -14,7 +14,7 @@ const volumes = [3200, 3650, 3400, 4100, 3900, 4600, 4350, 5100];
 
 const athlete = {
     userName: 'Alan Oliveira',
-    plan: { name: 'Hipertrofia — Upper A', phase: 'Semana 3 · Bloco de volume' },
+    plan: { name: 'Hipertrofia, Upper A', phase: 'Semana 3 · Bloco de volume' },
     showTodayCard: true,
     exercises: [
         { id: 1, name: 'Supino reto', muscles: ['Peitoral', 'Tríceps'], sets: [{ reps: '8', load: '80' }, {}, {}, {}] },

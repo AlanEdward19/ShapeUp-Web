@@ -21,8 +21,8 @@ Os 16 arquivos HTML desta pasta são cópias da exportação fornecida pelo Alan
 | register | `/register` |
 | invitation | `/register?payload=…` |
 | onboarding | `/dashboard/onboarding` |
-| professional | `/dashboard` — treinador |
-| athlete | `/dashboard` — aluno/independente |
+| professional | `/dashboard`, treinador |
+| athlete | `/dashboard`, aluno/independente |
 | builder | Editor de plano aberto pela biblioteca de treinos ou pela ficha do aluno |
 | exercises | `/dashboard/exercises` |
 | nutrition | `/dashboard/nutrition/diary` |

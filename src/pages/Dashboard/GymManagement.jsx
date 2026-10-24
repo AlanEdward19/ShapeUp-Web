@@ -73,7 +73,7 @@ export default function GymManagement({ mode = 'overview' }) {
  const cells = item => mode === 'staff'
   ? [`#${item.userId}`, item.role, new Date(item.hiredAt).toLocaleDateString(language)]
   : mode === 'clients'
-   ? [`#${item.userId}`, item.planName, item.trainerId ? `#${item.trainerId}` : '—']
+   ? [`#${item.userId}`, item.planName, item.trainerId ? `#${item.trainerId}` : '-']
    : [item.name, Number(item.price).toLocaleString(language, { minimumFractionDigits: 2 }), item.durationDays];
  const rowAction = item => mode === 'clients'
   ? <button type="button" className="gm-soft" onClick={() => setForm({ kind: 'assign', ...item })}>{tr('Alterar treinador', 'Change trainer', 'Cambiar entrenador')}</button>

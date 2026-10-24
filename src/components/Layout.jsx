@@ -23,7 +23,7 @@ const Layout = () => {
     const [gymProfile, setGymProfile] = useState({ name: storedName || '', avatar: null });
     const currentProfile = isProfessional ? coachProfile : (isGym ? gymProfile : clientProfile);
 
-    // Session title — set by TrainingPlansClient when a session starts/ends
+    // Session title, set by TrainingPlansClient when a session starts/ends
     const [sessionTitle, setSessionTitle] = useState(null);
 
     const bypassLegacyChrome =

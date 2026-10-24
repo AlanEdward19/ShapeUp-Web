@@ -11,7 +11,7 @@ const ACTIVITY_LEVELS = ['Sedentary', 'LightlyActive', 'ModeratelyActive', 'Very
 const sheetCopy = {
     'pt-BR': {
         title: 'Suas metas',
-        optional: 'Opcional — você pode ajustar quando quiser.',
+        optional: 'Opcional, você pode ajustar quando quiser.',
         current: 'Meta atual',
         none: 'Ainda sem meta definida',
         done: 'Concluído',
@@ -23,7 +23,7 @@ const sheetCopy = {
     },
     en: {
         title: 'Your goals',
-        optional: 'Optional — adjust it whenever you like.',
+        optional: 'Optional, adjust it whenever you like.',
         current: 'Current goal',
         none: 'No goal set yet',
         done: 'Done',
@@ -35,7 +35,7 @@ const sheetCopy = {
     },
     es: {
         title: 'Tus metas',
-        optional: 'Opcional — ajústala cuando quieras.',
+        optional: 'Opcional, ajústala cuando quieras.',
         current: 'Meta actual',
         none: 'Aún sin meta definida',
         done: 'Listo',
@@ -51,10 +51,10 @@ const text = (value) => (value === undefined || value === null ? '' : String(val
 
 const GoalSummary = ({ goal }) => (
     <dl className="gs-summary" data-testid="goal-summary">
-        <div><dt>kcal</dt><dd>{goal.kcal ?? '—'}</dd></div>
-        <div><dt>P</dt><dd>{goal.proteinG ?? '—'}<small> g</small></dd></div>
-        <div><dt>C</dt><dd>{goal.carbG ?? '—'}<small> g</small></dd></div>
-        <div><dt>G</dt><dd>{goal.fatG ?? '—'}<small> g</small></dd></div>
+        <div><dt>kcal</dt><dd>{goal.kcal ?? '-'}</dd></div>
+        <div><dt>P</dt><dd>{goal.proteinG ?? '-'}<small> g</small></dd></div>
+        <div><dt>C</dt><dd>{goal.carbG ?? '-'}<small> g</small></dd></div>
+        <div><dt>G</dt><dd>{goal.fatG ?? '-'}<small> g</small></dd></div>
         {goal.waterMl ? <div><dt>H₂O</dt><dd>{goal.waterMl}<small> ml</small></dd></div> : null}
     </dl>
 );

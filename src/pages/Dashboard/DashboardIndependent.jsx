@@ -257,7 +257,7 @@ const DashboardIndependent = () => {
                     <div>
                         <p className="su-dash-label">{t('client.dashboard.metric.weekly')}</p>
                         <p className="su-dash-feature-num">
-                            {hasData ? weeklyVolumeFormatted : '—'}
+                            {hasData ? weeklyVolumeFormatted : '-'}
                             {hasData && <span className="su-dash-feature-unit">{formatWeight(0).replace('0 ', '')}</span>}
                         </p>
                         <p className={`su-dash-feature-note su-metric-trend ${!weeklyDiff ? '' : weeklyDiff >= 0 ? 'positive' : 'negative'}`}>

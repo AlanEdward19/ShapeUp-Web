@@ -1,4 +1,4 @@
-# Retema do design system (Warm Oxide Athletic) — Tasks
+# Retema do design system (Warm Oxide Athletic), Tasks
 
 ## Execution Protocol (MANDATORY -- do not skip)
 
@@ -119,7 +119,7 @@ T8
 
 **Done when**:
 
-- [x] Before/after PNGs at 1440 and 390 under `.specs/features/design-system-retheme/` (`before-sidebar-*`, `after-sidebar-*`) — **blocked**: `/dashboard` requires auth and redirects to `/login`; 256px rail is not on public routes. Hex-to-token still applied; `width:256px` unchanged in `navStyle`.
+- [x] Before/after PNGs at 1440 and 390 under `.specs/features/design-system-retheme/` (`before-sidebar-*`, `after-sidebar-*`), **blocked**: `/dashboard` requires auth and redirects to `/login`; 256px rail is not on public routes. Hex-to-token still applied; `width:256px` unchanged in `navStyle`.
 - [x] Retired hex from the pre-swap dark block is gone from this file; colors use `var(--…)`
 - [x] Console has no new error/warning; layout (256px rail) unchanged
 - [x] Gate check passes: `npm test && npm run gate`
@@ -204,7 +204,7 @@ T8
 
 **Done when**:
 
-- [x] PNGs `before-dashboard-{1440,390}.png` and `after-dashboard-{1440,390}.png` — **blocked**: `/dashboard` redirects to `/login` without credentials
+- [x] PNGs `before-dashboard-{1440,390}.png` and `after-dashboard-{1440,390}.png`, **blocked**: `/dashboard` redirects to `/login` without credentials
 - [x] Background/text/border/primary match Warm Oxide; layout not shifted
 - [x] Retired hex in `src/pages/Dashboard/operational-dashboard/AthleteDashboardMarkup.tsx` (and this route's other non-`shell-assets` files) moved to tokens if grep hits
 - [x] Console clean; Gate check passes: `npm test && npm run gate`
@@ -232,7 +232,7 @@ T8
 
 **Done when**:
 
-- [x] PNGs `before-nutrition-{1440,390}.png` and `after-nutrition-{1440,390}.png` — **blocked**: diary is behind `/dashboard` auth
+- [x] PNGs `before-nutrition-{1440,390}.png` and `after-nutrition-{1440,390}.png`, **blocked**: diary is behind `/dashboard` auth
 - [x] Palette and contrast readable in both themes; no new console errors
 - [x] Retired hex in this shell/markup outside `shell-assets/` moved to tokens if present
 - [x] Gate check passes: `npm test && npm run gate`
@@ -260,7 +260,7 @@ T8
 
 **Done when**:
 
-- [x] PNGs `before-settings-{1440,390}.png` and `after-settings-{1440,390}.png` for dark, plus light after-settings shots at both viewports — **blocked**: `/dashboard/settings` requires auth
+- [x] PNGs `before-settings-{1440,390}.png` and `after-settings-{1440,390}.png` for dark, plus light after-settings shots at both viewports, **blocked**: `/dashboard/settings` requires auth
 - [x] Setting `data-theme` to `light` then `dark` still swaps token blocks; no ThemeContext API change
 - [x] Links in light mode use `--link-color` (readable vs `--bg-main`)
 - [x] Retired hex in settings markup / `src/components/ProfileControls.jsx` moved to tokens if present

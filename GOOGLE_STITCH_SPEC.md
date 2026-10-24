@@ -1,4 +1,4 @@
-# ShapeUp — Especificação de Redesign (Google Stitch)
+# ShapeUp, Especificação de Redesign (Google Stitch)
 
 App fitness B2B2C: personal trainers, academias e clientes. Web app (React), estilo atual "warm oxide" (laranja terracota + tipografia condensada). Este doc serve de prompt-base pra gerar um layout novo e mais moderno, mantendo os fluxos e papéis de usuário existentes.
 
@@ -7,18 +7,18 @@ App fitness B2B2C: personal trainers, academias e clientes. Web app (React), est
 ## 1. Identidade visual
 
 ### Conceito atual
-"Warm oxide" — terracota queimado sobre fundo bege quente, tipografia condensada de destaque (títulos) + sans neutra (corpo). Não é um design "clínico" tipo SaaS genérico: tem calor, textura, personalidade de academia/atlética.
+"Warm oxide", terracota queimado sobre fundo bege quente, tipografia condensada de destaque (títulos) + sans neutra (corpo). Não é um design "clínico" tipo SaaS genérico: tem calor, textura, personalidade de academia/atlética.
 
-### Paleta — Light mode
+### Paleta, Light mode
 | Token | Valor (OKLCH) | Uso |
 |---|---|---|
-| `--primary` | oklch(55% 0.14 38) — terracota | CTAs, links, ícones ativos |
+| `--primary` | oklch(55% 0.14 38), terracota | CTAs, links, ícones ativos |
 | `--primary-hover` | oklch(48% 0.13 38) | hover de primary |
-| `--accent` | oklch(46% 0.08 145) — verde oliva | badges secundários, sucesso sutil |
-| `--bg-main` | oklch(98.4% 0.006 80) — bege quase branco | fundo de página |
+| `--accent` | oklch(46% 0.08 145), verde oliva | badges secundários, sucesso sutil |
+| `--bg-main` | oklch(98.4% 0.006 80), bege quase branco | fundo de página |
 | `--bg-card` | oklch(99.6% 0.002 80) | cards, painéis |
 | `--bg-input` | oklch(100% 0.001 80) | inputs |
-| `--text-main` | oklch(24% 0.018 50) — marrom escuro | texto principal |
+| `--text-main` | oklch(24% 0.018 50), marrom escuro | texto principal |
 | `--text-muted` | oklch(46% 0.016 50) | texto secundário |
 | `--text-inverse` | oklch(98.4% 0.006 80) | texto sobre fundo escuro |
 | `--text-on-primary` | oklch(99% 0.01 80) | texto sobre botão primary |
@@ -29,7 +29,7 @@ App fitness B2B2C: personal trainers, academias e clientes. Web app (React), est
 | `--warning` | oklch(66% 0.13 70) |
 | `--error` / `--danger` | oklch(52% 0.16 28) |
 
-### Paleta — Dark mode
+### Paleta, Dark mode
 | Token | Valor (OKLCH) |
 |---|---|
 | `--primary` | oklch(74% 0.12 42) |
@@ -49,21 +49,21 @@ App fitness B2B2C: personal trainers, academias e clientes. Web app (React), est
 | `--warning` | oklch(80% 0.12 70) |
 | `--error` | oklch(72% 0.14 28) |
 
-Regra geral dark mode: não é preto puro — é marrom-carvão quente (`oklch(22% 0.032 42)`), mantendo o mesmo matiz do terracota, só invertendo luminância. Evitar cinza neutro/azulado — quebra a identidade.
+Regra geral dark mode: não é preto puro, é marrom-carvão quente (`oklch(22% 0.032 42)`), mantendo o mesmo matiz do terracota, só invertendo luminância. Evitar cinza neutro/azulado, quebra a identidade.
 
 ### Tipografia
-- **Display / títulos**: `Barlow Condensed` (600/700/800) — condensada, forte, usada em headers, títulos de página, nomes de plano. Sem uppercase forçado (`text-transform: none`), leve tracking negativo (`-0.02em`).
-- **Corpo**: `Source Sans 3` (400/600/700, itálico 400) — legibilidade em textos longos, formulários, tabelas.
+- **Display / títulos**: `Barlow Condensed` (600/700/800), condensada, forte, usada em headers, títulos de página, nomes de plano. Sem uppercase forçado (`text-transform: none`), leve tracking negativo (`-0.02em`).
+- **Corpo**: `Source Sans 3` (400/600/700, itálico 400), legibilidade em textos longos, formulários, tabelas.
 - Fallbacks: `Arial Narrow/Impact` pro display, `Segoe UI` pro corpo.
 
 ### Forma e sombra
-- Cantos: `--radius-sm 0.55rem`, `--radius-md 0.85rem`, `--radius-lg 1.15rem` — arredondado mas não "pill" exagerado.
+- Cantos: `--radius-sm 0.55rem`, `--radius-md 0.85rem`, `--radius-lg 1.15rem`, arredondado mas não "pill" exagerado.
 - Sombras suaves e quentes (tom da própria paleta, não cinza): `--shadow-soft` (cards em repouso), `--shadow-md` (modais, dropdowns, hover elevado).
 - Transições: 140ms (micro, hover) / 220ms (normal, abrir painel) com easing `cubic-bezier(0.16, 1, 0.3, 1)` (ease-out-expo-like).
 - Respeitar `prefers-reduced-motion`.
 
 ### O que "modernizar" deve preservar
-- A paleta terracota/oliva — não trocar para azul/roxo SaaS genérico.
+- A paleta terracota/oliva, não trocar para azul/roxo SaaS genérico.
 - Contraste do dark mode quente, não frio.
 - Tipografia condensada nos títulos (é a assinatura visual do produto).
 Pode modernizar: densidade de informação, hierarquia, uso de espaço em branco, componentes (cards, tabelas, gráficos), micro-interações, iconografia.
@@ -75,8 +75,8 @@ Pode modernizar: densidade de informação, hierarquia, uso de espaço em branco
 - **client** (aluno/cliente final)
 - **professional** (personal trainer autônomo com carteira de clientes)
 - **independent** (profissional solo, sem vínculo a academia)
-- **gym** (dono/admin de academia — gestão de staff, catraca, financeiro)
-- **admin** (moderação de conteúdo e feature flags — nível plataforma)
+- **gym** (dono/admin de academia, gestão de staff, catraca, financeiro)
+- **admin** (moderação de conteúdo e feature flags, nível plataforma)
 
 O Dashboard raiz (`/dashboard`) roteia por papel para um dos 4 dashboards (client/professional/independent/gym).
 
@@ -125,21 +125,21 @@ O Dashboard raiz (`/dashboard`) roteia por papel para um dos 4 dashboards (clien
 - Área de conteúdo com padding consistente (`--space-page`)
 - Componentes globais: `NotificationsPanel`, `ChatDrawer`, `OfflineQueueIndicator`
 
-**Dashboard — Client** (`DashboardClient`)
+**Dashboard, Client** (`DashboardClient`)
 - Resumo do plano de treino atual, próximos treinos
 - Progresso/gamificação (`GamificationProgressCard`, `RankingList`)
 - Atalho para diário alimentar (nutrition)
 - Objetivos ativos
 
-**Dashboard — Professional** (`DashboardProfessional`)
+**Dashboard, Professional** (`DashboardProfessional`)
 - Visão geral da carteira de clientes (ativos, pendências)
 - Feedbacks recentes recebidos
 - Atalhos: criar plano de treino, ver agenda/clientes
 
-**Dashboard — Independent** (`DashboardIndependent`)
-- Similar ao professional mas sem contexto de staff/academia — visão solo
+**Dashboard, Independent** (`DashboardIndependent`)
+- Similar ao professional mas sem contexto de staff/academia, visão solo
 
-**Dashboard — Gym** (`DashboardGym`)
+**Dashboard, Gym** (`DashboardGym`)
 - KPIs da academia (alunos ativos, catraca/acessos, financeiro resumido)
 - Atalhos: staff, catraca, financeiro
 
@@ -157,7 +157,7 @@ O Dashboard raiz (`/dashboard`) roteia por papel para um dos 4 dashboards (clien
 
 **Exercícios** (`/dashboard/exercises`, `Exercises`)
 - Biblioteca de exercícios (`ExerciseLibraryModal`), busca por grupo muscular
-- Mapa corporal anatômico (`WorkoutBodyMap`) — seleção visual de músculo/exercício
+- Mapa corporal anatômico (`WorkoutBodyMap`), seleção visual de músculo/exercício
 - Sugestão de novo exercício (`SuggestExerciseModal`), modal de detalhe (`ExerciseModal`)
 
 **Feedback** (`/dashboard/feedback`, `Feedback`)
@@ -186,7 +186,7 @@ O Dashboard raiz (`/dashboard`) roteia por papel para um dos 4 dashboards (clien
 - Cartão de crédito / cobrança (`CreditCardUI`)
 
 **Mensagens** (`/dashboard/messages`)
-- Placeholder atual — projetar como lista de conversas + thread (chat), reaproveitando `ChatDrawer`
+- Placeholder atual, projetar como lista de conversas + thread (chat), reaproveitando `ChatDrawer`
 
 #### Nutrição (`/dashboard/nutrition/*`)
 **Diário do dia** (`nutrition/diary`, `DiaryDay`)
@@ -220,16 +220,16 @@ O Dashboard raiz (`/dashboard`) roteia por papel para um dos 4 dashboards (clien
 ---
 
 ## 4. Componentes globais reutilizáveis
-- `Button` — variantes primary/secondary/danger/ghost, tamanhos, loading state
-- `Card` — container padrão com `--shadow-soft`, `--radius-md`
-- `Input` — com label, erro, ícone, foco com `--border-input-focus`
-- `Header` / `Sidebar` — shell de navegação
-- `NotificationsPanel` — dropdown/painel de notificações
-- `ChatDrawer` — painel lateral de chat
-- `CookieConsent` — banner LGPD
-- `ErrorBoundary` — estado de erro genérico full-page
-- `OfflineQueueIndicator` — indicador de ações pendentes de sync (PWA-like)
-- `CreditCardUI` — visual de cartão para cobrança
+- `Button`, variantes primary/secondary/danger/ghost, tamanhos, loading state
+- `Card`, container padrão com `--shadow-soft`, `--radius-md`
+- `Input`, com label, erro, ícone, foco com `--border-input-focus`
+- `Header` / `Sidebar`, shell de navegação
+- `NotificationsPanel`, dropdown/painel de notificações
+- `ChatDrawer`, painel lateral de chat
+- `CookieConsent`, banner LGPD
+- `ErrorBoundary`, estado de erro genérico full-page
+- `OfflineQueueIndicator`, indicador de ações pendentes de sync (PWA-like)
+- `CreditCardUI`, visual de cartão para cobrança
 - Modais: `ClientBillingModal`, `ExerciseLibraryModal`, `ExerciseModal`, `InviteClientModal`, `SuggestExerciseModal`, `SubstituteItemModal`
 - Gamificação: `GamificationProgressCard`, `RankingList`
 
@@ -238,10 +238,10 @@ O Dashboard raiz (`/dashboard`) roteia por papel para um dos 4 dashboards (clien
 ## 5. Diretrizes para o Google Stitch
 
 1. Gerar telas em **light e dark mode** usando exatamente os tokens de cor acima (converter OKLCH pra hex se a ferramenta não aceitar OKLCH direto).
-2. Manter tipografia condensada nos títulos e sans neutra no corpo — não usar fonte "SaaS padrão" (Inter genérico) sem diferenciação de título.
+2. Manter tipografia condensada nos títulos e sans neutra no corpo, não usar fonte "SaaS padrão" (Inter genérico) sem diferenciação de título.
 3. Sidebar + header persistentes no shell autenticado; conteúdo muda por rota.
 4. Adaptar navegação da sidebar por papel (client vê nutrição/objetivos/treino; gym vê staff/catraca/financeiro; professional/independent veem clientes/planos).
-5. Priorizar mobile-first ou ao menos responsivo — app é usado em academia (celular) e em escritório/recepção (desktop, no caso gym).
+5. Priorizar mobile-first ou ao menos responsivo, app é usado em academia (celular) e em escritório/recepção (desktop, no caso gym).
 6. Cards de dashboard devem comunicar dado numérico rápido (KPI) + tendência (gráfico pequeno/sparkline), não só texto.
-7. Estados vazios (sem clientes, sem planos, sem treinos) precisam de ilustração leve + CTA — não deixar tela em branco.
+7. Estados vazios (sem clientes, sem planos, sem treinos) precisam de ilustração leve + CTA, não deixar tela em branco.
 8. Fluxos com formulário longo (cadastro, onboarding nutricional) devem considerar wizard/multi-step em vez de form único gigante.

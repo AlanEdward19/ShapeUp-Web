@@ -371,7 +371,7 @@ const FastingPage = () => {
                             <ul className="su-fasting-history-list">
                                 {historyItems.map((item) => (
                                     <li key={item.id}>
-                                        {item.protocol} — {item.outcome}
+                                        {item.protocol}, {item.outcome}
                                     </li>
                                 ))}
                             </ul>

@@ -1,4 +1,4 @@
-# Variações de Exercício (frontend) — Tasks
+# Variações de Exercício (frontend), Tasks
 
 ## Execution Protocol (MANDATORY -- do not skip)
 

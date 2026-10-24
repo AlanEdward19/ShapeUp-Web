@@ -51,7 +51,7 @@
 | IF `CreateExercise` is called with a single muscle THEN the API SHALL persist exactly that one profile | persist count 1; one `Muscles` item | `CreateExerciseHandlerTests.cs:96-100` - `Assert.Single` + `Assert.Equal(MuscleGroup.MiddleChest, ...)` + `Count == 1` | ✅ PASS |
 | WHEN a catalog compound exercise is loaded from the seeded dataset THEN `Muscles` SHALL contain at least two distinct `MuscleGroup` values for the nine named lifts | ≥2 distinct `MuscleGroup` CAST ids per named exercise in Up() SQL | `SeedExerciseCompoundMuscleProfilesTests.cs:28-35` - regex `CAST((\d+) AS bigint)` per name, `groups.Length >= 2`; `:38-39` forbid `CAST(7)` / `CAST(448)` | ✅ PASS |
 | WHEN the active exercise has two or more muscle details with `activationPercent` THEN the drawer SHALL show the highest-activation name as agonist and the remaining names joined as synergists | agonist = max % name; synergist = remaining | `ExercisesShell.test.jsx:182-183` - `#drawerAgonist` `toHaveTextContent('Peitoral')`; `#drawerSynergist` `toHaveTextContent('Tríceps')` | ✅ PASS |
-| WHEN the active exercise has exactly one muscle THEN the synergist value SHALL be `—` | synergist text `—` | `ExercisesShell.test.jsx:80` - `#drawerSynergist` `toHaveTextContent('—')` | ✅ PASS |
+| WHEN the active exercise has exactly one muscle THEN the synergist value SHALL be `-` | synergist text `-` | `ExercisesShell.test.jsx:80` - `#drawerSynergist` `toHaveTextContent('-')` | ✅ PASS |
 | WHEN an exercise row in the library has multiple muscle labels THEN the row SHALL show them joined, not only `muscles[0]` | row contains joined labels | `ExercisesShell.test.jsx:192` - `expect(row).toHaveTextContent('Peitoral, Tríceps')` | ✅ PASS |
 
 **Status**: ✅ All ACs covered

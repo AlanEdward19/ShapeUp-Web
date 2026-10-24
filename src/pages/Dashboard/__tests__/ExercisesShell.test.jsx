@@ -77,7 +77,7 @@ describe('ExercisesShell', () => {
     expect(drawer).toHaveTextContent('Instrução da API');
     expect(drawer).toHaveTextContent('62%');
     expect(drawer).not.toHaveTextContent('95%');
-    expect(drawer.querySelector('#drawerSynergist')).toHaveTextContent('—');
+    expect(drawer.querySelector('#drawerSynergist')).toHaveTextContent('-');
     expect(root.querySelector('.shell-body')).not.toHaveTextContent('PÁGINA 1 DE 15');
     expect(row).not.toHaveTextContent('Glúteo Máximo, Adutores, Lombar');
     fireEvent.keyDown(within(drawer).getByTitle('Fechar Painel'), { key: 'Escape' });

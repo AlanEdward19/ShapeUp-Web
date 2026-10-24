@@ -271,7 +271,7 @@ T8
 **Done when**:
 
 - [x] Shell test with two `muscleDetails` shows both names (agonist highest %, synergist the other)
-- [x] Single-muscle fixture still shows synergist `—`
+- [x] Single-muscle fixture still shows synergist `-`
 - [x] Row with `muscles: ['Peitoral', 'Tríceps']` displays both
 - [x] Gate passes
 

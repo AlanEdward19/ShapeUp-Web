@@ -49,7 +49,7 @@ Web Jejum tab consumes `GET /api/nutrition/fasting`. Agenda + Start override sem
 
 ## Specific References
 
-- Foodvisor: Premium fasting programmes + iOS journal fasting toggle; App Store reviews that a fixed daily window does not move when start/end times change — ShapeUp must not copy that failure.
+- Foodvisor: Premium fasting programmes + iOS journal fasting toggle; App Store reviews that a fixed daily window does not move when start/end times change, ShapeUp must not copy that failure.
 - ShapeUp today: nutrition is athlete diary/foods/plans/goal; no nutritionist role; professionals are `professional`.
 
 ---

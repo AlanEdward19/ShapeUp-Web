@@ -38,7 +38,7 @@ const Reports = () => {
     useEffect(()=>{let active=true;setHistoryLoading(true);setHistoryError(false);
       Promise.all(clients.map(async client=>{
         const sessions=await readAllPages(cursor=>getWorkoutsByUser(client.id,cursor));
-        return [client.id,[{name:client.activePlan || '—',history:sessions.filter(session=>session.isCompleted || session.isCancelled).map(workoutHistory)}]];
+        return [client.id,[{name:client.activePlan || '-',history:sessions.filter(session=>session.isCompleted || session.isCancelled).map(workoutHistory)}]];
       })).then(entries=>{if(active)setPlansByClient(Object.fromEntries(entries));}).catch(()=>{if(active)setHistoryError(true);}).finally(()=>{if(active)setHistoryLoading(false);});return()=>{active=false;};
     },[clients,getWorkoutsByUser]);
 
@@ -99,7 +99,7 @@ setTimeout(() => {
                 type: reportType,
                 date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
                 status: 'Completed',
-                size: '—'
+                size: '-'
             };
 
             const updatedHistory = [newReport, ...reportsHistory].slice(0, 10);

@@ -4,9 +4,9 @@ import ActivityRings from '../../Dashboard/operational-dashboard/athlete/Activit
 import VolumeChart from '../../Dashboard/operational-dashboard/athlete/VolumeChart';
 
 const copy = {
-  'pt-BR': { today: 'Treino de hoje', plan: 'Hipertrofia — Upper A', meta: '4 exercícios · Semana 3', start: 'Ver treino de hoje', summary: 'Resumo da semana', workouts: 'Treinos', calories: 'Calorias', water: 'Água', week: 'Sua semana', weekMeta: '3 de 4 treinos', volume: 'Evolução de volume', chips: ['Peitoral', 'Dorsais', 'Ombros'], empty: '' },
-  en: { today: "Today's workout", plan: 'Hypertrophy — Upper A', meta: '4 exercises · Week 3', start: "View today's workout", summary: 'Week summary', workouts: 'Workouts', calories: 'Calories', water: 'Water', week: 'Your week', weekMeta: '3 of 4 workouts', volume: 'Volume trend', chips: ['Chest', 'Back', 'Shoulders'], empty: '' },
-  es: { today: 'Entrenamiento de hoy', plan: 'Hipertrofia — Upper A', meta: '4 ejercicios · Semana 3', start: 'Ver entrenamiento de hoy', summary: 'Resumen de la semana', workouts: 'Entrenos', calories: 'Calorías', water: 'Agua', week: 'Tu semana', weekMeta: '3 de 4 entrenos', volume: 'Evolución de volumen', chips: ['Pecho', 'Espalda', 'Hombros'], empty: '' },
+  'pt-BR': { today: 'Treino de hoje', plan: 'Hipertrofia, Upper A', meta: '4 exercícios · Semana 3', start: 'Ver treino de hoje', summary: 'Resumo da semana', workouts: 'Treinos', calories: 'Calorias', water: 'Água', week: 'Sua semana', weekMeta: '3 de 4 treinos', volume: 'Evolução de volume', chips: ['Peitoral', 'Dorsais', 'Ombros'], empty: '' },
+  en: { today: "Today's workout", plan: 'Hypertrophy, Upper A', meta: '4 exercises · Week 3', start: "View today's workout", summary: 'Week summary', workouts: 'Workouts', calories: 'Calories', water: 'Water', week: 'Your week', weekMeta: '3 of 4 workouts', volume: 'Volume trend', chips: ['Chest', 'Back', 'Shoulders'], empty: '' },
+  es: { today: 'Entrenamiento de hoy', plan: 'Hipertrofia, Upper A', meta: '4 ejercicios · Semana 3', start: 'Ver entrenamiento de hoy', summary: 'Resumen de la semana', workouts: 'Entrenos', calories: 'Calorías', water: 'Agua', week: 'Tu semana', weekMeta: '3 de 4 entrenos', volume: 'Evolución de volumen', chips: ['Pecho', 'Espalda', 'Hombros'], empty: '' },
 } as const;
 
 const volumes = [3200, 3650, 3400, 4100, 3900, 4600, 4350, 5100];

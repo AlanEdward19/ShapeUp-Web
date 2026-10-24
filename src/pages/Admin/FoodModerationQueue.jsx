@@ -61,7 +61,7 @@ const FoodModerationQueue = () => {
         <div className="su-admin-ledger">
             <span className="su-admin-kicker">{t('admin.food.kicker')}</span>
             <h1 className="su-page-title su-mb-6">{t('admin.food.title')}</h1>
-            <div className="su-moderation-summary"><strong>{loading ? '—' : items.length}</strong><span>{pt ? 'solicitações aguardando revisão' : 'requests awaiting review'}</span><button className="su-btn su-btn-secondary" onClick={loadQueue} disabled={loading}>{pt ? 'Atualizar fila' : 'Refresh queue'}</button></div>
+            <div className="su-moderation-summary"><strong>{loading ? '-' : items.length}</strong><span>{pt ? 'solicitações aguardando revisão' : 'requests awaiting review'}</span><button className="su-btn su-btn-secondary" onClick={loadQueue} disabled={loading}>{pt ? 'Atualizar fila' : 'Refresh queue'}</button></div>
 
             {error && <p className="su-input-error-text su-mb-4" role="alert">{error}</p>}
 

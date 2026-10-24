@@ -176,7 +176,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
                 <dl className="ah-legend">
                   <div style={{ ['--dot' as string]: 'var(--primary)' }}>
                     <dt>{c.ringWorkouts}</dt>
-                    <dd>{dashboard ? `${workoutsDone}/${workoutsTarget ?? '—'}` : '—'}</dd>
+                    <dd>{dashboard ? `${workoutsDone}/${workoutsTarget ?? '-'}` : '-'}</dd>
                   </div>
                   <div style={{ ['--dot' as string]: 'var(--accent)' }}>
                     <dt>{c.ringCalories}</dt>
@@ -194,7 +194,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
               <div className="ah-card-head">
                 <h3 className="ah-card-title">{c.week}</h3>
                 <p className="ah-card-sub">
-                  {dashboard ? c.weekDone(workoutsDone, workoutsTarget) : '—'}
+                  {dashboard ? c.weekDone(workoutsDone, workoutsTarget) : '-'}
                 </p>
               </div>
               <ol className="ah-days">{[0, 1, 2, 3, 4, 5, 6].map(weekDay)}</ol>
@@ -202,7 +202,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
                 <span className="ah-stat-label">{c.weeklyVolume}</span>
                 <span className="ah-stat-value">
                   <NumberFlow
-                    value={dashboard ? Number(dashboard.weeklyVolume || 0).toLocaleString(language) : '—'}
+                    value={dashboard ? Number(dashboard.weeklyVolume || 0).toLocaleString(language) : '-'}
                   />
                   <small>kg</small>
                   {Number.isFinite(dashboard?.weeklyVolumeProgressPercent) && dashboard!.weeklyVolumeProgressPercent !== 0 && (
@@ -235,7 +235,7 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
                             <small>{exercise.notes || exercise.muscles?.join(', ')}</small>
                           </span>
                           <span className="ah-prescription">
-                            {exercise.sets?.length || 0} × {first?.reps || '—'}
+                            {exercise.sets?.length || 0} × {first?.reps || '-'}
                             {first?.load ? <small>{first.load} {c.load}</small> : null}
                           </span>
                         </button>

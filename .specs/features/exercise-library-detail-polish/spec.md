@@ -26,10 +26,10 @@ O painel de detalhe da Biblioteca de Exercícios (drawer em `ExercisesPublicMark
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --------------------- | -------------- | --------- | ---------- |
-| Forma do placeholder sem vídeo | `aspect-square` na largura do conteúdo do drawer; player válido usa a mesma classe | Usuário pediu quadrado grande para não quebrar layout; 16:9 vs vazio era o desalinhamento | n — usuário fora; default do agente |
+| Forma do placeholder sem vídeo | `aspect-square` na largura do conteúdo do drawer; player válido usa a mesma classe | Usuário pediu quadrado grande para não quebrar layout; 16:9 vs vazio era o desalinhamento | n, usuário fora; default do agente |
 | Escopo de i18n | Drawer + chrome da biblioteca na mesma tela (`ExercisesPublicMarkup`, `ExerciseDrawer*`, fallback de equipamento no shell) | Pedido: "nesta mesma modal" + strings fixas em PT na tela da biblioteca | n |
 | Idiomas | en, pt-BR, es via `LanguageContext` | Padrão do repo | y |
-| Limite de 1 músculo | Não é contrato da API. `CreateExercise` já aceita array. Corrigir seed + UI | Unique key é `(ExerciseId, MuscleGroup)`, não um único perfil | y — código |
+| Limite de 1 músculo | Não é contrato da API. `CreateExercise` já aceita array. Corrigir seed + UI | Unique key é `(ExerciseId, MuscleGroup)`, não um único perfil | y, código |
 | Seed de sinergistas | Nova migration idempotente: compostos ganham ≥2 `MuscleGroup` folha (não flag composto `Chest=7`) | Migration `20260919030000` já rodou; não reescrever | n |
 | Isolamentos (rosca, elevação lateral) | Podem permanecer com 1 músculo | Pedido é alvo realista, não forçar sinergista inventado | n |
 | Repos | API em `ShapeUpV2`; UI em `ShapeUp-Web`. Commit+push nos dois, sem trailer Co-authored-by | Pedido explícito | y |
@@ -86,7 +86,7 @@ O painel de detalhe da Biblioteca de Exercícios (drawer em `ExercisesPublicMark
 2. IF `CreateExercise` is called with a single muscle THEN the API SHALL persist exactly that one profile
 3. WHEN a catalog compound exercise is loaded from the seeded dataset THEN `Muscles` SHALL contain at least two distinct `MuscleGroup` values for: Barbell Bench Press, Barbell Back Squat, Barbell Row, Pull-Up, Lat Pulldown, Barbell Overhead Press, Barbell Romanian Deadlift, Barbell Hip Thrust, Close-Grip Bench Press
 4. WHEN the active exercise has two or more muscle details with `activationPercent` THEN the drawer SHALL show the highest-activation name as agonist and the remaining names joined as synergists
-5. WHEN the active exercise has exactly one muscle THEN the synergist value SHALL be `—`
+5. WHEN the active exercise has exactly one muscle THEN the synergist value SHALL be `-`
 6. WHEN an exercise row in the library has multiple muscle labels THEN the row SHALL show them joined, not only `muscles[0]`
 
 **Independent Test**: GET a seeded bench press returns ≥2 muscles; drawer shows agonist + synergist; curl still shows one muscle.

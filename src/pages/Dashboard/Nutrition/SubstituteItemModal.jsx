@@ -88,7 +88,7 @@ const SubstituteItemModal = ({ entry, date, onClose, onSubstituted }) => {
                                             disabled={submitting}
                                             data-testid={`suggestion-${s.foodId}`}
                                         >
-                                            {s.name} — {s.macrosPer100?.kcal} kcal/100g
+                                            {s.name}, {s.macrosPer100?.kcal} kcal/100g
                                         </button>
                                     </li>
                                 ))}

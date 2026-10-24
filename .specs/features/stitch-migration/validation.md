@@ -4,7 +4,7 @@
 **Spec**: `.specs/features/stitch-migration/spec.md`  
 **Diff range**: feature branch through `fdeb92b` (T19) on `develop`; prior stitch-migration commits include `91c3f1c` (unrelated training bugfix on same branch)  
 **Verifier**: independent sub-agent (author ≠ verifier)  
-**Decision lens**: **AD-WEB-007** end-state — zero `src/stitch/`; native `.tsx` shells; `PlanEditorShell` replaces former `stitch/Builder`; static assets live under `pages/dashboard-stitch/` (allowed — not `src/stitch/`).
+**Decision lens**: **AD-WEB-007** end-state, zero `src/stitch/`; native `.tsx` shells; `PlanEditorShell` replaces former `stitch/Builder`; static assets live under `pages/dashboard-stitch/` (allowed, not `src/stitch/`).
 
 ---
 
@@ -26,9 +26,9 @@
 
 | Criterion (WHEN X THEN Y) | Spec-defined outcome | `file:line` + assertion expression | Result |
 | ------------------------- | -------------------- | ---------------------------------- | ------ |
-| WHEN migração termina THEN `pageTemplateEngine/` SHALL contain motor artifacts | Directory + listed files | — (`Test-Path src/lib/pageTemplateEngine` → false) | ⏭️ N/A (AD-WEB-007: delete engine, not relocate) |
-| WHEN motor imports were under `stitch/` THEN SHALL use `pageTemplateEngine/` | New base path | — | ⏭️ N/A |
-| WHEN `npm run build` THEN no missing-module errors | Exit 0 | Verifier 2026-09-15 — `npm run build` exit 0 | ✅ PASS |
+| WHEN migração termina THEN `pageTemplateEngine/` SHALL contain motor artifacts | Directory + listed files |, (`Test-Path src/lib/pageTemplateEngine` → false) | ⏭️ N/A (AD-WEB-007: delete engine, not relocate) |
+| WHEN motor imports were under `stitch/` THEN SHALL use `pageTemplateEngine/` | New base path | - | ⏭️ N/A |
+| WHEN `npm run build` THEN no missing-module errors | Exit 0 | Verifier 2026-09-15, `npm run build` exit 0 | ✅ PASS |
 
 **STMIG-01/02**: ⏭️ Superseded. **STMIG-03**: ✅ Verified.
 
@@ -36,9 +36,9 @@
 
 | Criterion (WHEN X THEN Y) | Spec-defined outcome | `file:line` + assertion expression | Result |
 | ------------------------- | -------------------- | ---------------------------------- | ------ |
-| WHEN migração termina THEN no `.jsx`/`.js`/`.css` under `/stitch/` | Zero under `src/**/stitch/**` (not `dashboard-stitch`) | — (`Test-Path src/stitch` → **False**; `git ls-tree -r HEAD --name-only \| grep ^src/stitch` → **0** files) | ✅ PASS |
-| WHEN legado colide THEN design records import vs remove | Per-file table + T17 evidence | `tasks.md:81-90` | ⚠️ Spec-precision gap (documentary AC — table present) |
-| WHEN imports used `stitch/X` THEN new paths / end-state zero `stitch/` imports | No `from '…/stitch/` in production or tests | — (`rg "from ['\"][^'\"]*\/stitch\/" src` → **0**; `dashboard-stitch` imports only) | ✅ PASS |
+| WHEN migração termina THEN no `.jsx`/`.js`/`.css` under `/stitch/` | Zero under `src/**/stitch/**` (not `dashboard-stitch`) |, (`Test-Path src/stitch` → **False**; `git ls-tree -r HEAD --name-only \| grep ^src/stitch` → **0** files) | ✅ PASS |
+| WHEN legado colide THEN design records import vs remove | Per-file table + T17 evidence | `tasks.md:81-90` | ⚠️ Spec-precision gap (documentary AC, table present) |
+| WHEN imports used `stitch/X` THEN new paths / end-state zero `stitch/` imports | No `from '…/stitch/` in production or tests |, (`rg "from ['\"][^'\"]*\/stitch\/" src` → **0**; `dashboard-stitch` imports only) | ✅ PASS |
 | WHEN 6 listed test files run THEN pass without assertion body changes | Same behaviors, paths may move | See STMIG-07 table below | ⚠️ See STMIG-07 |
 
 **STMIG-04**: ✅ Verified. **STMIG-05**: ✅ Verified. **STMIG-06**: ✅ Verified. **STMIG-07**: ⚠️ Partial (below).
@@ -47,32 +47,32 @@
 
 | Criterion (WHEN X THEN Y) | Spec-defined outcome | `file:line` + assertion expression | Result |
 | ------------------------- | -------------------- | ---------------------------------- | ------ |
-| WHEN `workout-editor` not PASS THEN Builder stays in `stitch/` | Interim state (pre-T19) | Historical — satisfied before T19 | ✅ PASS (historical) |
-| WHEN `workout-editor` PASS THEN move Builder (T19) | `PlanEditorShell` + no `src/stitch/Builder` | `PlanEditorShell.tsx:6` — `export { PlanEditor as PlanEditorShell, … } from './ClientDetail'`; `PlanEditorShell.test.jsx:7` — `expect(PlanEditorShell).toBe(PlanEditor)`; `Test-Path src/stitch` → false | ✅ PASS |
-| WHEN Builder migrates THEN motor in `pageTemplateEngine/` | P1 relocation | — | ⏭️ N/A under AD-WEB-007 |
+| WHEN `workout-editor` not PASS THEN Builder stays in `stitch/` | Interim state (pre-T19) | Historical, satisfied before T19 | ✅ PASS (historical) |
+| WHEN `workout-editor` PASS THEN move Builder (T19) | `PlanEditorShell` + no `src/stitch/Builder` | `PlanEditorShell.tsx:6`, `export { PlanEditor as PlanEditorShell, … } from './ClientDetail'`; `PlanEditorShell.test.jsx:7`, `expect(PlanEditorShell).toBe(PlanEditor)`; `Test-Path src/stitch` → false | ✅ PASS |
+| WHEN Builder migrates THEN motor in `pageTemplateEngine/` | P1 relocation | - | ⏭️ N/A under AD-WEB-007 |
 
 **STMIG-08**: ✅ Verified (coordination honored pre-T19). **STMIG-09**: ✅ Verified.
 
-### STMIG-07 — six legacy tests (behavioral traceability)
+### STMIG-07, six legacy tests (behavioral traceability)
 
 | Original spec path | Current coverage | `file:line` + assertion | Result |
 | ------------------ | ---------------- | ------------------------- | ------ |
-| `stitch/Usability.test.jsx` | `pages/public-auth/Usability.test.jsx` | `:18` — `expect(root.querySelector('.st-auth-brand')).toHaveAttribute('href', '/')` | ✅ PASS |
-| `stitch/Onboarding.test.jsx` | `pages/Dashboard/__tests__/OnboardingShell.stitch.test.jsx` | `:36-41` — `completeOnboarding` payload `{ age: 30, heightCm: 180, biologicalSex: 'Male', activityLevel: 'Moderate' }` | ✅ PASS |
-| `stitch/AthleteScoreboard.test.jsx` | `components/gamification/__tests__/AthleteScoreboard.test.jsx` | `:23-24` — `getByText('Nível 4',{selector:'strong'})`; `progressbar` `value` `'220'` | ✅ PASS |
-| `stitch/Exercises.test.jsx` | `pages/Dashboard/__tests__/ExercisesShell.test.jsx` | `:19` — `expect(drawer).toHaveAttribute('data-open','true')` | ✅ PASS |
-| `stitch/Moderation.test.jsx` | `pages/Admin/__tests__/ModerationShell.test.jsx` | `:43` — `decideModeration` with `'Approved'` | ✅ PASS |
-| `stitch/StitchTemplates.test.jsx` | **Removed with generic engine** (no `sourceRuntime` / `StitchTemplate` in `src`) | — | ⚠️ **Retired** — no replacement test; engine AC obsolete |
+| `stitch/Usability.test.jsx` | `pages/public-auth/Usability.test.jsx` | `:18`, `expect(root.querySelector('.st-auth-brand')).toHaveAttribute('href', '/')` | ✅ PASS |
+| `stitch/Onboarding.test.jsx` | `pages/Dashboard/__tests__/OnboardingShell.stitch.test.jsx` | `:36-41`, `completeOnboarding` payload `{ age: 30, heightCm: 180, biologicalSex: 'Male', activityLevel: 'Moderate' }` | ✅ PASS |
+| `stitch/AthleteScoreboard.test.jsx` | `components/gamification/__tests__/AthleteScoreboard.test.jsx` | `:23-24`, `getByText('Nível 4',{selector:'strong'})`; `progressbar` `value` `'220'` | ✅ PASS |
+| `stitch/Exercises.test.jsx` | `pages/Dashboard/__tests__/ExercisesShell.test.jsx` | `:19`, `expect(drawer).toHaveAttribute('data-open','true')` | ✅ PASS |
+| `stitch/Moderation.test.jsx` | `pages/Admin/__tests__/ModerationShell.test.jsx` | `:43`, `decideModeration` with `'Approved'` | ✅ PASS |
+| `stitch/StitchTemplates.test.jsx` | **Removed with generic engine** (no `sourceRuntime` / `StitchTemplate` in `src`) | - | ⚠️ **Retired**, no replacement test; engine AC obsolete |
 
 **STMIG-07 status**: ⚠️ **5/6 behaviors** still asserted at spec precision; **StitchTemplates** suite intentionally dropped at T19 (no surviving motor to test).
 
-### Revised Goals (AD-WEB-007 — primary acceptance bar)
+### Revised Goals (AD-WEB-007, primary acceptance bar)
 
 | Goal | Spec-defined outcome | Evidence | Result |
 | ---- | -------------------- | -------- | ------ |
 | Native `.tsx` per screen, no runtime engine at feature close | No `sourceRuntime` / `StitchTemplate` / `sourceDocument` in `src` | `rg sourceRuntime\|StitchTemplate\|sourceDocument src` → **0**; shells use markup + hosts | ✅ PASS |
-| Pixel-parity Playwright 1440+390 | Valid before/after pairs per converted screen | T18 archived PNGs referenced in `tasks.md:139`; **no** fresh pairs under `.specs/features/stitch-migration/` at verify time | ⚠️ **Archived / incomplete** — honesty gap (non-blocker for structural close) |
-| TypeScript toolchain | `tsconfig.json` strict + `npx tsc --noEmit` | Verifier — `npx tsc --noEmit` exit 0 | ✅ PASS |
+| Pixel-parity Playwright 1440+390 | Valid before/after pairs per converted screen | T18 archived PNGs referenced in `tasks.md:139`; **no** fresh pairs under `.specs/features/stitch-migration/` at verify time | ⚠️ **Archived / incomplete**, honesty gap (non-blocker for structural close) |
+| TypeScript toolchain | `tsconfig.json` strict + `npx tsc --noEmit` | Verifier, `npx tsc --noEmit` exit 0 | ✅ PASS |
 | Zero imports pointing at `src/stitch/` | All imports resolved | `rg` + `check-frontend-gates.mjs:62-64` | ✅ PASS |
 | Six legacy tests green | Listed behaviors | `npm test`: **32** files, **112** passed (see gate note) | ⚠️ StitchTemplates path retired |
 | Remove generic engine when last screen converts | No template HTML runtime motor | Engine JS gone; `manifest.json` + `copy` + CSS remain as **static** assets in `pages/dashboard-stitch/` (T19 design) | ✅ PASS (runtime motor removed) |
@@ -89,12 +89,12 @@ Scratch mutations in working tree; each restored with `git checkout --` (no last
 
 | Mutation | File:line | Description | Killed? |
 | -------- | --------- | ----------- | ------- |
-| 1 | `src/components/AuthBrand.tsx:8` | `st-auth-brand` → `st-auth-brand-broken` | ✅ Killed — `Usability.test.jsx` 2/6 failed |
-| 2 | `src/pages/Dashboard/markup/ExercisesPublicMarkup.tsx` | `data-open={state.open}` → `{!state.open}` | ✅ Killed — `ExercisesShell.test.jsx:19` |
-| 3 | `src/pages/Dashboard/PlanEditorShell.tsx:6` | Break re-export identity | ✅ Killed — `PlanEditorShell.test.jsx:7` |
+| 1 | `src/components/AuthBrand.tsx:8` | `st-auth-brand` → `st-auth-brand-broken` | ✅ Killed, `Usability.test.jsx` 2/6 failed |
+| 2 | `src/pages/Dashboard/markup/ExercisesPublicMarkup.tsx` | `data-open={state.open}` → `{!state.open}` | ✅ Killed, `ExercisesShell.test.jsx:19` |
+| 3 | `src/pages/Dashboard/PlanEditorShell.tsx:6` | Break re-export identity | ✅ Killed, `PlanEditorShell.test.jsx:7` |
 
 **Sensor depth**: lightweight (3 behavior-level faults)  
-**Result**: **3/3 killed** — ✅ PASS
+**Result**: **3/3 killed**, ✅ PASS
 
 ---
 
@@ -121,11 +121,11 @@ Not performed (automated verifier run only).
 
 ## Edge Cases (spec.md)
 
-- [x] Test import depth changes without body edits — e.g. `OnboardingShell.stitch.test.jsx:4` → `OnboardingShell`
-- [x] `public/stitch/ryno.png` untouched — out of scope
-- [x] `linkBinding.js` — absent
-- [x] Unused template/CSS — T18/T19 cleanup; static CSS under `dashboard-stitch/styles/`
-- [x] Builder — native `PlanEditor` in `ClientDetail.jsx`; public entry `PlanEditorShell.tsx`
+- [x] Test import depth changes without body edits, e.g. `OnboardingShell.stitch.test.jsx:4` → `OnboardingShell`
+- [x] `public/stitch/ryno.png` untouched, out of scope
+- [x] `linkBinding.js`, absent
+- [x] Unused template/CSS, T18/T19 cleanup; static CSS under `dashboard-stitch/styles/`
+- [x] Builder, native `PlanEditor` in `ClientDetail.jsx`; public entry `PlanEditorShell.tsx`
 
 ---
 
@@ -135,7 +135,7 @@ Not performed (automated verifier run only).
 | ------- | ------ | ------- |
 | `node scripts/check-frontend-gates.mjs` | ✅ PASS | Includes `src/stitch/` must not exist (`:62-64`) |
 | `npm run build` | ✅ PASS | Exit 0 (2026-09-15) |
-| `npm run lint` | ✅ PASS | Exit 0 — 0 errors; 2 pre-existing hook warnings |
+| `npm run lint` | ✅ PASS | Exit 0, 0 errors; 2 pre-existing hook warnings |
 | `npx tsc --noEmit` | ✅ PASS | Exit 0 |
 | `npm test` | ✅ PASS | **32** files, **112** tests passed, **0** failed, **0** skipped |
 
@@ -144,20 +144,20 @@ Not performed (automated verifier run only).
 
 ---
 
-## Fix Plans (ranked — optional follow-ups, not blockers for AD-WEB-007 structural close)
+## Fix Plans (ranked, optional follow-ups, not blockers for AD-WEB-007 structural close)
 
-### Fix 1: Document StitchTemplates retirement in spec traceability (Minor) — ✅ Done 2026-09-16
+### Fix 1: Document StitchTemplates retirement in spec traceability (Minor), ✅ Done 2026-09-16
 
 - **What**: Update `spec.md` STMIG-07 / Success Criteria to note engine test retired when motor removed.
-- **Verify**: Traceability matches this report — ✅ synced; feature marked Closed in `STATE.md` / `tasks.md`.
+- **Verify**: Traceability matches this report, ✅ synced; feature marked Closed in `STATE.md` / `tasks.md`.
 
-### Fix 2: Fresh pixel-parity capture for messages / nutrition / onboarding (Major — evidence quality) — ✅ Dropped 2026-09-16
+### Fix 2: Fresh pixel-parity capture for messages / nutrition / onboarding (Major, evidence quality), ✅ Dropped 2026-09-16
 
 - **What**: Re-capture true pre/post pairs at 1440+390; store under `.specs/features/stitch-migration/`.
 - **Verify**: Documented zero-diff or explicit diff resolution.
-- **Resolution**: User dropped — deleted archived before/after PNGs; not required for closed feature.
+- **Resolution**: User dropped, deleted archived before/after PNGs; not required for closed feature.
 
-### Fix 3: Rename `dashboard-stitch` long-term (Cosmetic) — ✅ Done 2026-09-16
+### Fix 3: Rename `dashboard-stitch` long-term (Cosmetic), ✅ Done 2026-09-16
 
 - **What**: Rename path vocabulary off “stitch”.
 - **Verify**: `src/pages/shell-assets/`, hosts `*ShellHost`, `useShellLanguage`, `public/assets/ryno.png`, `design/screens/`, CSS `.shell-body` / `data-shell`.
@@ -178,13 +178,13 @@ Not performed (automated verifier run only).
 | STMIG-08 | Verified | ✅ Verified |
 | STMIG-09 | Blocked | ✅ Verified |
 
-*(Synced into `spec.md` Requirement Traceability on 2026-09-16 — phase closed.)*
+*(Synced into `spec.md` Requirement Traceability on 2026-09-16, phase closed.)*
 
 ---
 
 ## Summary
 
-**Overall**: ✅ **Ready** — AD-WEB-007 structural end-state met at `fdeb92b` (zero `src/stitch/`, native shells, `PlanEditorShell`, no template runtime motor in `src`). **Phase closed 2026-09-16.**
+**Overall**: ✅ **Ready**, AD-WEB-007 structural end-state met at `fdeb92b` (zero `src/stitch/`, native shells, `PlanEditorShell`, no template runtime motor in `src`). **Phase closed 2026-09-16.**
 
 **Spec-anchored check (AD-WEB-007-weighted)**: **14** ✅; **3** ⚠️ (non-blocking evidence gaps)  
 **Sensor**: **3/3** mutations killed  
@@ -192,8 +192,8 @@ Not performed (automated verifier run only).
 
 **What works**: `src/stitch/` absent on disk and in HEAD; production imports use `dashboard-stitch` / shells only; `sourceRuntime`/`StitchTemplate` eliminated; T19 `PlanEditorShell` re-export tested; frontend gates script enforces teardown; full test suite green at 112 tests.
 
-**Issues found (ranked, optional backlog)**: none remaining — PNG archive deleted; `dashboard-stitch` renamed to `shell-assets` (2026-09-16).
+**Issues found (ranked, optional backlog)**: none remaining, PNG archive deleted; `dashboard-stitch` renamed to `shell-assets` (2026-09-16).
 
 **Next steps**: none for stitch-migration.
 
-**Lessons**: Clean PASS on structural ACs — no `scripts/lessons.py` entry required.
+**Lessons**: Clean PASS on structural ACs, no `scripts/lessons.py` entry required.

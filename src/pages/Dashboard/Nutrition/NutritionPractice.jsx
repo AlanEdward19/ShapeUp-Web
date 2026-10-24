@@ -215,21 +215,21 @@ export default function NutritionPractice() {
                 <section data-testid="client-chart">
                     <h2>#{selected}</h2>
                     <p data-testid="client-diary">
-                        {t('parity.practice.diary')} {chart.diary?.totals?.kcal ?? '—'} kcal
+                        {t('parity.practice.diary')} {chart.diary?.totals?.kcal ?? '-'} kcal
                     </p>
                     <p data-testid="client-goal">
-                        {t('parity.practice.goal')} {chart.profile?.activeGoal?.kcal ?? '—'} kcal
+                        {t('parity.practice.goal')} {chart.profile?.activeGoal?.kcal ?? '-'} kcal
                     </p>
                     <p data-testid="client-weight">
-                        {t('parity.practice.weight')} {lastWeight?.weight ?? '—'} kg
+                        {t('parity.practice.weight')} {lastWeight?.weight ?? '-'} kg
                     </p>
                     <p data-testid="client-water">
-                        {t('parity.practice.water')} {chart.hydration?.totalMl ?? '—'} ml
+                        {t('parity.practice.water')} {chart.hydration?.totalMl ?? '-'} ml
                     </p>
                     <p data-testid="client-fasting">
                         {chart.fasting?.off
                             ? t('parity.practice.fastingOff')
-                            : `${t('parity.practice.fasting')} ${chart.fasting?.clock?.status || chart.fasting?.error || '—'}`}
+                            : `${t('parity.practice.fasting')} ${chart.fasting?.clock?.status || chart.fasting?.error || '-'}`}
                     </p>
                     <form className="su-practice-goal" onSubmit={(event) => {
                         event.preventDefault();

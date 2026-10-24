@@ -109,7 +109,7 @@ const copy = {
 } as const;
 
 const sectionKey = (ex: ExerciseRecord, sort: string): string => {
-  if (sort === 'muscles') return ex.muscles?.[0] || '—';
+  if (sort === 'muscles') return ex.muscles?.[0] || '-';
   const first = String(ex.name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').charAt(0).toUpperCase();
   return /[A-Z]/.test(first) ? first : '#';
 };

@@ -71,7 +71,7 @@ graph TD
 
 Snapshot matches API: `agenda`, `override`, `recommendation`, `clock: { status, boundaryAt, source }`.
 
-PUT body: `{ protocol, eatingStartMinutes, timeZone, fastHours? }` — `timeZone` from `Intl.DateTimeFormat().resolvedOptions().timeZone`. Custom: `protocol: 'custom'` + `fastHours`.
+PUT body: `{ protocol, eatingStartMinutes, timeZone, fastHours? }`, `timeZone` from `Intl.DateTimeFormat().resolvedOptions().timeZone`. Custom: `protocol: 'custom'` + `fastHours`.
 
 ---
 

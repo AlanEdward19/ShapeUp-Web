@@ -95,7 +95,7 @@ const DARK_DESIGN_VALUES = {
   '--space-xl': '2.5rem',
 }
 
-/** M3/YAML names intentionally not mapped in design.md — not part of the Execute contract. */
+/** M3/YAML names intentionally not mapped in design.md, not part of the Execute contract. */
 const UNMAPPED_M3_TOKEN_NAMES = [
   '--primary-container',
   '--on-primary-container',

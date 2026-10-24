@@ -1,4 +1,4 @@
-# Drawer de Detalhe do Exercício — Tasks
+# Drawer de Detalhe do Exercício, Tasks
 
 ## Execution Protocol (MANDATORY -- do not skip)
 

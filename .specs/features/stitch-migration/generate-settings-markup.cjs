@@ -109,7 +109,7 @@ const html = fs.readFileSync(path.join(templatesDir, 'settings.html'), 'utf8');
 const dom = new JSDOM(`<body>${html}</body>`);
 const body = dom.window.document.body;
 const jsx = [...body.childNodes].map((n) => nodeToJsx(n)).join('');
-const file = `/* eslint-disable */\n/* Auto-generated from stitch/templates/settings.html — wire via SettingsPublicMarkup */\nimport type { ReactElement } from 'react';\n\nexport function SettingsStaticMarkup(): ReactElement {\n  return (\n    <>\n${jsx}    </>\n  );\n}\n`;
+const file = `/* eslint-disable */\n/* Auto-generated from stitch/templates/settings.html, wire via SettingsPublicMarkup */\nimport type { ReactElement } from 'react';\n\nexport function SettingsStaticMarkup(): ReactElement {\n  return (\n    <>\n${jsx}    </>\n  );\n}\n`;
 fs.mkdirSync(outDir, { recursive: true });
 fs.writeFileSync(path.join(outDir, 'SettingsStaticMarkup.tsx'), file);
 console.log('wrote SettingsStaticMarkup.tsx');

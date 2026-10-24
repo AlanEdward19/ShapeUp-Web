@@ -1,8 +1,8 @@
-# Migração estrutural de `src/stitch/` — Specification
+# Migração estrutural de `src/stitch/`, Specification
 
 ## Problem Statement
 
-`ShapeUp-Web/src/stitch/` (~35 arquivos) é código vivo — motor de template (`sourceRuntime.jsx`,
+`ShapeUp-Web/src/stitch/` (~35 arquivos) é código vivo, motor de template (`sourceRuntime.jsx`,
 `StitchTemplate.jsx`, `manifest.json`, `linkBinding.js`, `copy.js`/`copy.tsv`) que renderiza HTML
 exportado do Google Stitch (`templates/*.html`) e o liga a componentes React reais via
 `sourceDocument`/`renderSource`/`nodeText`. É importado direto por `App.jsx`, `Layout.jsx`,
@@ -13,58 +13,58 @@ dashboards por perfil, sidebar/workspace, e o editor de treino via `Builder.jsx`
 Foi produzido por uma refatoração de design ad-hoc (fora do escopo formal da feature
 `web-frontend-redesign`, cujo `spec.md` explicitamente excluiu "redesign tela a tela do dashboard
 autenticado") e nunca foi absorvido na estrutura normal do repo (`src/components`, `src/pages`,
-`src/hooks`) — ficou como camada paralela isolada numa pasta com nome de ferramenta externa, não
+`src/hooks`), ficou como camada paralela isolada numa pasta com nome de ferramenta externa, não
 de domínio. Confirmado com o usuário nesta sessão: a intenção original era essa absorção acontecer
 e não aconteceu.
 
-## Goals — REVISADO 2026-09-14 (ver AD-WEB-007, supersede AD-WEB-006)
+## Goals, REVISADO 2026-09-14 (ver AD-WEB-007, supersede AD-WEB-006)
 
 Decisão do usuário mudou depois do Specify/Design/Tasks originais (que assumiam só reorganizar
 pastas). Novo objetivo: **reescrever** cada tela hoje renderizada pelo motor genérico
 (`sourceRuntime`/`StitchTemplate`/HTML de `templates/`) como componente **TypeScript/React nativo
-(.tsx)**, com **obrigatoriedade dura de zero mudança visual/de comportamento** — pixel-parity, não
+(.tsx)**, com **obrigatoriedade dura de zero mudança visual/de comportamento**, pixel-parity, não
 "parecido".
 
-**Feature status (2026-09-16):** ✅ **Verified (PASS)** — T1–T19; Verifier `@fdeb92b`; report
+**Feature status (2026-09-16):** ✅ **Verified (PASS)**, T1–T19; Verifier `@fdeb92b`; report
 `.specs/features/stitch-migration/validation.md`.
 
 - [x] Cada tela hoje em `src/stitch/*.jsx` vira um ou mais componentes `.tsx` nativos, tipados, sem
       depender de `sourceRuntime`/`StitchTemplate`/`manifest.json`/HTML externo em runtime.
 - [x] DOM renderizado (estrutura, classes CSS, texto, comportamento interativo) é **idêntico** ao
-      estado atual — verificado por screenshot-diff automatizado (Playwright, já disponível no
-      ambiente — ver `.specs/verify-stitch.cjs` como precedente), não só "revisão visual".
-      *(Verifier: evidência pixel em arquivo parcial/arquivada — aceito no close estrutural; refresh
+      estado atual, verificado por screenshot-diff automatizado (Playwright, já disponível no
+      ambiente, ver `.specs/verify-stitch.cjs` como precedente), não só "revisão visual".
+      *(Verifier: evidência pixel em arquivo parcial/arquivada, aceito no close estrutural; refresh
       opcional fora desta fase.)*
-- [x] TypeScript é adotado no projeto (`tsconfig.json`, `typescript` como devDependency — os
-      `@types/react`/`@types/react-dom` já existem em `package.json` mas não usados) — escopo
+- [x] TypeScript é adotado no projeto (`tsconfig.json`, `typescript` como devDependency, os
+      `@types/react`/`@types/react-dom` já existem em `package.json` mas não usados), escopo
       mínimo: habilita `.tsx` coexistindo com `.jsx` existente (não converte o repo inteiro).
-- [x] Todo import (interno ao repo, inclusive testes) resolve pro novo caminho — zero import morto
+- [x] Todo import (interno ao repo, inclusive testes) resolve pro novo caminho, zero import morto
       apontando pra `stitch/`.
 - [x] Os 6 arquivos de teste existentes (`AthleteScoreboard.test.jsx`, `Exercises.test.jsx`,
       `Moderation.test.jsx`, `Onboarding.test.jsx`, `StitchTemplates.test.jsx`,
       `Usability.test.jsx`) continuam passando após a reescrita, sem alterar o que testam.
-      *(5/6 comportamentos cobertos em shells; `StitchTemplates` retired com o motor — AD-WEB-007.)*
+      *(5/6 comportamentos cobertos em shells; `StitchTemplates` retired com o motor, AD-WEB-007.)*
 - [x] Arquivos legados pré-Stitch com nome colidente (ex.: `src/pages/Login.jsx` vs.
       `stitch/PublicPages.jsx`'s `StitchLogin`) são investigados: mantidos (se ainda referenciados
-      por import real) ou removidos (se confirmados mortos) — nunca sobrescritos às cegas. Ver
-      tabela de investigação já fechada em `design.md` — continua válida, reescrita não muda quem
+      por import real) ou removidos (se confirmados mortos), nunca sobrescritos às cegas. Ver
+      tabela de investigação já fechada em `design.md`, continua válida, reescrita não muda quem
       é o dono da lógica de negócio (`Login.jsx`, `Register.jsx` etc. continuam sendo a lógica real
       que o novo `.tsx` vai envolver, só que sem o runtime genérico no meio).
 - [x] Motor genérico (`sourceRuntime.jsx`, `StitchTemplate.jsx`, `manifest.json`, `linkBinding.js`,
-      `copy.js`/`.tsv`, `templates/*.html`, `styles/*.css`) é **removido** ao final — só existe
+      `copy.js`/`.tsv`, `templates/*.html`, `styles/*.css`) é **removido** ao final, só existe
       enquanto alguma tela ainda não foi convertida (migração incremental, tela por tela).
-      *(Runtime motor removido; assets estáticos em `pages/shell-assets/` — rename pós-close 2026-09-16.)*
+      *(Runtime motor removido; assets estáticos em `pages/shell-assets/`, rename pós-close 2026-09-16.)*
 
 ## Out of Scope
 
 | Item | Motivo |
 | --- | --- |
-| ~~Reescrever telas como JSX nativo~~ | **REVOGADO 2026-09-14** — usuário pediu explicitamente reescrita em TypeScript/React nativo. Ver Goals revisado e AD-WEB-007. |
-| Mudar UX/visual/comportamento de qualquer tela, por menor que seja | Requisito duro e explícito do usuário: "NAO MUDAR O DESIGN E APARENCIA DE NADA" — pixel-parity é acceptance criteria, não guideline |
-| Converter o repo inteiro pra TypeScript | Escopo é habilitar `.tsx` pras telas desta migração; arquivos `.jsx` existentes fora do escopo continuam `.jsx` — conversão ampla é decisão separada |
+| ~~Reescrever telas como JSX nativo~~ | **REVOGADO 2026-09-14**, usuário pediu explicitamente reescrita em TypeScript/React nativo. Ver Goals revisado e AD-WEB-007. |
+| Mudar UX/visual/comportamento de qualquer tela, por menor que seja | Requisito duro e explícito do usuário: "NAO MUDAR O DESIGN E APARENCIA DE NADA", pixel-parity é acceptance criteria, não guideline |
+| Converter o repo inteiro pra TypeScript | Escopo é habilitar `.tsx` pras telas desta migração; arquivos `.jsx` existentes fora do escopo continuam `.jsx`, conversão ampla é decisão separada |
 | Mexer em `ShapeUpApi` (backend) | Fora do domínio desta spec |
-| `stitch/Builder.jsx` mudar de LOCAL antes da feature `workout-editor` fechar | Ver AD-1 abaixo — ordem coordenada com a Frente 1 (fechamento da Fase 2) desta sessão |
-| `.png`/screenshots de verificação em `ShapeUp-Web/.specs/` (ex.: `verified-*.png`, `source-*.png`) e scripts `.cjs` de verificação visual na raiz de `.specs/` | Artefatos da feature `web-frontend-redesign` já entregue — não pertencem ao escopo desta spec, que é só sobre `src/stitch/` |
+| `stitch/Builder.jsx` mudar de LOCAL antes da feature `workout-editor` fechar | Ver AD-1 abaixo, ordem coordenada com a Frente 1 (fechamento da Fase 2) desta sessão |
+| `.png`/screenshots de verificação em `ShapeUp-Web/.specs/` (ex.: `verified-*.png`, `source-*.png`) e scripts `.cjs` de verificação visual na raiz de `.specs/` | Artefatos da feature `web-frontend-redesign` já entregue, não pertencem ao escopo desta spec, que é só sobre `src/stitch/` |
 
 ---
 
@@ -72,18 +72,18 @@ pastas). Novo objetivo: **reescrever** cada tela hoje renderizada pelo motor gen
 
 | Assumption / decision | Chosen default | Rationale | Confirmed? |
 | --- | --- | --- | --- |
-| Nome da nova pasta pro motor de template | `src/lib/pageTemplateEngine/` (`sourceRuntime.jsx`, `StitchTemplate.jsx`, `manifest.json`, `linkBinding.js`, `copy.js`, `copy.tsv`, `useStitchLanguage.js`) | Repo não tem `src/lib/` ainda, mas é o padrão comum pra "motor compartilhado sem dono de domínio" (paralelo a `src/services/`, `src/utils/` já existentes) — nome descreve o QUE FAZ, não a ferramenta que gerou | y |
-| Onde cada tela-wrapper migra | Ver tabela de mapeamento na Design phase (arquivo por arquivo) — princípio: ao lado do domínio real (`src/pages/<domínio>/`), nunca uma pasta "stitch" nova | Consistente com goal 1 | y |
-| `templates/*.html` e `styles/*.css` | Movem junto com o motor (`src/lib/pageTemplateEngine/templates/`, `.../styles/`) — são o formato de entrada do motor, não pertencem a uma tela específica | São consumidos genericamente por `sourceDocument`/`StitchTemplate`, não importados por tela individual | y |
-| Arquivos sem nenhum importer real confirmado (após investigação de colisão) | Removidos nesta feature, registrados individualmente no `validation.md` do Verifier | Consistente com "código morto não é preservado por hábito" — mas só após confirmação real de import (não apenas grep de string), ver Goal 4 | y |
-| Coordenação com `workout-editor` (Frente 1 desta sessão) | `Builder.jsx`/`StitchBuilder` só migra de local DEPOIS que `workout-editor` roda seu Verifier e fecha — registrado em `STATE.md` de ambos os specs | Evita os dois trabalhos colidirem no mesmo arquivo ao mesmo tempo; `workout-editor` referencia o caminho atual (`../../stitch/Builder`) até lá | y |
-| `public/stitch/ryno.png` (referenciado em `Onboarding.jsx` como `/stitch/ryno.png`, path público servido pelo Vite, não import JS) | Fora de escopo — é asset estático em `public/`, não faz parte da pasta `src/stitch/` sendo migrada; só o `<img src>` é ajustado se o asset for renomeado, o que esta spec NÃO faz | Path público não tem relação com a estrutura de `src/`; renomear ativo estático é decisão separada, sem necessidade aqui | y |
+| Nome da nova pasta pro motor de template | `src/lib/pageTemplateEngine/` (`sourceRuntime.jsx`, `StitchTemplate.jsx`, `manifest.json`, `linkBinding.js`, `copy.js`, `copy.tsv`, `useStitchLanguage.js`) | Repo não tem `src/lib/` ainda, mas é o padrão comum pra "motor compartilhado sem dono de domínio" (paralelo a `src/services/`, `src/utils/` já existentes), nome descreve o QUE FAZ, não a ferramenta que gerou | y |
+| Onde cada tela-wrapper migra | Ver tabela de mapeamento na Design phase (arquivo por arquivo), princípio: ao lado do domínio real (`src/pages/<domínio>/`), nunca uma pasta "stitch" nova | Consistente com goal 1 | y |
+| `templates/*.html` e `styles/*.css` | Movem junto com o motor (`src/lib/pageTemplateEngine/templates/`, `.../styles/`), são o formato de entrada do motor, não pertencem a uma tela específica | São consumidos genericamente por `sourceDocument`/`StitchTemplate`, não importados por tela individual | y |
+| Arquivos sem nenhum importer real confirmado (após investigação de colisão) | Removidos nesta feature, registrados individualmente no `validation.md` do Verifier | Consistente com "código morto não é preservado por hábito", mas só após confirmação real de import (não apenas grep de string), ver Goal 4 | y |
+| Coordenação com `workout-editor` (Frente 1 desta sessão) | `Builder.jsx`/`StitchBuilder` só migra de local DEPOIS que `workout-editor` roda seu Verifier e fecha, registrado em `STATE.md` de ambos os specs | Evita os dois trabalhos colidirem no mesmo arquivo ao mesmo tempo; `workout-editor` referencia o caminho atual (`../../stitch/Builder`) até lá | y |
+| `public/stitch/ryno.png` (referenciado em `Onboarding.jsx` como `/stitch/ryno.png`, path público servido pelo Vite, não import JS) | Fora de escopo, é asset estático em `public/`, não faz parte da pasta `src/stitch/` sendo migrada; só o `<img src>` é ajustado se o asset for renomeado, o que esta spec NÃO faz | Path público não tem relação com a estrutura de `src/`; renomear ativo estático é decisão separada, sem necessidade aqui | y |
 
-| `tsconfig.json` strictness | `"strict": true` (padrão recomendado pra código novo) | Repo greenfield em TS — começar estrito evita dívida; arquivos `.jsx` não migrados ficam fora do `include` do TS, sem impacto | y |
-| Método de verificação de pixel-parity | Screenshot Playwright (viewport 1440 + 390, mesmo padrão de `verified-*-1440.png`/`-390.png` já em `.specs/`) tela-antes (branch atual) vs. tela-depois (`.tsx`), diff visual (`pixelmatch` ou comparação manual assistida por zoom) — zero diff tolerado fora de anti-aliasing | Já é o padrão usado nesse repo pra verificar redesign (`web-frontend-redesign`); reaproveita ferramenta já disponível (Playwright), sem nova dependência | y |
-| Ordem de conversão das 15 telas | Uma por vez (task por tela), cada uma com seu próprio gate de pixel-parity antes de seguir pra próxima — nunca converter várias em lote | Reduz blast radius de regressão visual; mais fácil isolar qual conversão quebrou o quê | y |
+| `tsconfig.json` strictness | `"strict": true` (padrão recomendado pra código novo) | Repo greenfield em TS, começar estrito evita dívida; arquivos `.jsx` não migrados ficam fora do `include` do TS, sem impacto | y |
+| Método de verificação de pixel-parity | Screenshot Playwright (viewport 1440 + 390, mesmo padrão de `verified-*-1440.png`/`-390.png` já em `.specs/`) tela-antes (branch atual) vs. tela-depois (`.tsx`), diff visual (`pixelmatch` ou comparação manual assistida por zoom), zero diff tolerado fora de anti-aliasing | Já é o padrão usado nesse repo pra verificar redesign (`web-frontend-redesign`); reaproveita ferramenta já disponível (Playwright), sem nova dependência | y |
+| Ordem de conversão das 15 telas | Uma por vez (task por tela), cada uma com seu próprio gate de pixel-parity antes de seguir pra próxima, nunca converter várias em lote | Reduz blast radius de regressão visual; mais fácil isolar qual conversão quebrou o quê | y |
 
-**Open questions:** none — todas resolvidas ou registradas acima.
+**Open questions:** none, todas resolvidas ou registradas acima.
 
 ---
 
@@ -95,7 +95,7 @@ pastas). Novo objetivo: **reescrever** cada tela hoje renderizada pelo motor gen
 `src/lib/pageTemplateEngine/` (não `src/stitch/`), pra qualquer pessoa entender o que o código FAZ
 sem saber a história da ferramenta que o gerou.
 
-**Why P1**: É a peça mais compartilhada — todo o resto depende dela; sem mover primeiro, nada mais
+**Why P1**: É a peça mais compartilhada, todo o resto depende dela; sem mover primeiro, nada mais
 pode migrar.
 
 **Acceptance Criteria**:
@@ -122,7 +122,7 @@ pode migrar.
 resto do seu domínio (`src/pages/...` ou `src/components/...`), não numa pasta separada por
 ferramenta.
 
-**Why P1**: É o objetivo central da spec — sem isso a "absorção" não aconteceu de fato.
+**Why P1**: É o objetivo central da spec, sem isso a "absorção" não aconteceu de fato.
 
 **Acceptance Criteria**:
 
@@ -132,13 +132,13 @@ ferramenta.
    domínio de uma tela-wrapper (ex. `Login.jsx`, `Register.jsx`, `Dashboard/Exercises.jsx`,
    `Dashboard/Settings.jsx`, `Dashboard/Messages.jsx`, `Dashboard/DashboardClient.jsx`) THEN a
    Design phase SHALL registrar, arquivo por arquivo, se o legado é: (a) ainda importado de
-   verdade por statement `import` (não por string de tradução/rota) — nesse caso o
-   nome/caminho final é decidido caso a caso pra não colidir — ou (b) confirmado sem nenhum
-   `import` real — nesse caso é removido
+   verdade por statement `import` (não por string de tradução/rota), nesse caso o
+   nome/caminho final é decidido caso a caso pra não colidir, ou (b) confirmado sem nenhum
+   `import` real, nesse caso é removido
 3. WHEN qualquer arquivo do repo (produção ou teste) importava uma tela-wrapper por caminho
    `stitch/X` THEN o import SHALL apontar pro novo caminho
 4. WHEN os 6 arquivos de teste existentes rodam (`npm test` ou equivalente) THEN SHALL passar sem
-   alteração de asserção — só ajuste de import path se necessário
+   alteração de asserção, só ajuste de import path se necessário
 
 **Independent Test**: `npm run build && npm run lint` limpos, suíte de teste do frontend 100%
 verde, navegação manual (via `run` skill) confirma que Login/Register/Dashboard/Exercícios/
@@ -164,7 +164,7 @@ entre as duas frentes desta sessão.
 3. WHEN `Builder.jsx` migra THEN `sourceRuntime` que ele usa já SHALL estar em
    `src/lib/pageTemplateEngine/` (P1 já fechado)
 
-**Independent Test**: Checar `STATE.md` de `workout-editor` — status `Verified`/PASS — antes de
+**Independent Test**: Checar `STATE.md` de `workout-editor`, status `Verified`/PASS, antes de
 rodar a task de mover `Builder.jsx`.
 
 ---
@@ -175,7 +175,7 @@ rodar a task de mover `Builder.jsx`.
   motor (checar `manifest.json` e imports `?inline`) THEN SHALL ser listado como candidato a
   remoção na Design phase, com evidência de zero-referência antes de apagar
 - WHEN `public/stitch/ryno.png` for o único artefato do nome "stitch" fora de `src/` THEN
-  permanece — fora de escopo (ver Assumptions)
+  permanece, fora de escopo (ver Assumptions)
 - WHEN um teste (`*.test.jsx`) importa um caminho relativo que muda de profundidade após a
   migração THEN o import SHALL ser ajustado sem alterar o corpo do teste
 
@@ -185,24 +185,24 @@ rodar a task de mover `Builder.jsx`.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| STMIG-01 | P1: Motor de template | Execute | ⏭️ Superseded (AD-WEB-007 — delete engine, not relocate to `pageTemplateEngine/`) |
+| STMIG-01 | P1: Motor de template | Execute | ⏭️ Superseded (AD-WEB-007, delete engine, not relocate to `pageTemplateEngine/`) |
 | STMIG-02 | P1: Motor de template | Execute | ⏭️ Superseded (AD-WEB-007) |
 | STMIG-03 | P1: Motor de template | Execute | ✅ Verified |
 | STMIG-04 | P1: Telas-wrapper | Execute | ✅ Verified |
 | STMIG-05 | P1: Telas-wrapper (colisão de nome legado) | Execute | ✅ Verified |
 | STMIG-06 | P1: Telas-wrapper | Execute | ✅ Verified |
-| STMIG-07 | P1: Telas-wrapper (testes) | Execute | ⚠️ Verified — StitchTemplates suite retired with engine |
+| STMIG-07 | P1: Telas-wrapper (testes) | Execute | ⚠️ Verified, StitchTemplates suite retired with engine |
 | STMIG-08 | P2: Builder.jsx coordenado | Execute | ✅ Verified |
 | STMIG-09 | P2: Builder.jsx coordenado | Execute | ✅ Verified |
 
-**Coverage:** 9 total — 7 ✅ Verified, 1 ⚠️ Verified (STMIG-07), 2 ⏭️ Superseded (STMIG-01/02). Mapped T1–T19; feature closed 2026-09-16. Source of truth: `validation.md`.
+**Coverage:** 9 total, 7 ✅ Verified, 1 ⚠️ Verified (STMIG-07), 2 ⏭️ Superseded (STMIG-01/02). Mapped T1–T19; feature closed 2026-09-16. Source of truth: `validation.md`.
 
 ---
 
 ## Success Criteria
 
-- [x] Zero caminho contendo `/stitch/` sob `src/` (exceto o histórico do git) — `src/stitch/` absent; assets em `shell-assets`
-- [x] `npm run build`, `npm run lint`, suíte de testes — todos limpos após a migração (Verifier: 112 tests)
+- [x] Zero caminho contendo `/stitch/` sob `src/` (exceto o histórico do git), `src/stitch/` absent; assets em `shell-assets`
+- [x] `npm run build`, `npm run lint`, suíte de testes, todos limpos após a migração (Verifier: 112 tests)
 - [x] `workout-editor` e `stitch-migration` não colidem: `Builder.jsx` migra só depois do Verifier
-      de `workout-editor` (coordenado via `STATE.md` dos dois repos) — T19 `PlanEditorShell`
+      de `workout-editor` (coordenado via `STATE.md` dos dois repos), T19 `PlanEditorShell`
 - [x] Nenhum arquivo removido sem evidência de zero-import real documentada no `validation.md`

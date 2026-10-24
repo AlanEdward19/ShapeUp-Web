@@ -162,7 +162,7 @@ const TrainingPlansProfessional = () => {
     };
 
     /**
-     * Saves a template — NOT tied to a specific client.
+     * Saves a template, NOT tied to a specific client.
      * Uses createWorkoutTemplate (POST /api/training/workout-templates).
      * The command only requires name, notes and exercises (no targetUserId).
      */

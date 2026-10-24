@@ -109,7 +109,7 @@ function MessagesShell() {
   );
 }
 
-/** `/dashboard/feedback` — pro/gym inbox uses the same messages shell via `Feedback`. */
+/** `/dashboard/feedback`, pro/gym inbox uses the same messages shell via `Feedback`. */
 export const FeedbackShell = MessagesShell;
 
 export default MessagesShell;

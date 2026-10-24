@@ -44,7 +44,7 @@ export function UnifiedSidebarNavigation({ flow, open, close }: UnifiedSidebarNa
       {flow && <div className="sn-space" style={{ width: 256, flexShrink: 0 }} />}
       <aside data-unified-sidebar data-open={open}>
         <div className="sn-brand">
-          <Link to="/dashboard" aria-label="ShapeUp — Início" onClick={close}>
+          <Link to="/dashboard" aria-label="ShapeUp, Início" onClick={close}>
             <Logo width="32" height="32" />
             <span className="sn-wordmark">ShapeUp</span>
           </Link>

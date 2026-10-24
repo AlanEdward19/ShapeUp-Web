@@ -1,4 +1,4 @@
-# XP Feedback Loop (frontend) — Tasks
+# XP Feedback Loop (frontend), Tasks
 
 ## Execution Protocol (MANDATORY -- do not skip)
 

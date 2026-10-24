@@ -1,8 +1,8 @@
-# Intermittent Fasting Timer (Web) — Specification
+# Intermittent Fasting Timer (Web), Specification
 
 > **Scope**: ShapeUp-Web only. Canonical persist, validation, auth, flag, and clock snapshot: `ShapeUpV2/.specs/features/intermittent-fasting-timer/` (`IFTA-*`). This spec owns **UI, client mapping, countdown tick, disclaimer, diary banner**. Do not invent a localStorage product. **API lands first**; Web binds to `GET /api/nutrition/fasting`.
 
-> Nutrition workspace already exists (`/dashboard/nutrition/{diary,foods,meal-plans,goal}`). No `nutritionist` role — `professional` is P2. Foodvisor is an indirect competitor; do not copy schedule-locked windows without Start.
+> Nutrition workspace already exists (`/dashboard/nutrition/{diary,foods,meal-plans,goal}`). No `nutritionist` role, `professional` is P2. Foodvisor is an indirect competitor; do not copy schedule-locked windows without Start.
 
 ## Problem Statement
 
@@ -41,7 +41,7 @@ The API will store agenda + override. The athlete still needs a Jejum screen: pi
 | Diary P1 | Add meal does not call fasting write APIs. | IFTA diary assumption. | n |
 | Disclaimer | One-liner i18n, no blocking modal. | Not challenged. | y |
 
-**Open questions:** none — all resolved or logged above.
+**Open questions:** none, all resolved or logged above.
 
 ---
 

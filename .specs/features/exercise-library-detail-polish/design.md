@@ -109,7 +109,7 @@ Seed compounds (minimum extra rows; percents illustrative, not claimed as EMG sc
 
 Prefer **leaf** flags (`1<<n`) over composites so `GetMuscleName` is not `"Chest"` hiding three regions.
 
-**Relationships**: Exercise 1—N MuscleProfile (unique pair).
+**Relationships**: Exercise 1-N MuscleProfile (unique pair).
 
 ---
 
@@ -118,7 +118,7 @@ Prefer **leaf** flags (`1<<n`) over composites so `GetMuscleName` is not `"Chest
 | Error Scenario | Handling | User Impact |
 | -------------- | -------- | ----------- |
 | Missing video | Square placeholder + translated copy | Layout holds |
-| GET muscles length 1 | Synergist `—` | Honest empty |
+| GET muscles length 1 | Synergist `-` | Honest empty |
 | Duplicate muscle on create | Unique index | Existing 400/500; no new handler |
 | Missing i18n key | `t()` returns key | No crash |
 

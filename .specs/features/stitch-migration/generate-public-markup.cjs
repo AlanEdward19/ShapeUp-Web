@@ -110,7 +110,7 @@ function generate(name) {
   const body = dom.window.document.body;
   const jsx = [...body.childNodes].map((n) => nodeToJsx(n)).join('');
   const component = name.charAt(0).toUpperCase() + name.slice(1);
-  const file = `/* eslint-disable */\n/* Auto-generated from stitch/templates/${name}.html — do not edit by hand */\nimport type { ReactElement } from 'react';\n\nexport function ${component}StaticMarkup(): ReactElement {\n  return (\n    <>\n${jsx}    </>\n  );\n}\n`;
+  const file = `/* eslint-disable */\n/* Auto-generated from stitch/templates/${name}.html, do not edit by hand */\nimport type { ReactElement } from 'react';\n\nexport function ${component}StaticMarkup(): ReactElement {\n  return (\n    <>\n${jsx}    </>\n  );\n}\n`;
   fs.writeFileSync(path.join(outDir, `${component}StaticMarkup.tsx`), file);
   console.log('wrote', component);
 }

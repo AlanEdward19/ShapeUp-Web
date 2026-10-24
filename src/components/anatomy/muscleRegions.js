@@ -1,4 +1,4 @@
-/** Leaf regions painted on the body maps — matches MuscleGroup flags (not composites). */
+/** Leaf regions painted on the body maps, matches MuscleGroup flags (not composites). */
 export const LEAF_MUSCLES = [
     'MiddleChest',
     'UpperChest',

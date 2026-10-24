@@ -260,9 +260,9 @@ export const PlanEditor = ({ plan, onSave, onCancel, onAssign, isIndependent = f
             .filter(s => s.intensityType === 'rpe')
             .map(s => parseFloat(s.intensityValue))
             .filter(r => !isNaN(r)));
-        return all.length ? (all.reduce((a, b) => a + b, 0) / all.length).toFixed(1) : '—';
+        return all.length ? (all.reduce((a, b) => a + b, 0) / all.length).toFixed(1) : '-';
     })();
-    const estMins = allExercises.length === 0 ? '—' : (() => {
+    const estMins = allExercises.length === 0 ? '-' : (() => {
         const totalRest = allExercises.reduce((acc, ex) =>
             acc + ex.sets.reduce((a, s) => a + (parseInt(s.rest) || 90), 0), 0);
         return `${Math.round((totalRest + totalSets * 45) / 60)}–${Math.round((totalRest + totalSets * 75) / 60)} ${t('pro.builder.summary.time.unit')}`;
@@ -729,7 +729,7 @@ const ClientDetail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const [client, setClient] = useState({name:`#${id}`,goal:'—',status:'—',weightProgress:[],strengthProgress:[],readinessRadar:[],adherence:{completed:0,skipped:0,partial:0},hasData:false});
+    const [client, setClient] = useState({name:`#${id}`,goal:'-',status:'-',weightProgress:[],strengthProgress:[],readinessRadar:[],adherence:{completed:0,skipped:0,partial:0},hasData:false});
 
     const [activeTab, setActiveTab] = useState(location.state?.tab || 'analytics');
     const [plans, setPlans] = useState([]);
@@ -748,7 +748,7 @@ const ClientDetail = () => {
                 const roster = await readAllPages(cursor=>getTrainerClients(me.userId || me.id,cursor));
                 const person = roster.find(item=>String(item.clientId)===String(id));
                 const history = sessions.filter(item=>item.isCompleted || item.isCancelled).map(workoutHistory);
-                setClient(prev=>({...prev,name:person?.clientName || `#${id}`,status:person?.status || '—',hasData:history.length>0,adherence:{completed:history.filter(item=>item.status==='completed').length,skipped:history.filter(item=>item.status==='skipped').length,partial:0}}));
+                setClient(prev=>({...prev,name:person?.clientName || `#${id}`,status:person?.status || '-',hasData:history.length>0,adherence:{completed:history.filter(item=>item.status==='completed').length,skipped:history.filter(item=>item.status==='skipped').length,partial:0}}));
                 setPlans(raw.map(p=>({...normalizePlan(p),history:history.filter(item=>String(item.workoutPlanId)===String(p.planId || p.id))})));
             } catch (err) {
                 console.error('Erro ao buscar planos do cliente:', err);

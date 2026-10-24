@@ -1,4 +1,4 @@
-# Time-Based Exercises (Frontend) — Tasks
+# Time-Based Exercises (Frontend), Tasks
 
 ## Execution Protocol (MANDATORY -- do not skip)
 
@@ -23,8 +23,8 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 | Domain utils (`trainingEnums` ExerciseType, `durationDistance`, `workoutPlanPayload`, `setCompletionGate`, `workoutStatePayload`, `workoutHistory`) | unit | All branches; 1:1 to TBE-02/03/05 ACs and listed edge cases | `src/utils/__tests__/*.test.js` | `npm test` |
 | Editor components (`SetRow`, `ExerciseRow`) | unit | TimeBased vs WeightBased render; technique lock; mixed headers | `src/components/training/__tests__/*.test.jsx` | `npm test` |
 | i18n key rows | none | Build/lint only | `src/contexts/LanguageContext.jsx` | build gate |
-| Page import rewire (`ClientDetail`, `TrainingPlansIndependent`, `TrainingPlansClient` after utils exist) | none | Behavior covered in utils + SetRow/ExerciseRow | — | build gate |
-| Entity/config | none | — | — | build gate |
+| Page import rewire (`ClientDetail`, `TrainingPlansIndependent`, `TrainingPlansClient` after utils exist) | none | Behavior covered in utils + SetRow/ExerciseRow | - | build gate |
+| Entity/config | none | - |, | build gate |
 
 ## Gate Check Commands
 
