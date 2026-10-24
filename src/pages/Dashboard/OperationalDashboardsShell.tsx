@@ -21,6 +21,7 @@ import {
 } from '../../utils/workoutSchedule';
 import WorkspaceShellPage from '../../components/Workspace/WorkspaceShellPage';
 import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
+import athleteHomeCss from './operational-dashboard/athlete/athleteHome.css?inline';
 import { AthleteDashboardMarkup, type AthleteDashboardState } from './operational-dashboard/AthleteDashboardMarkup';
 import {
   ProfessionalDashboardMarkup,
@@ -141,7 +142,7 @@ export function ProfessionalDashboard() {
   };
 
   return (
-    <WorkspaceShellPage name="professional" css={workspaceNavStyle}>
+    <WorkspaceShellPage name="professional" css={workspaceNavStyle + athleteHomeCss}>
       <ProfessionalDashboardMarkup state={shellState} />
     </WorkspaceShellPage>
   );
@@ -291,7 +292,7 @@ export function AthleteView(scoreboardState: AthleteDashboardState) {
   };
 
   return (
-    <WorkspaceShellPage name="athlete" css={workspaceNavStyle}>
+    <WorkspaceShellPage name="athlete" css={workspaceNavStyle + athleteHomeCss}>
       <AthleteDashboardMarkup state={athleteState} />
     </WorkspaceShellPage>
   );

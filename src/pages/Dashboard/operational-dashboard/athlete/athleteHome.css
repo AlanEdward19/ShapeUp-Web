@@ -1,0 +1,215 @@
+/* Athlete home. Colors come from design-system tokens so light and dark both follow the app theme. */
+.ah{min-height:100dvh;background:var(--bg-main);color:var(--text-main);font:16px/1.4 'Source Sans 3','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+.ah *{box-sizing:border-box}
+:where(.ah) button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0;text-align:inherit}
+.ah button:focus-visible{outline:2px solid var(--link-color);outline-offset:3px}
+.ah-page{max-width:1200px;margin:0 auto;padding:36px 40px 80px}
+.ah-alert{margin:0 0 16px;padding:12px 16px;border-radius:14px;background:color-mix(in oklab,var(--error) 14%,transparent);color:var(--text-main)}
+
+.ah-header{margin-bottom:24px}
+.ah-date{margin:0 0 2px;color:var(--text-muted);font-size:15px;font-weight:500}
+.ah-date::first-letter{text-transform:uppercase}
+.ah-header h1{margin:0;font:700 clamp(34px,5vw,46px)/1.05 'Barlow Condensed',sans-serif;letter-spacing:-.005em}
+
+.ah-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:18px;grid-auto-flow:dense}
+.ah-grid>*{min-width:0}
+.ah-hero{grid-column:span 8}
+.ah-summary{grid-column:span 4}
+.ah-week{grid-column:span 4}
+.ah-volume{grid-column:span 8}
+.ah-today{grid-column:span 8;grid-row:span 3}
+.ah-side{grid-column:span 4;grid-row:span 3;gap:0}
+.ah-block{padding:20px 0;border-top:1px solid var(--border-color)}
+.ah-block:first-child{padding-top:0;border-top:0}
+.ah-block:last-child{padding-bottom:0}
+.ah-progress,.ah-reading{grid-column:span 6}
+
+.ah-card{display:flex;flex-direction:column;background:var(--bg-card);border:1px solid var(--border-color);border-radius:26px;padding:22px 24px;box-shadow:var(--shadow-soft)}
+.ah-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.ah-card-title{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.ah-card>.ah-card-title{margin-bottom:14px}
+.ah-card-sub{margin:0;color:var(--text-muted);font-size:14px}
+
+/* hero: filled oxide block, paper ink */
+.ah-hero{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;min-height:260px;padding:32px;border-radius:26px;color:#fff8f5;background:#b94a25}
+.ah-eyebrow{margin:0 0 6px;font-size:15px;font-weight:600;opacity:.88}
+.ah-hero h2{margin:0;max-width:20ch;font:700 clamp(32px,4vw,44px)/1.04 'Barlow Condensed',sans-serif;letter-spacing:-.005em}
+.ah-hero-meta{margin:8px 0 0;max-width:46ch;font-size:16px;opacity:.9}
+.ah-chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0;padding:0;list-style:none}
+.ah-chips li{padding:5px 12px;border-radius:999px;background:rgb(255 255 255/.18);font-size:13px;font-weight:600}
+.ah-hero-cta{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;margin-top:24px;min-height:52px;padding:0 26px 0 20px;border-radius:16px;background:#fff8f5;color:#6b2a12;font-size:17px;font-weight:700;letter-spacing:-.01em;transition:transform .14s cubic-bezier(.16,1,.3,1),background-color .14s}
+.ah-hero-cta:hover{background:#fff;}
+.ah-hero-cta:active{transform:scale(.97)}
+.ah-hero-cta .material-symbols-outlined{font-size:26px}
+.ah-hero.is-quiet{align-items:flex-start;justify-content:center;gap:2px;background:var(--bg-card);color:var(--text-main);border:1px solid var(--border-color);box-shadow:var(--shadow-soft)}
+.ah-hero.is-quiet>.material-symbols-outlined{display:grid;place-items:center;width:56px;height:56px;margin-bottom:12px;border-radius:18px;background:color-mix(in oklab,var(--primary) 16%,transparent);color:var(--primary);font-size:30px}
+.ah-hero.is-quiet .ah-hero-meta{color:var(--text-muted);opacity:1}
+.ah-soft-cta{margin-top:20px;min-height:48px;padding:0 22px;border-radius:14px;background:var(--bg-surface-high);color:var(--text-main);font-weight:600;transition:background-color .14s}
+.ah-soft-cta:hover{background:var(--bg-surface-highest)}
+
+/* summary rings */
+.ah-summary-body{display:flex;flex-direction:column;align-items:center;gap:20px}
+.ah-rings{display:block;max-width:100%;height:auto}
+.ah-ring-fill{transition:stroke-dashoffset .9s cubic-bezier(.16,1,.3,1),opacity .3s}
+.ah-legend{width:100%;margin:0;display:grid;gap:10px}
+.ah-legend>div{display:flex;align-items:center;gap:10px}
+.ah-legend>div::before{content:'';flex:none;width:10px;height:10px;border-radius:50%;background:var(--dot)}
+.ah-legend dt{flex:1;color:var(--text-muted);font-size:15px}
+.ah-legend dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+
+/* week strip */
+.ah-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:6px 0 20px;padding:0;list-style:none}
+.ah-day{display:grid;justify-items:center;gap:8px;color:var(--text-muted);font-size:12px;font-weight:600}
+.ah-day>i,.ah-day>.material-symbols-outlined{display:grid;place-items:center;width:100%;max-width:38px;aspect-ratio:1;border-radius:50%;background:var(--bg-surface-high);font-style:normal;font-size:14px;font-weight:600;color:var(--text-muted)}
+.ah-day[data-workout-completed=true]>.material-symbols-outlined{background:var(--accent);color:#fff;font-size:20px;font-variation-settings:'wght' 600}
+.ah-day[data-today]{color:var(--text-main)}
+.ah-day[data-today]>i,.ah-day[data-today]>.material-symbols-outlined{box-shadow:0 0 0 2px var(--bg-card),0 0 0 4px var(--primary)}
+.ah-day[data-today]>i{color:var(--text-main)}
+.ah-stat{margin-top:auto;display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-top:16px;border-top:1px solid var(--border-color)}
+.ah-stat-label{color:var(--text-muted);font-size:14px}
+.ah-stat-value{display:flex;align-items:baseline;gap:6px;font:700 30px/1 'Barlow Condensed',sans-serif}
+.ah-stat-value small{color:var(--text-muted);font:500 14px 'Source Sans 3',sans-serif}
+.ah-pill{font:600 12px 'Source Sans 3',sans-serif;font-style:normal;padding:3px 8px;border-radius:999px;background:color-mix(in oklab,var(--accent) 22%,transparent);color:var(--text-main)}
+
+/* volume chart */
+.ah-chart-readout{margin:0 0 6px;display:flex;align-items:baseline;gap:6px;color:var(--text-muted);font-size:15px}
+.ah-chart-readout strong{color:var(--text-main);font:700 40px/1 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums}
+.ah-chart-readout span{margin-left:auto;font-size:14px}
+.ah-chart svg{display:block;width:100%;height:auto;touch-action:pan-y;overflow:visible}
+.ah-grid-line,.ah-chart .ah-grid{stroke:var(--border-color);stroke-width:1}
+.ah-line{stroke:var(--primary);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.ah-cursor{stroke:var(--text-muted);stroke-opacity:.35;stroke-dasharray:3 4}
+.ah-dot{fill:var(--bg-card);stroke:var(--primary);stroke-width:2.5;transition:r .12s}
+.ah-dot.is-active{fill:var(--primary);stroke:var(--bg-card);stroke-width:3}
+.ah-chart-axis{display:flex;justify-content:space-between;margin-top:2px;color:var(--text-muted);font-size:12px}
+.ah-empty{margin:0;padding:34px 12px;border-radius:18px;background:var(--bg-surface-high);color:var(--text-muted);text-align:center}
+
+/* today's exercises */
+.ah-exercises{margin:0 -8px;padding:0;list-style:none}
+.ah-exercises button{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:10px 8px;border-radius:18px;transition:background-color .14s}
+.ah-exercises button:hover{background:var(--bg-surface-high)}
+.ah-index{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--bg-surface-high);color:var(--text-muted);font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.ah-exercises button:hover .ah-index{background:var(--bg-card)}
+.ah-exercise-copy{display:grid;flex:1;min-width:0}
+.ah-exercise-copy strong{font-size:16px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ah-exercise-copy small{color:var(--text-muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ah-prescription{display:grid;justify-items:end;font:700 20px/1.1 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums}
+.ah-prescription small{color:var(--text-muted);font:500 13px 'Source Sans 3',sans-serif}
+
+/* nutrition + water */
+.ah-big{margin:0 0 12px;font:700 40px/1 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums}
+.ah-big small{color:var(--text-muted);font:500 15px 'Source Sans 3',sans-serif}
+.ah-bar{height:10px;border-radius:999px;background:var(--bg-surface-high);overflow:hidden}
+.ah-bar.is-thin{height:6px}
+.ah-bar i{display:block;height:100%;border-radius:inherit;transition:width .8s cubic-bezier(.16,1,.3,1)}
+.ah-macro{display:flex;justify-content:space-between;margin:16px 0 8px;font-size:14px;color:var(--text-muted)}
+.ah-macro strong{color:var(--text-main);font-weight:600}
+.ah-nutrition .ah-card-sub{margin-top:14px}
+.ah-glasses{display:flex;gap:5px;margin:0 0 16px;padding:0;list-style:none}
+.ah-glasses li{flex:1;height:34px;border-radius:9px;background:var(--bg-surface-high);transition:background-color .3s}
+.ah-glasses li[data-filled]{background:var(--warning)}
+.ah-water-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ah-water-actions button{min-height:46px;border-radius:14px;background:var(--bg-surface-high);font-weight:600;text-align:center;transition:transform .14s cubic-bezier(.16,1,.3,1),background-color .14s}
+.ah-water-actions button:hover:not(:disabled){background:var(--bg-surface-highest)}
+.ah-water-actions button:active:not(:disabled){transform:scale(.97)}
+.ah-water-actions button:disabled{opacity:.4;cursor:default}
+.ah-water-actions .is-primary{background:var(--primary-solid);color:#fff8f5}
+.ah-water-actions .is-primary:hover:not(:disabled){background:var(--primary-solid-hover)}
+
+/* coach */
+.ah-quote{margin:0 0 14px;padding:14px 16px;border-radius:18px;background:var(--bg-surface-high);font-size:16px;line-height:1.5}
+.ah-quote.is-empty{color:var(--text-muted)}
+.ah-link{display:inline-flex;align-items:center;gap:6px;min-height:32px;color:var(--link-color);font-size:15px;font-weight:600}
+.ah-link:hover{text-decoration:underline}
+.ah-link .material-symbols-outlined{font-size:18px}
+
+/* gamification cards: neutralise their own section chrome */
+.ah [data-athlete-scoreboard],.ah [data-weekly-reading]{border:0!important;padding:0!important}
+.ah [data-athlete-scoreboard] h2,.ah [data-weekly-reading] h2{margin:0 0 14px!important;font-size:17px!important;font-weight:600!important}
+.ah [data-athlete-scoreboard] strong{font-family:'Barlow Condensed',sans-serif}
+.ah [data-athlete-scoreboard] progress{border-radius:999px!important;height:10px!important}
+.ah [data-athlete-scoreboard] details{border-top-color:var(--border-color)!important}
+.ah [data-athlete-scoreboard] summary,.ah [data-athlete-scoreboard] button,.ah [data-weekly-reading] button{cursor:pointer}
+
+@media(max-width:1100px){
+  .ah-page{padding:28px 24px 96px}
+  .ah-hero,.ah-volume,.ah-today{grid-column:span 12}
+  .ah-today{grid-row:auto}
+  .ah-summary,.ah-week,.ah-progress,.ah-reading{grid-column:span 6}
+  .ah-side{grid-column:span 12;grid-row:auto}
+}
+@media(max-width:700px){
+  .ah-page{padding:12px 16px 48px}
+  .ah-grid{gap:14px}
+  .ah-grid>*{grid-column:span 12!important}
+  .ah-hero{min-height:230px;padding:24px;border-radius:26px}
+  .ah-card{padding:18px 18px;border-radius:22px}
+  .ah-summary-body{flex-direction:row;align-items:center;gap:16px}
+  .ah-rings{width:136px;height:136px;flex:none}
+}
+@media(prefers-reduced-motion:reduce){.ah *{transition:none!important}}
+
+/* ---- shared by the professional home ---- */
+.ah-header-split{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+.ah-lede{margin:6px 0 0;color:var(--text-muted);font-size:16px}
+.ah-actions{display:flex;flex-wrap:wrap;gap:10px}
+.ah-solid-cta,.ah-soft-cta{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 20px;border-radius:14px;font-size:16px;font-weight:600;letter-spacing:-.01em;transition:transform .14s cubic-bezier(.16,1,.3,1),background-color .14s}
+.ah-solid-cta{background:var(--primary-solid);color:#fff8f5}
+.ah-solid-cta:hover{background:var(--primary-solid-hover)}
+.ah-soft-cta{margin-top:0;background:var(--bg-surface-high);color:var(--text-main)}
+.ah-hero .ah-soft-cta,.ah-hero.is-quiet .ah-soft-cta{margin-top:20px}
+.ah-solid-cta:active,.ah-soft-cta:active{transform:scale(.97)}
+.ah-solid-cta .material-symbols-outlined,.ah-soft-cta .material-symbols-outlined{font-size:22px}
+.ah-pro-adherence{grid-column:span 4}
+.ah-pro-today{grid-column:span 3}
+.ah-pro-agenda{grid-column:span 5}
+.ah-pro-clients{grid-column:span 8}
+.ah-pro-feedback{grid-column:span 4}
+.ah-center{position:relative;display:grid;place-items:center}
+.ah-center-value{position:absolute;font:700 40px/1 'Barlow Condensed',sans-serif}
+.ah-center-value small{font-size:20px;color:var(--text-muted)}
+.ah-split{display:flex;width:100%;height:8px;border-radius:99px;overflow:hidden;background:var(--bg-surface-high)}
+.ah-split i{display:block;height:100%}
+.ah-duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;align-content:center}
+.ah-duo>div{display:grid;gap:4px;padding:16px;border-radius:18px;background:var(--bg-surface-high)}
+.ah-duo-value{font:700 44px/1 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums}
+.ah-duo-label{color:var(--text-muted);font-size:14px}
+.ah-list{margin:0;padding:0;list-style:none;display:grid;gap:4px}
+.ah-list li{display:flex;align-items:center;gap:14px;min-height:56px;padding:6px 0}
+.ah-list.is-stacked li{align-items:flex-start;flex-direction:column;gap:4px;border-top:1px solid var(--border-color);padding:12px 0}
+.ah-list.is-stacked li:first-child{border-top:0;padding-top:0}
+.ah-time{flex:none;min-width:58px;padding:6px 10px;border-radius:10px;background:var(--bg-surface-high);font-weight:700;font-variant-numeric:tabular-nums;text-align:center}
+.ah-list-copy{display:grid;flex:1;min-width:0}
+.ah-list-copy strong{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ah-list-copy small{color:var(--text-muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ah-clamp{white-space:normal!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.ah-wrap{flex-wrap:wrap}
+.ah-segmented{display:inline-flex;gap:2px;padding:3px;border-radius:12px;background:var(--bg-surface-high)}
+.ah-segmented button{min-height:34px;padding:0 12px;border-radius:9px;color:var(--text-muted);font-size:14px;font-weight:600;white-space:nowrap}
+.ah-segmented button small{margin-left:2px;font-size:12px;opacity:.8}
+.ah-segmented button[aria-pressed=true]{background:var(--bg-card);color:var(--text-main);box-shadow:0 1px 3px rgb(0 0 0/.18)}
+.ah-search{display:flex;align-items:center;gap:8px;min-height:44px;margin-bottom:8px;padding:0 14px;border-radius:12px;background:var(--bg-surface-high);color:var(--text-muted)}
+.ah-search input{flex:1;min-width:0;min-height:40px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--text-main);font:inherit;font-size:16px!important;outline:none}
+.ah-rows{margin:0 -8px;padding:0;list-style:none}
+.ah-rows button{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:8px;border-radius:16px;transition:background-color .14s}
+.ah-rows button:hover{background:var(--bg-surface-high)}
+.ah-avatar{flex:none;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:color-mix(in oklab,var(--primary) 16%,var(--bg-surface-high));color:var(--link-color);font-size:15px;font-weight:700}
+.ah-row-plan{flex:none;max-width:150px;color:var(--text-muted);font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ah-meter{flex:none;display:flex;align-items:center;gap:10px;width:112px}
+.ah-meter .ah-bar{flex:1}
+.ah-meter b{min-width:38px;text-align:right;font-variant-numeric:tabular-nums}
+.ah-chevron{flex:none;color:var(--text-muted);font-size:22px}
+.ah-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:14px;color:var(--text-muted);font-size:14px}
+@media(max-width:1100px){
+  .ah-pro-adherence,.ah-pro-today{grid-column:span 6}
+  .ah-pro-agenda,.ah-pro-clients,.ah-pro-feedback{grid-column:span 12}
+}
+@media(max-width:700px){
+  .ah-actions{width:100%}
+  .ah-actions>*{flex:1;justify-content:center}
+  .ah-row-plan{display:none}
+  .ah-meter{width:84px}
+}
+.ah-pro-adherence .ah-summary-body{flex-direction:column!important;align-items:center}
+.ah-pro-adherence .ah-rings{width:150px!important;height:150px!important}
+.ah-actions>button{white-space:nowrap}

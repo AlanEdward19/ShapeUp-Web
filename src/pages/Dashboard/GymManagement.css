@@ -1,0 +1,47 @@
+/* Gym management: stat tiles, toolbar, inset forms, quiet table. */
+.gym-api-page { display: flex; flex-direction: column; gap: 1rem; font-family: var(--font-sans); }
+.gym-api-page .su-dashboard-header-flex { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.gym-api-page select, .gym-api-page input:not([type='checkbox']), .gym-api-page textarea {
+  min-height: 3rem; padding: 0.55rem 0.9rem; background: var(--bg-input); color: var(--text-main);
+  border: 1px solid var(--border-input); border-radius: 12px; font: inherit;
+}
+.gym-api-page :is(select, input, textarea):focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 22%, transparent); }
+.gym-api-page label { display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.9375rem; font-weight: 600; }
+.gym-api-page p[role='alert'] { margin: 0; padding: 0.9rem 1.1rem; border-radius: 14px; background: color-mix(in oklab, var(--error) 14%, transparent); }
+.gm-note { margin: 0; padding: 1.25rem; border-radius: 20px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-muted); }
+
+.gm-primary, .gm-soft { min-height: 3rem; padding: 0 1.25rem; border: 0; border-radius: 14px; font: inherit; font-weight: 600; cursor: pointer; transition: transform 0.14s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.14s; }
+.gm-primary { background: var(--primary-solid); color: #fff8f5; }
+.gm-primary:hover:not(:disabled) { background: var(--primary-solid-hover); }
+.gm-soft { min-height: 2.75rem; background: var(--bg-surface-high); color: var(--text-main); }
+.gm-soft:hover:not(:disabled) { background: var(--bg-surface-highest); }
+.gm-soft.is-danger { color: var(--error); }
+.gm-primary:active, .gm-soft:active { transform: scale(0.97); }
+.gm-primary:disabled, .gm-soft:disabled { opacity: 0.5; cursor: default; }
+
+.gm-onboarding { display: grid; justify-items: center; gap: 0.5rem; max-width: 30rem; margin: 2rem auto; padding: 2rem 1.75rem; text-align: center; border-radius: 28px; background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: var(--shadow-soft); }
+.gm-onboarding > .material-symbols-outlined { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: color-mix(in oklab, var(--primary) 16%, transparent); color: var(--primary); font-size: 34px; }
+.gm-onboarding h2 { margin: 0.5rem 0 0; font: 700 1.75rem/1.1 var(--font-display); }
+.gm-onboarding p { margin: 0 0 0.75rem; color: var(--text-muted); }
+.gm-onboarding form { display: grid; gap: 0.9rem; width: 100%; text-align: left; }
+.gm-onboarding .gm-primary { width: 100%; margin-top: 0.25rem; }
+
+.gm-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem; }
+.gm-stat { display: grid; gap: 0.25rem; padding: 1.25rem 1.35rem; border-radius: 24px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); text-decoration: none; transition: transform 0.14s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.14s; }
+.gm-stat:hover { background: var(--bg-surface-high); color: var(--text-main); }
+.gm-stat:active { transform: scale(0.98); }
+.gm-stat .material-symbols-outlined { color: var(--primary); font-size: 28px; margin-bottom: 0.5rem; }
+.gm-stat strong { font: 700 3rem/1 var(--font-display); font-variant-numeric: tabular-nums; }
+.gm-stat span:last-child { color: var(--text-muted); }
+
+.gm-toolbar { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.gm-toolbar input { flex: 1; min-width: 12rem; }
+.gm-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; padding: 1.25rem; border-radius: 22px; background: var(--bg-card); border: 1px solid var(--border-color); }
+.gm-form-actions { display: flex; gap: 0.5rem; align-items: end; }
+.gm-check { flex-direction: row !important; align-items: center; }
+.gm-table-wrap { overflow-x: auto; border-radius: 22px; background: var(--bg-card); border: 1px solid var(--border-color); }
+.gm-table-wrap table { width: 100%; border-collapse: collapse; }
+.gm-table-wrap th { padding: 0.9rem 1.25rem; text-align: left; font-size: 0.8125rem; font-weight: 600; color: var(--text-muted); }
+.gm-table-wrap td { padding: 0.8rem 1.25rem; border-top: 1px solid var(--border-color); font-variant-numeric: tabular-nums; }
+.gm-actions { text-align: right; white-space: nowrap; }
+.gm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

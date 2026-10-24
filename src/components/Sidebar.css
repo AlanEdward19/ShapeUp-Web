@@ -23,10 +23,10 @@
 .su-sidebar-logo-text {
     font-family: var(--font-display);
     font-size: 1.65rem;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 0.9;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
 }
 
@@ -42,8 +42,8 @@
     font-family: var(--font-sans);
     font-size: 0.7rem;
     font-weight: 600;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
 }
 
@@ -74,14 +74,14 @@
     padding: 0.65rem 0.8rem;
     color: var(--text-muted);
     text-decoration: none;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
 }
 
 .su-nav-index {
     font-family: var(--font-display);
     font-size: 0.8rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0;
     color: color-mix(in oklch, var(--text-muted) 70%, var(--bg-main));
 }
 
@@ -176,7 +176,7 @@
     width: 100%;
     max-width: 28rem;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -194,9 +194,9 @@
     margin: 0;
     font-family: var(--font-display);
     font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
 }
 

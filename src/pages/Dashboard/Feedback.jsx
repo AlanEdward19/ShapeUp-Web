@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search, Filter, Reply, CheckCircle, Paperclip, X, FileText, Check, CheckCheck, Clock } from 'lucide-react';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { addNotification } from '../../utils/notifications';

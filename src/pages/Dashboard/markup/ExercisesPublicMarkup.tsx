@@ -3,6 +3,8 @@ import type { KeyboardEvent, MouseEvent, ReactElement, RefObject } from 'react';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import WorkspaceNavigation from '../../shell-assets/WorkspaceNavigation';
 import { ExerciseDrawer } from './ExerciseDrawer';
+import { exerciseKind, EXERCISE_KINDS } from '../../../utils/exerciseCatalog';
+import { MUSCLE_GROUPS, groupDisplayName, leafDisplayName } from '../../../components/anatomy/muscleRegions';
 
 export type ExerciseEquivalent = {
   exerciseId: number | string;
@@ -43,6 +45,12 @@ export type ExercisesShellState = {
   setSearchTerm: (value: string) => void;
   group: string;
   setGroup: (value: string) => void;
+  kind?: string;
+  setKind?: (value: string) => void;
+  muscles?: string[];
+  toggleMuscleGroup?: (group: string) => void;
+  toggleMuscleLeaf?: (group: string, leaf: string) => void;
+  clearFilters?: () => void;
   equipment: string;
   setEquipment: (value: string) => void;
   sort: string;
@@ -64,261 +72,209 @@ export type ExercisesShellState = {
   onEquivalentMissing?: (exerciseId?: number | string) => void;
 };
 
-function ExerciseRow({
-  ex,
-  state,
-}: {
-  ex: ExerciseRecord;
-  state: ExercisesShellState;
-}) {
+const copy = {
+  'pt-BR': {
+    kinds: { all: 'Todos', weight: 'Carga', cardio: 'Cardio', isometric: 'Isometria', stretch: 'Alongamento', mobility: 'Mobilidade' },
+    searchLabel: 'Buscar exercício',
+    type: 'Tipo',
+    muscle: 'Músculo',
+    clear: 'Limpar filtros',
+    emptyTitle: 'Nenhum exercício encontrado',
+    emptyBody: 'Tente outro nome ou remova os filtros.',
+    equipment: 'Equipamento',
+    allEquipment: 'Todos',
+  },
+  en: {
+    kinds: { all: 'All', weight: 'Weights', cardio: 'Cardio', isometric: 'Isometric', stretch: 'Stretching', mobility: 'Mobility' },
+    searchLabel: 'Search exercises',
+    type: 'Type',
+    muscle: 'Muscle',
+    clear: 'Clear filters',
+    emptyTitle: 'No exercises found',
+    emptyBody: 'Try another name or remove the filters.',
+    equipment: 'Equipment',
+    allEquipment: 'All',
+  },
+  es: {
+    kinds: { all: 'Todos', weight: 'Carga', cardio: 'Cardio', isometric: 'Isometría', stretch: 'Estiramiento', mobility: 'Movilidad' },
+    searchLabel: 'Buscar ejercicio',
+    type: 'Tipo',
+    muscle: 'Músculo',
+    clear: 'Limpiar filtros',
+    emptyTitle: 'No se encontraron ejercicios',
+    emptyBody: 'Prueba otro nombre o quita los filtros.',
+    equipment: 'Equipamiento',
+    allEquipment: 'Todos',
+  },
+} as const;
+
+const KIND_ICON: Record<string, string> = {
+  weight: 'exercise',
+  cardio: 'directions_run',
+  isometric: 'timer',
+  stretch: 'self_improvement',
+  mobility: 'accessibility_new',
+};
+
+function ExerciseRow({ ex, state, kindLabels }: { ex: ExerciseRecord; state: ExercisesShellState; kindLabels: Record<string, string> }) {
   const { t } = useLanguage();
   const active = state.active?.id === ex.id;
-  const cardStyle =
-    state.view === 'cards'
-      ? { flexWrap: 'wrap' as const, padding: 20, borderLeftColor: active ? '#e06c43' : 'transparent' }
-      : { borderLeftColor: active ? '#e06c43' : 'transparent' };
-
+  const kind = exerciseKind(ex);
+  const equipment = state.equipmentName(ex);
+  const subtitle = [(ex.muscles || []).slice(0, 2).join(', '), kindLabels[kind], equipment].filter(Boolean).join(' · ');
   return (
-    <div
-      className={`exercise-item group px-6 py-2.5 flex items-center justify-between gap-4 cursor-pointer hover:bg-surface-subtle transition-colors border-l-2 ${
-        active ? 'bg-surface-subtle' : 'border-transparent'
-      }`}
-      tabIndex={0}
-      aria-controls="exerciseDrawer"
-      aria-expanded={state.open && active}
-      style={cardStyle}
-      onClick={(event) => state.inspect(ex, event)}
-      onKeyDown={(event) => {
-        if (event.target === event.currentTarget && ['Enter', ' '].includes(event.key)) {
-          event.preventDefault();
-          state.inspect(ex, event);
-        }
-      }}
-    >
-      <div className="flex items-center gap-4 min-w-0 flex-1">
-        <span className="w-16 font-mono text-xs text-text-muted">EX-{ex.id}</span>
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="font-medium text-sm text-text-primary truncate group-hover:text-brand-terracotta transition-colors">
-              {ex.name}
-            </span>
-          </div>
-          <div className="mt-0.5 text-xs text-text-muted truncate">
-            <span className="text-text-secondary">{ex.muscles.join(', ')}</span>
-          </div>
-        </div>
-      </div>
-      <div className="hidden md:flex items-center gap-4 w-2/5 justify-between px-2 text-xs">
-        <span className="w-24 text-text-muted truncate">{state.equipmentName(ex)}</span>
-        <span className="w-28 text-text-secondary truncate">{ex.type || '—'}</span>
-      </div>
-      <div className="flex items-center gap-1 shrink-0 w-20 justify-end">
+    <li>
+      <div
+        className="exercise-item"
+        role="button"
+        tabIndex={0}
+        aria-controls="exerciseDrawer"
+        aria-expanded={state.open && active}
+        data-active={active || undefined}
+        onClick={(event) => state.inspect(ex, event)}
+        onKeyDown={(event) => {
+          if (event.target === event.currentTarget && ['Enter', ' '].includes(event.key)) {
+            event.preventDefault();
+            state.inspect(ex, event);
+          }
+        }}
+      >
+        <span className="ex-icon" aria-hidden="true">
+          <span className="material-symbols-outlined">{KIND_ICON[kind]}</span>
+        </span>
+        <span className="ex-copy">
+          <strong>{ex.name}</strong>
+          <small>{subtitle}</small>
+        </span>
         <button
           type="button"
-          className="p-1 rounded text-text-muted hover:text-brand-terracotta hover:bg-surface transition-colors"
+          className="ex-add"
           title={t('exlib.row.insert')}
+          aria-label={`${t('exlib.row.insert')}: ${ex.name}`}
           onClick={(event) => {
             event.stopPropagation();
             state.add(ex);
           }}
         >
-          <span className="material-symbols-outlined text-[17px]">playlist_add</span>
+          <span className="material-symbols-outlined" aria-hidden="true">playlist_add</span>
         </button>
-        <button type="button" className="p-1 rounded text-brand-terracotta transition-colors" title={t('exlib.row.inspect')}>
-          <span className="material-symbols-outlined text-[17px]">chevron_right</span>
-        </button>
+        <span className="material-symbols-outlined ex-chevron" aria-hidden="true">chevron_right</span>
       </div>
-    </div>
+    </li>
   );
 }
 
 export function ExercisesPublicMarkup({ state }: { state: ExercisesShellState }): ReactElement {
-  const { t } = useLanguage();
-  const muscleOptions = ['all', ...new Set(state.exercises.flatMap((ex) => (ex.muscles || []).filter(Boolean)))];
-  const equipmentOptions = ['all', ...new Set(state.exercises.map(state.equipmentName))];
+  const { t, language } = useLanguage() as { t: (key: string, vars?: Record<string, unknown>) => string; language: string };
+  const c = copy[(language as keyof typeof copy) in copy ? (language as keyof typeof copy) : 'pt-BR'];
+  const kind = state.kind ?? 'all';
+  const selected = state.muscles ?? [];
+  const equipmentOptions = [...new Set(state.exercises.map(state.equipmentName))];
+  const isGroupActive = (group: string) => selected.includes(group) || MUSCLE_GROUPS[group as keyof typeof MUSCLE_GROUPS].some((leaf) => selected.includes(leaf));
+  const expanded = Object.entries(MUSCLE_GROUPS).filter(([group, leaves]) => leaves.length > 1 && isGroupActive(group));
+  const filtered = kind !== 'all' || selected.length > 0 || state.equipment !== 'all' || state.searchTerm !== '';
 
   return (
     <>
       <WorkspaceNavigation flow open={state.navOpen} close={() => state.setNavOpen(false)} />
-      <div className="flex-1 flex flex-col h-screen overflow-hidden bg-bg-base">
-        <header className="h-14 bg-surface border-b border-border-subtle flex items-center justify-between px-6 shrink-0 z-30">
-          <div className="flex items-center gap-3">
-            <h1 className="font-condensed text-xl font-bold uppercase tracking-wider text-text-primary flex items-center gap-2">
-              <span>{t('exlib.title')}</span>
-              <span className="text-xs font-mono font-normal text-text-muted">({state.exercises.length})</span>
-            </h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="inline-flex rounded border border-border-subtle p-0.5 bg-surface-muted text-xs">
-              <button
-                type="button"
-                className={`px-2.5 py-1 rounded text-xs font-medium ${state.view === 'list' ? 'bg-surface text-text-primary' : 'text-text-muted hover:text-text-primary'}`}
-                id="viewModeList"
-                onClick={() => state.setView('list')}
-              >
-                {t('exlib.view.list')}
-              </button>
-              <button
-                type="button"
-                className={`px-2.5 py-1 rounded text-xs font-medium ${state.view === 'cards' ? 'bg-surface text-text-primary' : 'text-text-muted hover:text-text-primary'}`}
-                id="viewModeCards"
-                onClick={() => state.setView('cards')}
-              >
-                {t('exlib.view.cards')}
-              </button>
+      <div className="ah ex" data-shell-content style={{ marginLeft: 256 }}>
+        <main className="ah-page ex-page">
+          <header className="ah-header ah-header-split">
+            <div>
+              <h1>{t('exlib.title')}</h1>
+              <p className="ah-lede" id="exerciseCountLabel">{t('exlib.count', { n: state.filtered.length })}</p>
             </div>
-            <div className="h-4 w-px bg-border-subtle" />
-            <button
-              type="button"
-              className="h-8 px-3.5 bg-brand-terracotta hover:bg-brand-terracotta-hover text-white rounded text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
-              onClick={state.onSuggestOpen}
-            >
-              <span className="material-symbols-outlined text-[16px]">add</span>
-              <span>{t('exlib.new')}</span>
+            <button type="button" className="ah-solid-cta" onClick={state.onSuggestOpen}>
+              <span className="material-symbols-outlined" aria-hidden="true">add</span>
+              {t('exlib.new')}
             </button>
-          </div>
-        </header>
+          </header>
 
-        <section className="bg-surface border-b border-border-subtle px-6 pt-3.5 pb-3 space-y-3 shrink-0">
-          <div className="relative flex items-center">
-            <span className="material-symbols-outlined absolute left-3.5 text-[18px] text-text-muted pointer-events-none">search</span>
-            <input
-              className="w-full h-9 pl-10 pr-20 bg-bg-base border border-border-subtle focus:border-brand-terracotta rounded text-xs text-text-primary placeholder:text-text-muted focus:ring-0 focus:outline-none transition-all"
-              id="globalExerciseSearch"
-              placeholder={t('exlib.search.placeholder')}
-              type="text"
-              value={state.searchTerm}
-              onChange={(event) => state.setSearchTerm(event.target.value)}
-            />
-          </div>
-          <div className="flex flex-col gap-2 pt-0.5">
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
-              <span className="font-mono text-[10px] uppercase text-text-muted shrink-0 mr-1.5">{t('exlib.filter.group')}</span>
-              {muscleOptions.map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className="muscle-pill px-2.5 py-1 rounded text-xs shrink-0"
-                  aria-pressed={state.group === value}
-                  onClick={() => state.setGroup(value)}
-                  style={{
-                    padding: '4px 10px',
-                    borderRadius: 4,
-                    background: state.group === value ? '#e06c43' : 'transparent',
-                    whiteSpace: 'nowrap',
-                    color: state.group === value ? '#fff' : undefined,
-                  }}
-                >
-                  {value === 'all' ? t('exlib.filter.all') : value}
+          <section className="ex-filters" aria-label="Filtros">
+            <label className="ah-search">
+              <span className="material-symbols-outlined" aria-hidden="true">search</span>
+              <input
+                id="globalExerciseSearch"
+                type="search"
+                aria-label={c.searchLabel}
+                placeholder={t('exlib.search.placeholder')}
+                value={state.searchTerm}
+                onChange={(event) => state.setSearchTerm(event.target.value)}
+              />
+            </label>
+
+            <div className="ex-chips" role="group" aria-label={c.type}>
+              {EXERCISE_KINDS.map((value) => (
+                <button key={value} type="button" aria-pressed={kind === value} onClick={() => state.setKind?.(value)}>
+                  {c.kinds[value as keyof typeof c.kinds]}
                 </button>
               ))}
             </div>
-            <div className="flex items-center justify-between text-xs pt-1.5 border-t border-border-subtle flex-wrap gap-2">
-              <div className="flex items-center gap-1 flex-wrap">
-                <span className="font-mono text-[10px] uppercase text-text-muted mr-1.5">{t('exlib.filter.equipment')}</span>
-                {equipmentOptions.map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    className="equip-btn px-2 py-0.5 rounded text-[11px]"
-                    aria-pressed={state.equipment === value}
-                    onClick={() => state.setEquipment(value)}
-                    style={{
-                      padding: '4px 8px',
-                      borderRadius: 4,
-                      background: state.equipment === value ? 'var(--border-color)' : 'transparent',
-                    }}
-                  >
-                    {value === 'all' ? t('exlib.filter.all') : value}
+
+            {kind !== 'cardio' && (
+              <div className="ex-chips" role="group" aria-label={c.muscle}>
+                {Object.keys(MUSCLE_GROUPS).map((group) => (
+                  <button key={group} type="button" aria-pressed={isGroupActive(group)} onClick={() => state.toggleMuscleGroup?.(group)}>
+                    {groupDisplayName(group, language)}
                   </button>
                 ))}
               </div>
-              <div className="flex items-center gap-3 font-mono text-[11px] text-text-muted">
+            )}
+
+            {kind !== 'cardio' && expanded.map(([group, leaves]) => (
+              <div key={group} className="ex-chips is-leaves" role="group" aria-label={groupDisplayName(group, language)}>
+                <span>{groupDisplayName(group, language)}</span>
+                {leaves.map((leaf) => (
+                  <button key={leaf} type="button" aria-pressed={selected.includes(leaf)} onClick={() => state.toggleMuscleLeaf?.(group, leaf)}>
+                    {leafDisplayName(leaf, language)}
+                  </button>
+                ))}
+              </div>
+            ))}
+
+            <div className="ex-meta">
+              <label>
+                <span>{c.equipment}</span>
+                <select value={state.equipment} onChange={(event) => state.setEquipment(event.target.value)}>
+                  <option value="all">{c.allEquipment}</option>
+                  {equipmentOptions.map((value) => <option key={value} value={value}>{value}</option>)}
+                </select>
+              </label>
+              <label>
                 <span>{t('exlib.sort')}</span>
-                <select
-                  className="bg-transparent text-text-secondary hover:text-text-primary focus:outline-none cursor-pointer"
-                  value={state.sort}
-                  onChange={(event) => state.setSort(event.target.value)}
-                >
+                <select value={state.sort} onChange={(event) => state.setSort(event.target.value)}>
                   <option value="name">{t('exlib.sort.name')}</option>
                   <option value="muscles">{t('exlib.sort.muscles')}</option>
                 </select>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div className="flex-1 flex overflow-hidden relative">
-          <section className="flex-1 flex flex-col h-full bg-bg-base overflow-hidden min-w-0">
-            <div className="px-6 py-2 border-b border-border-subtle bg-surface/50 flex items-center justify-between text-xs shrink-0">
-              <div className="flex items-center gap-3">
-                <span className="text-text-secondary font-medium font-mono text-xs" id="exerciseCountLabel">
-                  {t('exlib.count', { n: state.filtered.length })}
-                </span>
-                <span className="text-border-subtle">|</span>
-                <span className="text-[11px] text-text-muted flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[15px] text-brand-terracotta">info</span>
-                  {t('exlib.hint.select')}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 font-mono text-[11px] text-text-muted">
-                <span>{t('exlib.sort')}</span>
-                <select
-                  className="bg-surface-subtle border border-border-subtle rounded px-2 py-0.5 text-xs text-text-primary focus:ring-0 focus:outline-none"
-                  value={state.sort}
-                  onChange={(event) => state.setSort(event.target.value)}
-                >
-                  <option value="name">{t('exlib.sort.name')}</option>
-                  <option value="muscles">{t('exlib.sort.muscles')}</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="px-6 py-2 bg-surface-muted border-b border-border-subtle flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-text-muted select-none shrink-0">
-              <div className="flex items-center gap-4 flex-1 min-w-0">
-                <span className="w-16">{t('exlib.col.code')}</span>
-                <span className="flex-1">{t('exlib.col.exercise')}</span>
-              </div>
-              <div className="hidden md:flex items-center gap-4 w-2/5 justify-between px-2">
-                <span className="w-24">{t('exlib.col.equipment')}</span>
-                <span className="w-28">{t('exlib.col.pattern')}</span>
-              </div>
-              <div className="w-20 text-right pr-2">{t('exlib.col.actions')}</div>
-            </div>
-
-            <div
-              className="flex-1 overflow-y-auto divide-y divide-border-subtle"
-              id="exerciseListContainer"
-              style={
-                state.view === 'cards'
-                  ? { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', alignContent: 'start' }
-                  : undefined
-              }
-            >
-              {state.error ? (
-                <p role="alert" className="p-6 text-text-muted">{t('exlib.error')}</p>
-              ) : state.loading ? (
-                <p className="p-6 text-text-muted">{t('exlib.loading')}</p>
-              ) : state.filtered.length ? (
-                state.filtered.map((ex) => <ExerciseRow key={ex.id} ex={ex} state={state} />)
-              ) : (
-                <p className="p-6 text-text-muted">{t('exlib.empty')}</p>
+              </label>
+              {filtered && state.clearFilters && (
+                <button type="button" className="ah-link" onClick={state.clearFilters}>{c.clear}</button>
               )}
             </div>
           </section>
 
-          <ExerciseDrawer state={state} />
-        </div>
+          <div id="exerciseListContainer">
+            {state.error ? (
+              <p role="alert" className="ah-alert">{t('exlib.error')}</p>
+            ) : state.loading ? (
+              <p className="ah-empty">{t('exlib.loading')}</p>
+            ) : state.filtered.length ? (
+              <ul className="ex-list">
+                {state.filtered.map((ex) => <ExerciseRow key={ex.id} ex={ex} state={state} kindLabels={c.kinds} />)}
+              </ul>
+            ) : (
+              <div className="ex-empty">
+                <strong>{c.emptyTitle}</strong>
+                <p>{t('exlib.empty') === 'exlib.empty' ? c.emptyBody : c.emptyBody}</p>
+                {state.clearFilters && <button type="button" className="ah-soft-cta" onClick={state.clearFilters}>{c.clear}</button>}
+              </div>
+            )}
+          </div>
+        </main>
+        <ExerciseDrawer state={state} />
       </div>
-
-      <div
-        className={`fixed bottom-5 right-5 bg-surface-subtle border border-border-strong text-text-primary px-4 py-2.5 rounded-lg shadow-2xl text-xs flex items-center gap-2.5 transition-all duration-300 transform z-50 ${
-          state.notice ? '' : 'translate-y-20 opacity-0 pointer-events-none'
-        }`}
-        id="toastNotification"
-        hidden={!state.notice}
-      >
-        <span className="material-symbols-outlined text-brand-olive text-[18px]">check_circle</span>
+      <div className="ex-toast" id="toastNotification" hidden={!state.notice} role="status">
+        <span className="material-symbols-outlined" aria-hidden="true">check_circle</span>
         <span id="toastMessage">{state.notice}</span>
       </div>
     </>

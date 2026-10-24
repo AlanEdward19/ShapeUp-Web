@@ -132,6 +132,7 @@ describe('ExerciseDrawer', () => {
       description: 'Texto solto duplicado',
       muscleDetails: [{ muscleGroup: 1, muscleNamePt: 'Peitoral', activationPercent: 62 }],
     });
+    localStorage.setItem('shapeup_role', 'professional');
     const { container, getByText, queryByRole } = render(withLang(<ExerciseDrawer state={state} />));
     expect(queryByRole('heading', { name: 'Músculos' })).toBeNull();
     expect(container.textContent).not.toMatch(/Peitoral: 62%/);

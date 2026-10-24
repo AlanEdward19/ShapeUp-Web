@@ -45,9 +45,9 @@
 .su-modal-title {
     font-family: var(--font-display);
     font-size: 1.65rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
     margin: 0;
     text-align: left;
@@ -72,8 +72,8 @@
     font-family: var(--font-display);
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
 }
 
@@ -131,8 +131,8 @@
     font-family: var(--font-display);
     font-size: 0.8rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     cursor: pointer;
 }
 
@@ -148,8 +148,8 @@
     font-family: var(--font-display);
     font-size: 0.8rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     cursor: pointer;
 }
 

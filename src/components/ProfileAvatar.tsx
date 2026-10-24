@@ -28,7 +28,7 @@ export default function ProfileAvatar({
         src={photo}
         alt=""
         className={className}
-        style={{ ...dimension, objectFit: 'cover', borderRadius: size >= 48 ? '50%' : 4, ...style }}
+        style={{ ...dimension, objectFit: 'cover', borderRadius: '50%', ...style }}
       />
     );
   }
@@ -40,9 +40,9 @@ export default function ProfileAvatar({
         ...dimension,
         display: 'grid',
         placeItems: 'center',
-        borderRadius: size >= 48 ? '50%' : 4,
-        background: '#29211d',
-        color: '#e06c43',
+        borderRadius: '50%',
+        background: 'var(--bg-surface-high)',
+        color: 'var(--link-color)',
         fontWeight: 600,
         fontSize: Math.max(12, Math.round(size * 0.4)),
         ...style,

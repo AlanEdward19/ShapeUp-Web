@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import manifest from './manifest.json';
 import higShellPolish from '../../styles/higShellPolish.css?inline';
+import { themeShellCss } from '../../utils/themeShellCss';
 import useShellLanguage from '../../hooks/useShellLanguage';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -15,7 +16,7 @@ const styles = import.meta.glob('./styles/*.css', {
 type ManifestEntry = { bodyClass?: string; fonts: string[] };
 const manifestEntries = manifest as Record<string, ManifestEntry>;
 
-const hostBaseCss = `.st-language-picker select,.st-language-picker option{background-color:#211a17!important;color:#f3eae5!important;color-scheme:dark}.st-language-picker select{cursor:pointer}:host{all:initial;display:block;color-scheme:dark}.shell-body{min-height:100dvh;width:100%;box-sizing:border-box}.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased}button,a,input,select,textarea{touch-action:manipulation}[hidden]{display:none!important}button:disabled{opacity:.5;cursor:not-allowed} :focus-visible{outline:2px solid #e06c43;outline-offset:3px}`;
+const hostBaseCss = `.st-language-picker select,.st-language-picker option{background-color:#211a17!important;color:#f3eae5!important;color-scheme:var(--su-color-scheme,dark)}.st-language-picker select{cursor:pointer}:host{all:initial;display:block;color-scheme:var(--su-color-scheme,dark)}.shell-body{min-height:100dvh;width:100%;box-sizing:border-box}.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;display:inline-block;line-height:1;letter-spacing:normal;text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased}button,a,input,select,textarea{touch-action:manipulation}[hidden]{display:none!important}button:disabled{opacity:.5;cursor:not-allowed} :focus-visible{outline:2px solid #e06c43;outline-offset:3px}`;
 
 export type DashboardShellPageName =
   | 'gyms'
@@ -110,7 +111,7 @@ export default function DashboardShellHost({
     }
   };
 
-  const inlineCss = styles[`./styles/${name}.css`] ?? '';
+  const inlineCss = themeShellCss(styles[`./styles/${name}.css`] ?? '');
 
   const portal = useMemo(
     () =>

@@ -13,9 +13,9 @@
 .su-page-title {
     font-family: var(--font-display);
     font-size: clamp(2rem, 5vw, 3.1rem);
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     line-height: 0.92;
     color: var(--text-main);
     margin-bottom: 0.35rem;
@@ -124,7 +124,7 @@
     color: var(--text-muted);
     cursor: grab;
     font-family: var(--font-display);
-    letter-spacing: 0.12em;
+    letter-spacing: 0;
     background: none;
     border: 0;
     user-select: none;
@@ -164,9 +164,9 @@
 .su-pe-ex-name-input {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 800;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
     background: transparent;
     border: none;
@@ -192,9 +192,9 @@
 .su-ex-title {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 800;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
 }
 
@@ -202,7 +202,7 @@
     font-size: 0.75rem;
     background-color: var(--bg-main);
     padding: 0.25rem 0.5rem;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     color: var(--text-muted);
     font-weight: 500;
 }
@@ -255,9 +255,9 @@
     font-family: var(--font-display);
     font-size: 0.7rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0;
     color: var(--text-muted);
-    text-transform: uppercase;
+    text-transform: none;
     border-bottom: 1px solid var(--text-main);
 }
 
@@ -286,7 +286,7 @@
 
 .su-set-index {
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 700;
     color: var(--primary);
     text-align: center;
 }
@@ -320,8 +320,8 @@
     color: var(--accent);
     padding: 0;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
+    text-transform: none;
+    letter-spacing: 0;
 }
 
 .su-tech-addon .su-input {
@@ -346,7 +346,7 @@
     border: 1px solid var(--border-color);
     background-color: var(--bg-main);
     color: var(--text-muted);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     font-size: 0.65rem;
     font-weight: 700;
     padding: 0.35rem 0.4rem;
@@ -403,15 +403,15 @@
     border: none;
     cursor: pointer;
     padding: 0.25rem;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--font-display);
     font-size: 0.7rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
 }
 
@@ -472,8 +472,8 @@
     font-size: 0.875rem;
     color: var(--text-muted);
     margin-bottom: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    text-transform: none;
+    letter-spacing: 0;
 }
 
 .su-mini-chart {
@@ -531,7 +531,7 @@
     overflow: hidden;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     box-shadow: var(--shadow-soft);
 }
 
@@ -563,9 +563,9 @@
 .su-template-title-clean {
     font-family: var(--font-display);
     font-size: 1.45rem;
-    font-weight: 800;
-    letter-spacing: 0.03em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
     line-height: 1.05;
     margin-bottom: 0.25rem;
@@ -599,7 +599,7 @@
 .su-metric-clean-val {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-main);
 }
 
@@ -607,8 +607,8 @@
     font-size: 0.65rem;
     font-weight: 600;
     color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    text-transform: none;
+    letter-spacing: 0;
 }
 
 .su-metric-divider {
@@ -656,9 +656,9 @@
 .su-empty-title {
     font-family: var(--font-display);
     font-size: 1.75rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
     color: var(--text-main);
     margin-bottom: 0.5rem;
 }
@@ -744,3 +744,5 @@
 .su-cancel-btn:hover {
     background-color: var(--bg-main) !important;
 }
+
+.su-builder-back { margin: 0 0 0.5rem -0.75rem; }

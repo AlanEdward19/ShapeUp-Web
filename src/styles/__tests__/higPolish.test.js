@@ -7,7 +7,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '../../..')
 const buttonCss = readFileSync(join(root, 'src/components/Button.css'), 'utf8')
 const designCss = readFileSync(join(root, 'src/styles/design-system.css'), 'utf8')
 const shellCss = readFileSync(join(root, 'src/styles/higShellPolish.css'), 'utf8')
-const navCss = readFileSync(join(root, 'src/components/Workspace/WorkspaceNavigation.tsx'), 'utf8')
+const navCss = readFileSync(join(root, 'src/components/Workspace/navigationStyles.ts'), 'utf8')
 
 function relativeLuminance(hex) {
   const h = hex.replace('#', '')
@@ -35,15 +35,17 @@ describe('HIG polish contract', () => {
     expect(designCss).toMatch(/\.su-page-title[\s\S]*text-transform:\s*none/)
   })
 
-  it('selects navigation with an oxide fill at a 44px target', () => {
+  it('selects navigation with a raised-surface fill and oxide icon at a 44px target', () => {
     expect(navCss).toMatch(/min-height:44px/)
-    expect(navCss).toMatch(/a\[aria-current=page\]\{background:var\(--primary\);color:var\(--text-on-primary\)/)
+    expect(navCss).toMatch(/a\[aria-current=page\]\{background:var\(--bg-surface-high\);color:var\(--text-main\)/)
+    expect(navCss).toMatch(/a\[aria-current=page\] \.material-symbols-outlined\{color:var\(--primary\)/)
   })
 
   it('keeps shell focus, alerts, and readable muted ink', () => {
     expect(shellCss).toMatch(/:focus-visible/)
     expect(shellCss).toMatch(/p\[role='alert'\]/)
-    expect(shellCss).toContain('#d0c4bb')
+    expect(shellCss).toContain('var(--text-muted)')
+    expect(contrastRatio('#fff8f5', '#b94a25')).toBeGreaterThanOrEqual(4.5)
     expect(contrastRatio('#181311', '#e06c43')).toBeGreaterThanOrEqual(4.5)
     expect(contrastRatio('#d0c4bb', '#18120f')).toBeGreaterThanOrEqual(4.5)
     expect(contrastRatio('#f5ede6', '#3b221f')).toBeGreaterThanOrEqual(4.5)

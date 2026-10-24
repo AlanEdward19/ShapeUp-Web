@@ -1,10 +1,13 @@
-import { useState, type MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Login from './Login';
 import ForgotPassword from './ForgotPassword';
 import SeoHead from '../components/SeoHead';
 import OrganizationJsonLd from '../components/OrganizationJsonLd';
 import publicCss from './public-auth/publicUsability.css?inline';
+import loginCss from './public-auth/loginScreen.css?inline';
+import showcaseCss from './public-auth/landingShowcase.css?inline';
+import athleteHomeCss from './Dashboard/operational-dashboard/athlete/athleteHome.css?inline';
 import { useLanguage } from '../contexts/LanguageContext';
 import PublicShellHost from './public-auth/PublicShellHost';
 import { LandingStaticMarkup } from './public-auth/markup/LandingStaticMarkup';
@@ -79,7 +82,7 @@ export function LandingShell() {
       <PublicShellHost
         name="landing"
         reveal
-        css={publicCss}
+        css={publicCss + athleteHomeCss + showcaseCss}
         onBodyClick={(event) => landingBodyClick(event, navigate)}
       >
         <LandingStaticMarkup />
@@ -89,21 +92,11 @@ export function LandingShell() {
 }
 
 export function LoginShell() {
-  const [passkeyNotice, setPasskeyNotice] = useState('');
   return (
     <Login
       renderView={(state) => (
-        <PublicShellHost name="login" css={publicCss}>
-          <LoginPublicMarkup
-            state={{
-              ...(state as import('./public-auth/markup/LoginPublicMarkup').LoginShellState),
-              passkeyNotice,
-              onPasskeyClick: () =>
-                setPasskeyNotice(
-                  'O acesso por passkey ainda não está habilitado nesta conta. Use e-mail e senha ou Google.',
-                ),
-            }}
-          />
+        <PublicShellHost name="login" css={publicCss + loginCss} bodyClass="">
+          <LoginPublicMarkup state={state as import('./public-auth/markup/LoginPublicMarkup').LoginShellState} />
         </PublicShellHost>
       )}
     />

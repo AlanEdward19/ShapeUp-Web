@@ -33,7 +33,7 @@ const baseState: AthleteDashboardState = {
 describe('AthleteDashboardMarkup today card (WSD-03)', () => {
   it('does not render the today card when showTodayCard is false', () => {
     render(withLang(<AthleteDashboardMarkup state={baseState} />));
-    expect(screen.queryByText('Exercícios Prescritos para Hoje')).not.toBeInTheDocument();
+    expect(screen.queryByText('Exercícios de hoje')).not.toBeInTheDocument();
     expect(screen.queryByTestId('today-workout-card')).not.toBeInTheDocument();
   });
 
@@ -53,7 +53,7 @@ describe('AthleteDashboardMarkup today card (WSD-03)', () => {
     expect(screen.getByTestId('today-workout-card')).toBeInTheDocument();
     expect(screen.getByText('Agachamento')).toBeInTheDocument();
     expect(screen.getByText('Supino')).toBeInTheDocument();
-    expect(screen.getByText('2 exercícios')).toBeInTheDocument();
+    expect(within(screen.getByTestId('today-workout-card')).getByText('2 exercícios')).toBeInTheDocument();
   });
 });
 
@@ -69,15 +69,19 @@ describe('AthleteDashboardMarkup Frequência empty state (WSD-06)', () => {
     const { container } = render(withLang(<AthleteDashboardMarkup state={baseState} />));
     const pills = container.querySelectorAll('[data-tour="client-metrics"] [data-workout-completed]');
     expect(pills).toHaveLength(7);
-    expect([...pills].map(pill => pill.textContent)).toEqual(['S', 'T', 'Q', 'Q', 'S', 'S', 'D']);
+    expect([...pills].map(pill => pill.querySelector('.ah-day-letter')?.textContent)).toEqual(['S', 'T', 'Q', 'Q', 'S', 'S', 'D']);
   });
 
-  it('shows em-dash for alvo and taxa when dashboard is null', () => {
+  it('shows em-dash for the workouts ring and the week summary when dashboard is null', () => {
+    const { container } = render(withLang(<AthleteDashboardMarkup state={baseState} />));
+    const workouts = screen.getByText('Treinos').closest('div') as HTMLElement;
+    expect(within(workouts).getByText('—')).toBeInTheDocument();
+    expect(container.querySelector('.ah-week .ah-card-sub')).toHaveTextContent('—');
+  });
+
+  it('offers the rest-day state instead of the start CTA when nothing is scheduled', () => {
     render(withLang(<AthleteDashboardMarkup state={baseState} />));
-    const headerRow = screen.getByText('Frequência').parentElement!;
-    expect(within(headerRow).getByText('—')).toBeInTheDocument();
-    const freqColumn = screen.getByText('Frequência').closest('div.py-2') as HTMLElement;
-    const rateEl = freqColumn.querySelector('.mb-2 .font-headline') as HTMLElement;
-    expect(rateEl).toHaveTextContent('—');
+    expect(screen.getByText('Hoje é dia de descanso')).toBeInTheDocument();
+    expect(screen.queryByText('Ver treino de hoje')).not.toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 .su-suggest-modal {
     max-width: 560px;
     gap: 1rem;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
 }
 
 .su-suggest-field {
@@ -13,9 +13,9 @@
 .su-suggest-label {
     font-family: var(--font-display);
     font-size: 0.8rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
 }
 
@@ -43,14 +43,14 @@
     flex: 1;
     padding: 0.55rem 1rem;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     background: transparent;
     color: var(--text-muted);
     font-family: var(--font-display);
     font-size: 0.85rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     cursor: pointer;
 }
 
@@ -86,8 +86,8 @@
 
 .su-suggest-modal .su-modal-title {
     font-family: var(--font-display);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    text-transform: none;
+    letter-spacing: 0;
 }
 
 .su-suggest-modal .su-modal-icon-header,

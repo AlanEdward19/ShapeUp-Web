@@ -4,7 +4,7 @@ import GamificationProgressCard from '../../components/gamification/Gamification
 import { useGamificationApi } from '../../hooks/api/useGamificationApi';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import './DashboardClient.css';
 import UpcomingWorkout from '../../components/UpcomingWorkout';
 

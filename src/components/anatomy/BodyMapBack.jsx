@@ -5,7 +5,7 @@ export default function BodyMapBack({ hits, maxHits, labels }) {
     return (
         <svg
             className="su-body-map-svg"
-            viewBox="205 40 380 960"
+            viewBox="197 136 396 792"
             role="img"
             aria-label={labels?.back || 'Back body map'}
         >

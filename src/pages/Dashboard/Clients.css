@@ -19,9 +19,9 @@
 .su-page-title {
     font-family: var(--font-display);
     font-size: clamp(1.85rem, 3.4vw, 2.6rem);
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     line-height: 0.95;
     color: var(--text-main);
     margin-bottom: 0.35rem;
@@ -64,8 +64,8 @@
     font-family: var(--font-display);
     font-size: 0.95rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     padding: 0 1.6rem 0 0;
     outline: none;
     cursor: pointer;
@@ -147,7 +147,7 @@
 .gym-recent-avatar {
     width: 2rem;
     height: 2rem;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     background: color-mix(in oklch, var(--primary) 12%, var(--bg-card));
     color: var(--primary);
     border: 1px solid color-mix(in oklch, var(--primary) 35%, var(--border-color));
@@ -155,9 +155,9 @@
     align-items: center;
     justify-content: center;
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 700;
     font-size: 0.85rem;
-    letter-spacing: 0.04em;
+    letter-spacing: 0;
     flex-shrink: 0;
 }
 
@@ -195,7 +195,7 @@
 .su-compliance-text {
     font-family: var(--font-display);
     font-size: 0.8rem;
-    letter-spacing: 0.04em;
+    letter-spacing: 0;
     color: var(--text-muted);
     font-weight: 700;
 }
@@ -209,8 +209,8 @@
     font-family: var(--font-display);
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     border: 1px solid currentColor;
     background: transparent;
 }
@@ -282,9 +282,9 @@
 .su-confirm-title {
     font-family: var(--font-display);
     font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .su-confirm-body {
@@ -343,8 +343,8 @@
     font-family: var(--font-display);
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
     margin-bottom: 0.35rem;
 }
@@ -352,7 +352,7 @@
 .su-journal-kpi-value {
     font-family: var(--font-display);
     font-size: clamp(1.8rem, 3vw, 2.4rem);
-    font-weight: 800;
+    font-weight: 700;
     line-height: 0.95;
     letter-spacing: 0.02em;
 }
@@ -360,9 +360,9 @@
 .su-journal-kicker {
     font-family: var(--font-display);
     font-size: 1.15rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     margin-bottom: 0.2rem;
 }
 
@@ -421,8 +421,8 @@
 .su-device-flag {
     font-family: var(--font-display);
     font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--error);
     margin-bottom: 0.45rem;
 }
@@ -430,9 +430,9 @@
 .su-device-name {
     font-family: var(--font-display);
     font-size: 1.15rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .su-device-meta {

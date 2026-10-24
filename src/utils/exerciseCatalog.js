@@ -45,15 +45,16 @@ export function muscleDisplayName(muscle, language) {
         const fromGroup = leavesFromMuscleGroup(text).map((id) => leafDisplayName(id, language));
         return fromGroup[0] || text;
     }
-    const named = pickLocalized(
+    // Same precedence as the mobile app: the muscle flag wins, API-provided names are the fallback.
+    const fromFlag = leavesFromMuscleGroup(muscle.muscleGroup ?? muscle.MuscleGroup)
+        .map((id) => leafDisplayName(id, language))
+        .join(' / ');
+    if (fromFlag) return fromFlag;
+    return pickLocalized(
         language,
         muscle.muscleName || muscle.MuscleName || muscle.name || muscle.Name,
         muscle.muscleNamePt || muscle.MuscleNamePt || muscle.namePt || muscle.NamePt,
     );
-    if (named) return named;
-    return leavesFromMuscleGroup(muscle.muscleGroup ?? muscle.MuscleGroup)
-        .map((id) => leafDisplayName(id, language))
-        .join(' / ');
 }
 
 export function equipmentDisplayName(item, language) {
@@ -143,4 +144,29 @@ export function exerciseMatchesMuscleFilter(ex, selected) {
 export function exerciseMatchesAnyMuscle(ex, selectedMuscles) {
     if (!selectedMuscles?.length) return true;
     return selectedMuscles.some((muscle) => exerciseMatchesMuscleFilter(ex, muscle));
+}
+
+/** Library kinds, same buckets as the mobile ExerciseKind. */
+export const EXERCISE_KINDS = ['all', 'weight', 'cardio', 'isometric', 'stretch', 'mobility'];
+
+export function exerciseKind(ex) {
+    const raw = String(ex?.exerciseType ?? ex?.ExerciseType ?? '').toLowerCase();
+    const timed = raw === '2' || raw === 'timebased';
+    if (!timed) return 'weight';
+    const name = fold([ex?.name, ex?.nameEn, ex?.namePt].filter(Boolean).join(' '));
+    const cardio = (ex?.muscles ?? []).some((muscle) => fold(muscle) === 'cardio');
+    if (cardio) return 'cardio';
+    if (/along|stretch|estiramiento/.test(name)) return 'stretch';
+    if (/mobilidade|mobility|movilidad/.test(name)) return 'mobility';
+    return 'isometric';
+}
+
+const KIND_LABELS = {
+    'pt-BR': { all: 'Todos', weight: 'Carga', cardio: 'Cardio', isometric: 'Isometria', stretch: 'Alongamento', mobility: 'Mobilidade' },
+    en: { all: 'All', weight: 'Weights', cardio: 'Cardio', isometric: 'Isometric', stretch: 'Stretching', mobility: 'Mobility' },
+    es: { all: 'Todos', weight: 'Carga', cardio: 'Cardio', isometric: 'Isometría', stretch: 'Estiramiento', mobility: 'Movilidad' },
+};
+
+export function exerciseKindLabel(kind, language = 'pt-BR') {
+    return (KIND_LABELS[language] || KIND_LABELS['pt-BR'])[kind] || kind;
 }

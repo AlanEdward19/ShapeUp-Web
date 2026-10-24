@@ -40,8 +40,8 @@
     font-family: var(--font-display);
     font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--primary);
     margin-bottom: 0.35rem;
 }
@@ -49,7 +49,7 @@
 .su-nutrition-page .su-page-title {
     font-family: var(--font-display);
     font-size: clamp(1.85rem, 3.6vw, 2.5rem);
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0;
     line-height: 1.05;
     text-transform: none;
@@ -61,45 +61,51 @@
     font-variant-numeric: tabular-nums;
     font-size: 0.9rem;
     border: 1px solid var(--border-input);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     background: var(--bg-card);
     padding: 0.45rem 0.65rem;
 }
 
 .su-nutrition-nav {
-    display: flex;
-    gap: 0.5rem;
+    display: inline-flex;
+    gap: 2px;
     flex-wrap: wrap;
-    padding: 0.45rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
+    max-width: 100%;
+    padding: 4px;
+    background: var(--bg-surface-high);
+    border: 0;
+    border-radius: 14px;
 }
 
-.su-nutrition-nav a {
+.su-nutrition-nav a,
+.su-nutrition-nav a.su-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
     font-family: var(--font-sans);
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     font-weight: 600;
     letter-spacing: 0;
     text-transform: none;
     text-decoration: none;
-    padding: 0.7rem 1.05rem;
+    padding: 0 1rem;
     color: var(--text-muted);
     background: transparent;
     border: 0;
-    border-radius: var(--radius-sm);
+    border-radius: 10px;
+    box-shadow: none;
 }
 
 .su-nutrition-nav a:hover {
     color: var(--text-main);
-    background: color-mix(in oklch, var(--bg-main) 70%, var(--bg-card));
+    background: transparent;
 }
 
 .su-nutrition-nav a.su-btn-primary,
 .su-nutrition-nav a[aria-current='page'] {
-    color: var(--text-on-primary);
-    background: var(--primary);
-    box-shadow: none;
+    color: var(--text-main);
+    background: var(--bg-card);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
 }
 
 .su-journal-sheet {
@@ -115,7 +121,7 @@
     font-family: var(--font-display);
     font-size: 1.05rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0;
     text-transform: none;
     margin: 0 0 1rem;
     color: var(--text-main);
@@ -184,9 +190,9 @@
 .su-goal-stamp {
     font-family: var(--font-display);
     font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--success);
 }
 
@@ -207,7 +213,7 @@
     align-items: center;
     padding: 0.75rem 0.35rem;
     border-bottom: 0;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
 }
 
 .su-ledger-row:nth-child(even) {
@@ -246,7 +252,7 @@
     background: transparent;
     color: var(--text-muted);
     border: 0;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     box-shadow: none;
 }
 
@@ -338,7 +344,7 @@
     text-transform: none;
     background: transparent;
     border: 0;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     box-shadow: none;
     color: var(--text-muted);
     margin-bottom: 0;
@@ -359,8 +365,8 @@
 
 .su-version-flag {
     font-family: var(--font-display);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     font-size: 0.85rem;
 }
 
@@ -388,8 +394,8 @@
 
 .su-substitute-sheet h4 {
     font-family: var(--font-display);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     font-size: 0.8rem;
     margin: 0 0 0.5rem;
 }
@@ -425,7 +431,7 @@
     background: transparent;
     color: var(--text-main);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     box-shadow: none;
     padding-left: 0.85rem;
     padding-right: 0.85rem;
@@ -507,9 +513,9 @@
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(2.25rem, 7vw, 3.75rem);
-    font-weight: 800;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.06em;
+    letter-spacing: 0;
     line-height: 1.05;
     color: var(--text-main);
 }
@@ -539,7 +545,7 @@
     font-family: var(--font-display);
     font-size: 0.92rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0;
 }
 
 .su-fasting-protocol {
@@ -549,7 +555,7 @@
     margin: 0;
     padding: 0.5rem 0.8rem;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     background: var(--bg-input);
     white-space: nowrap;
 }

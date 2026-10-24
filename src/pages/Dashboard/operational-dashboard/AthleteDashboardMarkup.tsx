@@ -4,9 +4,11 @@ import AthleteScoreboard from '../../../components/gamification/AthleteScoreboar
 import type { AthleteScoreboardState } from '../../../components/gamification/AthleteScoreboard';
 import WeeklyReadingCard from '../../../components/gamification/WeeklyReadingCard';
 import type { WeeklyReadingState } from '../../../components/gamification/WeeklyReadingCard';
-import HistoryChart from '../../../components/charts/HistoryChart';
 import type { ReactElement } from 'react';
 import type { ChartPoint, NormalizedExercise, NormalizedPlan, StoredMessage } from './types';
+import ActivityRings from './athlete/ActivityRings';
+import VolumeChart from './athlete/VolumeChart';
+import { athleteCopy } from './athlete/athleteCopy';
 
 export type AthleteDashboardState = AthleteScoreboardState & {
   userName: string;
@@ -37,15 +39,18 @@ export type AthleteDashboardState = AthleteScoreboardState & {
   onNavigate: (path: string) => void;
 };
 
-const weekdayTitles = [
-  'Segunda',
-  'Terça',
-  'Quarta (Descanso)',
-  'Quinta',
-  'Sexta',
-  'Sábado (Hoje)',
-  'Domingo',
-];
+const percent = (value: number | undefined, goal: number | undefined | null): number | null =>
+  goal ? Math.min(100, Math.round(((value || 0) / goal) * 100)) : null;
+
+const WATER_STEP = 250;
+
+function Icon({ name, filled }: { name: string; filled?: boolean }): ReactElement {
+  return (
+    <span className="material-symbols-outlined" aria-hidden="true" style={filled ? { fontVariationSettings: "'FILL' 1" } : undefined}>
+      {name}
+    </span>
+  );
+}
 
 export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState }): ReactElement {
   const {
@@ -62,277 +67,256 @@ export function AthleteDashboardMarkup({ state }: { state: AthleteDashboardState
     onRemoveWater,
     messages,
     language,
-    tr,
     onNavigate,
   } = state;
+  const c = athleteCopy(language);
+
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? c.morning : hour < 18 ? c.afternoon : c.evening;
+  const firstName = (userName || '').trim().split(/\s+/)[0];
+  const dateLabel = now.toLocaleDateString(language, { weekday: 'long', day: 'numeric', month: 'long' });
 
   const waterGoal = nutrition.goal?.waterMl || 0;
-  const waterPct = waterGoal ? Math.min(100, Math.round((water / waterGoal) * 100)) : null;
-  const nutritionPercent = nutrition.goal?.kcal
-    ? Math.round(((nutrition.totals?.kcal || 0) / nutrition.goal.kcal) * 100)
-    : 0;
+  const kcal = nutrition.totals?.kcal || 0;
+  const kcalGoal = nutrition.goal?.kcal || 0;
+  const workoutsDone = dashboard?.sessionsCompletedThisWeek ?? 0;
+  const workoutsTarget = dashboard?.sessionsTargetPerWeek ?? null;
+  const workoutPct = Number.isFinite(dashboard?.sessionsCompletionRate) ? Math.min(100, dashboard!.sessionsCompletionRate!) : null;
+  const caloriePct = percent(kcal, kcalGoal);
+  const waterPct = percent(water, waterGoal);
+  const proteinPct = percent(nutrition.totals?.proteinG, nutrition.goal?.proteinG);
 
-  const weekdayPill = (weekday: number) => {
+  const muscles = [...new Set(exercises.flatMap(exercise => exercise.muscles ?? []))].slice(0, 4);
+  const lastCoachMessage = messages[messages.length - 1];
+
+  const glasses = waterGoal ? Math.min(12, Math.max(1, Math.ceil(waterGoal / WATER_STEP))) : 8;
+  const filledGlasses = Math.min(glasses, Math.floor(water / WATER_STEP));
+
+  const weekDay = (offset: number) => {
     const day = new Date();
-    day.setDate(day.getDate() - ((day.getDay() + 6) % 7) + weekday);
+    day.setDate(day.getDate() - ((day.getDay() + 6) % 7) + offset);
     const done = chartData.some(item => new Date(item.startedAt).toDateString() === day.toDateString());
     const isToday = day.toDateString() === new Date().toDateString();
-    const title = day.toLocaleDateString(language, { dateStyle: 'full' });
     const letter = day.toLocaleDateString(language, { weekday: 'short' }).slice(0, 1).toUpperCase();
-    const style = {
-      color: done ? 'var(--text-main)' : 'var(--text-muted)',
-      background: done ? '#506443' : 'transparent',
-      border: `2px solid ${isToday ? '#e06c43' : done ? '#506443' : 'var(--border-color)'}`,
-      boxShadow: isToday ? '0 0 0 2px var(--bg-main)' : undefined,
-    };
     return (
-      <span
-        key={weekday}
-        title={title}
+      <li
+        key={offset}
+        title={day.toLocaleDateString(language, { dateStyle: 'full' })}
         aria-current={isToday ? 'date' : undefined}
         data-workout-completed={done}
-        className="flex h-5 w-5 items-center justify-center rounded text-[10px] font-bold"
-        style={style}
+        className="ah-day"
+        data-today={isToday || undefined}
       >
-        {letter}
-      </span>
+        <span className="ah-day-letter">{letter}</span>
+        {done ? <Icon name="check" /> : <i aria-hidden="true">{day.getDate()}</i>}
+      </li>
     );
   };
 
+  const hero = showTodayCard ? (
+    <section className="ah-hero" aria-labelledby="ah-hero-title">
+      <p className="ah-eyebrow">{c.todayEyebrow}</p>
+      <h2 id="ah-hero-title">{plan?.name || c.planFallback}</h2>
+      <p className="ah-hero-meta">
+        {c.exercisesCount(exercises.length)}
+        {plan?.phase ? ` · ${plan.phase}` : ''}
+      </p>
+      {muscles.length > 0 && (
+        <ul className="ah-chips" aria-label="Grupos musculares">
+          {muscles.map(muscle => <li key={muscle}>{muscle}</li>)}
+        </ul>
+      )}
+      <button type="button" className="ah-hero-cta" onClick={() => onNavigate('/dashboard/training')}>
+        <Icon name="play_arrow" filled />
+        {c.start}
+      </button>
+    </section>
+  ) : (
+    <section className="ah-hero is-quiet" aria-labelledby="ah-hero-title">
+      <Icon name={plan ? 'self_improvement' : 'event_available'} />
+      <h2 id="ah-hero-title">{plan ? c.restTitle : c.noPlanTitle}</h2>
+      <p className="ah-hero-meta">{plan ? c.restBody : c.noPlanBody}</p>
+      <button type="button" className="ah-soft-cta" onClick={() => onNavigate('/dashboard/training')}>
+        {c.seePlan}
+      </button>
+    </section>
+  );
+
   return (
-    <div className="sn-space flex min-h-screen flex-col flex-1 min-w-0 bg-[color:var(--bg-main)]" data-shell-content style={{ marginLeft: 256 }}>
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-[color:var(--border-color)] bg-[color:var(--bg-main)] px-8">
-        <div className="flex items-center gap-4 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-[#eee0da]">{plan?.name || tr('Plano de treinamento')}</span>
+    <div className="ah" data-shell-content style={{ marginLeft: 256 }}>
+      <main className="ah-page">
+        {trainingError ? <p role="alert" className="ah-alert">{trainingError}</p> : null}
+
+        <header className="ah-header" data-tour="client-header">
+          <div>
+            <p className="ah-date">{dateLabel}</p>
+            <h1>{greeting}{firstName ? `, ${firstName}` : ''}</h1>
           </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <p className="hidden text-xs font-medium text-[#eee0da] md:block">
-            {new Date().toLocaleDateString(language, { weekday: 'long', day: 'numeric', month: 'long' })}
-          </p>
-          <button
-            type="button"
-            className="flex items-center gap-2 rounded bg-[#e06c43] px-4 py-2 text-xs font-semibold tracking-wide text-white shadow-sm transition-all hover:bg-[#c85a33]"
-            onClick={() => onNavigate('/dashboard/training')}
-          >
-            <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>play_arrow</span>
-            <span>Iniciar Treino de Hoje</span>
-          </button>
-        </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-7xl flex-1 space-y-8 px-8 py-7">
-        {trainingError ? <p role="alert">{trainingError}</p> : null}
-
-        <section className="border-b border-[#2a201b] pb-6" data-tour="client-header">
-          <div className="flex flex-col justify-between gap-3 md:flex-row md:items-baseline">
-            <div>
-              <div className="mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-[#d4a359]">
-                <span>{plan?.phase || 'Plano de treinamento'}</span>
-              </div>
-              <h1 className="font-headline text-3xl font-bold uppercase tracking-tight text-[#eee0da] md:text-4xl">
-                {plan?.name || 'Seu Plano de Treinamento'}
-              </h1>
-              <p className="mt-1 max-w-2xl text-xs text-[#82736b]">
-                {exercises.length} exercícios programados • {plan?.notes || tr('Siga as orientações da sua ficha.')}
-              </p>
-            </div>
-          </div>
-          <AthleteScoreboard state={state} />
-        </section>
-
-        {state.weeklyReading ? <WeeklyReadingCard reading={state.weeklyReading} /> : null}
+        </header>
 
         <FadeUp>
-        <section className="grid grid-cols-2 divide-y divide-[#2a201b] border-y border-[#2a201b] py-4 md:grid-cols-4 md:divide-x md:divide-y-0" data-tour="client-metrics">
-          <div className="py-2 first:pl-0 md:px-5 md:py-0">
-            <div className="mb-1 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-[#82736b]">
-              <span>Frequência</span>
-              <span className="text-xs font-normal lowercase text-[#eee0da]">
-                {dashboard ? `${dashboard.sessionsCompletedThisWeek ?? 0} / ${dashboard.sessionsTargetPerWeek ?? '—'}` : '—'}
-              </span>
-            </div>
-            <div className="mb-2 flex items-baseline gap-2">
-              <NumberFlow
-                className="font-headline text-2xl font-bold text-[#eee0da]"
-                value={Number.isFinite(dashboard?.sessionsCompletionRate) ? `${dashboard!.sessionsCompletionRate}%` : '—'}
-              />
-            </div>
-            <div className="flex items-center gap-1">{weekdayTitles.map((_, index) => weekdayPill(index))}</div>
-          </div>
-          <div className="py-2 md:px-5 md:py-0">
-            <div className="mb-1 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-[#82736b]">
-              <span>Volume Semanal</span>
-              <span className="text-[11px] font-medium text-[#7d986b]">
-                {Number.isFinite(dashboard?.weeklyVolumeProgressPercent)
-                  ? `${dashboard!.weeklyVolumeProgressPercent}%`
-                  : '—'}
-              </span>
-            </div>
-            <div className="mb-1.5 flex items-baseline gap-1.5">
-              <NumberFlow
-                className="font-headline text-2xl font-bold text-[#eee0da]"
-                value={dashboard ? Number(dashboard.weeklyVolume || 0).toLocaleString(language) : '—'}
-              />
-              <span className="text-xs text-[#82736b]">kg tonelagem</span>
-            </div>
-          </div>
-          <div className="py-2 md:px-5 md:py-0">
-            <div className="mb-1 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-[#82736b]">
-              <span>Nutrição Diária</span>
-              <span className="text-xs font-medium text-[#eee0da]">
-                {Number(nutrition.totals?.kcal || 0).toLocaleString(language)} / {nutrition.goal?.kcal || '—'} kcal
-              </span>
-            </div>
-            <div className="my-2 h-1.5 w-full overflow-hidden rounded-full bg-[#241c18]">
-              <div className="h-full rounded-full bg-[#7d986b]" style={{ width: `${Math.min(100, nutritionPercent || 0)}%` }} />
-            </div>
-            <div className="flex items-center justify-between text-[11px] text-[#bdaea6]">
-              <span>
-                Proteína: <strong className="text-[#eee0da]">{nutrition.totals?.proteinG || 0}g</strong>{' '}
-                <span className="text-[#82736b]">/ {nutrition.goal?.proteinG || '—'}g</span>
-              </span>
-              <NumberFlow
-                className="font-medium text-[#7d986b]"
-                value={nutrition.goal?.kcal ? `${nutritionPercent}%` : '—'}
-              />
-            </div>
-          </div>
-          <div className="py-2 last:pr-0 md:px-5 md:py-0">
-            <div className="mb-1 flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-[#82736b]">
-              <span>Hidratação</span>
-              <span id="waterPct" className="text-[11px] text-[#82736b]">
-                {waterPct !== null ? `${waterPct}% da meta` : 'Sem meta definida'}
-              </span>
-            </div>
-            <div className="mb-1 flex items-baseline justify-between">
-              <div className="flex items-baseline gap-1">
-                <span id="waterDisplay" className="font-headline text-2xl font-bold text-[#eee0da]">
-                  {(water / 1000).toLocaleString(language)}
-                </span>
-                <span className="text-xs text-[#82736b]">
-                  {waterGoal ? `/ ${(waterGoal / 1000).toLocaleString(language)} litros` : 'litros registrados'}
-                </span>
-              </div>
-              <button
-                id="removeWaterQuickBtn"
-                type="button"
-                aria-label="Remover 250 ml de água"
-                disabled={water <= 0}
-                className="rounded border border-[#382b24] bg-[#1c1512] px-2 py-0.5 text-[11px] font-semibold text-[#82736b] transition-colors hover:border-[#7d986b] disabled:opacity-40"
-                onClick={onRemoveWater}
-              >
-                −250ml
-              </button>
-              <button
-                id="addWaterQuickBtn"
-                type="button"
-                className="rounded border border-[#382b24] bg-[#1c1512] px-2 py-0.5 text-[11px] font-semibold text-[#7d986b] transition-colors hover:border-[#7d986b]"
-                onClick={onAddWater}
-              >
-                +250ml
-              </button>
-            </div>
-            <div className="text-[11px] text-[#82736b]">
-              {waterGoal ? 'Sincronizado com a sua conta' : (
-                <button type="button" className="underline" onClick={() => onNavigate('/dashboard/nutrition/goal')}>
-                  Definir meta de água
-                </button>
-              )}
-            </div>
-          </div>
-        </section>
-        </FadeUp>
+          <div className="ah-grid">
+            {hero}
 
-        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
-          <div id="tabela-exercicios" className="space-y-8 lg:col-span-8">
-            {showTodayCard ? (
-              <div data-testid="today-workout-card">
-                <div className="flex items-center justify-between border-b border-[#2a201b] pb-3">
-                  <div>
-                    <h2 className="font-headline text-xl font-bold uppercase tracking-tight text-[#eee0da]">
-                      Exercícios Prescritos para Hoje
-                    </h2>
+            <section className="ah-card ah-summary" aria-label={c.summary}>
+              <h3 className="ah-card-title">{c.summary}</h3>
+              <div className="ah-summary-body">
+                <div className="ah-rings-wrap">
+                  <ActivityRings
+                    summary={`${c.ringWorkouts}: ${workoutPct ?? 0}%, ${c.ringCalories}: ${caloriePct ?? 0}%, ${c.ringWater}: ${waterPct ?? 0}%`}
+                    rings={[
+                      { label: c.ringWorkouts, pct: workoutPct, color: 'var(--primary)' },
+                      { label: c.ringCalories, pct: caloriePct, color: 'var(--accent)' },
+                      { label: c.ringWater, pct: waterPct, color: 'var(--warning)' },
+                    ]}
+                  />
+                </div>
+                <dl className="ah-legend">
+                  <div style={{ ['--dot' as string]: 'var(--primary)' }}>
+                    <dt>{c.ringWorkouts}</dt>
+                    <dd>{dashboard ? `${workoutsDone}/${workoutsTarget ?? '—'}` : '—'}</dd>
                   </div>
-                  <span className="text-xs text-[#bdaea6]">{exercises.length} exercícios</span>
-                </div>
-                <div className="divide-y divide-[#2a201b]">
-                  {exercises.map((exercise, index) => (
-                    <div key={exercise.id ?? index} className="group flex items-center justify-between gap-4 py-4">
-                      <div className="flex min-w-0 items-start gap-3.5">
-                        <span className="pt-0.5 font-mono text-xs font-bold text-[#82736b]">
-                          {String(index + 1).padStart(2, '0')}
-                        </span>
-                        <div className="min-w-0">
-                          <h3 className="text-sm font-semibold text-[#eee0da]">{exercise.name}</h3>
-                          <p className="mt-0.5 text-xs text-[#82736b]">
-                            {exercise.notes || exercise.muscles?.join(', ')}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-5 text-right">
-                        <div>
-                          <p className="text-xs font-bold text-[#eee0da]">
-                            {exercise.sets?.length || 0} {tr('séries ×')} {exercise.sets?.[0]?.reps || '—'} reps
-                          </p>
-                          <p className="text-xs font-medium text-[#d4a359]">
-                            {tr('Carga:')} {exercise.sets?.[0]?.load || '—'} kg
-                          </p>
-                        </div>
-                        <input
-                          className="h-4 w-4 cursor-pointer rounded border-[#382b24] bg-[color:var(--bg-main)] text-[#e06c43] focus:ring-0"
-                          title="Abrir sessão para registrar a execução"
-                          type="checkbox"
-                          onChange={() => onNavigate('/dashboard/training')}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                  <div style={{ ['--dot' as string]: 'var(--accent)' }}>
+                    <dt>{c.ringCalories}</dt>
+                    <dd>{kcalGoal ? `${kcal.toLocaleString(language)}/${kcalGoal.toLocaleString(language)}` : c.noTarget}</dd>
+                  </div>
+                  <div style={{ ['--dot' as string]: 'var(--warning)' }}>
+                    <dt>{c.ringWater}</dt>
+                    <dd>{waterGoal ? `${(water / 1000).toLocaleString(language)}/${(waterGoal / 1000).toLocaleString(language)} L` : c.noTarget}</dd>
+                  </div>
+                </dl>
               </div>
-            ) : null}
+            </section>
 
-            <div className="border-t border-[#2a201b] pt-4" data-tour="client-chart">
-              <h3 className="font-headline text-lg font-bold uppercase">Histórico de Volume</h3>
-              <HistoryChart data={chartData} />
-            </div>
-          </div>
-
-          <div className="space-y-6 lg:col-span-4">
-            <div className="border-b border-[#2a201b] pb-5">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[17px] text-[#e06c43]">record_voice_over</span>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#eee0da]">Feedback do Treinador</span>
-                </div>
+            <section className="ah-card ah-week" data-tour="client-metrics" aria-label={c.week}>
+              <div className="ah-card-head">
+                <h3 className="ah-card-title">{c.week}</h3>
+                <p className="ah-card-sub">
+                  {dashboard ? c.weekDone(workoutsDone, workoutsTarget) : '—'}
+                </p>
               </div>
-              <p className="rounded border border-[#2a201b] bg-[#1b1411] p-3 text-xs leading-relaxed text-[#bdaea6]">
-                {messages[messages.length - 1]?.text || 'Nenhuma orientação nova do treinador.'}
+              <ol className="ah-days">{[0, 1, 2, 3, 4, 5, 6].map(weekDay)}</ol>
+              <div className="ah-stat">
+                <span className="ah-stat-label">{c.weeklyVolume}</span>
+                <span className="ah-stat-value">
+                  <NumberFlow
+                    value={dashboard ? Number(dashboard.weeklyVolume || 0).toLocaleString(language) : '—'}
+                  />
+                  <small>kg</small>
+                  {Number.isFinite(dashboard?.weeklyVolumeProgressPercent) && dashboard!.weeklyVolumeProgressPercent !== 0 && (
+                    <em className="ah-pill">{dashboard!.weeklyVolumeProgressPercent}%</em>
+                  )}
+                </span>
+              </div>
+            </section>
+
+            <section className="ah-card ah-volume" data-tour="client-chart" aria-label={c.volume}>
+              <h3 className="ah-card-title">{c.volume}</h3>
+              <VolumeChart data={chartData} language={language} unit={c.volumeUnit} empty={c.volumeEmpty} />
+            </section>
+
+            {showTodayCard && (
+              <section className="ah-card ah-today" data-testid="today-workout-card" aria-label={c.todayList}>
+                <div className="ah-card-head">
+                  <h3 className="ah-card-title">{c.todayList}</h3>
+                  <p className="ah-card-sub">{c.exercisesCount(exercises.length)}</p>
+                </div>
+                <ol className="ah-exercises">
+                  {exercises.map((exercise, index) => {
+                    const first = exercise.sets?.[0];
+                    return (
+                      <li key={exercise.id ?? index}>
+                        <button type="button" onClick={() => onNavigate('/dashboard/training')}>
+                          <span className="ah-index">{index + 1}</span>
+                          <span className="ah-exercise-copy">
+                            <strong>{exercise.name}</strong>
+                            <small>{exercise.notes || exercise.muscles?.join(', ')}</small>
+                          </span>
+                          <span className="ah-prescription">
+                            {exercise.sets?.length || 0} × {first?.reps || '—'}
+                            {first?.load ? <small>{first.load} {c.load}</small> : null}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </section>
+            )}
+
+            <section className="ah-card ah-side" aria-label={`${c.nutrition} · ${c.hydration}`}>
+              <div className="ah-block ah-nutrition">
+              <div className="ah-card-head">
+                <h3 className="ah-card-title">{c.nutrition}</h3>
+                <button type="button" className="ah-link" onClick={() => onNavigate('/dashboard/nutrition/diary')}>{c.openDiary}</button>
+              </div>
+              <p className="ah-big">
+                {kcal.toLocaleString(language)}
+                <small>{kcalGoal ? ` / ${kcalGoal.toLocaleString(language)} kcal` : ' kcal'}</small>
               </p>
-              <button
-                type="button"
-                className="mt-3 flex items-center gap-1 text-xs font-semibold text-[#e06c43] hover:underline"
-                onClick={() => onNavigate('/dashboard/messages')}
-              >
-                <span className="material-symbols-outlined text-[15px]">chat_bubble</span>
-                <span>Responder ao treinador</span>
-              </button>
-            </div>
+              <div className="ah-bar" role="progressbar" aria-label="kcal" aria-valuemin={0} aria-valuemax={100} aria-valuenow={caloriePct ?? 0}>
+                <i style={{ width: `${caloriePct ?? 0}%`, background: 'var(--accent)' }} />
+              </div>
+              <div className="ah-macro">
+                <span>{c.protein}</span>
+                <strong>{nutrition.totals?.proteinG || 0} g{nutrition.goal?.proteinG ? ` / ${nutrition.goal.proteinG} g` : ''}</strong>
+              </div>
+              <div className="ah-bar is-thin" role="progressbar" aria-label={c.protein} aria-valuemin={0} aria-valuemax={100} aria-valuenow={proteinPct ?? 0}>
+                <i style={{ width: `${proteinPct ?? 0}%`, background: 'var(--primary)' }} />
+              </div>
+              <p className="ah-card-sub">{c.meals(nutrition.meals?.length || 0)}</p>
+              </div>
 
-            <div className="border-b border-[#2a201b] pb-5">
-              <h3 className="text-xs font-bold uppercase">Diário de Nutrição</h3>
-              <p className="py-3 text-sm">{nutrition.meals?.length || 0} refeições registradas</p>
-              <button type="button" className="text-xs text-[#e06c43]" onClick={() => onNavigate('/dashboard/nutrition/diary')}>
-                Abrir diário
-              </button>
-            </div>
+              <div className="ah-block ah-water">
+              <div className="ah-card-head">
+                <h3 className="ah-card-title">{c.hydration}</h3>
+                {!waterGoal && (
+                  <button type="button" className="ah-link" onClick={() => onNavigate('/dashboard/nutrition/goal')}>{c.setWaterGoal}</button>
+                )}
+              </div>
+              <p className="ah-big">
+                <span id="waterDisplay">{(water / 1000).toLocaleString(language)}</span>
+                <small>{waterGoal ? ` / ${(waterGoal / 1000).toLocaleString(language)} L` : ' L'}</small>
+              </p>
+              <ul className="ah-glasses" aria-hidden="true">
+                {Array.from({ length: glasses }, (_, index) => <li key={index} data-filled={index < filledGlasses || undefined} />)}
+              </ul>
+              <div className="ah-water-actions">
+                <button id="removeWaterQuickBtn" type="button" aria-label={`Remover ${WATER_STEP} ml de água`} disabled={water <= 0} onClick={onRemoveWater}>
+                  −{WATER_STEP} ml
+                </button>
+                <button id="addWaterQuickBtn" type="button" className="is-primary" onClick={onAddWater}>
+                  +{WATER_STEP} ml
+                </button>
+              </div>
+              </div>
 
-            <div className="text-xs text-[#82736b]">
-              <span className="font-semibold text-[#eee0da]">{userName}</span> — sessão ativa
-            </div>
+              <div className="ah-block ah-coach">
+              <div className="ah-card-head">
+                <h3 className="ah-card-title">{c.coach}</h3>
+              </div>
+              <p className={lastCoachMessage?.text ? 'ah-quote' : 'ah-quote is-empty'}>
+                {lastCoachMessage?.text || c.noCoach}
+              </p>
+              <button type="button" className="ah-link" onClick={() => onNavigate('/dashboard/messages')}>
+                <Icon name="chat_bubble" />
+                {c.reply}
+              </button>
+              </div>
+            </section>
+
+            <section className="ah-card ah-progress" aria-label={c.progress}>
+              <AthleteScoreboard state={state} />
+            </section>
+
+            {state.weeklyReading ? (
+              <section className="ah-card ah-reading">
+                <WeeklyReadingCard reading={state.weeklyReading} />
+              </section>
+            ) : null}
           </div>
-        </div>
+        </FadeUp>
       </main>
     </div>
   );

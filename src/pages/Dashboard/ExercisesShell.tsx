@@ -4,9 +4,12 @@ import SuggestExerciseModal from '../../components/SuggestExerciseModal';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useExercises } from '../../hooks/useExercises';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { exerciseMatchesMuscleFilter, getCatalogLanguage, pickLocalized } from '../../utils/exerciseCatalog';
+import { exerciseKind, exerciseMatchesMuscleFilter, getCatalogLanguage, pickLocalized } from '../../utils/exerciseCatalog';
+import { MUSCLE_GROUPS } from '../../components/anatomy/muscleRegions';
 import { mapExerciseEquivalents } from '../../utils/exerciseEquivalents';
 import { resolveEquivalentSelection } from './resolveEquivalentSelection';
+import athleteHomeCss from './operational-dashboard/athlete/athleteHome.css?inline';
+import libraryCss from './markup/exercisesLibrary.css?inline';
 import DashboardShellHost from '../shell-assets/DashboardShellHost';
 import { workspaceNavStyle } from '../shell-assets/workspaceNavStyle';
 import { ExercisesPublicMarkup, type ExerciseRecord } from './markup/ExercisesPublicMarkup';
@@ -36,6 +39,8 @@ export default function ExercisesShell() {
   const [equivalentRecords, setEquivalentRecords] = useState<ExerciseRecord[]>([]);
   const inspectRequestRef = useRef(0);
   const [group, setGroup] = useState('all');
+  const [kind, setKind] = useState('all');
+  const [muscles, setMuscles] = useState<string[]>([]);
   const [equipment, setEquipment] = useState('all');
   const [selected, setSelected] = useState<ExerciseRecord | null>(null);
   const [open, setOpen] = useState(false);
@@ -103,6 +108,8 @@ export default function ExercisesShell() {
       (ex) =>
         normalize([ex.name, ...ex.muscles, equipmentName(ex)].join(' ')).includes(normalize(searchTerm)) &&
         (group === 'all' || exerciseMatchesMuscleFilter(ex, group)) &&
+        (kind === 'all' || exerciseKind(ex) === kind) &&
+        (kind === 'cardio' || muscles.length === 0 || muscles.some((muscle) => exerciseMatchesMuscleFilter(ex, muscle))) &&
         (equipment === 'all' || normalize(equipmentName(ex)).includes(normalize(equipment))),
     );
     list.sort((a, b) =>
@@ -111,7 +118,29 @@ export default function ExercisesShell() {
       ),
     );
     return list;
-  }, [exercises, searchTerm, group, equipment, sort, equipmentName]);
+  }, [exercises, searchTerm, group, kind, muscles, equipment, sort, equipmentName]);
+
+  const toggleMuscleGroup = (groupKey: string) =>
+    setMuscles((current) => {
+      const leaves = MUSCLE_GROUPS[groupKey as keyof typeof MUSCLE_GROUPS] ?? [];
+      const active = current.includes(groupKey) || leaves.some((leaf) => current.includes(leaf));
+      return active ? current.filter((item) => item !== groupKey && !leaves.includes(item)) : [...current, groupKey];
+    });
+
+  /** Narrowing a whole group down to one portion, like the mobile chips. */
+  const toggleMuscleLeaf = (groupKey: string, leaf: string) =>
+    setMuscles((current) => {
+      if (current.includes(groupKey)) return [...current.filter((item) => item !== groupKey), leaf];
+      return current.includes(leaf) ? current.filter((item) => item !== leaf) : [...current, leaf];
+    });
+
+  const clearFilters = () => {
+    setKind('all');
+    setMuscles([]);
+    setGroup('all');
+    setEquipment('all');
+    setSearchTerm('');
+  };
 
   const add = (ex: ExerciseRecord | null | undefined) => {
     if (ex) navigate('/dashboard/training', { state: { create: true, exercise: ex } });
@@ -139,6 +168,12 @@ export default function ExercisesShell() {
     setSearchTerm,
     group,
     setGroup,
+    kind,
+    setKind,
+    muscles,
+    toggleMuscleGroup,
+    toggleMuscleLeaf,
+    clearFilters,
     equipment,
     setEquipment,
     sort,
@@ -175,7 +210,7 @@ export default function ExercisesShell() {
     <>
       <DashboardShellHost
         name="exercises"
-        css={workspaceNavStyle + drawerCss}
+        css={workspaceNavStyle + athleteHomeCss + libraryCss + drawerCss}
         after={
           <button
             type="button"

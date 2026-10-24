@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../components/tour/useShadowAwareTour';
 import Button from './Button';
 import Input from './Input';
 import './ClientBillingModal.css';

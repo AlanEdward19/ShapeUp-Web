@@ -1,76 +1,43 @@
+import WeekdayChips from '../../components/training/WeekdayChips';
 import { readAllPages } from '../../utils/readAllPages';
 import { workoutHistory } from '../../utils/workoutHistory';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useOutletContext, useLocation, useNavigate } from 'react-router-dom';
-import { useTour } from '@reactour/tour';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import Button from '../../components/Button';
 import { addNotification } from '../../utils/notifications';
 import { useLanguage } from '../../contexts/LanguageContext';
-import {
-    PlanEditor,
-    PlanCard,
-    SessionDetailModal,
-    SetTypeBadge,
-    ProSelect,
-    SET_TYPES,
-    TECHNIQUES
-} from './ClientDetail';
+import { PlanEditor, SessionDetailModal } from './ClientDetail';
 import { useTrainingApi } from '../../hooks/api/useTrainingApi';
 import { useAuthorizationApi } from '../../hooks/api/useAuthorizationApi';
 import { enqueueMutation } from '../../services/mutationQueue';
-import { enqueueMarkedSet } from '../../utils/markWorkoutSet';
 import { generateObjectId } from '../../utils/objectId';
 import { flattenBlockExercises, normalizePlan } from '../../utils/trainingNormalization';
-import { unmapSetType } from '../../utils/trainingEnums';
 import { buildWorkoutPlanBody, findTimeBasedDurationError } from '../../utils/workoutPlanPayload';
-import { buildWorkoutStatePayload, enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
+import { enrichExercisesFromCatalog } from '../../utils/workoutStatePayload';
 import { useExercises } from '../../hooks/useExercises';
 import WorkoutBodyMap from '../../components/anatomy/WorkoutBodyMap';
-import { useXpCelebration } from '../../hooks/useXpCelebration';
-import { runWorkoutSubmitFeedback } from './workoutSubmitFeedback';
-import WorkoutFinishXpPopup from './WorkoutFinishXpPopup';
-import SessionEndCard from '../../components/session/SessionEndCard';
-import { buildSessionEndSummary } from '../../utils/sessionEndSummary';
-import {
-    applyToggleLoggedSetComplete,
-    applyUpdateSetLog,
-    execInputClassName,
-    ExecutionLogHeaderCells,
-    ExecutionLogInputCells,
-    INVALID_LOG_FLASH_MS,
-    mergeSessionRequireRpe,
-    toRuntimeSets,
-} from './TrainingPlansClient';
 import './TrainingPlansClient.css';
 import './TrainingPlansProfessional.css';
 
-/* eslint-disable react-refresh/only-export-components -- execution helpers tested without mounting the page */
-export { applyToggleLoggedSetComplete, applyUpdateSetLog, toRuntimeSets };
-
-export const independentRestKicker = (t) => t('client.session.timer.rest_label');
-
+// eslint-disable-next-line react-refresh/only-export-components -- body builder is tested without mounting the page
 export { buildWorkoutPlanBody };
 
-const formatTime = (totalSeconds) => {
-    const hours = Math.floor(totalSeconds / 3600);
-    const mins = Math.floor((totalSeconds % 3600) / 60);
-    const secs = totalSeconds % 60;
-    if (hours > 0) {
-        return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+/** Workouts are executed in the mobile app; the web creates, organises and reviews them. */
+const appNotes = {
+    'pt-BR': 'Os treinos são executados no app ShapeUp. Aqui você cria, organiza e revisa o histórico.',
+    en: 'Workouts are run in the ShapeUp app. Here you create, organise and review your history.',
+    es: 'Los entrenamientos se realizan en la app ShapeUp. Aquí creas, organizas y revisas tu historial.',
 };
 
-const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, owned, catalog = [] }) => {
+const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, owned, catalog = [] }) => {
     const { t } = useLanguage();
     const mapExercises = enrichExercisesFromCatalog(flattenBlockExercises(plan.blocks), catalog);
     return (
         <div className="su-independent-plan-card">
             <div className="su-plan-card-body">
                 <div className="su-plan-card-main">
-                    <span className="su-phase-badge">
-                        {plan.phase?.toUpperCase() || 'GENERAL'}
-                    </span>
+                    {plan.phase ? <span className="su-phase-badge">{plan.phase}</span> : null}
                     <h2 className="su-plan-display-name">{plan.name}</h2>
                     <p className="su-plan-display-meta">
                         {t('pro.builder.diff')}: <strong>{t(`pro.builder.diff.${plan.difficulty?.toLowerCase()}`) || plan.difficulty}</strong> · {plan.weeks} {t('pro.client.plan.weeks')}
@@ -78,12 +45,12 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, owned, c
                     <div className="su-ex-count-badge">
                         <span>{mapExercises.length} {t('pro.client.plan.exercises')}</span>
                     </div>
+                    <WeekdayChips days={plan.assignedWeekdays} />
+                </div>
+                <div className="su-plan-card-map">
                     <WorkoutBodyMap exercises={mapExercises} compact />
                 </div>
                 <div className="su-plan-card-side">
-                    <button className="su-execute-btn-large" onClick={() => onStart(plan)}>
-                        {t('client.training.card.btn')}
-                    </button>
                     <div className="su-plan-tiny-actions">
                         {owned && <button onClick={() => onEdit(plan)} title={t('pro.client.plan.btn.edit')}>{t('pro.client.plan.btn.edit')}</button>}
                         <button onClick={() => onCopy(plan)} title={t('pro.client.plan.btn.copy')}>{t('pro.client.plan.btn.copy')}</button>
@@ -98,34 +65,32 @@ const IndependentPlanCard = ({ plan, onEdit, onCopy, onDelete, onStart, owned, c
 const TrainingPlansIndependent = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { setSessionTitle } = useOutletContext() || {};
-    const { t, language, unitSystem, formatWeight } = useLanguage();
+    const { t, language } = useLanguage();
+    const appNote = appNotes[language] || appNotes['pt-BR'];
     const { setIsOpen, setSteps, setCurrentStep } = useTour();
-    const {
-        getWorkoutPlansByUser,
-        getWorkoutsByUser,
-        getActiveWorkout,
-        getWorkoutPlanById,
-    } = useTrainingApi();
+    const { getWorkoutPlansByUser, getWorkoutsByUser } = useTrainingApi();
     const { getMe } = useAuthorizationApi();
     const { exercises: exercisesDB } = useExercises();
 
-    // ─── STATE MANAGEMENT ──────────────────────────────────────────
-
-    // 1. Storage & Navigation
     const [plans, setPlans] = useState([]);
     const [loadingPlans, setLoadingPlans] = useState(true);
     const [userId, setUserId] = useState(null);
     const [planError, setPlanError] = useState(false);
     const ownPlan = plan => userId != null && String(plan.createdByUserId) === String(userId);
-    const originText = language === 'en' ? ['Created by me','From my trainer','Other assigned workouts','You can create your own workouts. Workouts from your trainer stay separate.','Loading workouts…','Could not load your workouts.'] : language === 'es' ? ['Creados por mí','De mi entrenador','Otros entrenamientos asignados','Puedes crear tus propios entrenamientos. Los de tu entrenador se mantienen separados.','Cargando entrenamientos…','No se pudieron cargar tus entrenamientos.'] : ['Criados por mim','Do meu treinador','Outros treinos atribuídos','Você pode criar seus próprios treinos. Os treinos do seu treinador ficam separados.','Carregando treinos…','Não foi possível carregar seus treinos.'];
     const [editingPlan, setEditingPlan] = useState(null);
+    const originText = language === 'en' ? ['Created by me','From my trainer','Other assigned workouts','You can create your own workouts. Workouts from your trainer stay separate.','Loading workouts…','Could not load your workouts.'] : language === 'es' ? ['Creados por mí','De mi entrenador','Otros entrenamientos asignados','Puedes crear tus propios entrenamientos. Los de tu entrenador se mantienen separados.','Cargando entrenamientos…','No se pudieron cargar tus entrenamientos.'] : ['Criados por mim','Do meu treinador','Outros treinos atribuídos','Você pode criar seus próprios treinos. Os treinos do seu treinador ficam separados.','Carregando treinos…','Não foi possível carregar seus treinos.'];
+    const [showSessionDetail, setShowSessionDetail] = useState(null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [planToDelete, setPlanToDelete] = useState(null);
+    const [historyPage] = useState(1);
+    const HISTORY_PER_PAGE = 5;
     useEffect(() => {
         if (!location.state?.create) return;
         const exercise = location.state.exercise;
         setEditingPlan({ id: `p${Date.now()}`, name: 'Novo plano de treino', phase: 'Hypertrophy', difficulty: 'Intermediate', weeks: 6, active: false, notes: '', history: [], blocks: exercise ? [{ id: `b${Date.now()}`, type: 'straight', exercises: [{ ...exercise, exerciseId: exercise.id, id: `e${Date.now()}`, notes: '', sets: [{ type: 'working', technique: 'Straight', reps: '8-10', load: '', intensityType: 'rpe', intensityValue: '8', rest: '90' }] }] }] : [] });
         navigate(location.pathname, { replace: true, state: null });
     }, [location.state, location.pathname, navigate]);
+
 
     // Fetch plans from API on mount
     useEffect(() => {
@@ -172,169 +137,9 @@ const TrainingPlansIndependent = () => {
         fetchPlans();
     }, [getMe, getWorkoutPlansByUser, getWorkoutsByUser]);
 
-    // 2. Session Engine State
-    const [sessionActive, setSessionActive] = useState(false);
-    const [activePlan, setActivePlan] = useState(null);
-    const [workoutTime, setWorkoutTime] = useState(0);
-    const [restTimer, setRestTimer] = useState(0);
-    const [isResting, setIsResting] = useState(false);
-    const [sessionExercises, setSessionExercises] = useState([]);
-    const [sessionFeedback, setSessionFeedback] = useState({ rpe: null, comments: '' });
-    const [workoutSessionId, setWorkoutSessionId] = useState(null);
-    const [isFinishingSession, setIsFinishingSession] = useState(false);
-    const [pendingActiveWorkout, setPendingActiveWorkout] = useState(null);
-    const [isResumingWorkout, setIsResumingWorkout] = useState(false);
-    const [isCancellingActive, setIsCancellingActive] = useState(false);
-    const [invalidLogs, setInvalidLogs] = useState({});
-
-    const hasFirstDoneRef = useRef(false);
-    const committedSetsRef = useRef(new Set()); // Tracks sets that have been "sent" at least once as done
-    const doneClickGuardRef = useRef({});
-    const sessionExercisesRef = useRef(sessionExercises);
-    const workoutTimeRef = useRef(workoutTime);
-
-    // 3. Modals & Overlays
-    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-    const [showOverviewModal, setShowOverviewModal] = useState(false);
-    const [showCancelModal, setShowCancelModal] = useState(false);
-    const [showSessionDetail, setShowSessionDetail] = useState(null);
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [planToDelete, setPlanToDelete] = useState(null);
-
-    const xpCelebration = useXpCelebration();
-
-    // 4. Pagination
-    const [historyPage] = useState(1);
-    const HISTORY_PER_PAGE = 5;
-
-    useEffect(() => {
-        sessionExercisesRef.current = sessionExercises;
-    }, [sessionExercises]);
-
-    useEffect(() => {
-        workoutTimeRef.current = workoutTime;
-    }, [workoutTime]);
-
-    const buildWorkoutStatePayloadLocal = useCallback((sourceExercises, _elapsedSeconds) => {
-        return buildWorkoutStatePayload({
-            sessionId: workoutSessionId,
-            exercises: sourceExercises,
-            unitSystem,
-        });
-    }, [workoutSessionId, unitSystem]);
-    
-    const mutateSessionExercises = useCallback((mutator) => {
-        const next = [...sessionExercisesRef.current];
-        mutator(next);
-        setSessionExercises(next);
-        return next;
-    }, []);
-
-    const flashInvalidLog = (exerciseIndex, setIndex, missing) => {
-        const key = `${exerciseIndex}-${setIndex}`;
-        setInvalidLogs((prev) => ({ ...prev, [key]: missing }));
-        window.setTimeout(() => {
-            setInvalidLogs((prev) => {
-                if (!prev[key]) return prev;
-                const next = { ...prev };
-                delete next[key];
-                return next;
-            });
-        }, INVALID_LOG_FLASH_MS);
-    };
-
-    // ─── EFFECTS ───────────────────────────────────────────────────
-
-    // Initial Load handled in useState to prevent race conditions with Sync
-
-    // -- Check for active workout on mount --
-    useEffect(() => {
-        const checkActiveWorkout = async () => {
-            try {
-                const response = await getActiveWorkout();
-                if (response && response.hasActiveWorkout && response.session) {
-                    console.log('Active workout found (Independent):', response.session);
-                    setPendingActiveWorkout(response.session);
-                }
-            } catch (_error) {
-                console.log('No active workout found (expected).');
-            }
-        };
-
-        if (!sessionActive) {
-            checkActiveWorkout();
-        }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-    const handleResumeActiveWorkout = async () => {
-        if (!pendingActiveWorkout) return;
-        setIsResumingWorkout(true);
-        try {
-            const activeSessionId = pendingActiveWorkout.sessionId || pendingActiveWorkout.id;
-            const planId = pendingActiveWorkout.workoutPlanId || pendingActiveWorkout.planId;
-
-            setWorkoutSessionId(activeSessionId);
-
-            // Try to find the plan from local plans first
-            let plan = plans.find(p => (p._planId || p.id) === planId);
-
-            // If not found locally, try fetching from API
-            if (!plan && planId) {
-                try {
-                    const fetchedPlan = await getWorkoutPlanById(planId);
-                    if (fetchedPlan) plan = normalizePlan(fetchedPlan);
-                } catch (err) {
-                    console.error('Failed to fetch plan for resume:', err);
-                }
-            }
-
-            if (plan) {
-                const flattened = enrichExercisesFromCatalog(
-                    flattenBlockExercises(plan.blocks),
-                    exercisesDB
-                );
-                const sessionSnap = pendingActiveWorkout.exercises
-                    || pendingActiveWorkout.Exercises;
-                const runtimeExercises = mergeSessionRequireRpe(flattened, sessionSnap)
-                    .map(toRuntimeSets);
-
-                setSessionExercises(runtimeExercises);
-                hasFirstDoneRef.current = false;
-                committedSetsRef.current = new Set();
-                doneClickGuardRef.current = {};
-                setIsFinishingSession(false);
-                setActivePlan(plan);
-                setSessionActive(true);
-                setWorkoutTime(0);
-                setSessionTitle?.(`${plan.name} \u00b7 ${plan.phase}`);
-            }
-
-            setPendingActiveWorkout(null);
-        } catch (error) {
-            console.error('Failed to resume workout:', error);
-        } finally {
-            setIsResumingWorkout(false);
-        }
-    };
-
-    const handleCancelActiveWorkout = () => {
-        if (!pendingActiveWorkout) return;
-        setIsCancellingActive(true);
-        const activeSessionId = pendingActiveWorkout.sessionId || pendingActiveWorkout.id;
-        // Enqueued (offline foundation): local session state is reset unconditionally right
-        // after regardless of the response, so there's nothing to await here.
-        enqueueMutation({
-            endpoint: `/api/training/workouts/${activeSessionId}/cancel`,
-            method: 'POST',
-            dedupeKey: `workout-cancel-${activeSessionId}`,
-        });
-        setPendingActiveWorkout(null);
-        setIsCancellingActive(false);
-    };
-
     // -- Independent Training Plans Tour Trigger --
     useEffect(() => {
-        if (sessionActive || editingPlan) return;
+        if (editingPlan) return;
 
         const hasSeenTour = localStorage.getItem('shapeup_independent_training_plans_tour_seen');
         if (!hasSeenTour) {
@@ -362,34 +167,13 @@ const TrainingPlansIndependent = () => {
 
             localStorage.setItem('shapeup_independent_training_plans_tour_seen', 'true');
         }
-    }, [sessionActive, editingPlan, setIsOpen, setSteps, setCurrentStep, t]);
+    }, [editingPlan, setIsOpen, setSteps, setCurrentStep, t]);
 
-    // Sync Plans to Storage
+
+    // Sync plans to storage
     useEffect(() => {
         if (userId && !loadingPlans && !planError) localStorage.setItem(`shapeup_independent_plans_${userId}`, JSON.stringify(plans));
     }, [plans, userId, loadingPlans, planError]);
-
-    // Global Workout Timers
-    useEffect(() => {
-        let globalInterval = null;
-        let restInterval = null;
-        const isPausedByModal = showFeedbackModal || showOverviewModal || showCancelModal;
-
-        if (sessionActive && !isPausedByModal) {
-            globalInterval = setInterval(() => setWorkoutTime(sec => sec + 1), 1000);
-        }
-
-        if (isResting && restTimer > 0 && !isPausedByModal) {
-            restInterval = setInterval(() => setRestTimer(sec => sec - 1), 1000);
-        } else if (restTimer === 0 && isResting) {
-            setIsResting(false);
-        }
-
-        return () => {
-            clearInterval(globalInterval);
-            clearInterval(restInterval);
-        };
-    }, [sessionActive, isResting, restTimer, showFeedbackModal, showOverviewModal, showCancelModal]);
 
     // ─── PLAN MANAGEMENT HANDLERS ─────────────────────────────────
 
@@ -520,151 +304,6 @@ const TrainingPlansIndependent = () => {
         setPlanToDelete(null);
     };
 
-    // ─── SESSION ENGINE HANDLERS ──────────────────────────────────
-
-    // Enqueued (offline foundation): a client-generated session id (see objectId.js) is used
-    // as the real session id from the start -- state sync/finish/cancel run against this same
-    // id whether online or offline, no reconciliation needed (backend accepts a pre-set id,
-    // see StartWorkoutExecutionCommand.Id).
-    const startSession = (plan) => {
-        const pid = plan._planId || plan.id;
-
-        // Só dá pra iniciar no servidor se o plano em si já tiver um ID real (não temporário
-        // p.../plan_...) -- um plano ainda não sincronizado não existe lá pra referenciar.
-        if (pid && !String(pid).startsWith('p') && !String(pid).startsWith('plan_')) {
-            const sessionId = generateObjectId();
-            setWorkoutSessionId(sessionId);
-            enqueueMutation({
-                endpoint: '/api/training/workouts/start',
-                method: 'POST',
-                body: { id: sessionId, planId: pid, startedAtUtc: new Date().toISOString() },
-            });
-        } else {
-            setWorkoutSessionId(null);
-        }
-
-        const runtimeExercises = enrichExercisesFromCatalog(
-            flattenBlockExercises(plan.blocks),
-            exercisesDB
-        ).map(toRuntimeSets);
-
-        setSessionExercises(runtimeExercises);
-        hasFirstDoneRef.current = false;
-        committedSetsRef.current = new Set();
-        doneClickGuardRef.current = {};
-        setIsFinishingSession(false);
-        setActivePlan(plan);
-        setSessionActive(true);
-        setWorkoutTime(0);
-        setSessionTitle?.(`${plan.name} · ${plan.phase}`);
-    };
-
-    const finishSession = async () => {
-        if (isFinishingSession) return;
-
-        setIsFinishingSession(true);
-
-        setShowFeedbackModal(true);
-        setSessionTitle?.(null);
-        setIsFinishingSession(false);
-    };
-
-    const submitFeedback = () => {
-        // Enqueued (offline foundation): the session summary shown next (handleSessionCompleted)
-        // is built entirely from local sessionExercises/workoutTime, not from this response.
-        const payload = buildWorkoutStatePayloadLocal(sessionExercises, workoutTime);
-        runWorkoutSubmitFeedback({
-            workoutSessionId,
-            perceivedExertion: parseFloat(sessionFeedback.rpe) || 5,
-            finishExercises: payload.exercises || [],
-            enqueueMutation,
-            setShowFeedbackModal,
-            setShowOverviewModal,
-            xpCelebrationStart: xpCelebration.start,
-        });
-    };
-
-    const handleSessionCompleted = () => {
-        const totalVol = sessionExercises.reduce((acc, ex) => {
-            return acc + ex.sets.filter(s => s.completed).reduce((setAcc, set) => {
-                const w = parseFloat(set.log.weight) || 0;
-                const r = parseFloat(set.log.reps) || 0;
-                return setAcc + (w * r);
-            }, 0);
-        }, 0);
-
-        let totalSets = 0;
-        let completedSets = 0;
-        sessionExercises.forEach(ex => ex.sets.forEach(s => {
-            totalSets++;
-            if (s.completed) completedSets++;
-        }));
-
-        let sessionStatus = 'completed';
-        if (completedSets === 0) sessionStatus = 'skipped';
-        else if (completedSets < totalSets) sessionStatus = 'partial';
-
-        const newHistoryEntry = {
-            id: `h${Date.now()}`,
-            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            duration: formatTime(workoutTime),
-            totalVol: formatWeight(totalVol).replace('0 ', ''),
-            rpe: sessionFeedback.rpe || 5,
-            comments: sessionFeedback.comments || '',
-            status: sessionStatus,
-            exercises: sessionExercises.map(ex => ({
-                name: ex.name,
-                muscles: ex.muscles || [],
-                skipped: ex.sets.every(s => !s.completed),
-                sets: ex.sets.filter(s => s.completed).map((s, idx) => ({
-                    set: idx + 1,
-                    type: s.type,
-                    reps: s.log.reps || 0,
-                    load: s.log.weight || 0,
-                    rpe: s.log.rpe || 0
-                }))
-            }))
-        };
-
-        setPlans(prev => prev.map(p => {
-            if (p.id === activePlan.id) {
-                return { ...p, history: [newHistoryEntry, ...(p.history || [])] };
-            }
-            return p;
-        }));
-
-        resetSession({ skipCancel: true });
-    };
-
-    const resetSession = ({ skipCancel = false } = {}) => {
-        if (!skipCancel && workoutSessionId) {
-            // Enqueued (offline foundation): local session state is reset unconditionally
-            // right below regardless of the response.
-            enqueueMutation({
-                endpoint: `/api/training/workouts/${workoutSessionId}/cancel`,
-                method: 'POST',
-                dedupeKey: `workout-cancel-${workoutSessionId}`,
-            });
-        }
-        setSessionActive(false);
-        setActivePlan(null);
-        setWorkoutSessionId(null);
-        setIsFinishingSession(false);
-        setWorkoutTime(0);
-        setIsResting(false);
-        setRestTimer(0);
-        setSessionExercises([]);
-        setSessionFeedback({ rpe: null, comments: '' });
-        setShowOverviewModal(false);
-        setShowFeedbackModal(false);
-        setShowCancelModal(false);
-        hasFirstDoneRef.current = false;
-        doneClickGuardRef.current = {};
-        setSessionTitle?.(null);
-    };
-
-    // ─── COMPUTED ──────────────────────────────────────────────────
-
     const allHistory = plans.flatMap(plan =>
         (plan.history || []).map(h => ({
             ...h,
@@ -677,242 +316,11 @@ const TrainingPlansIndependent = () => {
 
     // ─── RENDER ────────────────────────────────────────────────────
 
-    if (sessionActive) {
-        return (
-            <div className="su-session-engine">
-                <div className="su-session-header-sticky">
-                    <div className="su-session-header-left">
-                        <Button variant="outline" onClick={() => setShowCancelModal(true)} size="sm">{t('client.session.btn.cancel')}</Button>
-                    </div>
-                    <div className={`su-rest-timer-group ${isResting ? 'active' : ''}`}>
-                        <div className="su-rest-controls">
-                            <button className="su-adjust-rest-btn minus" onClick={() => setRestTimer(p => Math.max(0, p - 15))}>-15s</button>
-                            <div className="su-rest-clock-display"><span className="su-timer-kicker">{independentRestKicker(t)}</span> <span className="su-timer-digits">{formatTime(restTimer)}</span></div>
-                            <button className="su-adjust-rest-btn plus" onClick={() => setRestTimer(p => p + 15)}>+15s</button>
-                        </div>
-                    </div>
-                    <div className="su-session-header-right">
-                        {isResting && <button className="su-skip-rest-btn" onClick={() => setIsResting(false)}>{t('client.session.btn.skip')}</button>}
-                    </div>
-                </div>
-
-                <div className="su-execution-scroll">
-                    <WorkoutBodyMap exercises={sessionExercises} compact />
-                    {sessionExercises.map((ex, exIdx) => {
-                        const liveSetIndex = ex.sets.findIndex(s => !s.completed);
-                        const isTimeBased = ex.exerciseType === 'timeBased';
-                        return (
-                        <article key={ex.id} className="su-ledger-exercise">
-                            <div className="su-ex-execution-header">
-                                <div className="su-ex-index-group">
-                                    <span className="su-ledger-num">{String(exIdx + 1).padStart(2, '0')}</span>
-                                    <div>
-                                        <h3 className="su-se-ex-title">{ex.name}</h3>
-                                        <span className="su-ex-target">{ex.target}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="su-sets-execution">
-                                <div className="su-exec-row su-exec-header">
-                                    <div className="col-set">{t('client.session.table.set')}</div>
-                                    <div className="col-target">{t('client.session.table.target')}</div>
-                                    <div className="col-rest">{t('client.session.table.rest')}</div>
-                                    <ExecutionLogHeaderCells isTimeBased={isTimeBased} t={t} />
-                                    <div className="col-log">{t('client.session.table.rpe')}</div>
-                                    <div className="col-failure">{t('client.session.table.failure')}</div>
-                                    <div className="col-done">{t('client.session.table.done')}</div>
-                                </div>
-                                {ex.sets.map((s, sIdx) => (
-                                    <div key={s.id} className={`su-exec-row ${s.completed ? 'completed' : ''} ${sIdx === liveSetIndex ? 'live' : ''}`}>
-                                        <div className="col-set">
-                                            <span className={`su-set-badge ${s.type}`} onClick={() => {
-                                                const types = ['warmup', 'working', 'topset', 'backoff'];
-                                                const cur = types.indexOf(s.type);
-                                                const next = types[(cur + 1) % types.length];
-                                                mutateSessionExercises(updated => {
-                                                    updated[exIdx].sets[sIdx].type = next;
-                                                });
-                                            }} style={{ cursor: 'pointer' }}>
-                                                {t(`client.session.set_type.${unmapSetType(s.type)}`)}
-                                            </span>
-                                        </div>
-                                        <div className="col-target">
-                                            <div className="su-target-primary">{s.target}</div>
-                                        </div>
-                                        <div className="col-rest">
-                                            <div className="su-rest-display">
-                                                <span>{s.prescribedRest}s</span>
-                                            </div>
-                                        </div>
-                                        <ExecutionLogInputCells
-                                            isTimeBased={isTimeBased}
-                                            set={s}
-                                            invalidFields={invalidLogs[`${exIdx}-${sIdx}`]}
-                                            onFieldChange={(field, value) => setSessionExercises(
-                                                applyUpdateSetLog(sessionExercisesRef.current, exIdx, sIdx, field, value),
-                                            )}
-                                            disabled={s.completed}
-                                        />
-                                        <div className="col-log">
-                                            <input type="number" className={execInputClassName(invalidLogs[`${exIdx}-${sIdx}`], 'rpe')} value={s.log.rpe} onChange={e => setSessionExercises(applyUpdateSetLog(sessionExercisesRef.current, exIdx, sIdx, 'rpe', e.target.value))} placeholder="--" disabled={s.completed} />
-                                        </div>
-                                        <div className="col-failure">
-                                            <label className={`su-failure-checkbox ${s.failure ? 'checked' : ''}`}>
-                                                <input
-                                                    type="checkbox"
-                                                    className="su-visually-hidden"
-                                                    checked={s.failure}
-                                                    onChange={e => {
-                                                        mutateSessionExercises(updated => {
-                                                            updated[exIdx].sets[sIdx].failure = e.target.checked;
-                                                            if (e.target.checked) updated[exIdx].sets[sIdx].log.rpe = '10';
-                                                        });
-                                                    }}
-                                                />
-                                                <span className="su-failure-icon" />
-                                            </label>
-                                        </div>
-                                        <div className="col-done">
-                                            <button className={`su-check-circle ${s.completed ? 'checked' : ''}`} onClick={() => {
-                                                const clickKey = `${exIdx}-${sIdx}`;
-                                                const now = Date.now();
-                                                const lastClick = doneClickGuardRef.current[clickKey] || 0;
-                                                if (now - lastClick < 350) return;
-                                                doneClickGuardRef.current[clickKey] = now;
-
-                                                const result = applyToggleLoggedSetComplete(sessionExercisesRef.current, exIdx, sIdx);
-                                                if (result.missing.length) {
-                                                    flashInvalidLog(exIdx, sIdx, result.missing);
-                                                    return;
-                                                }
-
-                                                setSessionExercises(result.exercises);
-                                                const completedState = result.exercises[exIdx].sets[sIdx].completed;
-
-                                                if (completedState) {
-                                                    committedSetsRef.current.add(s.id);
-                                                    hasFirstDoneRef.current = true;
-                                                    enqueueMarkedSet({
-                                                        enqueueMutation,
-                                                        sessionId: workoutSessionId,
-                                                        exercise: result.exercises[exIdx],
-                                                        set: result.exercises[exIdx].sets[sIdx],
-                                                        unitSystem,
-                                                    });
-                                                }
-
-                                                if (result.startRest && s.prescribedRest > 0) { setRestTimer(s.prescribedRest); setIsResting(true); }
-                                            }} aria-label={t('client.session.table.done')} />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </article>
-                        );
-                    })}
-                    <div className="su-session-footer su-mt-8 su-mb-12">
-                        <Button size="lg" fullWidth className="su-complete-session-btn" onClick={finishSession} disabled={isFinishingSession}>{t('client.session.btn.finish')}</Button>
-                    </div>
-                </div>
-
-                {showCancelModal && (
-                    <div className="su-modal-overlay">
-                        <div className="su-modal-box">
-                            <h2>{t('client.session.modal.cancel.title')}</h2>
-                            <p>{t('client.session.modal.cancel.desc')}</p>
-                            <div className="su-modal-actions">
-                                <Button variant="outline" onClick={() => setShowCancelModal(false)}>{t('client.session.modal.cancel.keep')}</Button>
-                                <Button onClick={resetSession} style={{ backgroundColor: 'var(--error)', color: 'white' }}>{t('client.session.modal.cancel.confirm')}</Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {showFeedbackModal && (
-                    <div className="su-rest-modal-overlay">
-                        <div className="su-feedback-modal-content">
-                            <h3>{t('client.session.modal.feedback.title')}</h3>
-                            <p className="su-text-muted su-mb-4" style={{ textAlign: 'center' }}>{t('client.session.modal.feedback.desc')}</p>
-
-                            <div className="su-feedback-rpe-scale">
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                                    <button
-                                        key={n}
-                                        className={`su-rpe-btn ${sessionFeedback.rpe === n ? 'active' : ''}`}
-                                        onClick={() => setSessionFeedback(prev => ({ ...prev, rpe: n }))}
-                                    >
-                                        {n}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="su-feedback-comments">
-                                <label className="su-input-label">{t('client.session.modal.feedback.comments')}</label>
-                                <textarea
-                                    className="su-textarea-input"
-                                    placeholder={t('client.session.modal.feedback.placeholder')}
-                                    value={sessionFeedback.comments}
-                                    onChange={e => setSessionFeedback(prev => ({ ...prev, comments: e.target.value }))}
-                                />
-                            </div>
-
-                            <div className="su-feedback-actions">
-                                <Button fullWidth onClick={submitFeedback} disabled={!sessionFeedback.rpe}>
-                                    {t('client.session.modal.feedback.submit')}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {showOverviewModal && (
-                    <div className="su-gamified-overlay">
-                        <div className="su-gamified-content">
-                            <button className="su-close-gamified" onClick={handleSessionCompleted} aria-label="Close">×</button>
-
-                            <div className="su-gamified-header">
-                                <h2>{t('client.session.modal.gamified.title')}</h2>
-                            </div>
-
-                            <div className="su-gamified-stats">
-                                <div className="su-stat-box highlight">
-                                    <span className="su-stat-value">{formatWeight(sessionExercises.reduce((a, ex) => a + ex.sets.filter(s => s.completed).reduce((sa, s) => sa + (parseFloat(s.log.weight) * parseFloat(s.log.reps) || 0), 0), 0)).replace('0 ', '')}</span>
-                                    <span className="su-stat-label">{t('client.session.modal.gamified.vol').replace('(kg)', `(${unitSystem === 'imperial' ? 'lbs' : 'kg'})`)}</span>
-                                </div>
-                                <div className="su-stat-box">
-                                    <span className="su-stat-value">{formatTime(workoutTime)}</span>
-                                    <span className="su-stat-label">{t('client.session.modal.gamified.duration')}</span>
-                                </div>
-                            </div>
-
-                            <SessionEndCard
-                                title={activePlan?.name || t('client.session.modal.gamified.fallback')}
-                                summary={buildSessionEndSummary(sessionExercises, activePlan?.history)}
-                                volumeText={formatWeight(sessionExercises.reduce((a, ex) => a + ex.sets.filter(s => s.completed).reduce((sa, s) => sa + (parseFloat(s.log.weight) * parseFloat(s.log.reps) || 0), 0), 0)).replace('0 ', '')}
-                                durationText={formatTime(workoutTime)}
-                            />
-
-                            <div className="su-gamified-actions">
-                                <Button fullWidth size="lg" onClick={handleSessionCompleted}>
-                                    {t('client.session.modal.gamified.return')}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-        );
-    }
-
     if (editingPlan) {
         return (
             <div className="su-pro-dashboard su-independent-builder">
-                <div className="su-dashboard-header-flex su-mb-6">
-                    <div>
-                        <h1 className="su-page-title">{t('independent.builder.title')}</h1>
-                        <p className="su-page-subtitle">{t('independent.training.subtitle.builder')}</p>
-                    </div>
-                    <Button variant="outline" onClick={() => setEditingPlan(null)}>{t('independent.builder.btn.back')}</Button>
+                <div className="su-builder-back">
+                    <Button variant="ghost" onClick={() => setEditingPlan(null)}>← {t('independent.builder.btn.back')}</Button>
                 </div>
                 <PlanEditor plan={editingPlan} isIndependent={true} onSave={handleSavePlan} onCancel={() => setEditingPlan(null)} />
             </div>
@@ -921,36 +329,6 @@ const TrainingPlansIndependent = () => {
 
     return (
         <div className="su-client-dashboard">
-            {/* Active Workout Recovery Modal (Blocking) */}
-            {pendingActiveWorkout && (
-                <div className="su-rest-modal-overlay" style={{ zIndex: 12000 }}>
-                    <div className="su-feedback-modal-content" style={{ textAlign: 'center' }}>
-                        <h3 style={{ marginBottom: '1rem' }}>{t('client.session.modal.active.title')}</h3>
-                        <p className="su-text-muted su-mb-6">
-                            {t('client.session.modal.active.desc')}
-                        </p>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <Button
-                                fullWidth
-                                onClick={handleResumeActiveWorkout}
-                                disabled={isResumingWorkout || isCancellingActive}
-                            >
-                                {isResumingWorkout ? '...' : t('client.session.modal.active.resume')}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                fullWidth
-                                onClick={handleCancelActiveWorkout}
-                                disabled={isResumingWorkout || isCancellingActive}
-                                style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}
-                            >
-                                {isCancellingActive ? '...' : t('client.session.modal.active.cancel')}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             <div className="su-dashboard-header" data-tour="idep-tp-header">
                 <div>
                     <h1 className="su-page-title">{t('client.training.title')}</h1>
@@ -959,12 +337,17 @@ const TrainingPlansIndependent = () => {
                 <Button className="su-mt-4" disabled={!userId || loadingPlans} onClick={handleAddPlan}>{t('independent.training.btn.create')}</Button>
             </div>
 
+            <aside className="su-app-note" role="note">
+                <span className="material-symbols-outlined" aria-hidden="true">smartphone</span>
+                <p>{appNote}</p>
+            </aside>
+
             <div className="su-independent-plans-list su-mt-8" data-tour="idep-tp-card">
                 {loadingPlans ? <p role="status">{originText[4]}</p> : planError ? <p role="alert">{originText[5]}</p> : [
                     plans.filter(ownPlan),
                     plans.filter(plan => !ownPlan(plan) && (plan.trainerUserId || plan.createdByUserId)),
                     plans.filter(plan => !ownPlan(plan) && !plan.trainerUserId && !plan.createdByUserId)
-                ].map((group, index) => (index < 2 || group.length > 0) && <section key={index} data-plan-origin={index === 0 ? 'self' : index === 1 ? 'trainer' : 'unknown'} style={{marginBottom:24}}><h2 className="su-section-title" style={{marginBottom:16}}>{originText[index]} <span className="su-text-muted">({group.length})</span></h2>{group.length ? group.map(plan => <IndependentPlanCard key={plan.id} plan={plan} catalog={exercisesDB} owned={ownPlan(plan)} onEdit={setEditingPlan} onCopy={handleCopyPlan} onDelete={handleDeletePlan} onStart={startSession} />) : <p className="su-text-muted">{t('client.training.empty.desc')}</p>}</section>)}
+                ].map((group, index) => (index < 2 || group.length > 0) && <section key={index} data-plan-origin={index === 0 ? 'self' : index === 1 ? 'trainer' : 'unknown'} style={{marginBottom:24}}><h2 className="su-section-title" style={{marginBottom:16}}>{originText[index]} <span className="su-text-muted">({group.length})</span></h2>{group.length ? group.map(plan => <IndependentPlanCard key={plan.id} plan={plan} catalog={exercisesDB} owned={ownPlan(plan)} onEdit={setEditingPlan} onCopy={handleCopyPlan} onDelete={handleDeletePlan} />) : <p className="su-text-muted">{t('client.training.empty.desc')}</p>}</section>)}
             </div>
 
             <div className="su-history-section su-mt-12" data-tour="idep-tp-history">
@@ -1004,7 +387,6 @@ const TrainingPlansIndependent = () => {
                     onClose={() => setShowSessionDetail(null)}
                 />
             )}
-            <WorkoutFinishXpPopup xpCelebration={xpCelebration} />
 
             {/* Delete Confirmation Modal */}
             {showDeleteConfirm && (

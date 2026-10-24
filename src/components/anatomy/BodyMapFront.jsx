@@ -5,7 +5,7 @@ export default function BodyMapFront({ hits, maxHits, labels }) {
     return (
         <svg
             className="su-body-map-svg"
-            viewBox="0 0 249 558"
+            viewBox="12 70 230 460"
             role="img"
             aria-label={labels?.front || 'Front body map'}
         >

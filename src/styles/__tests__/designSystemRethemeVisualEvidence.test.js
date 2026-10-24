@@ -34,8 +34,8 @@ const RETIRED_DARK_HEX = [
 const AUTH_BLOCKED_CONSUMERS = [
   {
     screen: 'sidebar',
-    path: 'src/components/Workspace/WorkspaceNavigation.tsx',
-    tokenSignals: ['var(--bg-main)', 'var(--border-color)', 'var(--text-main)'],
+    path: 'src/components/Workspace/navigationStyles.ts',
+    tokenSignals: ['var(--bg-card)', 'var(--border-color)', 'var(--text-main)'],
   },
   {
     screen: 'dashboard',
@@ -49,7 +49,7 @@ const AUTH_BLOCKED_CONSUMERS = [
   },
   {
     screen: 'settings',
-    path: 'src/pages/Dashboard/markup/SettingsPublicMarkup.tsx',
+    path: 'src/pages/Dashboard/markup/settingsPage.css',
     tokenSignals: ['var(--text-main)', 'var(--border-color)'],
   },
 ]

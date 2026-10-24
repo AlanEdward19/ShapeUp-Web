@@ -21,14 +21,14 @@ const SetRow = ({ set, index, blockType, exerciseType = 'weightBased', onChange,
         <div className="su-set-row">
             <div className="su-set-base-grid">
                 <div className="su-set-index">{index + 1}</div>
-                <div className="su-input-group">
-                    <select className="su-select" value={set.type}
+                <div className="su-set-cell" data-label={t('pro.builder.set.type')}>
+                    <select className="su-select" aria-label={t('pro.builder.set.type')} value={set.type}
                         onChange={e => onChange('type', e.target.value)}>
                         {SET_TYPES.map(type => <option key={type} value={type}>{t(`client.session.set_type.${type}`)}</option>)}
                     </select>
                 </div>
-                <div className="su-input-group">
-                    <select className="su-select" value={isTimeBased ? 'Straight' : set.technique}
+                <div className="su-set-cell" data-label={t('pro.builder.set.tech')}>
+                    <select className="su-select" aria-label={t('pro.builder.set.tech')} value={isTimeBased ? 'Straight' : set.technique}
                         disabled={isTimeBased}
                         onChange={e => onChange('technique', e.target.value)}>
                         {techniqueOptions.map(tech => <option key={tech} value={tech}>{t(`pro.builder.tech.${tech.toLowerCase().replace(' ', '')}`) || tech}</option>)}
@@ -36,35 +36,47 @@ const SetRow = ({ set, index, blockType, exerciseType = 'weightBased', onChange,
                 </div>
                 {isTimeBased ? (
                     <>
-                        <Input value={set.duration ?? ''} onChange={e => onChange('duration', e.target.value)} placeholder="05:00" />
-                        <Input value={set.distance ?? ''} onChange={e => onChange('distance', e.target.value)} placeholder="1000" />
+                        <div className="su-set-cell" data-label={t('pro.builder.set.duration')}>
+                            <Input value={set.duration ?? ''} onChange={e => onChange('duration', e.target.value)} placeholder="05:00" />
+                        </div>
+                        <div className="su-set-cell" data-label={t('pro.builder.set.distance')}>
+                            <Input value={set.distance ?? ''} onChange={e => onChange('distance', e.target.value)} placeholder="1000" />
+                        </div>
                     </>
                 ) : (
                     <>
-                        <Input value={set.reps} onChange={e => onChange('reps', e.target.value)} placeholder="8-10" />
-                        <Input value={set.load} onChange={e => onChange('load', e.target.value)} placeholder="75" />
+                        <div className="su-set-cell" data-label={t('pro.builder.set.reps')}>
+                            <Input value={set.reps} onChange={e => onChange('reps', e.target.value)} placeholder="8-10" />
+                        </div>
+                        <div className="su-set-cell" data-label={t('pro.builder.set.load')}>
+                            <Input value={set.load} onChange={e => onChange('load', e.target.value)} placeholder="75" />
+                        </div>
                     </>
                 )}
-                <div className="su-intensity-group">
-                    <button
-                        type="button"
-                        className="su-intensity-toggle"
-                        onClick={toggleIntensityType}
-                        title={t('pro.builder.intensity.toggle')}
-                    >
-                        {(set.intensityType || 'rpe').toUpperCase()}
-                    </button>
-                    <Input value={set.intensityValue} onChange={e => onChange('intensityValue', e.target.value)} placeholder="8" />
+                <div className="su-set-cell" data-label={t('pro.builder.set.intensity')}>
+                    <div className="su-intensity-group">
+                        <button
+                            type="button"
+                            className="su-intensity-toggle"
+                            onClick={toggleIntensityType}
+                            title={t('pro.builder.intensity.toggle')}
+                        >
+                            {(set.intensityType || 'rpe').toUpperCase()}
+                        </button>
+                        <Input value={set.intensityValue} onChange={e => onChange('intensityValue', e.target.value)} placeholder="8" />
+                    </div>
                 </div>
-                <Input
-                    value={restEnabled ? set.rest : ''}
-                    onChange={e => onChange('rest', e.target.value)}
-                    placeholder="90"
-                    disabled={!restEnabled}
-                    title={restEnabled ? undefined : t('pro.builder.rest.disabled')}
-                />
+                <div className="su-set-cell" data-label={t('pro.builder.set.rest')}>
+                    <Input
+                        value={restEnabled ? set.rest : ''}
+                        onChange={e => onChange('rest', e.target.value)}
+                        placeholder="90"
+                        disabled={!restEnabled}
+                        title={restEnabled ? undefined : t('pro.builder.rest.disabled')}
+                    />
+                </div>
                 <div className="su-set-actions">
-                    <button className="su-icon-btn su-error-text" onClick={onRemove}>
+                    <button type="button" className="su-icon-btn su-error-text" onClick={onRemove} aria-label={t('pro.builder.set.remove') === 'pro.builder.set.remove' ? 'Remove set' : t('pro.builder.set.remove')}>
                         ×
                     </button>
                 </div>

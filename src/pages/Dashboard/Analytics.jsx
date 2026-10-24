@@ -1,7 +1,7 @@
 import { useTrainerPortfolio } from '../../hooks/useTrainerPortfolio';
 import React, { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import {

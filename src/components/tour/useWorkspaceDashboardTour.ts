@@ -34,6 +34,8 @@ export function useWorkspaceDashboardTour(storageKey: string, stepDefs: Workspac
     if (!isOpen) return;
     const step = activeSteps.current[currentStep];
     const el = step && findWorkspaceTarget(step.targetSelector);
-    el?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    const compact = window.matchMedia?.('(max-width: 767px)').matches;
+    // On phones the card is pinned to the bottom, so keep the target in the upper half.
+    el?.scrollIntoView({ block: compact ? 'start' : 'nearest', inline: 'nearest' });
   }, [currentStep, isOpen]);
 }

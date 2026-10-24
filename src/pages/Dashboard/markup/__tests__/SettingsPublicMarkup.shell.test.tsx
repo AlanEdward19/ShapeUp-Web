@@ -4,6 +4,7 @@ import { SettingsPublicMarkup, type SettingsShellState } from '../SettingsPublic
 
 vi.mock('../../../../components/ProfileControls', () => ({
   ProfilePhoto: () => <div data-testid="profile-photo">photo</div>,
+  ProfileSwitcher: () => <div data-testid="profile-switcher">switcher</div>,
 }));
 
 const baseState: SettingsShellState = {
@@ -29,5 +30,18 @@ describe('SettingsPublicMarkup shell layout', () => {
     expect(mainColumn).toBeTruthy();
     expect(mainColumn).toHaveStyle({ marginLeft: '256px' });
     expect(container.querySelector('aside[data-unified-sidebar]')).toBeNull();
+  });
+});
+
+describe('SettingsPublicMarkup role awareness', () => {
+  it('hides professional fields from athletes and shows them to professionals', () => {
+    localStorage.setItem('shapeup_role', 'independent');
+    const { unmount } = render(<SettingsPublicMarkup state={baseState} />);
+    expect(screen.queryByText('Apresentação profissional')).not.toBeInTheDocument();
+    expect(screen.queryByText(/CREF/)).not.toBeInTheDocument();
+    unmount();
+    localStorage.setItem('shapeup_role', 'professional');
+    render(<SettingsPublicMarkup state={baseState} />);
+    expect(screen.getByText('Apresentação profissional')).toBeInTheDocument();
   });
 });

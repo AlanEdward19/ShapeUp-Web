@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTour } from '@reactour/tour';
+import { useTour } from '../../components/tour/useShadowAwareTour';
 import Button from '../../components/Button';
 import ExerciseModal from '../../components/ExerciseModal';
 import SuggestExerciseModal from '../../components/SuggestExerciseModal';

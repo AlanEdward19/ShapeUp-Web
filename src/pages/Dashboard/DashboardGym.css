@@ -5,10 +5,10 @@
 .su-clients-dashboard .su-page-title {
     font-family: var(--font-display);
     font-size: clamp(2.4rem, 5.5vw, 4.4rem);
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 0.92;
-    text-transform: uppercase;
+    text-transform: none;
 }
 
 .su-clients-dashboard .su-page-subtitle {
@@ -43,7 +43,7 @@
 .gym-metric-card.is-feature .gym-metric-value {
     font-family: var(--font-display);
     font-size: clamp(4rem, 9vw, 7rem);
-    font-weight: 800;
+    font-weight: 700;
     line-height: 0.85;
     letter-spacing: -0.03em;
 }
@@ -78,8 +78,8 @@
     font-family: var(--font-display);
     font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
 }
 
@@ -109,8 +109,8 @@
     font-family: var(--font-display);
     font-size: 1.35rem;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-main);
     margin-bottom: 0.85rem;
 }
@@ -147,8 +147,8 @@
     font-family: var(--font-display);
     font-size: 1.15rem;
     font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .gym-quicklink-desc {
@@ -181,8 +181,8 @@
     font-family: var(--font-display);
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
     border-bottom: 1px solid var(--text-main);
     text-align: left;
@@ -202,8 +202,8 @@
 .gym-recent-status {
     font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .gym-recent-status.allowed { color: var(--success); }
@@ -221,8 +221,8 @@
     font-family: var(--font-display);
     font-size: 0.95rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     cursor: pointer;
 }
 

@@ -4,6 +4,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Logo from '../components/Logo/Logo';
+import ProfileSelectionDialog from '../components/ProfileSelectionDialog';
 import WorkspaceIntro from '../components/WorkspaceIntro';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -130,12 +131,34 @@ const Login = ({ renderView } = {}) => {
 
         setTimeout(() => {
             navigate('/dashboard');
-        }, 800);
+        }, 350);
     };
 
-    if (renderView) return renderView({ availableRoles, handlePersonaSelect, handleSubmit, handleGoogleSignIn, error: error || fieldError, loading, rememberSession, setRememberSession, showPassword, setShowPassword });
+    const cancelPersonaSelection = async () => {
+        if (isTransitioning) return;
+        setAvailableRoles([]);
+        setTempUser(null);
+        await signOut();
+    };
+
+    const dialogProps = {
+        roles: availableRoles,
+        user: tempUser,
+        busyIndex: isTransitioning ? selectedRoleIndex : null,
+        onSelect: handlePersonaSelect,
+        onCancel: cancelPersonaSelection,
+    };
+
+    if (renderView) {
+        return (
+            <>
+                {renderView({ handleSubmit, handleGoogleSignIn, error: error || fieldError, loading, rememberSession, setRememberSession, showPassword, setShowPassword })}
+                <ProfileSelectionDialog {...dialogProps} />
+            </>
+        );
+    }
     return (
-        <div className={`login-container su-auth-login ${availableRoles.length > 0 ? 'is-selecting-persona' : ''} ${loading ? 'is-loading' : ''}`}>
+        <div className={`login-container su-auth-login ${loading ? 'is-loading' : ''}`}>
             {loading && (
                 <div className="login-loading-overlay">
                     <svg className="su-spinner overlay-spinner" viewBox="0 0 50 50">
@@ -144,73 +167,7 @@ const Login = ({ renderView } = {}) => {
                 </div>
             )}
 
-            {availableRoles.length > 0 && (
-                <div className={`persona-selection-wrapper ${isTransitioning ? 'transition-active' : ''}`}>
-                    <h2 className={`persona-title-main ${isTransitioning ? 'faded' : ''}`}>
-                        {t('login.persona.title')}
-                    </h2>
-                    <div className="persona-grid">
-                        {availableRoles.map((roleObj, index) => {
-                            let label = roleObj.role;
-                            let icon = null;
-
-                            if (roleObj.role === 'Trainer') {
-                                label = t('login.role.trainer');
-                                icon = (
-                                    <svg viewBox="0 0 24 24" width="60" height="60" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="persona-icon-svg">
-                                        <path d="M18 10h3v4h-3M3 10h3v4H3M6 8h4v8H6M14 8h4v8h-4M10 12h4"/>
-                                    </svg>
-                                );
-                            } else if (roleObj.role === 'GymOwner') {
-                                label = t('login.role.gym');
-                                icon = (
-                                    <svg viewBox="0 0 24 24" width="60" height="60" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="persona-icon-svg">
-                                        <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
-                                        <path d="M9 22v-4h6v4" />
-                                        <path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01" />
-                                    </svg>
-                                );
-                            } else {
-                                label = roleObj.role === 'IndependentClient' ? t('login.role.independent') : t('login.role.client');
-                                icon = (
-                                    <svg viewBox="0 0 24 24" width="60" height="60" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" className="persona-icon-svg">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                                        <circle cx="12" cy="7" r="4" />
-                                    </svg>
-                                );
-                            }
-
-                            const n = String(index + 1).padStart(2, '0');
-
-    return (
-                                <button
-                                    type="button"
-                                    className={`persona-card ${isTransitioning && selectedRoleIndex === index ? 'selected' : ''} ${isTransitioning && selectedRoleIndex !== index ? 'faded' : ''}`}
-                                    key={index}
-                                    onClick={() => handlePersonaSelect(roleObj, index)}
-                                >
-                                    <span className="persona-index">{n}</span>
-                                    <span className="persona-name">{label}</span>
-                                    <div className="persona-avatar">
-                                        {icon}
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    <button
-                        className={`persona-cancel-btn ${isTransitioning ? 'faded' : ''}`}
-                        onClick={async () => {
-                            setAvailableRoles([]);
-                            setTempUser(null);
-                            await signOut();
-                        }}
-                    >
-                        {t('login.persona.back')}
-                    </button>
-                </div>
-            )}
+            <ProfileSelectionDialog {...dialogProps} />
 
             <header className="su-auth-header">
                 <Link to="/" className="su-auth-logo">

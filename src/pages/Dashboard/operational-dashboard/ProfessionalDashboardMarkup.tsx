@@ -1,5 +1,7 @@
 import type { ChangeEvent, ReactElement } from 'react';
 import type { DashboardClientRow, StoredMessage } from './types';
+import ActivityRings from './athlete/ActivityRings';
+import { proCopy } from './athlete/proCopy';
 
 export type ProfessionalDashboardState = {
   userName: string;
@@ -24,7 +26,12 @@ export type ProfessionalDashboardState = {
   onOpenClients: () => void;
 };
 
-const filterLabels = ['Todos', 'Atrasados', 'Revisão'] as const;
+/** Filter keys stay in Portuguese: the container compares against them. */
+const FILTERS = [
+  ['Todos', 'all'],
+  ['Atrasados', 'late'],
+  ['Revisão', 'review'],
+] as const;
 
 function filterCount(label: string, clients: DashboardClientRow[], pending: number): number {
   if (label === 'Todos') return clients.length;
@@ -32,294 +39,185 @@ function filterCount(label: string, clients: DashboardClientRow[], pending: numb
   return pending;
 }
 
+const initials = (name?: string) =>
+  (name || '?').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]?.toUpperCase()).join('') || '?';
+
 export function ProfessionalDashboardMarkup({ state }: { state: ProfessionalDashboardState }): ReactElement {
   const {
-    userName,
-    query,
-    onQueryChange,
-    filter,
-    onFilterChange,
-    clients,
-    filtered,
-    loadError,
-    todayCount,
-    pending,
-    adherence,
-    feedback,
-    appointments,
-    language,
-    tr,
-    onOpenClient,
-    onOpenMessages,
-    onEnrollClient,
-    onNewWorkout,
-    onOpenClients,
+    userName, query, onQueryChange, filter, onFilterChange, clients, filtered, loadError, todayCount, pending,
+    adherence, feedback, appointments, language, onOpenClient, onOpenMessages, onEnrollClient, onNewWorkout, onOpenClients,
   } = state;
+  const c = proCopy(language);
 
-  const displayed = filtered.slice(0, 4);
-  const appointmentDateLabel = new Date().toLocaleDateString(language, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  });
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? c.morning : hour < 18 ? c.afternoon : c.evening;
+  const firstName = (userName || '').trim().split(/\s+/)[0];
+  const dateLabel = now.toLocaleDateString(language, { weekday: 'long', day: 'numeric', month: 'long' });
+
+  const compliance = (client: DashboardClientRow) => Number(client.compliance || 0);
+  const late = clients.filter(client => compliance(client) < 50).length;
+  const watch = clients.filter(client => compliance(client) >= 50 && compliance(client) < 75).length;
+  const onTrack = clients.length - late - watch;
+  const share = (count: number) => (clients.length ? (count / clients.length) * 100 : 0);
+
+  const displayed = filtered.slice(0, 6);
+  const time = (iso?: string) => (iso ? new Date(iso).toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' }) : '');
 
   return (
-    <div className="sn-space flex min-h-screen flex-col flex-1 min-w-0" data-shell-content style={{ marginLeft: 256 }}>
-      <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b border-brand-border bg-brand-bg/95 px-8 backdrop-blur">
-        <nav className="flex shrink-0 items-center gap-2 text-xs font-medium text-brand-muted">
-          <span>Treinadores</span>
-          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <span>{userName}</span>
-          <span className="material-symbols-outlined text-[14px]">chevron_right</span>
-          <span className="font-semibold text-brand-text">Visão Operacional</span>
-        </nav>
-        <div className="mx-4 max-w-lg flex-1">
-          <div className="relative flex items-center">
-            <span className="material-symbols-outlined pointer-events-none absolute left-3 text-lg text-brand-muted">search</span>
-            <input
-              className="w-full rounded-md border border-brand-border bg-brand-surface py-1.5 pl-9 pr-12 text-xs text-brand-text placeholder-brand-muted transition-colors focus:border-brand-terracotta focus:outline-none"
-              placeholder="Buscar aluno por nome, CPF ou objetivo..."
-              type="search"
-              value={query}
-              onChange={onQueryChange}
-            />
-          </div>
-        </div>
-        <div className="flex shrink-0 items-center gap-2.5">
-          <button
-            type="button"
-            className="flex items-center gap-1.5 rounded-md border border-brand-border bg-brand-surface px-3 py-1.5 text-xs font-semibold text-brand-text transition-colors hover:bg-brand-elevated"
-            onClick={onEnrollClient}
-          >
-            <span className="material-symbols-outlined text-base">person_add</span>
-            <span>+ Matricular Aluno</span>
-          </button>
-          <button
-            type="button"
-            className="flex items-center gap-1.5 rounded-md bg-brand-terracotta px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-brand-terracottaHover"
-            onClick={onNewWorkout}
-          >
-            <span className="material-symbols-outlined text-base">add</span>
-            <span>+ Novo Treino</span>
-          </button>
-        </div>
-      </header>
+    <div className="ah" data-shell-content style={{ marginLeft: 256 }}>
+      <main className="ah-page">
+        {loadError ? <p role="alert" className="ah-alert">{loadError}</p> : null}
 
-      <main className="mx-auto w-full max-w-7xl flex-1 space-y-6 p-8">
-        {loadError ? <p role="alert">{loadError}</p> : null}
-
-        <div className="flex flex-col justify-between gap-2 border-b border-brand-border/60 pb-1 sm:flex-row sm:items-baseline" data-tour="pro-header">
+        <header className="ah-header ah-header-split" data-tour="pro-header">
           <div>
-            <h1 className="font-condensed text-3xl font-bold uppercase tracking-wide text-brand-text">Painel do Treinador</h1>
-            <p className="mt-0.5 text-xs text-brand-secondary">
-              {clients.length} alunos ativos • {pending} revisões pendentes • {feedback.length} feedbacks aguardando revisão
-            </p>
+            <p className="ah-date">{dateLabel}</p>
+            <h1>{greeting}{firstName ? `, ${firstName}` : ''}</h1>
+            <p className="ah-lede">{c.summary(clients.length, pending)}</p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-brand-muted">
-            <span className="inline-block h-2 w-2 rounded-full bg-brand-olive" />
-            <span>Sincronização em tempo real ativa</span>
+          <div className="ah-actions">
+            <button type="button" className="ah-soft-cta" onClick={onEnrollClient}>
+              <span className="material-symbols-outlined" aria-hidden="true">person_add</span>
+              {c.enroll}
+            </button>
+            <button type="button" className="ah-solid-cta" onClick={onNewWorkout}>
+              <span className="material-symbols-outlined" aria-hidden="true">add</span>
+              {c.newWorkout}
+            </button>
           </div>
-        </div>
+        </header>
 
-        <section className="grid grid-cols-1 divide-y divide-brand-border rounded-lg border border-brand-border bg-brand-surface sm:grid-cols-2 lg:grid-cols-4 sm:divide-x sm:divide-y-0" data-tour="pro-metrics">
-          <div className="flex flex-col justify-between p-4">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">Treinamento Hoje</span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-condensed text-2xl font-bold tracking-wide text-brand-text">{todayCount} alunos</span>
-              <span className="text-[11px] font-medium text-brand-olive">{todayCount} concluídos</span>
-            </div>
-            <p className="mt-1 text-xs text-brand-secondary">Sessões registradas hoje</p>
-          </div>
-          <div className="flex flex-col justify-between p-4">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">Revisões Pendentes</span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-condensed text-2xl font-bold tracking-wide text-brand-ochre">{pending} fichas</span>
-            </div>
-            <p className="mt-1 text-xs text-brand-secondary">Necessitam ajuste de ciclo ou volume</p>
-          </div>
-          <div className="flex flex-col justify-between p-4">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">Adesão Semanal</span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-condensed text-2xl font-bold tracking-wide text-brand-olive">{adherence}%</span>
-            </div>
-            <p className="mt-1 text-xs text-brand-secondary">Aderência registrada pelos alunos</p>
-          </div>
-          <div className="flex flex-col justify-between p-4">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-muted">Próxima Sessão</span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-condensed text-2xl font-bold tracking-wide text-brand-text">
-                {appointments[0]
-                  ? new Date(appointments[0].nextSessionAt!).toLocaleTimeString(language, {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })
-                  : '—'}
-              </span>
-              <span className="text-[11px] font-semibold text-brand-terracotta">{appointments[0]?.name || 'Sem agendamento'}</span>
-            </div>
-            <p className="mt-1 text-xs text-brand-secondary">Próximo atendimento</p>
-          </div>
-        </section>
+        <div className="ah-grid">
+          <section className="ah-card ah-pro-adherence" data-tour="pro-metrics" aria-label={c.adherence}>
+            <h3 className="ah-card-title">{c.adherence}</h3>
+            {clients.length ? (
+              <div className="ah-summary-body">
+                <div className="ah-rings-wrap ah-center">
+                  <ActivityRings
+                    size={150}
+                    stroke={16}
+                    summary={`${c.adherence}: ${adherence}%`}
+                    rings={[{ label: c.adherence, pct: adherence, color: 'var(--primary)' }]}
+                  />
+                  <span className="ah-center-value">{adherence}<small>%</small></span>
+                </div>
+                <dl className="ah-legend">
+                  <div style={{ ['--dot' as string]: 'var(--accent)' }}><dt>{c.onTrack}</dt><dd>{onTrack}</dd></div>
+                  <div style={{ ['--dot' as string]: 'var(--warning)' }}><dt>{c.watch}</dt><dd>{watch}</dd></div>
+                  <div style={{ ['--dot' as string]: 'var(--error)' }}><dt>{c.late}</dt><dd>{late}</dd></div>
+                </dl>
+                <div className="ah-split" aria-hidden="true">
+                  <i style={{ width: `${share(onTrack)}%`, background: 'var(--accent)' }} />
+                  <i style={{ width: `${share(watch)}%`, background: 'var(--warning)' }} />
+                  <i style={{ width: `${share(late)}%`, background: 'var(--error)' }} />
+                </div>
+              </div>
+            ) : (
+              <p className="ah-empty">{c.noData}</p>
+            )}
+          </section>
 
-        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
-          <section className="flex flex-col rounded-lg border border-brand-border bg-brand-surface lg:col-span-8" data-tour="pro-clients">
-            <div className="flex flex-col justify-between gap-3 border-b border-brand-border p-4 sm:flex-row sm:items-center">
+          <section className="ah-card ah-pro-today" aria-label={c.today}>
+            <h3 className="ah-card-title">{c.today}</h3>
+            <div className="ah-duo">
               <div>
-                <h2 className="text-sm font-bold uppercase tracking-wider text-brand-text">Carteira de Alunos &amp; Status Semanal</h2>
-                <p className="mt-0.5 text-xs text-brand-secondary">Visão rápida de execução, consistência e ciclo vigente</p>
+                <span className="ah-duo-value">{todayCount}</span>
+                <span className="ah-duo-label">{c.trained}</span>
               </div>
-              <div className="flex items-center gap-1 rounded border border-brand-border bg-brand-bg p-0.5">
-                {filterLabels.map(label => {
-                  const count = filterCount(label, clients, pending);
-                  const active = filter === label;
-                  return (
-                    <button
-                      key={label}
-                      type="button"
-                      className={`rounded px-2.5 py-1 text-xs font-medium ${active ? 'bg-brand-surface font-semibold text-brand-text' : 'text-brand-muted hover:text-brand-text'}`}
-                      aria-pressed={active}
-                      onClick={() => onFilterChange(label)}
-                    >
-                      {tr(label)} ({count})
-                    </button>
-                  );
-                })}
+              <div>
+                <span className="ah-duo-value">{pending}</span>
+                <span className="ah-duo-label">{c.review}</span>
               </div>
-            </div>
-            <div data-table-scroll className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-brand-border bg-brand-bg/60 text-[10px] font-semibold uppercase tracking-wider text-brand-muted">
-                    <th className="px-4 py-2.5 font-semibold">Aluno &amp; Objetivo</th>
-                    <th className="px-3 py-2.5 font-semibold">Último Treino</th>
-                    <th className="px-3 py-2.5 font-semibold">Freq. Semanal</th>
-                    <th className="px-3 py-2.5 font-semibold">Periodização</th>
-                    <th className="px-4 py-2.5 text-right font-semibold">Ações Rápidas</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-brand-border/70">
-                  {displayed.length ? (
-                    displayed.map(client => (
-                      <tr key={client.id} className="transition-colors hover:bg-brand-elevated/50">
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <span
-                              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-brand-border bg-brand-elevated text-xs font-bold"
-                              style={{ display: 'grid', placeItems: 'center', background: '#29211d' }}
-                            >
-                              {(client.name || '?').slice(0, 2)}
-                            </span>
-                            <div className="min-w-0">
-                              <p className="truncate font-semibold text-brand-text">{client.name}</p>
-                              <p className="truncate text-[11px] text-brand-muted">
-                                {client.goal || client.objective || 'Objetivo não informado'}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-3 py-3 text-brand-secondary">
-                          <span className="block font-medium text-brand-text">{client.lastCheckin || 'Sem registro'}</span>
-                          <span className="text-[11px] text-brand-olive">{client.activePlan || 'Sem ficha'}</span>
-                        </td>
-                        <td className="px-3 py-3">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-brand-olive">{client.compliance || 0}%</span>
-                            <div className="h-1.5 w-14 overflow-hidden rounded-full bg-brand-bg">
-                              <div
-                                className="h-full rounded-full bg-brand-olive"
-                                style={{ width: `${Math.min(100, client.compliance || 0)}%` }}
-                              />
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-3 py-3">
-                          <span className="block font-medium text-brand-text">{client.activePlan || 'Sem periodização'}</span>
-                          <span className="text-[11px] text-brand-muted">{client.phase || '—'}</span>
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <button
-                            type="button"
-                            className="rounded border border-brand-border bg-brand-elevated px-2.5 py-1 text-xs font-medium text-brand-text transition-colors hover:bg-brand-border"
-                            onClick={() => onOpenClient(client.id)}
-                          >
-                            Abrir Ficha
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="px-4 py-8 text-brand-muted">Nenhum aluno encontrado.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex items-center justify-between border-t border-brand-border bg-brand-bg/40 p-3 text-xs text-brand-muted">
-              <span>
-                {tr('Exibindo')} {Math.min(4, filtered.length)} / {filtered.length}{' '}
-                {tr('alunos em acompanhamento contínuo')}
-              </span>
-              <button type="button" className="flex items-center gap-1 font-semibold text-brand-terracotta hover:underline" onClick={onOpenClients}>
-                <span>Ver listagem completa da carteira</span>
-                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-              </button>
             </div>
           </section>
 
-          <div className="flex flex-col gap-6 lg:col-span-4">
-            <section className="flex flex-col rounded-lg border border-brand-border bg-brand-surface">
-              <div className="flex items-center justify-between border-b border-brand-border p-4">
-                <div>
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-brand-text">Agenda de Hoje</h3>
-                  <p className="mt-0.5 text-xs text-brand-muted">{appointmentDateLabel}</p>
-                </div>
-                <span className="rounded border border-brand-border bg-brand-elevated px-2 py-0.5 text-xs font-semibold text-brand-secondary">
-                  {appointments.length} sessões
-                </span>
-              </div>
-              <div className="divide-y divide-brand-border">
-                {appointments.length ? (
-                  appointments.map(client => (
-                    <div key={client.id} className="border-b border-brand-border p-4">
-                      <strong className="text-xs text-brand-text">{client.name}</strong>
-                      <p className="text-xs text-brand-secondary">
-                        {new Date(client.nextSessionAt!).toLocaleTimeString(language, {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}{' '}
-                        • {client.activePlan}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="p-4 text-xs text-brand-muted">Nenhum atendimento agendado para hoje.</p>
-                )}
-              </div>
-            </section>
+          <section className="ah-card ah-pro-agenda" aria-label={c.agenda}>
+            <div className="ah-card-head">
+              <h3 className="ah-card-title">{c.agenda}</h3>
+              <p className="ah-card-sub">{appointments.length}</p>
+            </div>
+            {appointments.length ? (
+              <ul className="ah-list">
+                {appointments.slice(0, 4).map(client => (
+                  <li key={client.id}>
+                    <span className="ah-time">{time(client.nextSessionAt)}</span>
+                    <span className="ah-list-copy">
+                      <strong>{client.name}</strong>
+                      <small>{client.activePlan || c.noPlan}</small>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="ah-quote is-empty">{c.agendaEmpty}</p>
+            )}
+          </section>
 
-            <section className="flex flex-col rounded-lg border border-brand-border bg-brand-surface">
-              <div className="border-b border-brand-border p-4">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-brand-text">Feedbacks em Aberto</h3>
-                <p className="mt-0.5 text-xs text-brand-muted">{feedback.length} pendentes</p>
+          <section className="ah-card ah-pro-clients" data-tour="pro-clients" aria-label={c.clients}>
+            <div className="ah-card-head ah-wrap">
+              <h3 className="ah-card-title">{c.clients}</h3>
+              <div className="ah-segmented" role="group">
+                {FILTERS.map(([key, id]) => (
+                  <button key={key} type="button" aria-pressed={filter === key} onClick={() => onFilterChange(key)}>
+                    {c.filters[id]} <small>{filterCount(key, clients, pending)}</small>
+                  </button>
+                ))}
               </div>
-              <div className="divide-y divide-brand-border">
-                {feedback.length ? (
-                  feedback.slice(-2).map(message => (
-                    <div key={message.id} className="space-y-2.5 p-4">
-                      <strong className="text-xs text-brand-text">{message.clientName}</strong>
-                      <p className="rounded border border-brand-border bg-brand-bg p-2.5 text-xs text-brand-secondary">{message.text}</p>
-                      <button type="button" className="text-xs font-semibold text-brand-terracotta" onClick={onOpenMessages}>
-                        Responder Aluno
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <p className="p-4 text-xs text-brand-muted">Nenhum feedback pendente.</p>
-                )}
-              </div>
-            </section>
-          </div>
+            </div>
+            <label className="ah-search">
+              <span className="material-symbols-outlined" aria-hidden="true">search</span>
+              <input type="search" placeholder={c.search} aria-label={c.search} value={query} onChange={onQueryChange} />
+            </label>
+            {displayed.length ? (
+              <ul className="ah-rows">
+                {displayed.map(client => (
+                  <li key={client.id}>
+                    <button type="button" onClick={() => onOpenClient(client.id)} aria-label={`${c.open}: ${client.name}`}>
+                      <span className="ah-avatar" aria-hidden="true">{initials(client.name)}</span>
+                      <span className="ah-list-copy">
+                        <strong>{client.name}</strong>
+                        <small>{client.goal || client.objective || c.goalMissing}</small>
+                      </span>
+                      <span className="ah-row-plan">{client.activePlan || c.noPlan}</span>
+                      <span className="ah-meter" aria-label={`${compliance(client)}%`}>
+                        <span className="ah-bar is-thin"><i style={{ width: `${Math.min(100, compliance(client))}%`, background: compliance(client) < 50 ? 'var(--error)' : compliance(client) < 75 ? 'var(--warning)' : 'var(--accent)' }} /></span>
+                        <b>{compliance(client)}%</b>
+                      </span>
+                      <span className="material-symbols-outlined ah-chevron" aria-hidden="true">chevron_right</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="ah-empty">{c.none}</p>
+            )}
+            <div className="ah-foot">
+              <span>{c.showing(displayed.length, filtered.length)}</span>
+              <button type="button" className="ah-link" onClick={onOpenClients}>{c.seeAll}</button>
+            </div>
+          </section>
+
+          <section className="ah-card ah-pro-feedback" aria-label={c.feedback}>
+            <div className="ah-card-head">
+              <h3 className="ah-card-title">{c.feedback}</h3>
+              <p className="ah-card-sub">{feedback.length}</p>
+            </div>
+            {feedback.length ? (
+              <ul className="ah-list is-stacked">
+                {feedback.slice(-3).map(message => (
+                  <li key={message.id}>
+                    <span className="ah-list-copy">
+                      <strong>{message.clientName}</strong>
+                      <small className="ah-clamp">{message.text}</small>
+                    </span>
+                    <button type="button" className="ah-link" onClick={onOpenMessages}>{c.reply}</button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="ah-quote is-empty">{c.feedbackEmpty}</p>
+            )}
+          </section>
         </div>
       </main>
     </div>

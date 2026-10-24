@@ -1,0 +1,24 @@
+.hs{min-height:0;margin-top:56px;padding:28px;border-radius:40px;border:1px solid var(--border-color);background:color-mix(in oklab,var(--bg-surface-high) 55%,var(--bg-main));box-shadow:0 40px 90px rgb(0 0 0/.28)}
+.hs .ah-grid{gap:16px}
+.hs .ah-hero{grid-column:span 7;min-height:300px}
+.hs .ah-summary{grid-column:span 5}
+.hs .ah-week{grid-column:span 5}
+.hs .ah-volume{grid-column:span 7}
+.hs .ah-summary-body{flex-direction:row;align-items:center;gap:24px}
+@media(max-width:900px){.hs{padding:14px;border-radius:28px;margin-top:36px}.hs .ah-hero,.hs .ah-summary,.hs .ah-week,.hs .ah-volume{grid-column:span 12}.hs .ah-summary-body{flex-direction:column}}
+
+.lp-cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:0 28px;border-radius:16px;background:var(--primary-solid);color:#fff8f5;font:600 17px/1 'Source Sans 3',sans-serif;letter-spacing:-.01em;text-decoration:none;transition:background-color .14s,transform .14s cubic-bezier(.16,1,.3,1)}
+.lp-cta:hover{background:var(--primary-solid-hover)}
+.lp-cta:active{transform:scale(.97)}
+.lp-cta-soft{background:var(--bg-surface-high);color:var(--text-main)}
+.lp-cta-soft:hover{background:var(--bg-surface-highest)}
+
+/* Apple HIG: no tiny all-caps mono eyebrows; keep sentence case sans labels. */
+.shell-body .font-mono.uppercase,.shell-body .font-mono.tracking-widest{font-family:'Source Sans 3',sans-serif;text-transform:none;letter-spacing:0;font-size:14px;font-weight:600}
+.shell-body h1.uppercase,.shell-body h2.uppercase,.shell-body h3.uppercase{text-transform:none}
+
+/* Section grids become soft cards instead of ruled columns. */
+#pilares .grid,#manifesto .grid{gap:16px!important;border:0!important}
+#pilares .grid>div,#manifesto .grid>div{padding:28px!important;border:1px solid var(--border-color)!important;border-radius:28px;background:var(--bg-card);box-shadow:var(--shadow-soft)}
+#pilares .grid>div ul li{color:var(--text-muted)}
+@media(max-width:767px){#pilares .grid>div,#manifesto .grid>div{padding:22px!important;border-radius:24px}}

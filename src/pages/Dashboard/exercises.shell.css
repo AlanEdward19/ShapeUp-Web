@@ -949,7 +949,7 @@ select {
   white-space: nowrap;
 }
 .rounded {
-  border-radius: 0.25rem;
+  border-radius:12px;
 }
 .rounded-full {
   border-radius: 9999px;
@@ -1210,7 +1210,7 @@ select {
   line-height: 1rem;
 }
 .font-black {
-  font-weight: 900;
+  font-weight: 700;
 }
 .font-bold {
   font-weight: 700;
@@ -1225,7 +1225,7 @@ select {
   font-weight: 600;
 }
 .uppercase {
-  text-transform: uppercase;
+  text-transform:none;
 }
 .leading-relaxed {
   line-height: 1.625;
@@ -1234,7 +1234,7 @@ select {
   line-height: 1.25;
 }
 .tracking-wider {
-  letter-spacing: 0.05em;
+  letter-spacing:0;
 }
 .text-border-subtle {
   --tw-text-opacity: 1;
@@ -1303,7 +1303,7 @@ select {
 }
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: var(--bg-main); }
-    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius:12px; }
     ::-webkit-scrollbar-thumb:hover { background: #4D3C34; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

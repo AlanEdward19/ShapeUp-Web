@@ -28,9 +28,9 @@
 .su-billing-modal .su-modal-header h2 {
     font-family: var(--font-display);
     font-size: 1.35rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .su-billing-for {
@@ -41,17 +41,17 @@
 .su-billing-for-label {
     font-family: var(--font-display);
     font-size: 0.7rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     color: var(--text-muted);
 }
 
 .su-billing-for-name {
     font-family: var(--font-display);
     font-size: 1.2rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: none;
 }
 
 .su-billing-type-selector {
@@ -76,8 +76,8 @@
     color: var(--text-muted);
     font-family: var(--font-display);
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    letter-spacing: 0;
+    text-transform: none;
     cursor: pointer;
 }
 
